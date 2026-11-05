@@ -10,6 +10,12 @@
 			"import": "./dist/index.mjs",
 			"require": "./dist/index.cjs"
 		},
+		"./compile": {
+			"torpor:source": "./src/compile.ts",
+			"types": "./dist/compile.d.mts",
+			"import": "./dist/compile.mjs",
+			"require": "./dist/compile.cjs"
+		},
 		"./server": {
 			"torpor:source": "./src/server.ts",
 			"types": "./dist/server.d.mts",
@@ -25,7 +31,7 @@
 	},
 	"scripts": {
 		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
-		"build": "tsgo --noEmit && vp pack",
+		"build": "node scripts/generateVersion.mjs && tsgo --noEmit && vp pack",
 		"build:watch": "vp pack --watch",
 		"test": "vp test",
 		"format": "vp fmt ."

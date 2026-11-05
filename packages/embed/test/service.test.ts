@@ -10,6 +10,11 @@ export default function Counter($props: { start?: number }) {
 	@render {
 		<p>Count: {count.value}</p>
 	}
+	@style {
+		p {
+			color: rebeccapurple;
+		}
+	}
 }
 `;
 
@@ -58,9 +63,12 @@ async function withServer(
 test("renders over HTTP via the service", async () => {
 	await withServer({}, async (server) => {
 		const render = createServiceRenderer({ url: server.url });
-		const { body, head } = await render(artifact(), { props: { start: 6 } });
+		const { body, head, styles } = await render(artifact(), { props: { start: 6 } });
 		expect(body).toContain("Count: 6");
-		expect(head).toBe("");
+		// The embed's scoped styles ship in `head` -- place it in the page head
+		expect(head).toContain("rebeccapurple");
+		// ...and the raw styles are also available for hosts that compose them
+		expect(styles.some((s) => s.style.includes("rebeccapurple"))).toBe(true);
 	});
 });
 

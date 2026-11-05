@@ -75,6 +75,6 @@ export default function createServiceRenderer(options: ServiceRendererOptions): 
 				`Render service error (${response.status}): ${payload.error ?? response.statusText}`,
 			);
 		}
-		return { body: payload.body ?? "", head: payload.head ?? "" };
+		return { body: payload.body ?? "", head: payload.head ?? "", styles: payload.styles ?? [] };
 	};
 }

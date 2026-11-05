@@ -39,6 +39,12 @@ export default interface EmbedOptions {
 	styles?: boolean;
 
 	/**
+	 * A CSP nonce for the injected `<style>` element, when the host's
+	 * policy uses style-src nonces.
+	 */
+	nonce?: string;
+
+	/**
 	 * Cache the evaluated component on the artifact object, so mounting the
 	 * same artifact many times (a feed of posts, a dashboard of sections)
 	 * evaluates its code once. Keyed by artifact object identity, not
@@ -46,4 +52,14 @@ export default interface EmbedOptions {
 	 * Default false.
 	 */
 	cache?: boolean;
+
+	/**
+	 * Host modules the embed may import, keyed by the specifier used in the
+	 * embed's source: `{ "@example/ui": uiModule }`. The loader flattens
+	 * each module's keys into the identifiers the compiled code can
+	 * reference, and fails loudly (naming the missing bindings) if the
+	 * artifact imports something not provided. Scope values cannot cross
+	 * the iframe boundary -- sandboxed frames use slots and the bridge.
+	 */
+	scope?: Record<string, unknown>;
 }

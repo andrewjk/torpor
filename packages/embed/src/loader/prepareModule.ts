@@ -65,7 +65,7 @@ export async function prepareModule(
 			`Embed "${artifact.id}" does not contain a default export component. The artifact may be corrupt -- recompile it from its source.`,
 		);
 	}
-	if (options?.styles !== false) injectStyles(artifact);
+	if (options?.styles !== false) injectStyles(artifact, options?.nonce);
 	return { component };
 }
 

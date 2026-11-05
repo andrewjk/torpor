@@ -133,3 +133,13 @@ test("hydrates server-rendered markup", async () => {
 	handle.unmount();
 	expect(target.innerHTML).toBe("");
 });
+
+test("injectStyles honors the nonce option", () => {
+	const target = document.createElement("div");
+	document.body.appendChild(target);
+
+	const handle = mountEmbed(target, artifact(), {}, { nonce: "style-nonce-1" });
+	const style = document.querySelector('style[data-torpor-embed="counter-test"]');
+	expect(style?.getAttribute("nonce")).toBe("style-nonce-1");
+	handle.unmount();
+});

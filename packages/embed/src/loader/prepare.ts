@@ -34,15 +34,15 @@ export function prepare(artifact: EmbedArtifact, options?: EmbedOptions): unknow
 	if (options?.cache) {
 		const cached = componentCache.get(artifact);
 		if (cached === undefined) {
-			component = loadComponent(artifact);
+			component = loadComponent(artifact, options?.scope);
 			componentCache.set(artifact, component);
 		} else {
 			component = cached;
 		}
 	} else {
-		component = loadComponent(artifact);
+		component = loadComponent(artifact, options?.scope);
 	}
-	if (options?.styles !== false) injectStyles(artifact);
+	if (options?.styles !== false) injectStyles(artifact, options?.nonce);
 	return component;
 }
 

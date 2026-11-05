@@ -5,6 +5,7 @@ import compileEmbed from "../src/server/compileEmbed";
 import frameDocument, { safeJson } from "../src/frame/frameDocument";
 import frameScript from "../src/frame/frameScript";
 import mountEmbedFrame from "../src/frame/mountEmbedFrame";
+import listenEmbedFrame from "../src/frame/listenEmbedFrame";
 import type EmbedArtifact from "../src/types/EmbedArtifact";
 
 const SOURCE = `
@@ -236,6 +237,111 @@ test("unmount stops listening and clears the frame", () => {
 
 	expect(events).toEqual([]);
 	expect(iframe.hasAttribute("srcdoc")).toBe(false);
+	iframe.remove();
+});
+
+test("host css is injected before the artifact's styles", () => {
+	const iframe = document.createElement("iframe");
+	document.body.appendChild(iframe);
+
+	mountEmbedFrame(
+		iframe,
+		artifact(),
+		{},
+		{
+			runtime: RUNTIME,
+			css: [":root { --accent: red; }", "body { font-family: sans-serif; }"],
+		},
+	);
+
+	const doc = iframe.srcdoc;
+	expect(doc).toContain(":root { --accent: red; }");
+	expect(doc).toContain("body { font-family: sans-serif; }");
+	// Host theme first, artifact styles after (so the embed can override)
+	expect(doc.indexOf("--accent")).toBeLessThan(doc.indexOf("Count:"));
+	iframe.remove();
+});
+
+test("rejects scope: host components cannot cross the frame boundary", () => {
+	const iframe = document.createElement("iframe");
+	document.body.appendChild(iframe);
+
+	expect(() =>
+		mountEmbedFrame(iframe, artifact(), {}, {
+			runtime: RUNTIME,
+			scope: { "@host/ui": {} },
+		} as any),
+	).toThrow(/cannot cross the frame boundary/);
+
+	iframe.remove();
+});
+
+test("frameDocument applies the CSP nonce to script and style tags", () => {
+	const doc = frameDocument({
+		artifact: artifact(),
+		props: {},
+		runtime: RUNTIME,
+		nonce: "abc123",
+	});
+
+	const nonceCount = doc.split('nonce="abc123"').length - 1;
+	// runtime script + artifact script + bootstrap + mount call (this
+	// artifact has no styles, so no style tag)
+	expect(nonceCount).toBe(4);
+	// The src variant gets the nonce too
+	const srcDoc = frameDocument({
+		artifact: artifact(),
+		props: {},
+		runtimeUrl: "/r.js",
+		nonce: "abc123",
+	});
+	expect(srcDoc).toMatch(/<script nonce="abc123" src="\/r\.js"><\/script>/);
+});
+
+test("listenEmbedFrame works standalone for URL-served frames", async () => {
+	// A host that serves the frame document from its own URL sets iframe.src
+	// itself and pairs it with the listener
+	const iframe = document.createElement("iframe");
+	iframe.src = "https://author.example/apps/poll/frame";
+	document.body.appendChild(iframe);
+
+	const posted: any[] = [];
+	iframe.contentWindow!.postMessage = (message: any) => posted.push(message);
+	const events: { type: string; artifactId: string }[] = [];
+	const calls: string[] = [];
+
+	const listener = listenEmbedFrame(iframe, {
+		artifactId: "frame-counter",
+		bridge: createBridge({
+			onEvent: (type, _detail, source) => events.push({ type, artifactId: source.artifactId }),
+			invoke: async (method) => {
+				calls.push(method);
+				return "polled";
+			},
+		}),
+		maxHeight: 200,
+	});
+
+	window.dispatchEvent(
+		frameEvent(iframe, { channel: "torpor-embed", kind: "event", type: "voted" }),
+	);
+	window.dispatchEvent(
+		frameEvent(iframe, { channel: "torpor-embed", kind: "invoke", call: 1, method: "submit" }),
+	);
+	window.dispatchEvent(frameEvent(iframe, { channel: "torpor-embed", kind: "height", value: 900 }));
+	await new Promise((resolve) => setTimeout(resolve, 10));
+
+	expect(events).toEqual([{ type: "voted", artifactId: "frame-counter" }]);
+	expect(calls).toEqual(["submit"]);
+	expect(posted[0]).toMatchObject({ kind: "invoke-result", call: 1, value: "polled" });
+	// maxHeight clamps the frame's reported height
+	expect(iframe.style.height).toBe("200px");
+
+	listener.dispose();
+	window.dispatchEvent(
+		frameEvent(iframe, { channel: "torpor-embed", kind: "event", type: "late" }),
+	);
+	expect(events.length).toBe(1);
 	iframe.remove();
 });
 

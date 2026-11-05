@@ -25,7 +25,7 @@ export interface RenderInWorkerOptions {
 export default async function renderInWorker(
 	artifact: EmbedArtifact,
 	options?: RenderInWorkerOptions,
-): Promise<EmbedRenderResult> {
+): Promise<{ body: string; head: string }> {
 	const timeout = options?.timeout ?? 5000;
 	const worker = new Worker(resolveWorkerPath(), {
 		// The .mjs extension makes this an ES module worker

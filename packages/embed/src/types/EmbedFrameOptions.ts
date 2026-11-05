@@ -31,7 +31,9 @@ export default interface EmbedFrameOptions {
 	/**
 	 * The iframe's sandbox attribute. Defaults to "allow-scripts", which
 	 * gives the frame an opaque origin: it can run the embed's code but
-	 * cannot touch the host page's DOM, storage, or cookies.
+	 * cannot touch the host page's DOM, storage, or cookies. Form-bearing
+	 * embeds (polls, surveys) need "allow-scripts allow-forms" -- without
+	 * it, native form posts silently no-op inside the frame.
 	 */
 	sandbox?: string;
 
@@ -39,4 +41,25 @@ export default interface EmbedFrameOptions {
 	 * The iframe's title, for accessibility.
 	 */
 	title?: string;
+
+	/**
+	 * Clamps the height the host applies from the frame's height reports,
+	 * so a runaway frame can't grow forever.
+	 */
+	maxHeight?: number;
+
+	/**
+	 * The host's own CSS (theme custom properties, base styles), injected
+	 * into the frame document before the artifact's styles, so a sandboxed
+	 * frame inherits the host's look-and-feel while the embed can still
+	 * override.
+	 */
+	css?: string | string[];
+
+	/**
+	 * A CSP nonce applied to the frame document's `<script>` and `<style>`
+	 * tags, when the host's policy uses nonces. Note srcdoc frames inherit
+	 * the parent page's CSP; URL-served frames set their own headers.
+	 */
+	nonce?: string;
 }

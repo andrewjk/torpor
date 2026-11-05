@@ -1,22 +1,31 @@
 import * as ssr from "@torpor/view/ssr";
 import type { ServerComponent } from "@torpor/view/ssr";
-
+import type EmbedArtifact from "../types/EmbedArtifact";
+import { flattenScope, validateImports, type EmbedScope } from "../loader/scope";
 /**
  * Evaluates an artifact's server code and returns its component.
  *
  * The server build imports from "@torpor/view/ssr"; since evaluation happens
  * in a function scope rather than a module, those imports are stripped and
- * the SSR runtime exports are injected as parameters instead. This keeps a
- * second @torpor/view instance out of play and means the only identifiers
- * the embed code can reference are the SSR runtime and its own -- it cannot
- * resolve new imports at render time.
+ * the SSR runtime exports are injected as parameters instead -- along with
+ * any host modules the embed imports (via `scope`). This keeps a second
+ * @torpor/view instance out of play and means the only identifiers the
+ * embed code can reference are the SSR runtime, the scope, and its own --
+ * it cannot resolve new imports at render time.
  */
-export default function loadServerComponent(artifact: {
-	name: string;
-	server: { code: string };
-}): ServerComponent {
-	const names = Object.keys(ssr);
-	const values = Object.values(ssr);
+export default function loadServerComponent(
+	artifact: {
+		name: string;
+		server: { code: string };
+		imports?: EmbedArtifact["imports"];
+		id: string;
+	},
+	scope?: EmbedScope,
+): ServerComponent {
+	const injected = { ...ssr, ...flattenScope(scope) };
+	validateImports(artifact, injected);
+	const names = Object.keys(injected);
+	const values = Object.values(injected);
 	const code = artifact.server.code
 		.replace("export default ", "")
 		// Sucrase hoists its helpers above the import statements, so don't

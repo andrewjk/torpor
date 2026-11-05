@@ -485,3 +485,14 @@ single-process WASM isolation (QuickJS running the SSR runtime with no Node
 builtins); unverified whether torpor's async SSR (`@await` boundaries,
 promise draining) works there, so it stays on the README roadmap as
 research rather than a built feature.
+
+### Embed edge-safety test is a source grep, not a bundler build
+
+The SAAS_EMBED.md test suggestion asked for a bundler-level check that
+`@torpor/embed/compile` emits no `node:` specifiers into a browser/worker
+bundle. The current test greps the entry's sources for `from "node:"`,
+which catches direct imports but not transitive ones (sucrase and
+@torpor/view/compile are believed worker-safe but unverified by an actual
+build). A stronger check would build the compile entry with Vite for the
+worker runtime (or a miniflare smoke test) and fail on any `node:` specifier
+in the output. Add it when the repo gains a Workers test harness.

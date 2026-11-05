@@ -1,15 +1,8 @@
-import scopeBridge from "../bridge/scopeBridge";
+import frameDocument from "./frameDocument";
+import listenEmbedFrame, { type EmbedFrameListener } from "./listenEmbedFrame";
 import type EmbedArtifact from "../types/EmbedArtifact";
 import type EmbedFrameHandle from "../types/EmbedFrameHandle";
 import type EmbedFrameOptions from "../types/EmbedFrameOptions";
-import frameDocument from "./frameDocument";
-
-const CHANNEL = "torpor-embed";
-
-type FrameMessage =
-	| { channel: string; kind: "event"; type: string; detail?: unknown }
-	| { channel: string; kind: "invoke"; call: number; method: string; payload?: unknown }
-	| { channel: string; kind: "height"; value: number };
 
 /**
  * Mounts an embed artifact into a sandboxed iframe, for authors you don't
@@ -23,7 +16,8 @@ type FrameMessage =
  * load anything else.
  *
  * Invoke payloads and props cross the boundary as structured clone, so they
- * must be serializable data.
+ * must be serializable data. Scope values (host components) are functions
+ * and cannot cross at all -- sandboxed frames use slots and the bridge.
  */
 export default function mountEmbedFrame(
 	iframe: HTMLIFrameElement,
@@ -36,6 +30,11 @@ export default function mountEmbedFrame(
 			'mountEmbedFrame needs exactly one of { runtime } (the bundle source, e.g. import runtime from "@torpor/view/runtime?raw") or { runtimeUrl } (a URL the runtime bundle is served from).',
 		);
 	}
+	if ((options as { scope?: unknown }).scope !== undefined) {
+		throw new Error(
+			"Scope values (host components) are functions and cannot cross the frame boundary. Sandboxed frames use slots and the bridge instead.",
+		);
+	}
 
 	// jsdom doesn't implement iframe.sandbox (DOMTokenList); the attribute works everywhere
 	iframe.setAttribute("sandbox", options.sandbox ?? "allow-scripts");
@@ -45,54 +44,20 @@ export default function mountEmbedFrame(
 		props,
 		runtime: options.runtime,
 		runtimeUrl: options.runtimeUrl,
+		css: options.css,
+		nonce: options.nonce,
 	});
 
-	const bridge = options.bridge
-		? scopeBridge(options.bridge, { artifactId: artifact.id })
-		: undefined;
-
-	function replyToFrame(frame: Window | null, message: Record<string, unknown>): void {
-		// The frame has an opaque origin, so "*" is the only usable
-		// targetOrigin; its content is fully authored by us (runtime +
-		// artifact + bootstrap), which is what makes that safe.
-		frame?.postMessage({ channel: CHANNEL, ...message }, "*");
-	}
-
-	async function onMessage(event: MessageEvent): Promise<void> {
-		// With a sandboxed (opaque-origin) frame, event.origin is "null" and
-		// useless; event.source is the definitive check
-		if (event.source !== iframe.contentWindow) return;
-		const data = event.data as FrameMessage;
-		if (!data || data.channel !== CHANNEL) return;
-
-		if (data.kind === "event") {
-			bridge?.emit(data.type, data.detail);
-		} else if (data.kind === "invoke") {
-			try {
-				const value = await bridge?.invoke(data.method, data.payload);
-				replyToFrame(iframe.contentWindow, {
-					kind: "invoke-result",
-					call: data.call,
-					value,
-				});
-			} catch (error) {
-				replyToFrame(iframe.contentWindow, {
-					kind: "invoke-error",
-					call: data.call,
-					message: error instanceof Error ? error.message : String(error),
-				});
-			}
-		} else if (data.kind === "height") {
-			iframe.style.height = `${data.value}px`;
-		}
-	}
-
-	window.addEventListener("message", onMessage);
+	const listener: EmbedFrameListener = listenEmbedFrame(iframe, {
+		bridge: options.bridge,
+		artifactId: artifact.id,
+		maxHeight: options.maxHeight,
+	});
 
 	return {
 		iframe,
 		unmount() {
-			window.removeEventListener("message", onMessage);
+			listener.dispose();
 			// Stop the frame from running: clearing srcdoc unloads its document
 			iframe.removeAttribute("srcdoc");
 		},

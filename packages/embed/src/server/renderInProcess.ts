@@ -1,12 +1,16 @@
 import type { ServerSlotRender } from "@torpor/view/ssr";
 import type EmbedArtifact from "../types/EmbedArtifact";
-import type EmbedRenderResult from "../types/EmbedRenderResult";
 import loadServerComponent from "./loadServerComponent";
 
 export interface RenderInProcessOptions {
 	props?: Record<string, any>;
 	context?: Record<string, any>;
 	slots?: Record<string, ServerSlotRender>;
+	/**
+	 * Host modules the embed may import, keyed by the specifier used in the
+	 * embed's source (see EmbedOptions.scope).
+	 */
+	scope?: Record<string, unknown>;
 	/**
 	 * Soft timeout in milliseconds: the returned promise rejects after this,
 	 * but the render itself keeps running (CPU-bound loops cannot be
@@ -25,8 +29,8 @@ export interface RenderInProcessOptions {
 export default async function renderInProcess(
 	artifact: EmbedArtifact,
 	options?: RenderInProcessOptions,
-): Promise<EmbedRenderResult> {
-	const component = loadServerComponent(artifact);
+): Promise<{ body: string; head: string }> {
+	const component = loadServerComponent(artifact, options?.scope);
 	const timeout = options?.timeout ?? 5000;
 	let timer: ReturnType<typeof setTimeout> | undefined;
 	const render = component(options?.props ?? {}, options?.context, options?.slots);

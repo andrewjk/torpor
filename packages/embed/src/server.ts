@@ -1,5 +1,7 @@
 // Compiling embeds from source (server side)
 export { default as compileEmbed } from "./server/compileEmbed";
+export { default as recompileEmbed } from "./compile/recompileEmbed";
+export { RUNTIME_VERSION } from "./generated/version";
 export { default as assertRunnable } from "./server/assertRunnable";
 export { default as getRuntimeVersion } from "./server/getRuntimeVersion";
 export { default as renderEmbed } from "./server/renderEmbed";

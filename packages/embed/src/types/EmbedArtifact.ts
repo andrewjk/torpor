@@ -1,3 +1,5 @@
+import type EmbedArtifactImport from "./EmbedArtifactImport";
+
 /**
  * A component authored at runtime (by a REPL user, a feed post author, an
  * admin building a custom section), compiled at publish time and stored as
@@ -44,6 +46,15 @@ export default interface EmbedArtifact {
 	 * mountModuleEmbed/hydrateModuleEmbed.
 	 */
 	format?: "globals" | "module";
+
+	/**
+	 * The modules the embed imports from (besides the runtime, which is
+	 * provided automatically), with the local binding names its code
+	 * references. The loaders validate these against the host's `scope`
+	 * option and fail loudly -- naming the missing bindings -- instead of
+	 * throwing ReferenceErrors from inside compiled code.
+	 */
+	imports?: EmbedArtifactImport[];
 
 	/**
 	 * The client build. Imports are stripped and TypeScript is removed, so

@@ -24,6 +24,13 @@ export interface RenderEmbedOptions extends RenderInProcessOptions {
 	bridge?: EmbedBridge;
 
 	/**
+	 * Host modules the embed may import, keyed by the specifier used in the
+	 * embed's source -- the server build's imports are stripped and these
+	 * namespaces are injected instead (see EmbedOptions.scope).
+	 */
+	scope?: Record<string, unknown>;
+
+	/**
 	 * The expected runtime version. Defaults to the installed
 	 * @torpor/view's version, and mismatches throw.
 	 */
@@ -64,16 +71,26 @@ export default async function renderEmbed(
 	const renderOptions = { ...options, props };
 
 	if (options?.isolate) {
-		// Host bridge handlers are functions; they can't cross the worker
-		// boundary. The worker injects its own bridge that fails loudly if
-		// the embed calls it during render.
+		// Host bridge handlers and scope values are functions; they can't
+		// cross the worker boundary. Fail loudly rather than silently
+		// rendering an embed whose imports are unresolvable.
+		const hostImports = (artifact.imports ?? []).filter(
+			(imported) => imported.source !== "@torpor/view",
+		);
+		if (hostImports.length > 0 || options.scope) {
+			throw new Error(
+				"Embed requires host-side values (scope/bridge) that cannot cross the worker boundary. Render without isolation, or pass the data as props.",
+			);
+		}
 		const workerProps = { ...renderOptions.props };
 		delete workerProps.$embed;
-		return renderInWorker(artifact, {
+		const result = await renderInWorker(artifact, {
 			props: workerProps,
 			context: renderOptions.context,
 			timeout: renderOptions.timeout,
 		});
+		return { ...result, styles: artifact.styles };
 	}
-	return renderInProcess(artifact, renderOptions);
+	const result = await renderInProcess(artifact, renderOptions);
+	return { ...result, styles: artifact.styles };
 }

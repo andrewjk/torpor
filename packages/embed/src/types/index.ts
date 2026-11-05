@@ -1,4 +1,5 @@
 import type EmbedArtifact from "./EmbedArtifact";
+import type EmbedArtifactImport from "./EmbedArtifactImport";
 import type EmbedBridge from "./EmbedBridge";
 import type EmbedBridgeHandlers from "./EmbedBridgeHandlers";
 import type EmbedCompileError from "./EmbedCompileError";
@@ -13,6 +14,7 @@ import type EmbedVersionError from "./EmbedVersionError";
 
 export type {
 	EmbedArtifact,
+	EmbedArtifactImport,
 	EmbedBridge,
 	EmbedBridgeHandlers,
 	EmbedCompileError,

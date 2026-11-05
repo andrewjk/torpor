@@ -28,6 +28,17 @@ export interface FrameDocumentInput {
 	 * the host page's base.
 	 */
 	runtimeUrl?: string;
+	/**
+	 * The host's own CSS (theme custom properties, base styles), injected
+	 * before the artifact's styles so the embed can still override. This
+	 * is how a sandboxed frame inherits the host's look-and-feel.
+	 */
+	css?: string | string[];
+
+	/**
+	 * A CSP nonce applied to the document's `<script>` and `<style>` tags.
+	 */
+	nonce?: string;
 }
 
 /**
@@ -43,23 +54,27 @@ export function safeAttribute(value: string): string {
  */
 export default function frameDocument(input: FrameDocumentInput): string {
 	const { artifact, props } = input;
+	const hostCss =
+		input.css === undefined ? "" : Array.isArray(input.css) ? input.css.join("\n") : input.css;
 	const styles = artifact.styles.map((s) => s.style).join("\n");
+	const head = [hostCss, styles].filter((css) => css.length > 0);
+	const nonce = input.nonce !== undefined ? ` nonce="${safeAttribute(input.nonce)}"` : "";
 	// A classic <script src> blocks the scripts after it, so the runtime is
 	// always defined before the artifact code and bootstrap run
 	const runtimeTag = input.runtimeUrl
-		? `<script src="${safeAttribute(input.runtimeUrl)}"></script>`
-		: `<script>${input.runtime};Object.assign(globalThis, TorporView);</script>`;
+		? `<script${nonce} src="${safeAttribute(input.runtimeUrl)}"></script>`
+		: `<script${nonce}>${input.runtime};Object.assign(globalThis, TorporView);</script>`;
 	return `<!doctype html>
 <html>
 <head>
-${styles ? `<style>${styles}</style>` : ""}
+${head.length > 0 ? `<style${nonce}>${head.join("\n")}</style>` : ""}
 </head>
 <body>
 <div id="torpor-embed"></div>
 ${runtimeTag}
-<script>${artifact.client.code}</script>
-<script>${frameScript}</script>
-<script>TorporEmbed.mount(${safeJson({ id: artifact.id, name: artifact.name, props })});</script>
+<script${nonce}>${artifact.client.code}</script>
+<script${nonce}>${frameScript}</script>
+<script${nonce}>TorporEmbed.mount(${safeJson({ id: artifact.id, name: artifact.name, props })});</script>
 </body>
 </html>`;
 }
