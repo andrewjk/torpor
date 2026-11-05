@@ -247,9 +247,9 @@ const importsMap: Record<string, string> = {
 	'import { t_attr } from "@torpor/view/ssr";':
 		'import t_attr from "../../../../src/render/formatAttributeText";',
 	'import { t_class } from "@torpor/view/ssr";':
-		'import t_class from "../../../../src/render/buildClasses";',
+		'import t_class from "../../../../src/ssr/buildClasses";',
 	'import { t_style } from "@torpor/view/ssr";':
-		'import t_style from "../../../../src/render/buildStyles";',
+		'import t_style from "../../../../src/ssr/buildStyles";',
 	'import { t_print } from "@torpor/view";':
 		'import t_print from "../../../../src/debug/printNode";',
 	'import { type ServerSlotRender } from "@torpor/view/ssr";':

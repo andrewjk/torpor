@@ -1,4 +1,4 @@
-import t_class from "../../../../src/render/buildClasses";
+import t_class from "../../../../src/ssr/buildClasses";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
@@ -15,7 +15,7 @@ export default async function ForNested3(
 	for (let row of $props.matrix) {
 		t_body += `<!^><tr><![>`;
 		for (let cell of row) {
-			t_body += `<!^><td ${t_class({ active: cell === $props.highlight }) !== "" ? `class="${t_class({ active: cell === $props.highlight })}"` : ""}> ${t_fmt(cell)} </td>`;
+			t_body += `<!^><td ${t_class({ active: cell === $props.highlight })}> ${t_fmt(cell)} </td>`;
 		}
 		t_body += `<!]><!></tr>`;
 	}

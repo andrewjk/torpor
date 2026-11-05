@@ -1,4 +1,4 @@
-import t_style from "../../../../src/render/buildStyles";
+import t_style from "../../../../src/ssr/buildStyles";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function Style(
@@ -10,7 +10,7 @@ export default async function Style(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<div ${t_style({ color: $props.color }) !== "" ? `style="${t_style({ color: $props.color })}"` : ""}> Hello! </div>`;
+	t_body += `<div ${t_style({ color: $props.color })}> Hello! </div>`;
 
 	return { body: t_body, head: t_head };
 }

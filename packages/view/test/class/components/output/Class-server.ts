@@ -1,4 +1,4 @@
-import t_class from "../../../../src/render/buildClasses";
+import t_class from "../../../../src/ssr/buildClasses";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function Class(
@@ -10,7 +10,7 @@ export default async function Class(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<div id="divid" class="torp-16s1yph"> From id </div> <div class="divclass torp-16s1yph"> From string </div> <a ${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-16s1yph") !== "" ? `class="${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-16s1yph")}"` : ""}> From state </a> <div ${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-16s1yph") !== "" ? `class="${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-16s1yph")}"` : ""}> From state with scope </div> <div ${t_class({ foo: true, bar: false, baz: 5, qux: null }, "torp-16s1yph") !== "" ? `class="${t_class({ foo: true, bar: false, baz: 5, qux: null }, "torp-16s1yph")}"` : ""}> Class object </div> <div ${t_class([ "foo", false, true && "baz", undefined ], "torp-16s1yph") !== "" ? `class="${t_class([ "foo", false, true && "baz", undefined ], "torp-16s1yph")}"` : ""}> Class array </div> <div ${t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ], "torp-16s1yph") !== "" ? `class="${t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ], "torp-16s1yph")}"` : ""}> Class nested </div> <![>`;
+	t_body += `<div id="divid" class="torp-16s1yph"> From id </div> <div class="divclass torp-16s1yph"> From string </div> <a ${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-16s1yph")}> From state </a> <div ${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-16s1yph")}> From state with scope </div> <div ${t_class({ foo: true, bar: false, baz: 5, qux: null }, "torp-16s1yph")}> Class object </div> <div ${t_class([ "foo", false, true && "baz", undefined ], "torp-16s1yph")}> Class array </div> <div ${t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ], "torp-16s1yph")}> Class nested </div> <![>`;
 	const t_props_1 = {
 		class: ["hey", "torp-16s1yph"],
 	};
@@ -81,7 +81,7 @@ async function Child(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<div ${t_class($props.class) !== "" ? `class="${t_class($props.class)}"` : ""} data-state="active"><![>`;
+	t_body += `<div ${t_class($props.class)} data-state="active"><![>`;
 	if ($slots && $slots["_"]) {
 		t_body += await $slots["_"](undefined, $context);
 	} else {

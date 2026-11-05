@@ -1,4 +1,4 @@
-import t_style from "../../../../src/render/buildStyles";
+import t_style from "../../../../src/ssr/buildStyles";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function StyleMultiple(
@@ -10,7 +10,7 @@ export default async function StyleMultiple(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<div id="multi" ${t_style({ color: $props.color, fontSize: $props.fontSize + "px", background: $props.background }) !== "" ? `style="${t_style({ color: $props.color, fontSize: $props.fontSize + "px", background: $props.background })}"` : ""}> Multi style </div>`;
+	t_body += `<div id="multi" ${t_style({ color: $props.color, fontSize: $props.fontSize + "px", background: $props.background })}> Multi style </div>`;
 
 	return { body: t_body, head: t_head };
 }

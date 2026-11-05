@@ -96,20 +96,19 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 				attributes.push(`${propName}="\${${valueOrDefault}}"`);
 			} else if (name === "class") {
 				status.imports.add("t_class");
-				let params = [value];
+				let params = value;
 				if (node.scopeStyles && !status.inHead) {
-					params.push(`"torp-${status.styleHash}"`);
+					params = `${value}, "torp-${status.styleHash}"`;
 					needsClass = false;
 				}
-				// Only set the attribute if the value is truthy
-				// HACK: don't call t_class twice -- maybe there should be a buildServerClasses?
-				value = params.join(", ");
-				attributes.push(`\${t_class(${value}) !== "" ? \`class="\${t_class(${value})}"\` : ""}`);
+				// Only set the attribute if the value is truthy. The ssr
+				// `t_class` returns the whole `class="..."` attribute (or "")
+				attributes.push(`\${t_class(${params})}`);
 			} else if (name === "style") {
-				// Only set the attribute if the value is truthy
-				// HACK: don't call t_style twice -- maybe there should be a buildServerStyles?
+				// Only set the attribute if the value is truthy. The ssr
+				// `t_style` returns the whole `style="..."` attribute (or "")
 				status.imports.add("t_style");
-				attributes.push(`\${t_style(${value}) !== "" ? \`style="\${t_style(${value})}"\` : ""}`);
+				attributes.push(`\${t_style(${value})}`);
 			} else {
 				// Only set the attribute if the value is truthy
 				// e.g. `... ${className ? `class="${className}"` : ''} ...`

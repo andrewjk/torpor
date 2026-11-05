@@ -1,4 +1,4 @@
-import t_class from "../../../../src/render/buildClasses";
+import t_class from "../../../../src/ssr/buildClasses";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function ClassToggle(
@@ -10,7 +10,7 @@ export default async function ClassToggle(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<p ${t_class({ active: $props.active, emphasis: $props.emphasis, base: true }) !== "" ? `class="${t_class({ active: $props.active, emphasis: $props.emphasis, base: true })}"` : ""}> Toggle class </p>`;
+	t_body += `<p ${t_class({ active: $props.active, emphasis: $props.emphasis, base: true })}> Toggle class </p>`;
 
 	return { body: t_body, head: t_head };
 }

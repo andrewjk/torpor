@@ -1,4 +1,4 @@
-import t_class from "../../../../src/render/buildClasses";
+import t_class from "../../../../src/ssr/buildClasses";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function ClassString(
@@ -10,7 +10,7 @@ export default async function ClassString(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<p ${t_class("box " + $props.size + " " + $props.color) !== "" ? `class="${t_class("box " + $props.size + " " + $props.color)}"` : ""}> Concatenated </p> <p ${t_class(["tag", $props.size, $props.color].join(" ")) !== "" ? `class="${t_class(["tag", $props.size, $props.color].join(" "))}"` : ""}> Joined </p>`;
+	t_body += `<p ${t_class("box " + $props.size + " " + $props.color)}> Concatenated </p> <p ${t_class(["tag", $props.size, $props.color].join(" "))}> Joined </p>`;
 
 	return { body: t_body, head: t_head };
 }

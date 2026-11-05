@@ -1,4 +1,4 @@
-import t_style from "../../../../src/render/buildStyles";
+import t_style from "../../../../src/ssr/buildStyles";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function StyleCustomProp(
@@ -10,7 +10,7 @@ export default async function StyleCustomProp(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<div ${t_style({ "--my-color": $props.styleVar, color: "var(--my-color)" }) !== "" ? `style="${t_style({ "--my-color": $props.styleVar, color: "var(--my-color)" })}"` : ""}> Colored text </div>`;
+	t_body += `<div ${t_style({ "--my-color": $props.styleVar, color: "var(--my-color)" })}> Colored text </div>`;
 
 	return { body: t_body, head: t_head };
 }
