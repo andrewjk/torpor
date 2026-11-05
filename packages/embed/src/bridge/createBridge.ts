@@ -39,7 +39,7 @@ export default function createBridge(handlers: EmbedBridgeHandlers): EmbedBridge
 			handlers.onEvent(type, detail, source ?? noSource());
 		},
 
-		invoke<T>(method: string, payload?: unknown, source?: EmbedEventSource): Promise<T> {
+		invoke(method, payload, source) {
 			if (!handlers.invoke) {
 				if (!warnedInvoke) {
 					warnedInvoke = true;
@@ -48,9 +48,9 @@ export default function createBridge(handlers: EmbedBridgeHandlers): EmbedBridge
 					);
 				}
 				// An unwired bridge resolves undefined for any method
-				return Promise.resolve(undefined) as Promise<T>;
+				return Promise.resolve(undefined);
 			}
-			return Promise.resolve(handlers.invoke(method, payload, source ?? noSource()) as T);
+			return Promise.resolve(handlers.invoke(method, payload, source ?? noSource()));
 		},
 	};
 }

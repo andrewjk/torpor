@@ -24,12 +24,16 @@ export default interface EmbedBridge {
 
 	/**
 	 * Calls a host-provided API and waits for the result, e.g. submitting a
-	 * business form or fetching data for the current tenant.
+	 * business form or fetching data for the current tenant. Returns any so
+	 * hand-written bridges and typed call sites both work; embeds can cast
+	 * the result:
+	 *
+	 * `const data = await $props.$embed.invoke("fetch-data") as SectionData`
 	 *
 	 * @param method The API name, e.g. "save-section-data"
 	 * @param payload Arbitrary request payload
 	 * @param source Set by the loader when it scopes a bridge to a mount;
 	 * embeds should not pass this
 	 */
-	invoke<T = unknown>(method: string, payload?: unknown, source?: EmbedEventSource): Promise<T>;
+	invoke(method: string, payload?: unknown, source?: EmbedEventSource): Promise<any>;
 }

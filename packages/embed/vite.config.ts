@@ -1,10 +1,19 @@
 import { defineConfig, UserConfig } from "vite-plus";
 
 export default defineConfig({
-	pack: {
-		entry: ["src/index.ts", "src/server.ts"],
-		format: ["esm", "cjs"],
-	},
+	pack: [
+		{
+			entry: ["src/index.ts", "src/server.ts"],
+			format: ["esm", "cjs"],
+		},
+		{
+			// Worker entry for renderEmbed({ isolate: true }). Not exported
+			// from package.json; renderInWorker resolves it next to dist.
+			entry: ["src/worker/renderWorker.ts"],
+			format: "esm",
+			dts: false,
+		},
+	],
 	lint: {
 		options: {
 			typeAware: true,

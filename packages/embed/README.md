@@ -63,6 +63,28 @@ handle.unmount();
 hydrateEmbed(target, artifact, { sectionId: 42 }, { bridge });
 ```
 
+Server-render (from `@torpor/embed/server`):
+
+```ts
+import { createBridge, renderEmbed } from "@torpor/embed/server";
+
+// Renders to HTML; hydrateEmbed the result with the same props + bridge
+const { body, head } = await renderEmbed(artifact, {
+	props: { sectionId: 42 },
+	bridge, // available to the embed during render (e.g. @await data fetches)
+	isolate: true, // render in a worker thread with a hard timeout
+	timeout: 5000,
+});
+```
+
+`isolate: true` runs the render in a worker thread and terminates it at the
+timeout, so a runaway embed can't take your server down. It's fault
+isolation, not a security boundary (workers share the process): for
+untrusted authors, skip server rendering entirely and render client-side in
+a sandboxed iframe. Isolated renders also can't bridge host APIs during
+render -- pass data as props instead; the worker fails loudly if an embed
+tries.
+
 ## The bridge
 
 Embeds receive the bridge as a reserved `$embed` prop:

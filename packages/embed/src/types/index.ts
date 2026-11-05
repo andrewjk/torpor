@@ -5,6 +5,7 @@ import type EmbedCompileError from "./EmbedCompileError";
 import type EmbedEventSource from "./EmbedEventSource";
 import type EmbedHandle from "./EmbedHandle";
 import type EmbedOptions from "./EmbedOptions";
+import type EmbedRenderResult from "./EmbedRenderResult";
 import type EmbedStyle from "./EmbedStyle";
 import type EmbedVersionError from "./EmbedVersionError";
 
@@ -16,6 +17,7 @@ export type {
 	EmbedEventSource,
 	EmbedHandle,
 	EmbedOptions,
+	EmbedRenderResult,
 	EmbedStyle,
 	EmbedVersionError,
 };

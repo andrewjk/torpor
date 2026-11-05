@@ -458,3 +458,16 @@ packages/embed) inherit the root config and format correctly. Either the
 root fmt settings should be merged into partial package blocks, or each
 package block should spell out the full settings — until then, format from
 the repo root only (`pnpm format`).
+
+### Embed server render isolation is fault isolation, not a security boundary
+
+`renderEmbed({ isolate: true })` renders in a worker thread with a hard
+timeout (the worker is terminated at the deadline), which contains crashes,
+hangs, and runaway loops. But worker threads share the process's memory and
+Node builtins, so a hostile author can still reach `process` from embed
+code. In-process renders (the default) don't even interrupt CPU-bound loops
+-- their timeout only rejects the promise while the render keeps running.
+Before rendering genuinely untrusted embeds server-side, move to a stronger
+boundary: a separate process/subruntime per render (e.g. isolates or a
+container pool), or skip server rendering for untrusted tiers entirely and
+use sandboxed iframes client-side.

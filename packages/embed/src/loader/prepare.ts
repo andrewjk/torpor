@@ -1,29 +1,13 @@
 import { unmount } from "@torpor/view";
-import createBridge from "../bridge/createBridge";
-import scopeBridge from "../bridge/scopeBridge";
 import checkVersion from "../checkVersion";
 import type EmbedArtifact from "../types/EmbedArtifact";
 import type EmbedHandle from "../types/EmbedHandle";
 import type EmbedOptions from "../types/EmbedOptions";
+import embedProps from "../bridge/embedProps";
 import injectStyles, { removeStyles } from "./injectStyles";
 import loadComponent from "./loadComponent";
 
-/**
- * Returns the props to pass to the component, with the bridge injected as
- * the reserved `$embed` prop. A `$embed` prop set explicitly by the host
- * wins over `options.bridge`.
- */
-export function embedProps(
-	artifact: EmbedArtifact,
-	props: Record<string, any>,
-	options?: EmbedOptions,
-): Record<string, any> {
-	if (props.$embed !== undefined) return props;
-	const bridge = options?.bridge
-		? scopeBridge(options.bridge, { artifactId: artifact.id })
-		: createBridge({});
-	return { ...props, $embed: bridge };
-}
+export { embedProps };
 
 /**
  * Checks the artifact against the running version and evaluates its client
