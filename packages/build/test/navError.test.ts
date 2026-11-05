@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
-import { mount } from "@torpor/view";
+import { clearLayoutSlot, fillLayoutSlot, mount, unmount } from "@torpor/view";
 
 vi.mock("@torpor/view", () => ({
 	// The render machinery is stubbed out; navigate is what's under test
@@ -24,6 +24,9 @@ import type ManifestRoute from "../src/types/ManifestRoute";
 import { ERROR_ROUTE, PAGE_ROUTE, PAGE_SERVER_ROUTE, SERVER_ROUTE } from "../src/types/RouteType";
 
 const mountMock = vi.mocked(mount);
+const unmountMock = vi.mocked(unmount);
+const clearLayoutSlotMock = vi.mocked(clearLayoutSlot);
+const fillLayoutSlotMock = vi.mocked(fillLayoutSlot);
 
 const pageComponent = () => ({ body: "<p>page</p>", head: "" });
 const errorComponent = () => ({ body: "<p>error page</p>", head: "" });
@@ -68,6 +71,9 @@ beforeEach(() => {
 	vi.spyOn(window, "scrollTo").mockImplementation(() => {});
 	vi.mocked(mount).mockClear();
 	vi.mocked(mount).mockImplementation(() => {});
+	unmountMock.mockClear();
+	clearLayoutSlotMock.mockClear();
+	fillLayoutSlotMock.mockClear();
 });
 
 describe("loadData", () => {
@@ -189,6 +195,110 @@ describe("layout reuse", () => {
 		} finally {
 			vi.unstubAllGlobals();
 		}
+	});
+});
+
+describe("layout slot reuse", () => {
+	const layoutComponent = () => {};
+	const pageRoute = (): ManifestRoute => ({
+		path: "/dashboard",
+		type: PAGE_ROUTE,
+		endPoint: () => Promise.resolve({ default: { component: pageComponent } }),
+		subFolder: undefined,
+	});
+	const layoutRoute = (path = "/_layout"): ManifestRoute => ({
+		path,
+		type: PAGE_ROUTE,
+		endPoint: () => Promise.resolve({ default: { component: layoutComponent } }),
+		subFolder: undefined,
+	});
+	const liveRegion = () => {
+		const node = document.createElement("main");
+		document.body.appendChild(node);
+		return { startNode: node, endNode: node };
+	};
+
+	test("a released reused slot falls back to a full client re-render", async () => {
+		client.router.addPages([layoutRoute(), pageRoute()]);
+
+		// The previous navigation's layout slot region was released by a
+		// reactive layout update during this navigation: `clearRegion` sets the
+		// region's `startNode` to null, and loadData still marks the layout for
+		// reuse because the path matches
+		client.layoutStack = [
+			{
+				path: "/_layout",
+				data: {},
+				reuse: false,
+				slotRegion: { startNode: null, endNode: null },
+			},
+		];
+
+		const navigated = await navigate(new URL("http://localhost/dashboard"));
+
+		// Instead of the old crash (reading 'parentNode' of null, swallowed into
+		// the "Script syntax error" placeholder) the whole chain re-renders
+		expect(navigated).toBe(true);
+		expect(unmountMock).toHaveBeenCalledTimes(1);
+		expect(mountMock).toHaveBeenCalledTimes(1);
+		expect(mountMock.mock.calls[0][1]).toBe(layoutComponent);
+		expect(document.getElementById("app")!.innerHTML).not.toContain("Script syntax error");
+	});
+
+	test("a detached reused slot start node also falls back to a full client re-render", async () => {
+		client.router.addPages([layoutRoute(), pageRoute()]);
+
+		// A post-hydration re-render (e.g. an @await page) removed the node the
+		// slot region started at: startNode is set but detached from the DOM,
+		// so it has no parent to render into
+		const detached = document.createElement("main");
+		client.layoutStack = [
+			{
+				path: "/_layout",
+				data: {},
+				reuse: false,
+				slotRegion: { startNode: detached, endNode: detached },
+			},
+		];
+
+		const navigated = await navigate(new URL("http://localhost/dashboard"));
+
+		expect(navigated).toBe(true);
+		expect(unmountMock).toHaveBeenCalledTimes(1);
+		expect(mountMock).toHaveBeenCalledTimes(1);
+		expect(mountMock.mock.calls[0][1]).toBe(layoutComponent);
+		expect(document.getElementById("app")!.innerHTML).not.toContain("Script syntax error");
+	});
+
+	test("keeps the nearest live layout when an inner layout's slot was released", async () => {
+		client.router.addPages([layoutRoute(), layoutRoute("/dashboard/_layout"), pageRoute()]);
+
+		// The root layout's slot is alive; the section layout's own slot was
+		// released (e.g. a control-flow branch inside the section layout was
+		// cleared). The root layout can still be reused
+		const rootSlot = liveRegion();
+		client.layoutStack = [
+			{ path: "/_layout", data: {}, reuse: false, slotRegion: rootSlot },
+			{
+				path: "/dashboard/_layout",
+				data: {},
+				reuse: false,
+				slotRegion: { startNode: null, endNode: null },
+			},
+		];
+
+		const navigated = await navigate(new URL("http://localhost/dashboard"));
+
+		expect(navigated).toBe(true);
+		expect(clearLayoutSlotMock).toHaveBeenCalledTimes(1);
+		expect(clearLayoutSlotMock.mock.calls[0][0]).toBe(rootSlot);
+		// The chain below the live layout is rendered into its slot rather than
+		// remounting the whole app
+		expect(fillLayoutSlotMock).toHaveBeenCalledTimes(1);
+		expect(fillLayoutSlotMock.mock.calls[0][0]).toBe(layoutComponent);
+		expect(fillLayoutSlotMock.mock.calls[0][1]).toBeTypeOf("function");
+		expect(mountMock).not.toHaveBeenCalled();
+		expect(document.getElementById("app")!.innerHTML).not.toContain("Script syntax error");
 	});
 });
 

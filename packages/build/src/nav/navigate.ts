@@ -200,13 +200,25 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<bo
 	// TODO: There's probably a nicer way to do this with reducers or something
 	let component = clientEndPoint.component as Component;
 	let slots: Record<string, SlotRender> | undefined = undefined;
-	let reused = false;
-	// The index of the innermost reused layout. Its slotRegion is the region
-	// that must be cleared and refilled (it contains the next layout's or the
-	// page's content). This is usually the last entry of the stack, but not
-	// when an outer layout is reused while an inner one is new — e.g.
-	// navigating between sections that share the root layout.
+	// The index of the innermost layout that can actually be reused. It must
+	// be on the same path (loadData marked it) *and* its slot region must still
+	// be live: a released region has no `startNode`, and one whose window was
+	// left pointing at a removed node has a detached `startNode`. A reactive
+	// update inside the layout during this navigation — e.g. an @if branch
+	// before the <slot> being cleared because $page.url changed — can cascade
+	// through `clearRegion` and release the slot region; a post-hydration
+	// re-render can remove the node it starts at. Reusing either throws on
+	// `slotRegion.startNode!.parentNode`, so treat such layouts as new instead:
+	// keep the nearest live ancestor layout, or fully re-render the chain below.
 	let reusedIndex = -1;
+	for (let i = layoutStack.length - 1; i >= 0; i--) {
+		const stackLayout = layoutStack[i];
+		if (stackLayout.reuse && stackLayout.slotRegion?.startNode?.parentNode != null) {
+			reusedIndex = i;
+			break;
+		}
+	}
+	let reused = reusedIndex !== -1;
 	if (handler.layouts) {
 		let slotFunctions: SlotRender[] = [];
 		// The last slot function will render the client component
@@ -227,13 +239,11 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<bo
 			const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint())
 				?.default;
 			if (layoutEndPoint?.component) {
-				if (layoutStack[i].reuse) {
+				if (i === reusedIndex) {
 					// Reuse this layout — clear and refill its slot (done in
 					// the try block below so a failure doesn't leave the slot
 					// half-cleared)
 					component = slotFunctions[i + 1] as Component;
-					reusedIndex = i;
-					reused = true;
 					break;
 				} else if (i === 0) {
 					component = layoutEndPoint.component as Component;
@@ -268,7 +278,22 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<bo
 				// refuses to mount into. Both the clear and the fill are inside
 				// the try so that a failure doesn't leave the slot half-cleared.
 				const slotRegion = layoutStack[reusedIndex].slotRegion;
-				app = slotRegion.startNode!.parentNode as HTMLElement;
+				if (
+					slotRegion === null ||
+					slotRegion.startNode === null ||
+					slotRegion.startNode.parentNode === null
+				) {
+					// The region died after we planned to reuse it (a layout
+					// update ran while an endpoint was being imported). Don't
+					// paint an error over the current page — reload so the
+					// server renders the requested page.
+					console.error(
+						"The layout slot was cleared during navigation; falling back to a full page load",
+					);
+					window.location.reload();
+					return;
+				}
+				app = slotRegion.startNode.parentNode as HTMLElement;
 				clearLayoutSlot(slotRegion);
 				component(app, null);
 			} else if (withHydration) {
