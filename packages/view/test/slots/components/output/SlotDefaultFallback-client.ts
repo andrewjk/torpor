@@ -44,7 +44,6 @@ export default function SlotDefault(
 		const t_root_2 = t_root_el(t_fragment_2);
 		const t_p_1 = t_root_2 as HTMLElement;
 		t_add_element(t_p_1, $sparent, $sanchor);
-		t_next(t_p_1);
 	}
 	List(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 
@@ -60,7 +59,6 @@ export default function SlotDefault(
 	ListWithItems(t_fragment_0, t_comp_anchor_2, t_props_1, $context);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_2, t_root_0);
-	t_next(t_comp_anchor_2);
 
 }
 
@@ -86,10 +84,8 @@ function List(
 		const t_root_1 = t_root_el(t_fragment_1);
 		const t_li_1 = t_root_1 as HTMLElement;
 		t_add_element(t_li_1, t_ul_1, t_slot_anchor_1);
-		t_next(t_li_1);
 	}
 	t_add_element(t_ul_1, $parent, $anchor);
-	t_next(t_ul_1);
 
 }
 
@@ -132,7 +128,6 @@ function ListWithItems(
 				t_text_1.textContent = t_fmt(item);
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
-			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -146,6 +141,5 @@ function ListWithItems(
 	);
 
 	t_add_element(t_ul_1, $parent, $anchor);
-	t_next(t_ul_1);
 
 }

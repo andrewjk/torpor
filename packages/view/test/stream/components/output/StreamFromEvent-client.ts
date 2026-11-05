@@ -41,6 +41,5 @@ export default function StreamFromEvent(
 		t_text_1.textContent = `Count: ${t_fmt($state.count)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
-	t_next(t_p_1);
 
 }

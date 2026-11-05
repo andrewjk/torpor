@@ -1,4 +1,5 @@
 import context from "./context";
+import nodeNext from "./nodeNext";
 import runMountSideEffects from "./runMountSideEffects";
 
 export default function addFragment(
@@ -42,4 +43,11 @@ export default function addFragment(
 	// If we're adding this fragment to the DOM, we can now run any $onmount
 	// effects, add our stashed events and play our stashed animations
 	runMountSideEffects(parent, activeRegion, hydrationNode);
+
+	// When hydrating, advance the hydration cursor past the end node. The
+	// compiler relies on this: it used to emit a trailing
+	// `t_next(endNode)` after every `t_add_fragment(..., endNode)` call
+	if (hydrationNode !== null && endNode !== undefined) {
+		nodeNext(endNode);
+	}
 }

@@ -6,7 +6,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
@@ -46,7 +45,6 @@ export default function IfForSwitchCombo(
 			const t_root_1 = t_root_el(t_fragment_1);
 			const t_p_1 = t_root_1 as HTMLElement;
 			t_add_element(t_p_1, t_fragment_0, t_before);
-			t_next(t_p_1);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 0;
 		}
@@ -110,7 +108,6 @@ export default function IfForSwitchCombo(
 											t_text_1.textContent = `[HIGH] ${t_fmt(todo.text)}`;
 										}, undefined, { forVarMask: 1 });
 										t_add_element(t_strong_1, t_li_1, t_before);
-										t_next(t_strong_1);
 										t_pop_region(t_old_region);
 										t_switch_index_1 = 0;
 										break;
@@ -128,7 +125,6 @@ export default function IfForSwitchCombo(
 											t_text_2.textContent = `[low] ${t_fmt(todo.text)}`;
 										}, undefined, { forVarMask: 1 });
 										t_add_element(t_em_1, t_li_1, t_before);
-										t_next(t_em_1);
 										t_pop_region(t_old_region);
 										t_switch_index_1 = 1;
 										break;
@@ -146,7 +142,6 @@ export default function IfForSwitchCombo(
 											t_text_3.textContent = `[med] ${t_fmt(todo.text)}`;
 										}, undefined, { forVarMask: 1 });
 										t_add_element(t_span_1, t_li_1, t_before);
-										t_next(t_span_1);
 										t_pop_region(t_old_region);
 										t_switch_index_1 = 2;
 										break;
@@ -155,7 +150,6 @@ export default function IfForSwitchCombo(
 							});
 
 							t_add_element(t_li_1, t_fragment_3, t_before);
-							t_next(t_li_1);
 							t_pop_region(t_old_region);
 							t_if_index_2 = 0;
 						}
@@ -166,7 +160,6 @@ export default function IfForSwitchCombo(
 					});
 
 					t_add_fragment(t_fragment_3, t_fragment_2, t_before_1, t_if_anchor_2, t_root_3);
-					t_next(t_if_anchor_2);
 					t_pop_region(t_old_region_1);
 				},
 				(t_old_item, t_new_item) => {
@@ -175,13 +168,11 @@ export default function IfForSwitchCombo(
 			);
 
 			t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_for_anchor_1, t_root_2);
-			t_next(t_for_anchor_1);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 1;
 		}
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_if_anchor_1, t_root_0);
-	t_next(t_if_anchor_1);
 
 }

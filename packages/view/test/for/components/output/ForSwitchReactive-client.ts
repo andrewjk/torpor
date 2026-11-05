@@ -73,7 +73,6 @@ export default function ForSwitchReactive(
 							t_text_1.textContent = t_fmt(item.id);
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_li_1, t_fragment_1, t_before);
-						t_next(t_li_1);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 0;
 						break;
@@ -91,7 +90,6 @@ export default function ForSwitchReactive(
 							t_text_2.textContent = t_fmt(item.id);
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_li_2, t_fragment_1, t_before);
-						t_next(t_li_2);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 1;
 						break;
@@ -109,7 +107,6 @@ export default function ForSwitchReactive(
 							t_text_3.textContent = t_fmt(item.id);
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_li_3, t_fragment_1, t_before);
-						t_next(t_li_3);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 2;
 						break;
@@ -118,7 +115,6 @@ export default function ForSwitchReactive(
 			});
 
 			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_switch_anchor_1, t_root_1);
-			t_next(t_switch_anchor_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -128,6 +124,5 @@ export default function ForSwitchReactive(
 
 	const t_footer_1 = t_next(t_next(t_for_parent_1, true)) as HTMLElement;
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_footer_1, t_root_0);
-	t_next(t_footer_1);
 
 }

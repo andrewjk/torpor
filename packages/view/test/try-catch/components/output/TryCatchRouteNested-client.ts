@@ -6,7 +6,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
@@ -52,7 +51,6 @@ export default function NestedBoundaries(
 				t_text_1.textContent = `Inner: ${t_fmt(maybeThrow())}`;
 			});
 			t_add_element(t_p_1, t_fragment_1, t_before);
-			t_next(t_p_1);
 		},(t_before, inner) => {
 			const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<p class="inner">#</p>`);
 			const t_root_3 = t_root_el(t_fragment_3);
@@ -62,11 +60,9 @@ export default function NestedBoundaries(
 				t_text_2.textContent = `Inner caught: ${t_fmt(inner.message)}`;
 			});
 			t_add_element(t_p_2, t_fragment_1, t_before);
-			t_next(t_p_2);
 		});
 
 		t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_try_anchor_2, t_root_1);
-		t_next(t_try_anchor_2);
 	},(t_before, outer) => {
 		const t_fragment_4 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 4, `<p class="outer">#</p>`);
 		const t_root_4 = t_root_el(t_fragment_4);
@@ -76,10 +72,8 @@ export default function NestedBoundaries(
 			t_text_3.textContent = `Outer caught: ${t_fmt(outer.message)}`;
 		});
 		t_add_element(t_p_3, t_fragment_0, t_before);
-		t_next(t_p_3);
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_try_anchor_1, t_root_0);
-	t_next(t_try_anchor_1);
 
 }

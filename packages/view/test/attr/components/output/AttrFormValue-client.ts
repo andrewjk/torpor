@@ -2,7 +2,6 @@ import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_attribute from "../../../../src/render/setAttribute";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -24,6 +23,5 @@ export default function TextareaValue(
 		t_attribute(t_textarea_1, "value", $props.value);
 	});
 	t_add_element(t_textarea_1, $parent, $anchor);
-	t_next(t_textarea_1);
 
 }

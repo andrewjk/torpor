@@ -4,7 +4,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_region from "../../../../src/render/newRegion";
 import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root_el from "../../../../src/render/nodeRootElement";
@@ -53,7 +52,6 @@ export default function Colors(
 				t_text_1.textContent = t_fmt(color);
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
-			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -67,6 +65,5 @@ export default function Colors(
 	);
 
 	t_add_element(t_ul_1, $parent, $anchor);
-	t_next(t_ul_1);
 
 }

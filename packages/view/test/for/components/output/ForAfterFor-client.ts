@@ -51,7 +51,6 @@ export default function ForAfterFor(
 				t_text_1.textContent = ` ${t_fmt(i)} `;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_p_1, t_section_1, t_before_1);
-			t_next(t_p_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -89,7 +88,6 @@ export default function ForAfterFor(
 				t_text_2.textContent = ` ${t_fmt(i)} `;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_p_2, t_section_1, t_before_2);
-			t_next(t_p_2);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -103,6 +101,5 @@ export default function ForAfterFor(
 	);
 
 	t_add_element(t_section_1, $parent, $anchor);
-	t_next(t_section_1);
 
 }

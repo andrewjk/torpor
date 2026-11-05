@@ -6,7 +6,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
@@ -47,7 +46,6 @@ export default function TryCatch(
 			t_text_1.textContent = `Value: ${t_fmt(value)}`;
 		});
 		t_add_element(t_p_1, t_fragment_0, t_before);
-		t_next(t_p_1);
 	},(t_before, err) => {
 		const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p class="error">#</p>`);
 		const t_root_2 = t_root_el(t_fragment_2);
@@ -57,10 +55,8 @@ export default function TryCatch(
 			t_text_2.textContent = `Caught: ${t_fmt(err.message)}`;
 		});
 		t_add_element(t_p_2, t_fragment_0, t_before);
-		t_next(t_p_2);
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_try_anchor_1, t_root_0);
-	t_next(t_try_anchor_1);
 
 }

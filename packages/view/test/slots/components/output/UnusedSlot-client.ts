@@ -4,7 +4,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import type SlotRender from "../../../../src/types/SlotRender";
@@ -28,7 +27,6 @@ export default function Unused(
 	Header(t_fragment_0, t_comp_anchor_1, undefined, $context);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
-	t_next(t_comp_anchor_1);
 
 }
 
@@ -55,9 +53,7 @@ function Header(
 		const t_root_1 = t_root(t_fragment_1, true);
 		const t_text_1 = t_root_1;
 		t_add_fragment(t_fragment_1, t_h2_1, t_slot_anchor_1, t_text_1, t_root_1);
-		t_next(t_text_1);
 	}
 	t_add_element(t_h2_1, $parent, $anchor);
-	t_next(t_h2_1);
 
 }

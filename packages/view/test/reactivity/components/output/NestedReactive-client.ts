@@ -56,7 +56,6 @@ export default function NestedReactive(
 				t_text_2.textContent = t_fmt(tag);
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_for_parent_1, t_before_1);
-			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -76,6 +75,5 @@ export default function NestedReactive(
 		t_text_3.textContent = `Tag count: ${t_fmt($props.user.tags.length)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
-	t_next(t_p_1);
 
 }

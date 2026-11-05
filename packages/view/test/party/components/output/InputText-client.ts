@@ -36,6 +36,5 @@ export default function InputHello(
 		t_text_1.textContent = t_fmt($state.text);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_input_1, t_root_0);
-	t_next(t_input_1);
 
 }

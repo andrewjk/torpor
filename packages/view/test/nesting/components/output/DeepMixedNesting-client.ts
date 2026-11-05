@@ -89,7 +89,6 @@ export default function DeepMixed(
 											const t_root_5 = t_root_el(t_fragment_5);
 											const t_p_1 = t_root_5 as HTMLElement;
 											t_add_element(t_p_1, t_fragment_4, t_before);
-											t_next(t_p_1);
 											t_pop_region(t_old_region);
 											t_if_index_5 = 0;
 										}
@@ -100,7 +99,6 @@ export default function DeepMixed(
 									});
 
 									t_add_fragment(t_fragment_4, t_fragment_3, t_before, t_if_anchor_5, t_root_4);
-									t_next(t_if_anchor_5);
 									t_pop_region(t_old_region);
 									t_if_index_4 = 0;
 								}
@@ -111,7 +109,6 @@ export default function DeepMixed(
 							});
 
 							t_add_fragment(t_fragment_3, t_fragment_2, t_before, t_if_anchor_4, t_root_3);
-							t_next(t_if_anchor_4);
 							t_pop_region(t_old_region);
 							t_if_index_3 = 0;
 						}
@@ -122,7 +119,6 @@ export default function DeepMixed(
 					});
 
 					t_add_fragment(t_fragment_2, t_fragment_1, t_before, t_if_anchor_3, t_root_2);
-					t_next(t_if_anchor_3);
 					t_pop_region(t_old_region);
 					t_if_index_2 = 0;
 				}
@@ -133,7 +129,6 @@ export default function DeepMixed(
 			});
 
 			t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_if_anchor_2, t_root_1);
-			t_next(t_if_anchor_2);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 0;
 		}
@@ -157,7 +152,6 @@ export default function DeepMixed(
 			const t_root_6 = t_root_el(t_fragment_6);
 			const t_p_2 = t_root_6 as HTMLElement;
 			t_add_element(t_p_2, t_fragment_0, t_before);
-			t_next(t_p_2);
 			t_pop_region(t_old_region);
 			t_if_index_6 = 0;
 		}
@@ -168,6 +162,5 @@ export default function DeepMixed(
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_if_anchor_6, t_root_0);
-	t_next(t_if_anchor_6);
 
 }

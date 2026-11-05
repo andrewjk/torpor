@@ -56,7 +56,6 @@ export default function ForTemplateLiteral(
 				t_attribute(t_p_2, "aria-label", `slide show`);
 			}, undefined, { forVarMask: 1 });
 			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_p_2, t_root_1);
-			t_next(t_p_2);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -70,6 +69,5 @@ export default function ForTemplateLiteral(
 	);
 
 	t_add_element(t_section_1, $parent, $anchor);
-	t_next(t_section_1);
 
 }

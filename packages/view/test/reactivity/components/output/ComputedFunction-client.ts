@@ -30,6 +30,5 @@ export default function ComputedGetter(
 		t_text_3.textContent = `Quadrupled: ${t_fmt($props.count * 4)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
-	t_next(t_p_1);
 
 }

@@ -46,6 +46,5 @@ export default function PickPill(
 		t_text_1.textContent = `Picked: ${t_fmt($state.picked)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_label_1, t_root_0);
-	t_next(t_label_1);
 
 }

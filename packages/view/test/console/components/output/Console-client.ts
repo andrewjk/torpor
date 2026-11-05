@@ -1,6 +1,5 @@
 import t_add_element from "../../../../src/render/addElement";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -21,6 +20,5 @@ export default function Console(
 	/* @console */
 	console.log("@console is logging here");
 	t_add_element(t_div_1, $parent, $anchor);
-	t_next(t_div_1);
 
 }

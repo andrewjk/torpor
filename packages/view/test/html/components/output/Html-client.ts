@@ -4,7 +4,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_first_inside from "../../../../src/render/firstInsideNode";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_region from "../../../../src/render/newRegion";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_control from "../../../../src/render/runControl";
@@ -66,6 +65,5 @@ export default function Html(
 	});
 
 	t_add_element(t_p_1, $parent, $anchor);
-	t_next(t_p_1);
 
 }

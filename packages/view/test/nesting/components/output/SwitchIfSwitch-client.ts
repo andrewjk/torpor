@@ -3,7 +3,6 @@ import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
@@ -67,7 +66,6 @@ export default function SwitchInsideIfInsideSwitch(
 									const t_root_3 = t_root_el(t_fragment_3);
 									const t_p_1 = t_root_3 as HTMLElement;
 									t_add_element(t_p_1, t_fragment_2, t_before);
-									t_next(t_p_1);
 									t_pop_region(t_old_region);
 									t_switch_index_2 = 0;
 									break;
@@ -80,7 +78,6 @@ export default function SwitchInsideIfInsideSwitch(
 									const t_root_4 = t_root_el(t_fragment_4);
 									const t_p_2 = t_root_4 as HTMLElement;
 									t_add_element(t_p_2, t_fragment_2, t_before);
-									t_next(t_p_2);
 									t_pop_region(t_old_region);
 									t_switch_index_2 = 1;
 									break;
@@ -89,7 +86,6 @@ export default function SwitchInsideIfInsideSwitch(
 						});
 
 						t_add_fragment(t_fragment_2, t_fragment_1, t_before, t_switch_anchor_2, t_root_2);
-						t_next(t_switch_anchor_2);
 						t_pop_region(t_old_region);
 						t_if_index_1 = 0;
 					}
@@ -101,14 +97,12 @@ export default function SwitchInsideIfInsideSwitch(
 						const t_root_5 = t_root_el(t_fragment_5);
 						const t_p_3 = t_root_5 as HTMLElement;
 						t_add_element(t_p_3, t_fragment_1, t_before);
-						t_next(t_p_3);
 						t_pop_region(t_old_region);
 						t_if_index_1 = 1;
 					}
 				});
 
 				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_if_anchor_1, t_root_1);
-				t_next(t_if_anchor_1);
 				t_pop_region(t_old_region);
 				t_switch_index_1 = 0;
 				break;
@@ -121,7 +115,6 @@ export default function SwitchInsideIfInsideSwitch(
 				const t_root_6 = t_root_el(t_fragment_6);
 				const t_p_4 = t_root_6 as HTMLElement;
 				t_add_element(t_p_4, t_fragment_0, t_before);
-				t_next(t_p_4);
 				t_pop_region(t_old_region);
 				t_switch_index_1 = 1;
 				break;
@@ -134,7 +127,6 @@ export default function SwitchInsideIfInsideSwitch(
 				const t_root_7 = t_root_el(t_fragment_7);
 				const t_p_5 = t_root_7 as HTMLElement;
 				t_add_element(t_p_5, t_fragment_0, t_before);
-				t_next(t_p_5);
 				t_pop_region(t_old_region);
 				t_switch_index_1 = 2;
 				break;
@@ -143,6 +135,5 @@ export default function SwitchInsideIfInsideSwitch(
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_switch_anchor_1, t_root_0);
-	t_next(t_switch_anchor_1);
 
 }

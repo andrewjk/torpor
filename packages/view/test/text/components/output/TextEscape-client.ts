@@ -28,6 +28,5 @@ export default function TextEscape(
 		t_text_2.textContent = t_fmt("<b>bold</b>");
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
-	t_next(t_p_1);
 
 }

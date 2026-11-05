@@ -3,7 +3,6 @@ import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
@@ -33,10 +32,8 @@ export default function TryNoCatch(
 		const t_root_1 = t_root_el(t_fragment_1);
 		const t_p_1 = t_root_1 as HTMLElement;
 		t_add_element(t_p_1, t_fragment_0, t_before);
-		t_next(t_p_1);
 	}, null);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_try_anchor_1, t_root_0);
-	t_next(t_try_anchor_1);
 
 }

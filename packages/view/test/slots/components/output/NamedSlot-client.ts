@@ -37,7 +37,6 @@ export default function Named(
 		const t_root_2 = t_root_el(t_fragment_2);
 		const t_p_1 = t_root_2 as HTMLElement;
 		t_add_element(t_p_1, $sparent, $sanchor);
-		t_next(t_p_1);
 	}
 	t_slots_1["header"] = (
 		$sparent: ParentNode,
@@ -49,12 +48,10 @@ export default function Named(
 		const t_root_3 = t_root(t_fragment_3, true);
 		const t_text_1 = t_root_3;
 		t_add_fragment(t_fragment_3, $sparent, $sanchor, t_text_1, t_root_3);
-		t_next(t_text_1);
 	}
 	Article(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
-	t_next(t_comp_anchor_1);
 
 }
 
@@ -86,6 +83,5 @@ function Article(
 		$slots["footer"](t_section_1, t_slot_anchor_3, undefined, $context)
 	}
 	t_add_element(t_section_1, $parent, $anchor);
-	t_next(t_section_1);
 
 }

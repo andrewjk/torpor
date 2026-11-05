@@ -59,7 +59,6 @@ export default function ForSingleRoot(
 				t_text_1.textContent = `${t_fmt(row.label)}${t_fmt(suffix)}`;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
-			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -73,6 +72,5 @@ export default function ForSingleRoot(
 	);
 
 	t_add_element(t_ul_1, $parent, $anchor);
-	t_next(t_ul_1);
 
 }

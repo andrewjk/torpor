@@ -82,7 +82,6 @@ export default function ForNestedKeyed(
 						t_text_2.textContent = t_fmt(it.label);
 					}, undefined, { forVarMask: 2 });
 					t_add_element(t_li_1, t_for_parent_2, t_before_2);
-					t_next(t_li_1);
 				},
 				(t_old_item, t_new_item) => {
 					let t_changed_mask = 0;
@@ -100,7 +99,6 @@ export default function ForNestedKeyed(
 				t_text_1.textContent = t_fmt(g.id);
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_section_1, t_for_parent_1, t_before_1);
-			t_next(t_section_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -110,6 +108,5 @@ export default function ForNestedKeyed(
 
 	const t_footer_1 = t_next(t_next(t_for_parent_1, true)) as HTMLElement;
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_footer_1, t_root_0);
-	t_next(t_footer_1);
 
 }

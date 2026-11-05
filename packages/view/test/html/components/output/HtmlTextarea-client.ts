@@ -82,6 +82,5 @@ export default function HtmlTextarea(
 	});
 	t_event(t_textarea_1, "input", (e) => $state.text = e.target.value);
 	t_add_element(t_div_1, $parent, $anchor);
-	t_next(t_div_1);
 
 }

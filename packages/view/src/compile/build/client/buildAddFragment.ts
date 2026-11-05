@@ -61,14 +61,12 @@ export default function buildAddFragment(
 			// before)` replaces `t_add_fragment(fragment, parent, before,
 			// endNode)`. Saves the `firstChild` / `lastChild` reads and the
 			// `DocumentFragment`-aware branches inside `t_add_fragment`.
+			// (`t_add_element` also advances the hydration cursor past the
+			// node when hydrating.)
 			status.imports.add("t_add_element");
 			b.append(
 				`t_add_element(${fragment.endVarName ?? fragmentName}, ${parentName}, ${anchorName});`,
 			);
-			if (fragment.endVarName) {
-				status.imports.add("t_next");
-				b.append(`t_next(${fragment.endVarName});`);
-			}
 		} else {
 			status.imports.add("t_add_fragment");
 			let params = [fragmentName, parentName, anchorName];
@@ -84,11 +82,8 @@ export default function buildAddFragment(
 				params.push(fragment.rootVarName);
 			}
 			b.append(`t_add_fragment(${params.join(", ")});`);
-			// TODO: Don't need to do this if the last thing we hydrated was the end node
-			if (fragment.endVarName) {
-				status.imports.add("t_next");
-				b.append(`t_next(${fragment.endVarName});`);
-			}
+			// (`t_add_fragment` advances the hydration cursor past the end
+			// node when hydrating)
 		}
 	}
 }

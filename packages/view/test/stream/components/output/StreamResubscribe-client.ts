@@ -79,7 +79,6 @@ export default function StreamResubscribe(
 				t_text_1.textContent = t_fmt(m);
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
-			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -94,6 +93,5 @@ export default function StreamResubscribe(
 
 	t_event(t_button_1, "click", () => { $state.channel = "b" });
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_ul_1, t_root_0);
-	t_next(t_ul_1);
 
 }

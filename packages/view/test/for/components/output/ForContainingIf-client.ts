@@ -6,7 +6,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
@@ -72,7 +71,6 @@ export default function ForContainingIf(
 						t_text_1.textContent = ` ${t_fmt(i)} `;
 					}, undefined, { forVarMask: 1 });
 					t_add_element(t_p_1, t_fragment_1, t_before);
-					t_next(t_p_1);
 					t_pop_region(t_old_region);
 					t_if_index_1 = 0;
 				}
@@ -83,7 +81,6 @@ export default function ForContainingIf(
 			});
 
 			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_if_anchor_1, t_root_1);
-			t_next(t_if_anchor_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -92,6 +89,5 @@ export default function ForContainingIf(
 	);
 
 	t_add_element(t_section_1, $parent, $anchor);
-	t_next(t_section_1);
 
 }

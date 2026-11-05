@@ -63,18 +63,15 @@ export default function AwaitRapid(
 			t_text_1.textContent = `Result: ${t_fmt($state.data)}`;
 		});
 		t_add_element(t_p_1, t_fragment_0, t_before);
-		t_next(t_p_1);
 	}, (t_before) => {
 		const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p>Loading...</p>`);
 		const t_root_2 = t_root_el(t_fragment_2);
 		const t_p_2 = t_root_2 as HTMLElement;
 		t_add_element(t_p_2, t_fragment_0, t_before);
-		t_next(t_p_2);
 	});
 
 	const t_button_1 = t_next(t_next(t_await_anchor_1, true)) as HTMLButtonElement;
 	t_event(t_button_1, "click", refresh);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_button_1, t_root_0);
-	t_next(t_button_1);
 
 }

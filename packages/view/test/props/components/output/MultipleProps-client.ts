@@ -46,7 +46,6 @@ export default function MultipleProps(
 	Card(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
-	t_next(t_comp_anchor_1);
 
 }
 
@@ -81,7 +80,6 @@ function Card(
 			const t_root_1 = t_root_el(t_fragment_1);
 			const t_span_1 = t_root_1 as HTMLSpanElement;
 			t_add_element(t_span_1, t_div_1, t_before);
-			t_next(t_span_1);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 0;
 		}
@@ -93,7 +91,6 @@ function Card(
 			const t_root_2 = t_root_el(t_fragment_2);
 			const t_span_2 = t_root_2 as HTMLSpanElement;
 			t_add_element(t_span_2, t_div_1, t_before);
-			t_next(t_span_2);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 1;
 		}
@@ -105,6 +102,5 @@ function Card(
 		t_text_3.textContent = `Count: ${t_fmt($props.count)}`;
 	});
 	t_add_element(t_div_1, $parent, $anchor);
-	t_next(t_div_1);
 
 }

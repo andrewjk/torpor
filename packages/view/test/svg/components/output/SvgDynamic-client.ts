@@ -2,7 +2,6 @@ import t_add_element from "../../../../src/render/addElement";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
@@ -39,7 +38,6 @@ export default function SvgDynamic(
 			const t_root_1 = t_root_el(t_fragment_1);
 			const t_circle_1 = t_root_1 as HTMLElement;
 			t_add_element(t_circle_1, t_svg_1, t_before);
-			t_next(t_circle_1);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 0;
 		}
@@ -51,7 +49,6 @@ export default function SvgDynamic(
 			const t_root_2 = t_root_el(t_fragment_2);
 			const t_rect_1 = t_root_2 as SVGRectElement;
 			t_add_element(t_rect_1, t_svg_1, t_before);
-			t_next(t_rect_1);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 1;
 		}
@@ -63,13 +60,11 @@ export default function SvgDynamic(
 			const t_root_3 = t_root_el(t_fragment_3);
 			const t_polygon_1 = t_root_3 as HTMLElement;
 			t_add_element(t_polygon_1, t_svg_1, t_before);
-			t_next(t_polygon_1);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 2;
 		}
 	});
 
 	t_add_element(t_svg_1, $parent, $anchor);
-	t_next(t_svg_1);
 
 }

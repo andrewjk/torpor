@@ -5,7 +5,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_dynamic from "../../../../src/render/setDynamicElement";
 import t_fragment from "../../../../src/render/getFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -42,12 +41,10 @@ export default function Element(
 		const t_root_2 = t_root(t_fragment_2, true);
 		const t_text_1 = t_root_2;
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1, t_root_2);
-		t_next(t_text_1);
 	}
 	Child(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
-	t_next(t_comp_anchor_1);
 
 }
 
@@ -73,6 +70,5 @@ function Child(
 		t_element_1 = t_dynamic(t_element_1, $props.tag);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_element_1, t_root_0);
-	t_next(t_element_1);
 
 }

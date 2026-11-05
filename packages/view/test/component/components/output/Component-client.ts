@@ -7,7 +7,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import type SlotRender from "../../../../src/types/SlotRender";
@@ -34,7 +33,6 @@ export default function Component(
 	Header(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
-	t_next(t_comp_anchor_1);
 
 }
 
@@ -57,6 +55,5 @@ function Header(
 		t_text_1.textContent = `Hi, ${t_fmt($props.name)}`;
 	});
 	t_add_element(t_h2_1, $parent, $anchor);
-	t_next(t_h2_1);
 
 }

@@ -72,7 +72,6 @@ export default function ForIfElseReactive(
 						t_text_1.textContent = t_fmt(t.id);
 					}, undefined, { forVarMask: 1 });
 					t_add_element(t_li_1, t_fragment_1, t_before);
-					t_next(t_li_1);
 					t_pop_region(t_old_region);
 					t_if_index_1 = 0;
 				}
@@ -89,14 +88,12 @@ export default function ForIfElseReactive(
 						t_text_2.textContent = t_fmt(t.id);
 					}, undefined, { forVarMask: 1 });
 					t_add_element(t_li_2, t_fragment_1, t_before);
-					t_next(t_li_2);
 					t_pop_region(t_old_region);
 					t_if_index_1 = 1;
 				}
 			});
 
 			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_if_anchor_1, t_root_1);
-			t_next(t_if_anchor_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -106,6 +103,5 @@ export default function ForIfElseReactive(
 
 	const t_footer_1 = t_next(t_next(t_for_parent_1, true)) as HTMLElement;
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_footer_1, t_root_0);
-	t_next(t_footer_1);
 
 }

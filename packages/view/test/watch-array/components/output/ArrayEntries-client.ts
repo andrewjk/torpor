@@ -52,7 +52,6 @@ export default function ArrayEntries(
 				t_text_1.textContent = ` ${t_fmt(i > 0 ? ", " : "")} ${t_fmt(item.text)} `;
 			}, undefined, { forVarMask: 3 });
 			t_add_element(t_span_1, t_section_1, t_before_1);
-			t_next(t_span_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -70,6 +69,5 @@ export default function ArrayEntries(
 	);
 
 	t_add_element(t_section_1, $parent, $anchor);
-	t_next(t_section_1);
 
 }

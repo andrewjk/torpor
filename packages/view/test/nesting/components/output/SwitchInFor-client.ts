@@ -4,7 +4,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
@@ -70,7 +69,6 @@ export default function SwitchInFor(
 							t_text_1.textContent = `${t_fmt(item.name)} (admin)`;
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_strong_1, t_li_1, t_before);
-						t_next(t_strong_1);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 0;
 						break;
@@ -88,7 +86,6 @@ export default function SwitchInFor(
 							t_text_2.textContent = `${t_fmt(item.name)} (user)`;
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_span_1, t_li_1, t_before);
-						t_next(t_span_1);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 1;
 						break;
@@ -106,7 +103,6 @@ export default function SwitchInFor(
 							t_text_3.textContent = `${t_fmt(item.name)} (unknown)`;
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_em_1, t_li_1, t_before);
-						t_next(t_em_1);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 2;
 						break;
@@ -115,7 +111,6 @@ export default function SwitchInFor(
 			});
 
 			t_add_element(t_li_1, t_ul_1, t_before_1);
-			t_next(t_li_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -124,6 +119,5 @@ export default function SwitchInFor(
 	);
 
 	t_add_element(t_ul_1, $parent, $anchor);
-	t_next(t_ul_1);
 
 }

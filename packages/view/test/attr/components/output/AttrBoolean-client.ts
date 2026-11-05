@@ -28,6 +28,5 @@ export default function AttrBoolean(
 		t_attribute(t_input_2, "readonly", $props.readonly);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_input_2, t_root_0);
-	t_next(t_input_2);
 
 }

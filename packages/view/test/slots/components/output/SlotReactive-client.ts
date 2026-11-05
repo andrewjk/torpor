@@ -43,12 +43,10 @@ export default function SlotReactive(
 			t_text_1.textContent = t_fmt($props.label);
 		});
 		t_add_element(t_p_1, $sparent, $sanchor);
-		t_next(t_p_1);
 	}
 	Labeled(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
-	t_next(t_comp_anchor_1);
 
 }
 
@@ -71,6 +69,5 @@ function Labeled(
 		$slots["_"](t_div_1, t_slot_anchor_1, undefined, $context)
 	}
 	t_add_element(t_div_1, $parent, $anchor);
-	t_next(t_div_1);
 
 }

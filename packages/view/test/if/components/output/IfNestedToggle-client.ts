@@ -53,7 +53,6 @@ export default function IfNested(
 					const t_root_2 = t_root_el(t_fragment_2);
 					const t_p_1 = t_root_2 as HTMLElement;
 					t_add_element(t_p_1, t_fragment_1, t_before);
-					t_next(t_p_1);
 					t_pop_region(t_old_region);
 					t_if_index_2 = 0;
 				}
@@ -65,14 +64,12 @@ export default function IfNested(
 					const t_root_3 = t_root_el(t_fragment_3);
 					const t_p_2 = t_root_3 as HTMLElement;
 					t_add_element(t_p_2, t_fragment_1, t_before);
-					t_next(t_p_2);
 					t_pop_region(t_old_region);
 					t_if_index_2 = 1;
 				}
 			});
 
 			t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_if_anchor_2, t_root_1);
-			t_next(t_if_anchor_2);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 0;
 		}
@@ -84,13 +81,11 @@ export default function IfNested(
 			const t_root_4 = t_root_el(t_fragment_4);
 			const t_p_3 = t_root_4 as HTMLElement;
 			t_add_element(t_p_3, t_fragment_0, t_before);
-			t_next(t_p_3);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 1;
 		}
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_if_anchor_1, t_root_0);
-	t_next(t_if_anchor_1);
 
 }

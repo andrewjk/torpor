@@ -55,7 +55,6 @@ export default function ReactiveNewProp(
 				t_text_1.textContent = t_fmt(item);
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_for_parent_1, t_before_1);
-			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -80,6 +79,5 @@ export default function ReactiveNewProp(
 		t_text_5.textContent = `New: ${t_fmt($props.newItem)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
-	t_next(t_p_1);
 
 }

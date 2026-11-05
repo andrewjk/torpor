@@ -41,7 +41,6 @@ export default function MultiComponent(
 		t_text_1.textContent = `outer ${t_fmt($state.count)}`;
 	});
 	t_add_element(t_div_1, $parent, $anchor);
-	t_next(t_div_1);
 
 }
 
@@ -71,6 +70,5 @@ function Inner(
 		t_text_1.textContent = `inner ${t_fmt($props.label)}`;
 	});
 	t_add_element(t_span_1, $parent, $anchor);
-	t_next(t_span_1);
 
 }

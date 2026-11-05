@@ -7,7 +7,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_region from "../../../../src/render/newRegion";
 import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
@@ -53,12 +52,10 @@ export default function Let(
 			t_text_1.textContent = ` ${t_fmt($slot.item.text)} `;
 		});
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1, t_root_2);
-		t_next(t_text_1);
 	}
 	List(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
-	t_next(t_comp_anchor_1);
 
 }
 
@@ -108,7 +105,6 @@ function List(
 				$slots["_"](t_li_1, t_slot_anchor_1, t_slot_props_1, $context)
 			}
 			t_add_element(t_li_1, t_ul_1, t_before_1);
-			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -122,6 +118,5 @@ function List(
 	);
 
 	t_add_element(t_ul_1, $parent, $anchor);
-	t_next(t_ul_1);
 
 }

@@ -62,7 +62,6 @@ export default function ForWrite(
 				t_text_1.textContent = ` ${t_fmt(row.done ? "done" : "todo")}:${t_fmt(row.label)} `;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
-			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
 			t_old_item.data.row = t_new_item.data.row;
@@ -70,6 +69,5 @@ export default function ForWrite(
 	);
 
 	t_add_element(t_ul_1, $parent, $anchor);
-	t_next(t_ul_1);
 
 }

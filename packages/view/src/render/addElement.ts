@@ -1,4 +1,5 @@
 import context from "./context";
+import nodeNext from "./nodeNext";
 import runMountSideEffects from "./runMountSideEffects";
 
 /**
@@ -40,4 +41,11 @@ export default function addElement(node: Element, parent: ParentNode, before: No
 	// If we're adding this node to the DOM, we can now run any $onmount
 	// effects, add our stashed events and play our stashed animations
 	runMountSideEffects(parent, activeRegion, hydrationNode);
+
+	// When hydrating, advance the hydration cursor past the node. The
+	// compiler relies on this: it used to emit a trailing `t_next(node)`
+	// after every `t_add_element(node, ...)` call
+	if (hydrationNode !== null) {
+		nodeNext(node);
+	}
 }

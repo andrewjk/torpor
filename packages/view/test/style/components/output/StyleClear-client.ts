@@ -26,6 +26,5 @@ export default function StyleClear(
 		t_div_2.style.cssText = t_style(`color: ${$props.color}`);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_2, t_root_0);
-	t_next(t_div_2);
 
 }

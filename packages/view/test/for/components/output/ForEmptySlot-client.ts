@@ -59,7 +59,6 @@ export default function App(
 				const t_root_3 = t_root_el(t_fragment_3);
 				const t_p_1 = t_root_3 as HTMLElement;
 				t_add_element(t_p_1, t_fragment_2, t_before);
-				t_next(t_p_1);
 				t_pop_region(t_old_region);
 				t_if_index_1 = 0;
 			}
@@ -94,7 +93,6 @@ export default function App(
 					t_text_1.textContent = t_fmt(item);
 				}, undefined, { forVarMask: 1 });
 				t_add_element(t_li_1, t_fragment_2, t_before_1);
-				t_next(t_li_1);
 			},
 			(t_old_item, t_new_item) => {
 				let t_changed_mask = 0;
@@ -108,12 +106,10 @@ export default function App(
 		);
 
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_for_anchor_1, t_root_2);
-		t_next(t_for_anchor_1);
 	}
 	Wrapper(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
-	t_next(t_comp_anchor_1);
 
 }
 
@@ -136,6 +132,5 @@ function Wrapper(
 		$slots["_"](t_div_1, t_slot_anchor_1, undefined, $context)
 	}
 	t_add_element(t_div_1, $parent, $anchor);
-	t_next(t_div_1);
 
 }

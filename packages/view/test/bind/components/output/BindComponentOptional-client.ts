@@ -52,7 +52,6 @@ export default function BindComponentOptional(
 		t_text_1.textContent = `Hello, ${t_fmt($state.user?.name)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_button_1, t_root_0);
-	t_next(t_button_1);
 
 }
 
@@ -75,6 +74,5 @@ function BindText(
 	});
 	t_event(t_input_1, "input", (e) => $props.name = e.target.value);
 	t_add_element(t_input_1, $parent, $anchor);
-	t_next(t_input_1);
 
 }

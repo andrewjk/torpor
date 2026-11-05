@@ -59,7 +59,6 @@ export default function ForFollowedByIf(
 				t_text_1.textContent = t_fmt(item);
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_for_parent_1, t_before_1);
-			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -86,7 +85,6 @@ export default function ForFollowedByIf(
 			const t_root_2 = t_root_el(t_fragment_2);
 			const t_p_1 = t_root_2 as HTMLElement;
 			t_add_element(t_p_1, t_fragment_0, t_before);
-			t_next(t_p_1);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 0;
 		}
@@ -97,6 +95,5 @@ export default function ForFollowedByIf(
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_if_anchor_1, t_root_0);
-	t_next(t_if_anchor_1);
 
 }

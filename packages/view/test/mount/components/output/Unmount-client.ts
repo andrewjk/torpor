@@ -1,7 +1,6 @@
 import $onmount from "../../../../src/watch/$onmount";
 import t_add_element from "../../../../src/render/addElement";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -27,6 +26,5 @@ export default function UnmountTest(
 	const t_root_0 = t_root_el(t_fragment_0);
 	const t_p_1 = t_root_0 as HTMLElement;
 	t_add_element(t_p_1, $parent, $anchor);
-	t_next(t_p_1);
 
 }

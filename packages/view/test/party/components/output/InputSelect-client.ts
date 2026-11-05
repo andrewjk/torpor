@@ -72,7 +72,6 @@ export default function ColorSelect(
 				t_text_2.textContent = ` ${t_fmt(color.text)} `;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_option_1, t_select_1, t_before_1);
-			t_next(t_option_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -93,6 +92,5 @@ export default function ColorSelect(
 		t_text_1.textContent = `Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_select_1, t_root_0);
-	t_next(t_select_1);
 
 }

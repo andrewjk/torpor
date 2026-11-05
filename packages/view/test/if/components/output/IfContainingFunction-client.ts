@@ -4,7 +4,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_event from "../../../../src/render/addEvent";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
@@ -49,7 +48,6 @@ export default function IfContainingIf(
 
 			t_event(t_button_1, "click", doit);
 			t_add_element(t_button_1, t_fragment_0, t_before);
-			t_next(t_button_1);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 0;
 		}
@@ -60,6 +58,5 @@ export default function IfContainingIf(
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_if_anchor_1, t_root_0);
-	t_next(t_if_anchor_1);
 
 }

@@ -4,7 +4,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
@@ -74,7 +73,6 @@ export default function ForNested(
 						t_text_1.textContent = t_fmt(cell);
 					}, undefined, { forVarMask: 2 });
 					t_add_element(t_td_1, t_tr_1, t_before_2);
-					t_next(t_td_1);
 				},
 				(t_old_item, t_new_item) => {
 					let t_changed_mask = 0;
@@ -88,7 +86,6 @@ export default function ForNested(
 			);
 
 			t_add_element(t_tr_1, t_table_1, t_before_1);
-			t_next(t_tr_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -97,6 +94,5 @@ export default function ForNested(
 	);
 
 	t_add_element(t_table_1, $parent, $anchor);
-	t_next(t_table_1);
 
 }

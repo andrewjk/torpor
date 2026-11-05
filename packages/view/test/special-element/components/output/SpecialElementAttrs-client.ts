@@ -4,7 +4,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_dynamic from "../../../../src/render/setDynamicElement";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -30,6 +29,5 @@ export default function SpecialElementAttrs(
 		t_text_1.textContent = ` ${t_fmt($props.content)} `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_element_1, t_root_0);
-	t_next(t_element_1);
 
 }

@@ -43,6 +43,5 @@ export default function OnmountNestedRun(
 	const t_button_1 = t_next(t_next(t_span_1, true)) as HTMLButtonElement;
 	t_event(t_button_1, "click", increment);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_button_1, t_root_0);
-	t_next(t_button_1);
 
 }

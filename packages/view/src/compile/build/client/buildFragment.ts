@@ -854,6 +854,7 @@ function getFragmentVarPathPart(
 			if (child.type === "text" || child.type === "space") {
 				// HACK: Using t_next_text just stops t_next(node, true) from
 				// being converted into t_skip
+				status.imports.add("t_next");
 				varPath = `t_next_text(${varPath}, true)`;
 			} else {
 				status.imports.add("t_next");

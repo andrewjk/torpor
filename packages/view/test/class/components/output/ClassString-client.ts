@@ -26,6 +26,5 @@ export default function ClassString(
 		t_p_2.className = t_class(["tag", $props.size, $props.color].join(" "));
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_2, t_root_0);
-	t_next(t_p_2);
 
 }

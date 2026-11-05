@@ -56,7 +56,6 @@ export default function NestedComponent(
 		Child(t_fragment_2, t_comp_anchor_2, t_props_2, $context);
 
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_comp_anchor_2, t_root_2);
-		t_next(t_comp_anchor_2);
 	}
 	Parent(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 
@@ -64,7 +63,6 @@ export default function NestedComponent(
 		t_text_1.textContent = t_fmt($props.parentName);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
-	t_next(t_comp_anchor_1);
 
 }
 
@@ -91,7 +89,6 @@ function Parent(
 		t_text_1.textContent = `Parent: ${t_fmt($props.name)}`;
 	});
 	t_add_element(t_div_1, $parent, $anchor);
-	t_next(t_div_1);
 
 }
 
@@ -114,6 +111,5 @@ function Child(
 		t_text_1.textContent = `Child: ${t_fmt($props.name)}`;
 	});
 	t_add_element(t_p_1, $parent, $anchor);
-	t_next(t_p_1);
 
 }

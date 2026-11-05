@@ -2,7 +2,6 @@ import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_class from "../../../../src/render/buildClasses";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -24,6 +23,5 @@ export default function ClassToggle(
 		t_p_1.className = t_class({ active: $props.active, emphasis: $props.emphasis, base: true });
 	});
 	t_add_element(t_p_1, $parent, $anchor);
-	t_next(t_p_1);
 
 }

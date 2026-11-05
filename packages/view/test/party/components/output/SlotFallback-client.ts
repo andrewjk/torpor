@@ -41,12 +41,10 @@ export default function FunnyButtonApp(
 		const t_root_2 = t_root(t_fragment_2, true);
 		const t_text_1 = t_root_2;
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1, t_root_2);
-		t_next(t_text_1);
 	}
 	FunnyButton(t_fragment_0, t_comp_anchor_2, undefined, $context, t_slots_1);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_2, t_root_0);
-	t_next(t_comp_anchor_2);
 
 }
 
@@ -72,9 +70,7 @@ function FunnyButton(
 		const t_root_1 = t_root_el(t_fragment_1);
 		const t_span_1 = t_root_1 as HTMLSpanElement;
 		t_add_element(t_span_1, t_button_1, t_slot_anchor_1);
-		t_next(t_span_1);
 	}
 	t_add_element(t_button_1, $parent, $anchor);
-	t_next(t_button_1);
 
 }

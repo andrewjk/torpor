@@ -38,7 +38,6 @@ export default function MultipleChildren(
 		const t_root_2 = t_root(t_fragment_2);
 		const t_footer_1 = t_next(t_next(t_next(t_next(t_root_2, true)), true)) as HTMLElement;
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_footer_1, t_root_2);
-		t_next(t_footer_1);
 	}
 	Card(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 
@@ -48,7 +47,6 @@ export default function MultipleChildren(
 		t_text_1.textContent = t_fmt($props.text);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
-	t_next(t_p_1);
 
 }
 
@@ -71,6 +69,5 @@ function Card(
 		$slots["_"](t_div_1, t_slot_anchor_1, undefined, $context)
 	}
 	t_add_element(t_div_1, $parent, $anchor);
-	t_next(t_div_1);
 
 }

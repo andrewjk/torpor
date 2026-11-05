@@ -65,7 +65,6 @@ export default function ForObjectProps(
 					const t_root_2 = t_root_el(t_fragment_2);
 					const t_strong_1 = t_root_2 as HTMLElement;
 					t_add_element(t_strong_1, t_li_1, t_before);
-					t_next(t_strong_1);
 					t_pop_region(t_old_region);
 					t_if_index_1 = 0;
 				}
@@ -80,7 +79,6 @@ export default function ForObjectProps(
 				t_text_1.textContent = t_fmt(item.name);
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
-			t_next(t_li_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -89,6 +87,5 @@ export default function ForObjectProps(
 	);
 
 	t_add_element(t_ul_1, $parent, $anchor);
-	t_next(t_ul_1);
 
 }

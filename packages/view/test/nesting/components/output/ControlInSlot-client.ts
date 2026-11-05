@@ -83,7 +83,6 @@ export default function ControlInSlot(
 							t_text_1.textContent = t_fmt(item.name);
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_p_1, t_fragment_3, t_before);
-						t_next(t_p_1);
 						t_pop_region(t_old_region);
 						t_if_index_1 = 0;
 					}
@@ -94,7 +93,6 @@ export default function ControlInSlot(
 				});
 
 				t_add_fragment(t_fragment_3, t_fragment_2, t_before_1, t_if_anchor_1, t_root_3);
-				t_next(t_if_anchor_1);
 				t_pop_region(t_old_region_1);
 			},
 			(t_old_item, t_new_item) => {
@@ -103,12 +101,10 @@ export default function ControlInSlot(
 		);
 
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_for_anchor_1, t_root_2);
-		t_next(t_for_anchor_1);
 	}
 	Card(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
-	t_next(t_comp_anchor_1);
 
 }
 
@@ -131,6 +127,5 @@ function Card(
 		$slots["_"](t_div_1, t_slot_anchor_1, undefined, $context)
 	}
 	t_add_element(t_div_1, $parent, $anchor);
-	t_next(t_div_1);
 
 }

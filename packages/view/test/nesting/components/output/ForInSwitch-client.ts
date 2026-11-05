@@ -6,7 +6,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
@@ -72,7 +71,6 @@ export default function ForInSwitch(
 							t_text_1.textContent = t_fmt(item);
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_li_1, t_ul_1, t_before_1);
-						t_next(t_li_1);
 					},
 					(t_old_item, t_new_item) => {
 						let t_changed_mask = 0;
@@ -86,7 +84,6 @@ export default function ForInSwitch(
 				);
 
 				t_add_element(t_ul_1, t_fragment_0, t_before);
-				t_next(t_ul_1);
 				t_pop_region(t_old_region);
 				t_switch_index_1 = 0;
 				break;
@@ -103,7 +100,6 @@ export default function ForInSwitch(
 					t_text_2.textContent = `Count: ${t_fmt($props.items.length)}`;
 				});
 				t_add_element(t_p_1, t_fragment_0, t_before);
-				t_next(t_p_1);
 				t_pop_region(t_old_region);
 				t_switch_index_1 = 1;
 				break;
@@ -116,7 +112,6 @@ export default function ForInSwitch(
 				const t_root_4 = t_root_el(t_fragment_4);
 				const t_p_2 = t_root_4 as HTMLElement;
 				t_add_element(t_p_2, t_fragment_0, t_before);
-				t_next(t_p_2);
 				t_pop_region(t_old_region);
 				t_switch_index_1 = 2;
 				break;
@@ -125,6 +120,5 @@ export default function ForInSwitch(
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_switch_anchor_1, t_root_0);
-	t_next(t_switch_anchor_1);
 
 }

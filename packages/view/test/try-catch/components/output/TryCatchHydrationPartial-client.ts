@@ -45,7 +45,6 @@ export default function TryHydrationMismatch(
 			t_text_1.textContent = t_fmt(boom());
 		});
 		t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_p_1, t_root_1);
-		t_next(t_p_1);
 	},(t_before, err) => {
 		const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p class="error">#</p>`);
 		const t_root_2 = t_root_el(t_fragment_2);
@@ -55,10 +54,8 @@ export default function TryHydrationMismatch(
 			t_text_2.textContent = `Caught: ${t_fmt(err.message)}`;
 		});
 		t_add_element(t_p_2, t_fragment_0, t_before);
-		t_next(t_p_2);
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_try_anchor_1, t_root_0);
-	t_next(t_try_anchor_1);
 
 }

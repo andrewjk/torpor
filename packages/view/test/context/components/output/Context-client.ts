@@ -38,7 +38,6 @@ export default function Parent(
 	ChildB(t_fragment_0, t_comp_anchor_2, undefined, $context);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_2, t_root_0);
-	t_next(t_comp_anchor_2);
 
 }
 
@@ -68,7 +67,6 @@ function ChildA(
 		t_text_3.textContent = `Child b: ${t_fmt($context["ChildBContext"] ?? "???")}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
-	t_next(t_p_1);
 
 }
 
@@ -90,6 +88,5 @@ function ChildB(
 	const t_root_0 = t_root_el(t_fragment_0);
 	const t_p_1 = t_root_0 as HTMLElement;
 	t_add_element(t_p_1, $parent, $anchor);
-	t_next(t_p_1);
 
 }

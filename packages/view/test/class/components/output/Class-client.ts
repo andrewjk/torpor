@@ -47,7 +47,6 @@ export default function Class(
 		const t_root_2 = t_root(t_fragment_2, true);
 		const t_text_1 = t_root_2;
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1, t_root_2);
-		t_next(t_text_1);
 	}
 	Child(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 
@@ -71,7 +70,6 @@ export default function Class(
 		const t_root_4 = t_root(t_fragment_4, true);
 		const t_text_2 = t_root_4;
 		t_add_fragment(t_fragment_4, $sparent, $sanchor, t_text_2, t_root_4);
-		t_next(t_text_2);
 	}
 	Child(t_fragment_0, t_comp_anchor_2, t_props_2, $context, t_slots_2);
 
@@ -92,7 +90,6 @@ export default function Class(
 		const t_root_6 = t_root(t_fragment_6, true);
 		const t_text_3 = t_root_6;
 		t_add_fragment(t_fragment_6, $sparent, $sanchor, t_text_3, t_root_6);
-		t_next(t_text_3);
 	}
 	Child(t_fragment_0, t_comp_anchor_3, t_props_3, $context, t_slots_3);
 
@@ -104,7 +101,6 @@ export default function Class(
 		t_div_4.className = t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ], "torp-16s1yph");
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_3, t_root_0);
-	t_next(t_comp_anchor_3);
 
 }
 
@@ -131,12 +127,10 @@ function Child(
 		const t_root_1 = t_root(t_fragment_1, true);
 		const t_text_1 = t_root_1;
 		t_add_fragment(t_fragment_1, t_div_1, t_slot_anchor_1, t_text_1, t_root_1);
-		t_next(t_text_1);
 	}
 	$run(() => {
 		t_div_1.className = t_class($props.class);
 	});
 	t_add_element(t_div_1, $parent, $anchor);
-	t_next(t_div_1);
 
 }

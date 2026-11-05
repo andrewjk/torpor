@@ -1,7 +1,6 @@
 import $onmount from "../../../../src/watch/$onmount";
 import t_add_element from "../../../../src/render/addElement";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -24,6 +23,5 @@ export default function OnMount(
 		return ((node) => node.value = "hi")(t_input_1);
 	});
 	t_add_element(t_input_1, $parent, $anchor);
-	t_next(t_input_1);
 
 }

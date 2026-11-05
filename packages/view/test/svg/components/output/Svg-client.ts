@@ -4,7 +4,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_class from "../../../../src/render/buildClasses";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
@@ -41,7 +40,6 @@ export default function Shape(
 			const t_root_1 = t_root_el(t_fragment_1);
 			const t_rect_1 = t_root_1 as SVGRectElement;
 			t_add_element(t_rect_1, t_svg_1, t_before);
-			t_next(t_rect_1);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 0;
 		}
@@ -53,7 +51,6 @@ export default function Shape(
 			const t_root_2 = t_root_el(t_fragment_2);
 			const t_circle_1 = t_root_2 as HTMLElement;
 			t_add_element(t_circle_1, t_svg_1, t_before);
-			t_next(t_circle_1);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 1;
 		}
@@ -64,6 +61,5 @@ export default function Shape(
 		t_svg_1.className.baseVal = t_class({ "svg-cls": true });
 	});
 	t_add_element(t_svg_1, $parent, $anchor);
-	t_next(t_svg_1);
 
 }

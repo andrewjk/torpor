@@ -4,7 +4,6 @@ import t_add_element from "../../../../src/render/addElement";
 import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -32,6 +31,5 @@ export default function NameUpdate(
 		t_text_1.textContent = `Hello ${t_fmt($state.name)}`;
 	});
 	t_add_element(t_h1_1, $parent, $anchor);
-	t_next(t_h1_1);
 
 }

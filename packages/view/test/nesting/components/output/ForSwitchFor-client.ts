@@ -6,7 +6,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
@@ -74,7 +73,6 @@ export default function ForSwitchFor(
 							t_text_1.textContent = t_fmt(row.reduce((a, b) => a + b, 0));
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_p_1, t_div_1, t_before);
-						t_next(t_p_1);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 0;
 						break;
@@ -92,7 +90,6 @@ export default function ForSwitchFor(
 							t_text_2.textContent = t_fmt(Math.max(...row));
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_p_2, t_div_1, t_before);
-						t_next(t_p_2);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 1;
 						break;
@@ -129,7 +126,6 @@ export default function ForSwitchFor(
 									t_text_3.textContent = `${t_fmt(cell)} `;
 								}, undefined, { forVarMask: 2 });
 								t_add_element(t_span_1, t_fragment_4, t_before_2);
-								t_next(t_span_1);
 							},
 							(t_old_item, t_new_item) => {
 								let t_changed_mask = 0;
@@ -143,7 +139,6 @@ export default function ForSwitchFor(
 						);
 
 						t_add_fragment(t_fragment_4, t_div_1, t_before, t_for_anchor_2, t_root_4);
-						t_next(t_for_anchor_2);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 2;
 						break;
@@ -156,7 +151,6 @@ export default function ForSwitchFor(
 						const t_root_6 = t_root_el(t_fragment_6);
 						const t_p_3 = t_root_6 as HTMLElement;
 						t_add_element(t_p_3, t_div_1, t_before);
-						t_next(t_p_3);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 3;
 						break;
@@ -165,7 +159,6 @@ export default function ForSwitchFor(
 			});
 
 			t_add_element(t_div_1, t_fragment_0, t_before_1);
-			t_next(t_div_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -174,6 +167,5 @@ export default function ForSwitchFor(
 	);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_for_anchor_1, t_root_0);
-	t_next(t_for_anchor_1);
 
 }
