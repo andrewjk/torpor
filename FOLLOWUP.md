@@ -373,3 +373,51 @@ script, not just the subset the template rendered, so a cache that keys a page
 by URL alone can expose values the markup never showed. A dev-only reminder
 prompts for an explicit `Cache-Control` (and any value silences it), but that's
 a nudge, not enforcement — the requirement is on the site's cache config.
+
+### Control-flow branches repeat the region push/pop boilerplate (view compiler)
+
+Every emitted `@if`/`@switch`/`@await` branch carries a six-line
+preamble/outro: `t_run_branch(...)` guard, `t_region()`,
+`t_push_region(new, true)`, then `t_pop_region(old)` and the branch-index
+assignment. `test/nesting/components/output/IfForSwitchCombo-client.ts` is
+mostly this. `t_run_branch` (src/render/runControlBranch.ts) could create +
+push the region and return it (or take a completion callback) so the emitter
+folds the bookkeeping into one call, cutting nesting output ~30-40% and
+removing a class of emitter mistakes. Not done inline: it changes a core
+runtime API that hydration branch-mismatch handling depends on, and wanted
+its own careful pass.
+
+### Component props get a redundant re-apply `$run` for statically-constant expressions
+
+`buildComponentNode` (client) emits `$watch({...})` plus a
+`$run(() => { t_props["x"] = expr })` whenever the parser flagged the
+attribute reactive — and `isReactive` (compile/utils/isReactive.ts) is just a
+brace check, so any object/array literal (e.g. `class={{ "child-class": true }}`)
+counts as reactive and gets the effect + a duplicate of the literal, even when
+the expression contains nothing reactive and the effect can never re-run
+(see `test/class/components/output/Class-client.ts` `t_props_2`). Fixing it
+wants real static analysis (the "TODO: Need to be more fancy" in isReactive:
+matching braces, skipping strings/comments) to avoid silently changing
+reactivity. Same heuristic gap drives `as const` on static string props.
+
+### Generated element walks are hard to eyeball in golden diffs
+
+Element variables are emitted as nested walker chains —
+`const t_a_1 = t_next(t_next(t_next(t_next(t_root_0, true)), true)) as ...`
+(test/class/components/output/Class-client.ts) — where each `t_next` is a
+required hydration-cursor step, not a no-op. Flat sequential statements (or
+element comments) would make the committed goldens easier to review, at the
+cost of touching the path-building code in buildFragment.ts (which also does
+the `t_next(t_next(x))` → `t_skip(x, n)` shortening). Purely cosmetic; skipped
+to avoid churning every golden file for no behavior change.
+
+### Generated `-types.ts` goldens are drift-checked but never typechecked
+
+The committed `test/*/components/output/*-types.ts` files now fail the global
+teardown check when compiler type emission changes (same as client/server
+goldens), but nothing compiles them — the package tsconfig only includes
+`src/**/*`, so `pnpm check` never validates the generated declarations. A
+tsgo pass over a few generated types files (or folding the test tree into the
+typecheck, which the rest of the test code may not survive yet) would catch
+malformed `buildType` output, which `@torpor/ui`'s postbuild script relies on
+for its published `.d.ts` files.
