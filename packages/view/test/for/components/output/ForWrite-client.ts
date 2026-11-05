@@ -38,8 +38,7 @@ export default function ForWrite(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let row of $props.rows) {
-				t_new_items_1.push({ data: { row }, key:
-				row.id });
+				t_new_items_1.push({ data: { row }, key: row.id });
 			}
 			return t_new_items_1;
 		},

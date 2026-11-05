@@ -44,8 +44,7 @@ export default function ForWithIfElse(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let tab of $props.tabs) {
-				t_new_items_1.push({ data: { tab }, key:
-				undefined });
+				t_new_items_1.push({ data: { tab } });
 			}
 			return t_new_items_1;
 		},

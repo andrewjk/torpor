@@ -42,8 +42,7 @@ export default function ForComment(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let [index, item] of $props.items.entries()) {
-				t_new_items_1.push({ data: { index, item }, key:
-				undefined });
+				t_new_items_1.push({ data: { index, item } });
 			}
 			return t_new_items_1;
 		},

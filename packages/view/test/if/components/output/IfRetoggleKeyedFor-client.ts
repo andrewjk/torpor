@@ -61,8 +61,7 @@ export default function IfRetoggle(
 				() => {
 					let t_new_items_1: ListItemSpec[] = [];
 					for (let tab of tabs()) {
-						t_new_items_1.push({ data: tab, key:
-						tab.id });
+						t_new_items_1.push({ data: tab, key: tab.id });
 					}
 					return t_new_items_1;
 				},

@@ -37,8 +37,7 @@ export default function ForDuplicateKeys(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let row of $props.items) {
-				t_new_items_1.push({ data: row, key:
-				row.id });
+				t_new_items_1.push({ data: row, key: row.id });
 			}
 			return t_new_items_1;
 		},

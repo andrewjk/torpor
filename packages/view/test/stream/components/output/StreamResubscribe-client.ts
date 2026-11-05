@@ -65,8 +65,7 @@ export default function StreamResubscribe(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let m of $state.messages) {
-				t_new_items_1.push({ data: m, key:
-				undefined });
+				t_new_items_1.push({ data: m });
 			}
 			return t_new_items_1;
 		},

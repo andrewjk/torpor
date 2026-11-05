@@ -39,8 +39,7 @@ export default function Colors(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let color of colors) {
-				t_new_items_1.push({ data: color, key:
-				color });
+				t_new_items_1.push({ data: color, key: color });
 			}
 			return t_new_items_1;
 		},

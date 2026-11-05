@@ -13,8 +13,12 @@
  * NOTE: `data` is `any` rather than `Record<string, any>` -- when a `@for`
  * body binds a single loop variable and is proxy-safe, the variable is stored
  * directly (e.g. `data: page` for a number), not as a bag.
+ *
+ * NOTE: `key` is optional -- the compiler only emits it when the `@for` has
+ * an `@key` block; unkeyed loops omit it (a missing key behaves the same as
+ * an `undefined` one during reconciliation).
  */
 export default interface ListItemSpec {
-	key: any;
+	key?: any;
 	data: any;
 }

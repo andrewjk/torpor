@@ -45,8 +45,7 @@ export default function ForNestedKeyed(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let g of $props.groups) {
-				t_new_items_1.push({ data: { g }, key:
-				g.id });
+				t_new_items_1.push({ data: { g }, key: g.id });
 			}
 			return t_new_items_1;
 		},
@@ -69,8 +68,7 @@ export default function ForNestedKeyed(
 					let t_new_items_2: ListItemSpec[] = [];
 					const g = t_item_1.data.g;
 					for (let it of g.items) {
-						t_new_items_2.push({ data: it, key:
-						it.id });
+						t_new_items_2.push({ data: it, key: it.id });
 					}
 					return t_new_items_2;
 				},

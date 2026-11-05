@@ -37,8 +37,7 @@ export default function ForObject(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let fruit of $props.fruits) {
-				t_new_items_1.push({ data: fruit, key:
-				undefined });
+				t_new_items_1.push({ data: fruit });
 			}
 			return t_new_items_1;
 		},

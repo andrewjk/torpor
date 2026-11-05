@@ -37,8 +37,7 @@ export default function ForVarDeps(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let { id, a, b } of $props.items) {
-				t_new_items_1.push({ data: { id, a, b }, key:
-				id });
+				t_new_items_1.push({ data: { id, a, b }, key: id });
 			}
 			return t_new_items_1;
 		},

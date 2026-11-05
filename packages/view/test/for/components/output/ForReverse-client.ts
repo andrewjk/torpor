@@ -37,8 +37,7 @@ export default function ForReverse(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let item of $props.items) {
-				t_new_items_1.push({ data: item, key:
-				undefined });
+				t_new_items_1.push({ data: item });
 			}
 			return t_new_items_1;
 		},

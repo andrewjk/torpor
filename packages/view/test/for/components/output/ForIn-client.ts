@@ -37,8 +37,7 @@ export default function ForIn(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let key in $props.item) {
-				t_new_items_1.push({ data: key, key:
-				undefined });
+				t_new_items_1.push({ data: key });
 			}
 			return t_new_items_1;
 		},

@@ -37,8 +37,7 @@ export default function ForAfterFor(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let i = 0; i < 5; i++) {
-				t_new_items_1.push({ data: i, key:
-				undefined });
+				t_new_items_1.push({ data: i });
 			}
 			return t_new_items_1;
 		},
@@ -76,8 +75,7 @@ export default function ForAfterFor(
 		() => {
 			let t_new_items_2: ListItemSpec[] = [];
 			for (let i = 10; i > 5; i--) {
-				t_new_items_2.push({ data: i, key:
-				undefined });
+				t_new_items_2.push({ data: i });
 			}
 			return t_new_items_2;
 		},

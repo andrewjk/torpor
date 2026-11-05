@@ -167,15 +167,22 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	// body is no-proxy safe and binds a single loop var, store it directly
 	// (`data: row`) rather than wrapping it (`data: { row }`) so we skip the
 	// per-row wrapper-object allocation entirely.
-	if (singleVar) {
-		b.append(`${listItemsName}.push({ data: ${forVarNames[0]}, key: `);
-	} else {
-		b.append(`${listItemsName}.push({ data: { ${forVarNames.join(", ")} }, key: `);
-	}
+	const dataExpr = singleVar ? forVarNames[0] : `{ ${forVarNames.join(", ")} }`;
 	if (key !== undefined) {
-		addMappedText("", `${keyStatement || "undefined"}`, " });", key.span, status, b);
+		// Emit the push on a single line, with the key expression mapped to
+		// its source span
+		addMappedText(
+			`${listItemsName}.push({ data: ${dataExpr}, key: `,
+			`${keyStatement || "undefined"}`,
+			" });",
+			key.span,
+			status,
+			b,
+		);
 	} else {
-		b.append(`undefined });`);
+		// No @key: omit the property entirely (the reconciler treats a
+		// missing key the same as an undefined one)
+		b.append(`${listItemsName}.push({ data: ${dataExpr} });`);
 	}
 	b.append(`}`);
 	b.append(`return ${listItemsName};`);

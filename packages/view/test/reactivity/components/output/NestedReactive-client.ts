@@ -42,8 +42,7 @@ export default function NestedReactive(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let tag of $props.user.tags) {
-				t_new_items_1.push({ data: tag, key:
-				undefined });
+				t_new_items_1.push({ data: tag });
 			}
 			return t_new_items_1;
 		},

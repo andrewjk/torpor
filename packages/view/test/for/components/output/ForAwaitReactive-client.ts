@@ -43,8 +43,7 @@ export default function ForAwaitReactive(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let id of $props.ids) {
-				t_new_items_1.push({ data: { id }, key:
-				id });
+				t_new_items_1.push({ data: { id }, key: id });
 			}
 			return t_new_items_1;
 		},

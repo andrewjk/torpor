@@ -56,8 +56,7 @@ export default function IfContainingIf(
 				() => {
 					let t_new_items_1: ListItemSpec[] = [];
 					for (let i = 0; i < $props.counter; i++) {
-						t_new_items_1.push({ data: i, key:
-						undefined });
+						t_new_items_1.push({ data: i });
 					}
 					return t_new_items_1;
 				},

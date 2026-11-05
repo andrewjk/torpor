@@ -44,8 +44,7 @@ export default function ForIfLeadingContent(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let t of $props.todos) {
-				t_new_items_1.push({ data: { t }, key:
-				t.id });
+				t_new_items_1.push({ data: { t }, key: t.id });
 			}
 			return t_new_items_1;
 		},

@@ -41,8 +41,7 @@ export default function ForTemplateLiteral(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let slide of $props.slides) {
-				t_new_items_1.push({ data: slide, key:
-				undefined });
+				t_new_items_1.push({ data: slide });
 			}
 			return t_new_items_1;
 		},

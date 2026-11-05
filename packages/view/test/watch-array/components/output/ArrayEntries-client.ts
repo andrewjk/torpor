@@ -37,8 +37,7 @@ export default function ArrayEntries(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let [i, item] of $props.items.entries()) {
-				t_new_items_1.push({ data: { i, item }, key:
-				item.id });
+				t_new_items_1.push({ data: { i, item }, key: item.id });
 			}
 			return t_new_items_1;
 		},

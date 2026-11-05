@@ -56,8 +56,7 @@ export default function ColorSelect(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let color of colors) {
-				t_new_items_1.push({ data: color, key:
-				undefined });
+				t_new_items_1.push({ data: color });
 			}
 			return t_new_items_1;
 		},

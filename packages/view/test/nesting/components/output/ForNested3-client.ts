@@ -40,8 +40,7 @@ export default function ForNested3(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let row of $props.matrix) {
-				t_new_items_1.push({ data: { row }, key:
-				undefined });
+				t_new_items_1.push({ data: { row } });
 			}
 			return t_new_items_1;
 		},
@@ -62,8 +61,7 @@ export default function ForNested3(
 					let t_new_items_2: ListItemSpec[] = [];
 					const row = t_item_1.data.row;
 					for (let cell of row) {
-						t_new_items_2.push({ data: cell, key:
-						undefined });
+						t_new_items_2.push({ data: cell });
 					}
 					return t_new_items_2;
 				},

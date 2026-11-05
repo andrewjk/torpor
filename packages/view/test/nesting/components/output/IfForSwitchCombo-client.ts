@@ -67,8 +67,7 @@ export default function IfForSwitchCombo(
 				() => {
 					let t_new_items_1: ListItemSpec[] = [];
 					for (let todo of $props.todos) {
-						t_new_items_1.push({ data: { todo }, key:
-						undefined });
+						t_new_items_1.push({ data: { todo } });
 					}
 					return t_new_items_1;
 				},

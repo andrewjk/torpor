@@ -37,8 +37,7 @@ export default function ArrayIndexes(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let i = 0; i < $props.items.length; i++) {
-				t_new_items_1.push({ data: i, key:
-				$props.items[i].id });
+				t_new_items_1.push({ data: i, key: $props.items[i].id });
 			}
 			return t_new_items_1;
 		},

@@ -46,8 +46,7 @@ export default function ForEscape(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let i = 0; i < $state.things.length; i++) {
-				t_new_items_1.push({ data: i, key:
-				undefined });
+				t_new_items_1.push({ data: i });
 			}
 			return t_new_items_1;
 		},
