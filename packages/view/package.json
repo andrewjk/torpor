@@ -27,17 +27,20 @@
 			"types": "./dist/dev.d.mts",
 			"import": "./dist/dev.mjs",
 			"require": "./dist/dev.cjs"
-		}
+		},
+		"./runtime": "./dist/runtime.iife.js",
+		"./package.json": "./package.json"
 	},
 	"files": [
-		"dist"
+		"dist",
+		"package.json"
 	],
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
 		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
-		"build": "tsgo --noEmit && vp pack && tsx ./scripts/copyToRepl.ts",
+		"build": "tsgo --noEmit && vp pack",
 		"build:watch": "vp pack --watch",
 		"test": "vp test",
 		"test:build": "tsx ./scripts/buildTestOutput.ts",

@@ -1,6 +1,6 @@
 import { build, parse } from "@torpor/view/compile";
 import { transform } from "sucrase";
-import script from "./view.txt?raw";
+import runtime from "@torpor/view/runtime?raw";
 
 export default function Repl($props: { input?: string } | undefined) {
 	let input = $props?.input ?? "";
@@ -36,7 +36,7 @@ export default function Repl($props: { input?: string } | undefined) {
 <html>
 <head>
 ${component.styles.map((s) => `<style>${s.style}</style>`).join("\n")}
-<script>${script}</script>
+<script>${runtime};Object.assign(globalThis, TorporView);</script>
 <script>${
 					transform(
 						component.code

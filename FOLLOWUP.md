@@ -421,3 +421,40 @@ tsgo pass over a few generated types files (or folding the test tree into the
 typecheck, which the rest of the test code may not survive yet) would catch
 malformed `buildType` output, which `@torpor/ui`'s postbuild script relies on
 for its published `.d.ts` files.
+
+### Embed client-code import stripping relies on line-anchored imports
+
+`@torpor/embed`'s `compileEmbed` strips imports from the client build with
+`/^import\s.+\n/gm` (same regex the site REPL has always used) before the
+sucrase pass, so it only works while the compiler emits single-line imports
+at the start of lines. The server build keeps its imports and gets the same
+sucrase treatment, which hoists `_nullishCoalesce` helpers _above_ the
+import statements — proving the emitted shape can change out from under a
+line-anchored regex (the loader test now strips with a brace-matching
+regex for this reason). If the compiler ever emits multi-line imports for
+the client build, embeds and the REPL will silently ship `import`
+statements in global-scope code. A small parser-based strip (or having the
+compiler emit a no-import mode directly) would remove the fragility.
+
+### Embed server-build evaluation is only proven via function-wrapper injection
+
+The artifact's server code is stored as an ES module importing
+`@torpor/view/ssr`, but nothing in the repo yet saves it to disk and imports
+it with real node resolution (the hydrate test injects the SSR exports via
+`new Function` parameters). When the host serve path is built, verify the
+saved-module flow end to end, and decide the sandbox story (isolated
+context, timeouts) before rendering untrusted embeds server-side. Also
+remember sucrase hoists helpers above imports, so saved modules have
+statements before their imports — valid ESM, but worth a smoke test in
+whatever runtime evaluates them first.
+
+### Package-level `fmt` blocks replace the root fmt config
+
+Running `vp fmt .` inside packages/view reformatted the whole package to
+2-space indentation, because the package's `fmt: { ignorePatterns }` block
+_replaces_ the root `fmt` settings (including `useTabs: true`) instead of
+merging with them. Packages without any `fmt` block (e.g. the new
+packages/embed) inherit the root config and format correctly. Either the
+root fmt settings should be merged into partial package blocks, or each
+package block should spell out the full settings — until then, format from
+the repo root only (`pnpm format`).
