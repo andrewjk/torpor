@@ -112,8 +112,35 @@ that warns on first use -- unwired embeds fail loudly in the console
 instead of silently doing nothing. Embeds can also be given a bridge
 explicitly through props (a `$embed` prop wins over `options.bridge`).
 
-For sandboxed embeds (see trust model below), the same interface is what a
-postMessage-based bridge will implement; embed code doesn't change.
+For sandboxed embeds (see trust model below), mount the embed in a sandboxed
+iframe with `mountEmbedFrame` -- it uses the same bridge interface over
+postMessage, so embed code doesn't change between tiers:
+
+```ts
+import { mountEmbedFrame } from "@torpor/embed";
+import runtime from "@torpor/view/runtime?raw";
+
+const iframe = document.createElement("iframe");
+container.appendChild(iframe);
+
+const handle = mountEmbedFrame(
+	iframe,
+	artifact,
+	{ postId: 7 },
+	{
+		runtime, // the bundle the frame runs the embed against
+		bridge, // same createBridge() as in-process embeds
+	},
+);
+// The frame reports its content height; the iframe auto-sizes.
+// handle.unmount() stops listening and clears the frame.
+```
+
+The iframe gets `sandbox="allow-scripts"` (an opaque origin: no access to
+the host page's DOM, storage, or cookies), and its document is fully
+authored by you -- runtime + compiled artifact + bootstrap -- so the frame
+can only run code you compiled. Invoke payloads and props must be
+serializable (they cross as structured clone).
 
 ## Version policy
 
@@ -164,7 +191,9 @@ run compiled code against.
 
 ## Roadmap
 
-- Server-side render sandbox for untrusted authors
-- PostMessage bridge (same `EmbedBridge` interface) for sandboxed-iframe
-  embeds
+- Stronger server-side isolation for untrusted authors (separate
+  process/subruntime per render; worker isolation is fault isolation only --
+  see FOLLOWUP.md)
 - Import-map mode for artifacts (real ES modules instead of injected globals)
+- Serving the runtime bundle from a URL instead of inlining it per iframe
+  (one cached download for a feed of many embeds)

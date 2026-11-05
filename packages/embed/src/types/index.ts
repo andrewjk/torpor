@@ -3,6 +3,8 @@ import type EmbedBridge from "./EmbedBridge";
 import type EmbedBridgeHandlers from "./EmbedBridgeHandlers";
 import type EmbedCompileError from "./EmbedCompileError";
 import type EmbedEventSource from "./EmbedEventSource";
+import type EmbedFrameHandle from "./EmbedFrameHandle";
+import type EmbedFrameOptions from "./EmbedFrameOptions";
 import type EmbedHandle from "./EmbedHandle";
 import type EmbedOptions from "./EmbedOptions";
 import type EmbedRenderResult from "./EmbedRenderResult";
@@ -15,6 +17,8 @@ export type {
 	EmbedBridgeHandlers,
 	EmbedCompileError,
 	EmbedEventSource,
+	EmbedFrameHandle,
+	EmbedFrameOptions,
 	EmbedHandle,
 	EmbedOptions,
 	EmbedRenderResult,

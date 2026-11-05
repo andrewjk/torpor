@@ -6,6 +6,11 @@ export { default as hydrateEmbed } from "./loader/hydrateEmbed";
 export { default as createBridge } from "./bridge/createBridge";
 export { default as scopeBridge } from "./bridge/scopeBridge";
 
+// Sandboxed iframe embeds (untrusted authors)
+export { default as mountEmbedFrame } from "./frame/mountEmbedFrame";
+export { default as frameScript } from "./frame/frameScript";
+export { default as frameDocument, safeJson } from "./frame/frameDocument";
+
 // Version compatibility
 export { default as checkVersion } from "./checkVersion";
 
@@ -18,7 +23,10 @@ export type {
 	EmbedBridge,
 	EmbedBridgeHandlers,
 	EmbedEventSource,
+	EmbedFrameHandle,
+	EmbedFrameOptions,
 	EmbedHandle,
 	EmbedOptions,
+	EmbedRenderResult,
 	EmbedStyle,
 } from "./types";
