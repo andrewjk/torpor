@@ -16,6 +16,27 @@ export interface CompileEmbedOptions {
 	 * `build` in @torpor/view/compile.
 	 */
 	preserveWhitespace?: boolean;
+
+	/**
+	 * Compile the client build as a real ES module (artifact `format:
+	 * "module"`): TypeScript is removed but imports and the default export
+	 * are kept, and the code is loaded with mountModuleEmbed /
+	 * hydrateModuleEmbed instead of the injected-globals loader.
+	 */
+	module?: boolean;
+
+	/**
+	 * Rewrites import specifiers in the module client build, e.g. turning
+	 * the bare "@torpor/view" into a versioned runtime URL your server
+	 * hosts:
+	 *
+	 * `(spec) => (spec === "@torpor/view" ? `/modules/@torpor/view@${version}/index.mjs` : undefined)`
+	 *
+	 * Returning undefined keeps the specifier as-is (a bare specifier needs
+	 * an import map on the host page to resolve). Only used with
+	 * `module: true`.
+	 */
+	resolveImport?: (specifier: string) => string | undefined;
 }
 
 /**
@@ -68,7 +89,12 @@ export default function compileEmbed(
 		name: component.name,
 		version: options?.version ?? getRuntimeVersion(),
 		source,
-		client: { code: toClientCode(client.code) },
+		format: options?.module ? "module" : "globals",
+		client: {
+			code: options?.module
+				? toModuleClientCode(client.code, options.resolveImport)
+				: toClientCode(client.code),
+		},
 		server: { code: toServerCode(server.code) },
 		styles: client.styles,
 	};
@@ -85,6 +111,29 @@ function toClientCode(code: string): string {
 		// Compiled imports are always single-line
 		.replace(/^import\s.+\n/gm, "");
 	return transform(stripped, { transforms: ["typescript"] }).code;
+}
+
+/**
+ * Prepares client code as a real ES module: TypeScript is removed (type-only
+ * imports disappear with it), imports are kept with specifiers rewritten
+ * through `resolveImport`, and the default export stays.
+ */
+function toModuleClientCode(
+	code: string,
+	resolveImport?: (specifier: string) => string | undefined,
+): string {
+	const js = transform(code, { transforms: ["typescript"] }).code;
+	if (!resolveImport) return js;
+	// Generated imports are single-line, and helpers that sucrase hoists
+	// (e.g. _nullishCoalesce) can land above them, so don't rely on line
+	// anchors here either
+	return js.replace(
+		/(import\s[^;'"]*["'])([^"' ]+)(["'])/g,
+		(match, before: string, specifier: string, after: string) => {
+			const rewritten = resolveImport(specifier);
+			return rewritten ? `${before}${rewritten}${after}` : match;
+		},
+	);
 }
 
 /**

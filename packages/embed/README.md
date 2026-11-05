@@ -85,6 +85,39 @@ a sandboxed iframe. Isolated renders also can't bridge host APIs during
 render -- pass data as props instead; the worker fails loudly if an embed
 tries.
 
+## Module-format artifacts
+
+By default artifacts compile to _globals format_: imports stripped, run by
+the loader against injected runtime exports (works everywhere, including
+sandboxed iframe frames). For in-process embeds you can instead compile to
+_module format_ -- a real ES module with imports and its default export
+intact:
+
+```ts
+const artifact = compileEmbed("section-42", source, {
+	module: true,
+	// Optional: point imports at a runtime URL your server hosts, so stored
+	// artifacts keep importing the exact runtime they were built against
+	resolveImport: (spec) =>
+		spec === "@torpor/view" ? `/modules/@torpor/view@${getRuntimeVersion()}/index.mjs` : undefined,
+});
+```
+
+Then load it asynchronously:
+
+```ts
+import { mountModuleEmbed, hydrateModuleEmbed } from "@torpor/embed";
+
+const handle = await mountModuleEmbed(target, artifact, props, { bridge });
+```
+
+Module loading defaults to a blob-URL `import()`; an import map on the host
+page resolves bare specifiers, rewritten URLs resolve directly, and hosts
+with their own module pipeline can pass an `import` hook. Version checking
+is stricter here: it runs against the installed runtime before loading.
+The sync `mountEmbed` rejects module artifacts with a pointer to
+`mountModuleEmbed`.
+
 ## The bridge
 
 Embeds receive the bridge as a reserved `$embed` prop:
@@ -194,6 +227,7 @@ run compiled code against.
 - Stronger server-side isolation for untrusted authors (separate
   process/subruntime per render; worker isolation is fault isolation only --
   see FOLLOWUP.md)
-- Import-map mode for artifacts (real ES modules instead of injected globals)
 - Serving the runtime bundle from a URL instead of inlining it per iframe
   (one cached download for a feed of many embeds)
+- Module caching for module-format embeds (each mount currently imports
+  fresh; a host registry could dedupe by artifact id)

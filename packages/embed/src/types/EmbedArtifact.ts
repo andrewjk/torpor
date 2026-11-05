@@ -34,6 +34,18 @@ export default interface EmbedArtifact {
 	source: string;
 
 	/**
+	 * How the client build must be run:
+	 *
+	 * - "globals" (default): imports are stripped and TypeScript is removed;
+	 * the code runs against the runtime functions injected by the loader.
+	 * - "module": TypeScript is removed but imports and the default export
+	 * are kept as a real ES module; import specifiers may have been
+	 * rewritten by the compiler's `resolveImport` option. Run it with
+	 * mountModuleEmbed/hydrateModuleEmbed.
+	 */
+	format?: "globals" | "module";
+
+	/**
 	 * The client build. Imports are stripped and TypeScript is removed, so
 	 * the code runs against the runtime functions injected by the loader.
 	 */

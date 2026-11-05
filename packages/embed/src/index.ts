@@ -2,6 +2,10 @@
 export { default as mountEmbed } from "./loader/mountEmbed";
 export { default as hydrateEmbed } from "./loader/hydrateEmbed";
 
+// Module-format embeds (real ES modules)
+export { default as mountModuleEmbed } from "./loader/mountModuleEmbed";
+export { default as hydrateModuleEmbed } from "./loader/hydrateModuleEmbed";
+
 // Host ↔ embed bridge
 export { default as createBridge } from "./bridge/createBridge";
 export { default as scopeBridge } from "./bridge/scopeBridge";
@@ -30,3 +34,4 @@ export type {
 	EmbedRenderResult,
 	EmbedStyle,
 } from "./types";
+export type { ModuleEmbedOptions } from "./loader/prepareModule";
