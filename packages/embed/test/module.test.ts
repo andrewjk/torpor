@@ -137,6 +137,92 @@ test("version mismatches fail before loading", async () => {
 	expect(loaded).toBe(false);
 });
 
+test("cache: true evaluates shared code once per artifact", async () => {
+	const artifact = compileEmbed("mod-cache", SOURCE, { module: true });
+	let loads = 0;
+	const countingImporter = async (code: string) => {
+		loads++;
+		return testImporter(code);
+	};
+
+	const options = { cache: true as const, import: countingImporter };
+	const targetA = document.createElement("div");
+	document.body.appendChild(targetA);
+	const handleA = await mountModuleEmbed(targetA, artifact, { start: 1 }, options);
+
+	// Second mount of the same artifact object: no second load
+	const targetB = document.createElement("div");
+	document.body.appendChild(targetB);
+	await mountModuleEmbed(targetB, artifact, { start: 2 }, options);
+	expect(loads).toBe(1);
+
+	// Both mounts render independently and reactively
+	const buttonA = targetA.querySelector("button") as HTMLButtonElement;
+	const buttonB = targetB.querySelector("button") as HTMLButtonElement;
+	expect(buttonA.textContent).toBe("Count: 1");
+	expect(buttonB.textContent).toBe("Count: 2");
+	buttonA.click();
+	await new Promise((resolve) => setTimeout(resolve, 10));
+	expect(buttonA.textContent).toBe("Count: 2");
+	expect(buttonB.textContent).toBe("Count: 2");
+
+	handleA.unmount();
+	// A different artifact object with identical content loads separately
+	const refetched = compileEmbed("mod-cache", SOURCE, { module: true });
+	await mountModuleEmbed(
+		document.createElement("div"),
+		refetched,
+		{},
+		{
+			cache: true,
+			import: countingImporter,
+		},
+	);
+	expect(loads).toBe(2);
+});
+
+test("cache: true reuses the evaluated component for globals artifacts", async () => {
+	const artifact = compileEmbed("glob-cache", SOURCE);
+	const options = { cache: true as const };
+
+	const targetA = document.createElement("div");
+	document.body.appendChild(targetA);
+	const handleA = mountEmbed(targetA, artifact, { start: 1 }, options);
+
+	const targetB = document.createElement("div");
+	document.body.appendChild(targetB);
+	mountEmbed(targetB, artifact, { start: 2 }, options);
+
+	// Independent reactive instances from one shared component
+	const buttonA = targetA.querySelector("button") as HTMLButtonElement;
+	const buttonB = targetB.querySelector("button") as HTMLButtonElement;
+	buttonA.click();
+	await new Promise((resolve) => setTimeout(resolve, 10));
+	expect(buttonA.textContent).toBe("Count: 2");
+	expect(buttonB.textContent).toBe("Count: 2");
+
+	handleA.unmount();
+});
+
+test("a failed module load is not cached", async () => {
+	const artifact = compileEmbed("mod-fail", SOURCE, { module: true });
+	let attempts = 0;
+	const flakyImporter = async (code: string) => {
+		attempts++;
+		if (attempts === 1) throw new Error("network hiccup");
+		return testImporter(code);
+	};
+
+	const options = { cache: true as const, import: flakyImporter };
+	const target = document.createElement("div");
+	document.body.appendChild(target);
+
+	await expect(mountModuleEmbed(target, artifact, {}, options)).rejects.toThrow("network hiccup");
+	// Second attempt retries instead of replaying the cached rejection
+	await mountModuleEmbed(target, artifact, {}, options);
+	expect(target.querySelector("button")).not.toBeNull();
+});
+
 test("bridge is injected into module embeds", async () => {
 	const artifact = compileEmbed("mod-bridge", BRIDGE_SOURCE, { module: true });
 	const events: { type: string; artifactId: string }[] = [];

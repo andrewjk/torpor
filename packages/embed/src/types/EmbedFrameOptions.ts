@@ -6,12 +6,19 @@ import type EmbedBridge from "./EmbedBridge";
 export default interface EmbedFrameOptions {
 	/**
 	 * The source of the @torpor/view runtime bundle, as text. Import it with
-	 * the ?raw query: `import runtime from "@torpor/view/runtime?raw"`. It is
-	 * inlined into the frame's document, so keep the runtime and the
-	 * compiler that built the artifact in lockstep (build both from the same
-	 * workspace).
+	 * the ?raw query: `import runtime from "@torpor/view/runtime?raw"`. It
+	 * is inlined into the frame's document. Provide this or `runtimeUrl`.
 	 */
-	runtime: string;
+	runtime?: string;
+
+	/**
+	 * A URL the runtime bundle is served from, instead of inlining it: the
+	 * browser caches one download for every frame on the page, which
+	 * matters for feeds with many embeds. Relative URLs resolve against
+	 * the host page's base. Note the URL must serve the same runtime
+	 * version the artifact was compiled with.
+	 */
+	runtimeUrl?: string;
 
 	/**
 	 * The bridge the embed uses to emit events and call host APIs across

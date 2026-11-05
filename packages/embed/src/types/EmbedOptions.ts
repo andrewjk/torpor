@@ -37,4 +37,13 @@ export default interface EmbedOptions {
 	 * deduped by artifact id, and removed again on unmount. Default true.
 	 */
 	styles?: boolean;
+
+	/**
+	 * Cache the evaluated component on the artifact object, so mounting the
+	 * same artifact many times (a feed of posts, a dashboard of sections)
+	 * evaluates its code once. Keyed by artifact object identity, not
+	 * content -- refetching the same artifact produces a new cache entry.
+	 * Default false.
+	 */
+	cache?: boolean;
 }

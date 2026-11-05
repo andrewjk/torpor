@@ -31,16 +31,21 @@ export default function mountEmbedFrame(
 	props: Record<string, any> = {},
 	options: EmbedFrameOptions,
 ): EmbedFrameHandle {
-	if (typeof options?.runtime !== "string" || options.runtime.length === 0) {
+	if ((options.runtime !== undefined) === (options.runtimeUrl !== undefined)) {
 		throw new Error(
-			'mountEmbedFrame needs the runtime bundle source. Import it: import runtime from "@torpor/view/runtime?raw", then pass { runtime }.',
+			'mountEmbedFrame needs exactly one of { runtime } (the bundle source, e.g. import runtime from "@torpor/view/runtime?raw") or { runtimeUrl } (a URL the runtime bundle is served from).',
 		);
 	}
 
 	// jsdom doesn't implement iframe.sandbox (DOMTokenList); the attribute works everywhere
 	iframe.setAttribute("sandbox", options.sandbox ?? "allow-scripts");
 	if (options.title) iframe.title = options.title;
-	iframe.srcdoc = frameDocument({ artifact, props, runtime: options.runtime });
+	iframe.srcdoc = frameDocument({
+		artifact,
+		props,
+		runtime: options.runtime,
+		runtimeUrl: options.runtimeUrl,
+	});
 
 	const bridge = options.bridge
 		? scopeBridge(options.bridge, { artifactId: artifact.id })

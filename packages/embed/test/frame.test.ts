@@ -239,12 +239,40 @@ test("unmount stops listening and clears the frame", () => {
 	iframe.remove();
 });
 
-test("requires the runtime source", () => {
+test("requires exactly one runtime source", () => {
 	const iframe = document.createElement("iframe");
 	document.body.appendChild(iframe);
 
-	expect(() => mountEmbedFrame(iframe, artifact(), {}, {} as any)).toThrow("runtime bundle");
+	expect(() => mountEmbedFrame(iframe, artifact(), {}, {} as any)).toThrow("exactly one");
+	expect(() =>
+		mountEmbedFrame(iframe, artifact(), {}, { runtime: RUNTIME, runtimeUrl: "/r.js" }),
+	).toThrow("exactly one");
 
+	iframe.remove();
+});
+
+test("runtimeUrl is served from a script src instead of inlined", () => {
+	const iframe = document.createElement("iframe");
+	document.body.appendChild(iframe);
+
+	mountEmbedFrame(iframe, artifact(), {}, { runtimeUrl: "/runtime/torpor-view.iife.js" });
+
+	const doc = iframe.srcdoc;
+	expect(doc).toContain('<script src="/runtime/torpor-view.iife.js"></script>');
+	// Nothing inlined: the srcdoc stays small regardless of runtime size
+	expect(doc).not.toContain("TorporView = ");
+	expect(doc).toContain("function Counter"); // artifact code still inline
+
+	iframe.remove();
+});
+
+test("runtimeUrl is attribute-escaped", () => {
+	const iframe = document.createElement("iframe");
+	document.body.appendChild(iframe);
+
+	mountEmbedFrame(iframe, artifact(), {}, { runtimeUrl: '/runtime?a="1"&b<2' });
+
+	expect(iframe.srcdoc).toContain('src="/runtime?a=&quot;1&quot;&amp;b&lt;2"');
 	iframe.remove();
 });
 

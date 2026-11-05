@@ -10,6 +10,12 @@ import loadComponent from "./loadComponent";
 export { embedProps };
 
 /**
+ * Evaluated components, keyed by artifact object. A WeakMap so caches die
+ * with the artifact -- no host-side eviction to think about.
+ */
+const componentCache = new WeakMap<EmbedArtifact, unknown>();
+
+/**
  * Checks the artifact against the running version and evaluates its client
  * code, ready to be mounted or hydrated. Shared by mountEmbed/hydrateEmbed.
  */
@@ -24,7 +30,18 @@ export function prepare(artifact: EmbedArtifact, options?: EmbedOptions): unknow
 			allowMismatch: options?.allowVersionMismatch,
 		});
 	}
-	const component = loadComponent(artifact);
+	let component: unknown;
+	if (options?.cache) {
+		const cached = componentCache.get(artifact);
+		if (cached === undefined) {
+			component = loadComponent(artifact);
+			componentCache.set(artifact, component);
+		} else {
+			component = cached;
+		}
+	} else {
+		component = loadComponent(artifact);
+	}
 	if (options?.styles !== false) injectStyles(artifact);
 	return component;
 }

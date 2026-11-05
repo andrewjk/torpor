@@ -118,6 +118,22 @@ is stricter here: it runs against the installed runtime before loading.
 The sync `mountEmbed` rejects module artifacts with a pointer to
 `mountModuleEmbed`.
 
+## Caching
+
+Every loader takes `cache: true`, which stores the evaluated component
+(globals format) or loaded module (module format) on the artifact object,
+so mounting the same artifact many times -- a feed of posts, a dashboard
+of sections -- evaluates its code once:
+
+```ts
+mountEmbed(target, artifact, props, { cache: true });
+```
+
+Caching is keyed by artifact object identity (a WeakMap, so it dies with
+the artifact): refetching identical content produces a new cache entry,
+which is what you want -- the new fetch may have been recompiled against a
+newer runtime. Failed module loads are not cached; the next mount retries.
+
 ## The bridge
 
 Embeds receive the bridge as a reserved `$embed` prop:
@@ -175,6 +191,12 @@ authored by you -- runtime + compiled artifact + bootstrap -- so the frame
 can only run code you compiled. Invoke payloads and props must be
 serializable (they cross as structured clone).
 
+For pages with many frames (a feed), pass `runtimeUrl` instead of
+`runtime`: the frame loads the runtime from a URL your server serves, so
+the browser caches one download for every embed instead of inlining ~36KB
+per frame. The URL must serve the same runtime version the artifact was
+compiled with.
+
 ## Version policy
 
 Compiled embed code references the runtime's internal helpers (`t_anchor`,
@@ -227,7 +249,3 @@ run compiled code against.
 - Stronger server-side isolation for untrusted authors (separate
   process/subruntime per render; worker isolation is fault isolation only --
   see FOLLOWUP.md)
-- Serving the runtime bundle from a URL instead of inlining it per iframe
-  (one cached download for a feed of many embeds)
-- Module caching for module-format embeds (each mount currently imports
-  fresh; a host registry could dedupe by artifact id)
