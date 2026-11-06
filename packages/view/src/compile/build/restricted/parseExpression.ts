@@ -365,11 +365,25 @@ function parseCore(source: string, offset: number, allowTrailing: boolean): Pars
 			const token = peek();
 			if (token.type !== "punct") return expression;
 
-			if (token.value === ".") {
+			if (token.value === "." || token.value === "?.") {
+				const optional = token.value === "?.";
 				next();
+				// `a?.[b]` tokenizes as "?." then "["
+				if (optional && peek().type === "punct" && peek().value === "[") {
+					next();
+					const indexExpr = parseTernary();
+					expect("]");
+					expression = {
+						op: "index",
+						object: expression,
+						index: indexExpr,
+						optional: true,
+					};
+					continue;
+				}
 				const key = next();
 				if (key.type !== "ident") {
-					error(`Expected a property name after "."`, key);
+					error(`Expected a property name after "${token.value}"`, key);
 				}
 				if (DANGEROUS_KEYS.has(key.value)) {
 					error(
@@ -377,7 +391,9 @@ function parseCore(source: string, offset: number, allowTrailing: boolean): Pars
 						key,
 					);
 				}
-				expression = { op: "get", object: expression, key: key.value };
+				expression = optional
+					? { op: "get", object: expression, key: key.value, optional: true }
+					: { op: "get", object: expression, key: key.value };
 				continue;
 			}
 
@@ -391,13 +407,6 @@ function parseCore(source: string, offset: number, allowTrailing: boolean): Pars
 
 			if (token.value === "(") {
 				error(CALLS_UNSUPPORTED, token);
-			}
-
-			if (token.value === "?.") {
-				error(
-					"Optional chaining isn't supported in restricted expressions; guard with @if or compute a safe value in the data layer.",
-					token,
-				);
 			}
 
 			if (token.value === "++" || token.value === "--") {

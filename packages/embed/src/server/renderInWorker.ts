@@ -30,7 +30,11 @@ export default async function renderInWorker(
 	const worker = new Worker(resolveWorkerPath(), {
 		// The .mjs extension makes this an ES module worker
 		workerData: {
-			artifact: { id: artifact.id, name: artifact.name, server: artifact.server },
+			artifact: {
+				id: artifact.id,
+				name: artifact.name,
+				server: { code: artifact.server?.code ?? "" },
+			},
 			props: options?.props,
 			context: options?.context,
 		},

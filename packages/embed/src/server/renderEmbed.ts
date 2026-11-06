@@ -63,6 +63,11 @@ export default async function renderEmbed(
 	artifact: EmbedArtifact,
 	options?: RenderEmbedOptions,
 ): Promise<EmbedRenderResult> {
+	if (artifact.format === "restricted") {
+		throw new Error(
+			`Embed "${artifact.id}" is a restricted artifact (its server build is data, not JS). Render it with renderRestricted from "@torpor/embed/restricted".`,
+		);
+	}
 	checkVersion(artifact.version, options?.runtimeVersion ?? getRuntimeVersion(), {
 		allowMismatch: options?.allowVersionMismatch,
 	});

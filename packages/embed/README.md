@@ -167,6 +167,58 @@ a sandboxed iframe. Isolated renders also can't bridge host APIs during
 render -- pass data as props instead; the worker fails loudly if an embed
 tries.
 
+## Restricted mode (no-eval SSR)
+
+For server rendering where code generation from strings is unavailable
+(Cloudflare Workers) or where author code must not run on your servers, compile
+to a **restricted** artifact: the server build is a serialized instruction
+tree, interpreted by trusted code — no `new Function`, no `eval`. The client
+build is ordinary globals-format code.
+
+```ts
+import { compileRestricted, renderRestricted } from "@torpor/embed/restricted";
+
+// Publish (edge-safe: runs on Node, workers, browsers)
+const artifact = compileRestricted(id, source, {
+	requirementKinds: { tickets: validateTicketSpec }, // spec shape validation
+});
+
+// Render (edge-safe; resolves data, then interprets the template)
+const { body, head, styles } = await renderRestricted(artifact, {
+	props: { queue: "open" },
+	sources: {
+		tickets: async (spec, { props }) => db.tickets.forTenant(tenant).list(spec),
+	},
+});
+```
+
+Data declarations in the template are inert specs, implemented by the host:
+
+```torp
+data tickets from tickets { queue: $props.queue, sort: "recency" };
+```
+
+- `sources` is the trusted boundary: authorization, tenant scoping and network
+  access live there, never in the artifact. Unknown kinds fail at compile time
+  (`requirementKinds`). Pass `data` instead of `sources` when the host already
+  fetched the data.
+- Template expressions are a restricted op set — reads, literals, operators,
+  optional chaining, array/object literals — **no calls**. Compute formatted
+  values in a data requirement (or host-shape the source's result); the client
+  build is full JS, so formatting helpers are fine there via `scope`.
+- Rendering reuses the server build's value helpers (`t_fmt`, `t_class`,
+  `t_style`, `t_attr`), so output matches the Node SSR path.
+- Paint-then-mount: `renderRestricted` returns HTML + styles; the client mounts
+  the same artifact with `mountEmbed(target, artifact, { $data: data })` (the
+  data bag is passed in props). `$data.x` works in both builds.
+- v1 supports elements, text/interpolations, static/dynamic attributes,
+  `@if`/`@else if`/`@else`, and `@for` (single variable, `of`, optional
+  `@key`). Deferred with clear compile errors: slots, nested components,
+  `@head`, `@html`, `@switch`, `@await`, `@try`, form bindings, mixed
+  static/dynamic attribute values.
+- `recompileRestricted(artifact)` is the upgrade path for these artifacts
+  (`recompileEmbed` covers the JS formats).
+
 ## Module-format artifacts
 
 By default artifacts compile to _globals format_: imports stripped, run by

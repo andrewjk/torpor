@@ -44,8 +44,8 @@ export type RestrictedUnaryOperator = "!" | "-" | "+" | "typeof";
 export type RestrictedExpr =
 	| { op: "lit"; value: RestrictedLiteral }
 	| { op: "ref"; name: string }
-	| { op: "get"; object: RestrictedExpr; key: string }
-	| { op: "index"; object: RestrictedExpr; index: RestrictedExpr }
+	| { op: "get"; object: RestrictedExpr; key: string; optional?: boolean }
+	| { op: "index"; object: RestrictedExpr; index: RestrictedExpr; optional?: boolean }
 	| { op: "unary"; operator: RestrictedUnaryOperator; operand: RestrictedExpr }
 	| {
 			op: "binary";

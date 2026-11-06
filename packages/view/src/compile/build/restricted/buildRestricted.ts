@@ -401,10 +401,20 @@ function serializeControl(node: ControlNode, context: Context): RestrictedNode |
 
 	context.report(
 		`"${node.operation}" isn't supported in restricted mode yet.`,
-		node.span.start,
-		node.span.end,
+		controlSpan(node).start,
+		controlSpan(node).end,
 	);
 	return undefined;
+}
+
+/** Group nodes (`@if group`, `@html group`…) carry zero spans; their first
+ * control child has the real source span. */
+function controlSpan(node: ControlNode): { start: number; end: number } {
+	if (node.span.start === 0 && node.span.end === 0) {
+		const child = node.children.find(isControlNode);
+		if (child) return child.span;
+	}
+	return node.span;
 }
 
 /**

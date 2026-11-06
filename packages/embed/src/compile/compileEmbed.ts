@@ -79,22 +79,7 @@ export default function compileEmbed(
 	source: string,
 	options?: CompileEmbedOptions,
 ): EmbedArtifact {
-	if (options?.maxSourceBytes !== undefined) {
-		const bytes = new TextEncoder().encode(source).length;
-		if (bytes > options.maxSourceBytes) {
-			throw new EmbedCompileError([
-				{
-					message: `Embed source is ${bytes} bytes, over the ${options.maxSourceBytes} byte limit`,
-					startIndex: 0,
-					startLine: 0,
-					startChar: 0,
-					endIndex: 0,
-					endLine: 0,
-					endChar: 0,
-				},
-			]);
-		}
-	}
+	checkMaxSourceBytes(source, options?.maxSourceBytes);
 
 	const parsed = parse(source);
 	if (!parsed.ok || !parsed.template) {
@@ -165,7 +150,7 @@ export default function compileEmbed(
  * Prepares client code to run against the loader-injected runtime exports:
  * exports become plain declarations and imports are removed.
  */
-function toClientCode(code: string): string {
+export function toClientCode(code: string): string {
 	const stripped = code
 		.replaceAll("export default function", "function")
 		.replaceAll("export function", "function")
@@ -242,4 +227,26 @@ export function scanImports(code: string): EmbedArtifactImport[] {
 		if (names.size > 0) bySource.set(source, names);
 	}
 	return [...bySource].map(([source, names]) => ({ source, names: [...names].sort() }));
+}
+
+/**
+ * Rejects embed sources over a byte limit, so a runaway author can't store
+ * megabytes of code in one artifact. Shared with `compileRestricted`.
+ */
+export function checkMaxSourceBytes(source: string, maxSourceBytes?: number): void {
+	if (maxSourceBytes === undefined) return;
+	const bytes = new TextEncoder().encode(source).length;
+	if (bytes > maxSourceBytes) {
+		throw new EmbedCompileError([
+			{
+				message: `Embed source is ${bytes} bytes, over the ${maxSourceBytes} byte limit`,
+				startIndex: 0,
+				startLine: 0,
+				startChar: 0,
+				endIndex: 0,
+				endLine: 0,
+				endChar: 0,
+			},
+		]);
+	}
 }

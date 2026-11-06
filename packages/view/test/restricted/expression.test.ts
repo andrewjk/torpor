@@ -149,9 +149,29 @@ test("rejects method calls", () => {
 	expect(error.start).toBe(11);
 });
 
-test("rejects arrows, optional chaining, updates and assignments", () => {
+test("parses optional chaining", () => {
+	expect(parseExpression("a?.b")).toEqual({
+		op: "get",
+		object: { op: "ref", name: "a" },
+		key: "b",
+		optional: true,
+	});
+	expect(parseExpression("a?.[0]")).toEqual({
+		op: "index",
+		object: { op: "ref", name: "a" },
+		index: { op: "lit", value: 0 },
+		optional: true,
+	});
+	// Non-optional access stays non-optional
+	expect(parseExpression("a.b")).toEqual({
+		op: "get",
+		object: { op: "ref", name: "a" },
+		key: "b",
+	});
+});
+
+test("rejects arrows, updates and assignments", () => {
 	expect(parseError("t => t").message).toContain("Arrow functions");
-	expect(parseError("a?.b").message).toContain("Optional chaining");
 	expect(parseError("a++").message).toContain("Updates");
 	expect(parseError("a = 1").message).toContain("Assignments");
 	expect(parseError("a += 1").message).toContain("Assignments");

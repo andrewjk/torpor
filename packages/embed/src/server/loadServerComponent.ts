@@ -16,7 +16,7 @@ import { flattenScope, validateImports, type EmbedScope } from "../loader/scope"
 export default function loadServerComponent(
 	artifact: {
 		name: string;
-		server: { code: string };
+		server?: { code?: string };
 		imports?: EmbedArtifact["imports"];
 		id: string;
 	},
@@ -26,7 +26,13 @@ export default function loadServerComponent(
 	validateImports(artifact, injected);
 	const names = Object.keys(injected);
 	const values = Object.values(injected);
-	const code = artifact.server.code
+	const serverCode = artifact.server?.code;
+	if (serverCode === undefined) {
+		throw new Error(
+			`Embed "${artifact.id}" has no JS server build -- restricted artifacts render with renderRestricted from "@torpor/embed/restricted".`,
+		);
+	}
+	const code = serverCode
 		.replace("export default ", "")
 		// Sucrase hoists its helpers above the import statements, so don't
 		// rely on line anchors here

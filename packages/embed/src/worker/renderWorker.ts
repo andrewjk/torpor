@@ -1,6 +1,5 @@
 import { parentPort, workerData } from "node:worker_threads";
 import * as ssr from "@torpor/view/ssr";
-import type EmbedArtifact from "../types/EmbedArtifact";
 
 /**
  * Worker entry for `renderEmbed` with `isolate: true`. Renders one embed and
@@ -12,7 +11,11 @@ import type EmbedArtifact from "../types/EmbedArtifact";
  * process. See renderEmbed's docs.
  */
 
-const artifact = workerData.artifact as Pick<EmbedArtifact, "id" | "name" | "server">;
+const artifact = workerData.artifact as {
+	id: string;
+	name: string;
+	server: { code: string };
+};
 const props = workerData.props as Record<string, any>;
 const context = workerData.context as Record<string, any> | undefined;
 
