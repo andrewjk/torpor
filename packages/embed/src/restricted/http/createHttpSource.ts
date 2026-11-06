@@ -1,0 +1,286 @@
+import type { RestrictedSource } from "../types";
+
+/**
+ * A host-side credential binding for the `http` source kind. Secrets live
+ * here — the artifact only ever carries the credential *name*.
+ */
+export interface HttpCredential {
+	/** Header to send the secret in. Default "Authorization". */
+	header?: string;
+	/** The secret value (host-side only). */
+	value: string;
+	/** Prefix before the value, e.g. "Bearer ". Default none. */
+	prefix?: string;
+}
+
+export interface HttpSourceOptions {
+	/**
+	 * Exact origins (`"https://api.example.com"`) admins may point `url` at.
+	 * **Default: deny all.** This is the operator's egress policy; enabling
+	 * an unknown API is a deliberate deployment decision.
+	 */
+	allowOrigins?: string[];
+
+	/**
+	 * Credential name → binding. Requirements reference a name via `auth`;
+	 * an unconfigured name is a render error that names the missing
+	 * credential (never another credential's value).
+	 */
+	credentials?: Record<string, HttpCredential>;
+
+	/** Request timeout in milliseconds. Default 5000. */
+	timeout?: number;
+
+	/** Maximum response body size in bytes. Default 1,000,000. */
+	maxResponseBytes?: number;
+
+	/**
+	 * Maximum array rows kept after `pick`/`limit`. Default 1000. Applies
+	 * only when the value is an array.
+	 */
+	maxRows?: number;
+
+	/**
+	 * Fetch implementation override — for tests, or to route through an
+	 * egress proxy. Defaults to the global `fetch`.
+	 */
+	fetch?: typeof fetch;
+}
+
+const DEFAULT_TIMEOUT = 5000;
+const DEFAULT_MAX_RESPONSE_BYTES = 1_000_000;
+const DEFAULT_MAX_ROWS = 1000;
+
+const DANGEROUS_KEYS = new Set(["__proto__", "prototype", "constructor"]);
+
+/**
+ * Creates the generic `http` source kind: one implementation serves every
+ * JSON API the operator enables, so admins can point requirements at APIs
+ * the host was never told about — under operator policy.
+ *
+ * Security posture:
+ * - **Default deny**: only origins listed in `allowOrigins` are fetched.
+ * - Literal private/loopback hosts are blocked even when allowlisted;
+ *   DNS-level egress control (a proxy or `globalOutbound`) remains the
+ *   deployment's job.
+ * - Credentials are referenced by name; secrets are bound here at fetch
+ *   time and never enter the artifact.
+ * - Redirects are not followed, responses must be JSON, and both body size
+ *   and row count are capped.
+ */
+export default function createHttpSource(options?: HttpSourceOptions): RestrictedSource {
+	const allowOrigins = new Set(options?.allowOrigins ?? []);
+	const credentials = options?.credentials ?? {};
+	const timeout = options?.timeout ?? DEFAULT_TIMEOUT;
+	const maxResponseBytes = options?.maxResponseBytes ?? DEFAULT_MAX_RESPONSE_BYTES;
+	const maxRows = options?.maxRows ?? DEFAULT_MAX_ROWS;
+	const fetchImpl: typeof fetch =
+		options?.fetch ?? ((input, init) => globalThis.fetch(input, init));
+
+	return async (spec, context): Promise<unknown> => {
+		const urlValue = spec.url;
+		if (typeof urlValue !== "string") {
+			throw new Error(`http requirement in "${context.artifactId}" is missing a url.`);
+		}
+		let url: URL;
+		try {
+			url = new URL(urlValue);
+		} catch {
+			throw new Error(`http requirement url is not valid: ${urlValue}`);
+		}
+		if (url.protocol !== "https:" && url.protocol !== "http:") {
+			throw new Error(`http requirement url must use http: or https: (got ${url.protocol}).`);
+		}
+		if (url.username || url.password) {
+			throw new Error("http requirement url must not embed credentials; use auth.");
+		}
+		if (!allowOrigins.has(url.origin)) {
+			const allowed = [...allowOrigins].join(", ") || "(none)";
+			throw new Error(
+				`http requirement origin "${url.origin}" is not allowed by this deployment. Allowed origins: ${allowed}.`,
+			);
+		}
+		if (isBlockedHostname(url.hostname)) {
+			throw new Error(
+				`http requirement host "${url.hostname}" is a private or local address and is blocked.`,
+			);
+		}
+
+		const params = spec.params;
+		if (params !== undefined) {
+			if (params === null || typeof params !== "object" || Array.isArray(params)) {
+				throw new Error('http requirement "params" must be an object.');
+			}
+			for (const [key, value] of Object.entries(params)) {
+				if (value === null || value === undefined) continue;
+				if (typeof value === "object") {
+					throw new Error(`http requirement param "${key}" must be a primitive value.`);
+				}
+				url.searchParams.set(key, String(value));
+			}
+		}
+
+		const headers: Record<string, string> = { accept: "application/json" };
+		const authName = spec.auth;
+		if (authName !== undefined) {
+			if (typeof authName !== "string") {
+				throw new Error('http requirement "auth" must be a credential name.');
+			}
+			const credential = credentials[authName];
+			if (credential === undefined) {
+				const configured = Object.keys(credentials).join(", ") || "(none)";
+				throw new Error(
+					`http requirement references credential "${authName}", which this deployment has not configured. Configured credentials: ${configured}.`,
+				);
+			}
+			const header = (credential.header ?? "Authorization").toLowerCase();
+			headers[header] = (credential.prefix ?? "") + credential.value;
+		}
+
+		let response: Response;
+		try {
+			response = await fetchImpl(url, {
+				method: "GET",
+				headers,
+				redirect: "error",
+				signal: timeoutSignal(timeout),
+			});
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			throw new Error(
+				`http requirement request to ${url.origin}${url.pathname} failed: ${message}`,
+			);
+		}
+
+		if (!response.ok) {
+			throw new Error(
+				`http requirement got HTTP ${response.status} from ${url.origin}${url.pathname}.`,
+			);
+		}
+
+		const contentType = response.headers.get("content-type") ?? "";
+		if (!/application\/(?:[\w.+-]*\+)?json/i.test(contentType)) {
+			throw new Error(
+				`http requirement expected JSON from ${url.origin}${url.pathname} (content-type: ${contentType || "missing"}).`,
+			);
+		}
+
+		const text = await readCapped(response, maxResponseBytes, url);
+		let payload: unknown;
+		try {
+			payload = JSON.parse(text);
+		} catch {
+			throw new Error(`http requirement got invalid JSON from ${url.origin}${url.pathname}.`);
+		}
+
+		let value = payload;
+		const pick = spec.pick;
+		if (typeof pick === "string" && pick.length > 0) {
+			value = pickPath(payload, pick);
+			if (value === undefined) {
+				throw new Error(
+					`http requirement pick path "${pick}" wasn't found in the response from ${url.origin}${url.pathname}.`,
+				);
+			}
+		}
+
+		if (Array.isArray(value)) {
+			const specLimit =
+				typeof spec.limit === "number" && Number.isInteger(spec.limit) && spec.limit > 0
+					? spec.limit
+					: maxRows;
+			const limit = Math.min(specLimit, maxRows);
+			if (value.length > limit) value = value.slice(0, limit);
+		}
+
+		return value;
+	};
+}
+
+function timeoutSignal(timeout: number): AbortSignal | undefined {
+	if (typeof AbortSignal === "undefined" || typeof AbortSignal.timeout !== "function") {
+		return undefined;
+	}
+	return AbortSignal.timeout(timeout);
+}
+
+function pickPath(payload: unknown, path: string): unknown {
+	let current = payload;
+	for (const segment of path.split(".")) {
+		if (current === null || current === undefined) return undefined;
+		if (DANGEROUS_KEYS.has(segment)) {
+			throw new Error(`http requirement pick path uses a dangerous key: "${segment}".`);
+		}
+		if (/^\d+$/.test(segment)) {
+			current = (current as Record<number, unknown>)[Number(segment)];
+		} else {
+			current = (current as Record<string, unknown>)[segment];
+		}
+	}
+	return current;
+}
+
+async function readCapped(response: Response, maxBytes: number, url: URL): Promise<string> {
+	const body = response.body;
+	if (body === null) {
+		const text = await response.text();
+		if (new TextEncoder().encode(text).length > maxBytes) {
+			throw new Error(
+				`http requirement response from ${url.origin}${url.pathname} exceeded ${maxBytes} bytes.`,
+			);
+		}
+		return text;
+	}
+
+	const reader = body.getReader();
+	const chunks: Uint8Array[] = [];
+	let size = 0;
+	try {
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			size += value.byteLength;
+			if (size > maxBytes) {
+				await reader.cancel().catch(() => {});
+				throw new Error(
+					`http requirement response from ${url.origin}${url.pathname} exceeded ${maxBytes} bytes.`,
+				);
+			}
+			chunks.push(value);
+		}
+	} finally {
+		reader.releaseLock();
+	}
+
+	const merged = new Uint8Array(size);
+	let offset = 0;
+	for (const chunk of chunks) {
+		merged.set(chunk, offset);
+		offset += chunk.byteLength;
+	}
+	return new TextDecoder().decode(merged);
+}
+
+/**
+ * Blocks obvious private/loopback targets (defense in depth on top of the
+ * origin allowlist). Hostname-level DNS rebinding is the egress layer's job.
+ */
+function isBlockedHostname(hostname: string): boolean {
+	const host = hostname.toLowerCase().replace(/^\[|\]$/g, "");
+	if (host === "localhost" || host.endsWith(".localhost")) return true;
+	if (host === "::1" || host === "::") return true;
+	if (/^f[cd][0-9a-f]{2}:/.test(host)) return true; // fc00::/7 (ULA)
+	if (/^fe[89ab][0-9a-f]:/.test(host)) return true; // fe80::/10 (link-local)
+
+	const ipv4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
+	if (ipv4 !== null) {
+		const a = Number(ipv4[1]);
+		const b = Number(ipv4[2]);
+		if (a === 0 || a === 10 || a === 127) return true;
+		if (a === 169 && b === 254) return true;
+		if (a === 172 && b >= 16 && b <= 31) return true;
+		if (a === 192 && b === 168) return true;
+		if (a >= 224) return true; // multicast + reserved
+	}
+	return false;
+}

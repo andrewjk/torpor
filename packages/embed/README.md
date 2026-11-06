@@ -219,6 +219,57 @@ data tickets from tickets { queue: $props.queue, sort: "recency" };
 - `recompileRestricted(artifact)` is the upgrade path for these artifacts
   (`recompileEmbed` covers the JS formats).
 
+### The `http` source kind
+
+`@torpor/embed/restricted` ships one generic mechanism so admins can point
+requirements at JSON APIs the host was never told about — under operator
+policy:
+
+```ts
+import { createHttpSource, httpRequirementKind } from "@torpor/embed/restricted";
+
+const artifact = compileRestricted(id, source, {
+	requirementKinds: { http: httpRequirementKind }, // authoring-time shape errors
+});
+
+const { body } = await renderRestricted(artifact, {
+	sources: {
+		http: createHttpSource({
+			allowOrigins: ["https://api.corp.example"], // default: deny all
+			credentials: { "corp-key": { value: process.env.CORP_KEY!, prefix: "Bearer " } },
+			timeout: 5000,
+			maxResponseBytes: 1_000_000,
+			maxRows: 1000,
+		}),
+	},
+});
+```
+
+```torp
+data tickets from http {
+	url: "https://api.corp.example/tickets",  // string literal; props never reach the origin
+	auth: "corp-key",                          // credential *name* (secret stays host-side)
+	params: { queue: $props.queue },           // query params; values may be props
+	pick: "items",                             // dot path into the JSON response
+	limit: 50,
+};
+```
+
+Security posture, all enforced by `createHttpSource`:
+
+- **Default deny** — origins not in `allowOrigins` are never fetched.
+- Credentials are referenced by name; an unconfigured name errors with the
+  _names_ configured, never another credential's value. Secrets never enter
+  the artifact.
+- GET only, redirects not followed, response must be JSON, and response
+  bytes + array rows are capped.
+- Literal private/loopback hosts are blocked even when allowlisted; DNS
+  rebinding and outbound network control remain the deployment's job (route
+  through an egress proxy via the `fetch` option, or `globalOutbound` on
+  Workers).
+- Response data is inert: `renderRestricted` escapes it like any other
+  string, so a row containing markup renders as text.
+
 ## Module-format artifacts
 
 By default artifacts compile to _globals format_: imports stripped, run by

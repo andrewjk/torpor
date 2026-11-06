@@ -23,3 +23,4 @@ export type {
 	RestrictedRequirementKindValidator,
 	RestrictedStaticAttribute,
 } from "./compile/build/restricted/types";
+export type { RestrictedSpecEntry } from "./compile/build/restricted/parseRequirementSpec";
