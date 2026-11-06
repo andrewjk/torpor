@@ -107,7 +107,8 @@ const httpRequirementKind: RestrictedRequirementKindValidator = (entries, report
 						value.op !== "index" &&
 						value.op !== "ternary" &&
 						value.op !== "binary" &&
-						value.op !== "unary"
+						value.op !== "unary" &&
+						value.op !== "call"
 					) {
 						report(
 							`http param "${key}" must evaluate to a primitive (string, number or boolean).`,

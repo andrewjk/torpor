@@ -85,7 +85,11 @@ export default function parseRequirementSpec(
 		skipSpace();
 
 		const valueStart = i;
-		const parsed = parseExpressionPrefix(source.substring(i), offset + i);
+		// Data-layer specs may call host functions (formatters); template
+		// expressions still reject calls.
+		const parsed = parseExpressionPrefix(source.substring(i), offset + i, {
+			allowCalls: true,
+		});
 		const valueEnd = parsed.end;
 		i = valueEnd - offset;
 		entries.push({

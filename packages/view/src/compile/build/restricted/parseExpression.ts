@@ -280,6 +280,15 @@ export interface ParsedExpressionPrefix {
 	end: number;
 }
 
+export interface ParseExpressionOptions {
+	/**
+	 * Allow calls to named host functions (`format($item.due)`). Data-layer
+	 * specs (requirement values, derive expressions) allow them; template
+	 * expressions do not, so rendering stays pure.
+	 */
+	allowCalls?: boolean;
+}
+
 /**
  * Parses one restricted expression.
  *
@@ -287,8 +296,12 @@ export interface ParsedExpressionPrefix {
  * @param offset The source index the expression starts at, so errors point
  *   into the original file
  */
-export default function parseExpression(source: string, offset = 0): RestrictedExpr {
-	return parseCore(source, offset, false).expression;
+export default function parseExpression(
+	source: string,
+	offset = 0,
+	options?: ParseExpressionOptions,
+): RestrictedExpr {
+	return parseCore(source, offset, false, options).expression;
 }
 
 /**
@@ -296,11 +309,21 @@ export default function parseExpression(source: string, offset = 0): RestrictedE
  * spec's `,` or the end of the spec). Returns where the expression ended so
  * callers can continue scanning.
  */
-export function parseExpressionPrefix(source: string, offset = 0): ParsedExpressionPrefix {
-	return parseCore(source, offset, true);
+export function parseExpressionPrefix(
+	source: string,
+	offset = 0,
+	options?: ParseExpressionOptions,
+): ParsedExpressionPrefix {
+	return parseCore(source, offset, true, options);
 }
 
-function parseCore(source: string, offset: number, allowTrailing: boolean): ParsedExpressionPrefix {
+function parseCore(
+	source: string,
+	offset: number,
+	allowTrailing: boolean,
+	options?: ParseExpressionOptions,
+): ParsedExpressionPrefix {
+	const allowCalls = options?.allowCalls === true;
 	const tokens = tokenize(source, offset);
 	let index = 0;
 
@@ -406,7 +429,23 @@ function parseCore(source: string, offset: number, allowTrailing: boolean): Pars
 			}
 
 			if (token.value === "(") {
-				error(CALLS_UNSUPPORTED, token);
+				if (!allowCalls) error(CALLS_UNSUPPORTED, token);
+				if (expression.op !== "ref") {
+					error(
+						"Only named host functions can be called; method calls (a.b()) aren't supported in restricted expressions.",
+						token,
+					);
+				}
+				next();
+				const args: RestrictedExpr[] = [];
+				while (!isPunct(")")) {
+					if (peek().type === "eof") expect(")");
+					args.push(parseTernary());
+					if (isPunct(",")) next();
+				}
+				expect(")");
+				expression = { op: "call", name: expression.name, args };
+				continue;
 			}
 
 			if (token.value === "++" || token.value === "--") {

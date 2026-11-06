@@ -5,6 +5,7 @@ import checkVersion from "../checkVersion";
 import { RUNTIME_VERSION } from "../generated/version";
 import type EmbedArtifact from "../types/EmbedArtifact";
 import evaluateExpr from "./evaluateExpr";
+import resolveDerive from "./derive/resolveDerive";
 import type { RenderRestrictedOptions, RestrictedRenderResult, RestrictedSource } from "./types";
 
 /** The HTML void elements (the JS server build treats these as self-closing). */
@@ -64,7 +65,16 @@ export default async function renderRestricted(
 	});
 
 	const props = embedProps(artifact, options?.props ?? {}, options);
-	const data = options?.data ?? (await resolveData(artifact, program, options?.sources, props));
+	const data =
+		options?.data ??
+		(await resolveData(
+			artifact,
+			program,
+			options?.sources,
+			options?.formatters,
+			props,
+			options?.deriveLimits,
+		));
 
 	const component =
 		program.components.find((candidate) => candidate.default) ?? program.components[0];
@@ -80,10 +90,19 @@ async function resolveData(
 	artifact: EmbedArtifact,
 	program: RestrictedProgram,
 	sources: Record<string, RestrictedSource> | undefined,
+	formatters: Record<string, (...args: unknown[]) => unknown> | undefined,
 	props: Record<string, any>,
+	deriveLimits: import("./derive/resolveDerive").DeriveLimits | undefined,
 ): Promise<Record<string, unknown>> {
 	const data: Record<string, unknown> = {};
 	for (const requirement of program.requirements) {
+		// `derive` is built in: it computes over earlier requirements' rows
+		// with per-row scope, so its expressions are not pre-evaluated here.
+		if (requirement.kind === "derive") {
+			data[requirement.name] = resolveDerive(requirement, data, props, formatters, deriveLimits);
+			continue;
+		}
+
 		const source = sources?.[requirement.kind];
 		if (source === undefined) {
 			throw new Error(
@@ -92,9 +111,9 @@ async function resolveData(
 		}
 		const spec: Record<string, unknown> = {};
 		for (const [key, expr] of Object.entries(requirement.spec)) {
-			// Requirement specs may only reference $props (data is what they
-			// produce); the evaluator reports anything else.
-			spec[key] = evaluateExpr(expr, { $props: props });
+			// Requirement specs may reference only $props (plus host
+			// formatters); the evaluator reports anything else.
+			spec[key] = evaluateExpr(expr, { $props: props }, formatters);
 		}
 		data[requirement.name] = await source(spec, { artifactId: artifact.id, props });
 	}

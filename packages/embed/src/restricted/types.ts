@@ -1,5 +1,6 @@
 import type EmbedBridge from "../types/EmbedBridge";
 import type EmbedStyle from "../types/EmbedStyle";
+import type { DeriveLimits } from "./derive/resolveDerive";
 
 /**
  * What a first-party requirement implementation receives alongside the
@@ -39,6 +40,17 @@ export interface RenderRestrictedOptions {
 	 * every kind used by the artifact (unless `data` is provided).
 	 */
 	sources?: Record<string, RestrictedSource>;
+
+	/**
+	 * Host functions available to **data-layer** expressions only
+	 * (requirement specs and `derive`): formatting and pure helpers. Template
+	 * expressions never see these; their results ship in `$data` with the
+	 * paint, so hydration can't re-run locale-sensitive formatting.
+	 */
+	formatters?: Record<string, (...args: unknown[]) => unknown>;
+
+	/** Budgets for `derive` requirements (input rows, output rows, time). */
+	deriveLimits?: DeriveLimits;
 
 	/**
 	 * The bridge, injected as the `$embed` prop (for any client-side code in

@@ -204,8 +204,8 @@ data tickets from tickets { queue: $props.queue, sort: "recency" };
   fetched the data.
 - Template expressions are a restricted op set — reads, literals, operators,
   optional chaining, array/object literals — **no calls**. Compute formatted
-  values in a data requirement (or host-shape the source's result); the client
-  build is full JS, so formatting helpers are fine there via `scope`.
+  values in a requirement spec or a `derive` (see below); the client build is
+  full JS, so formatting helpers are fine there via `scope`.
 - Rendering reuses the server build's value helpers (`t_fmt`, `t_class`,
   `t_style`, `t_attr`), so output matches the Node SSR path.
 - Paint-then-mount: `renderRestricted` returns HTML + styles; the client mounts
@@ -269,6 +269,44 @@ Security posture, all enforced by `createHttpSource`:
   Workers).
 - Response data is inert: `renderRestricted` escapes it like any other
   string, so a row containing markup renders as text.
+
+### `derive`: the computation layer
+
+Formatting and shaping belong in data, not templates — `derive` filters,
+maps, sorts and limits an earlier requirement's rows, with host functions
+callable here (and only here):
+
+```torp
+data view from derive {
+	of: "tickets",                               // an earlier requirement (array)
+	where: $item.priority >= 2,                  // optional per-row filter
+	map: { due: formatDue($item.due), isLate: $item.due < now() },  // optional shape
+	sortBy: $item.priority,
+	order: "desc",                               // "asc" (default) | "desc"
+	limit: 20,
+};
+```
+
+```ts
+const { body } = await renderRestricted(artifact, {
+	formatters: { formatDue: (d) => dateFmt.format(d as number), now: () => Date.now() },
+	sources: { http: createHttpSource(…), rows: … },
+	deriveLimits: { maxInputRows: 5000, maxOutputRows: 1000, timeoutMs: 50 },
+});
+```
+
+- `$item`, `$index` and `$props` are in scope per row; the result (after
+  `map`) ships in `$data` with the paint, so hydration never re-runs
+  locale-sensitive formatting.
+- Sorting is stable; `order` and `limit` are literals, `where`/`map`/`sortBy`
+  are expressions. Derives resolve in declaration order, so `of` must name an
+  earlier requirement (enforced at compile time with
+  `requirementKinds: { derive: deriveRequirementKind }`).
+- Budgets are enforced (input rows, output rows, wall clock) and reported as
+  render errors. Cross-source joins are deliberately out — correlate in the
+  template or in a host-shaped source.
+- Host functions are not available to template expressions; a missing
+  formatter fails loudly, naming it.
 
 ## Module-format artifacts
 

@@ -46,6 +46,11 @@ export type RestrictedExpr =
 	| { op: "ref"; name: string }
 	| { op: "get"; object: RestrictedExpr; key: string; optional?: boolean }
 	| { op: "index"; object: RestrictedExpr; index: RestrictedExpr; optional?: boolean }
+	/**
+	 * Calls a host function by name (data-layer specs only — template
+	 * expressions reject calls). The function must be provided by the host.
+	 */
+	| { op: "call"; name: string; args: RestrictedExpr[] }
 	| { op: "unary"; operator: RestrictedUnaryOperator; operand: RestrictedExpr }
 	| {
 			op: "binary";
@@ -127,7 +132,15 @@ export interface RestrictedBuildResult {
 	errors: import("../../types/CompileError").default[];
 }
 
+export interface RestrictedRequirementKindContext {
+	/** The name this requirement binds. */
+	name: string;
+	/** Names of requirements declared *before* this one (dependency order). */
+	names: string[];
+}
+
 export type RestrictedRequirementKindValidator = (
 	spec: import("./parseRequirementSpec").RestrictedSpecEntry[],
 	report: (message: string, start: number, end: number) => void,
+	context?: RestrictedRequirementKindContext,
 ) => void;

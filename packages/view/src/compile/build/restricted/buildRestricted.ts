@@ -108,7 +108,10 @@ export default function buildRestricted(
 				);
 				continue;
 			}
-			validator(entries, report);
+			validator(entries, report, {
+				name: declaration.name,
+				names: [...names].filter((n) => n !== declaration.name),
+			});
 			const spec: Record<string, RestrictedExpr> = {};
 			for (const entry of entries) spec[entry.key] = entry.expr;
 			requirements.push({ name: declaration.name, kind: declaration.kind, spec });
