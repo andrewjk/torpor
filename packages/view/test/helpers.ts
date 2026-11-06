@@ -159,6 +159,8 @@ function trimElement(el: RootNode | ElementNode | ControlNode) {
 			}
 			// @ts-ignore
 			delete child.spans;
+			// @ts-ignore
+			delete child.start;
 		} else if (child.type === "element") {
 			// HACK:
 			(child as ElementNode).attributes.forEach(

@@ -1,4 +1,5 @@
 import type Import from "../compile/types/Import";
+import type RequirementDeclaration from "../compile/types/RequirementDeclaration";
 import type ScriptChunk from "../compile/types/ScriptChunk";
 import type TemplateComponent from "./TemplateComponent";
 
@@ -9,4 +10,6 @@ export default interface Template {
 	imports: Import[];
 	script: ScriptChunk[];
 	components: TemplateComponent[];
+	/** File-level `data` declarations (restricted-mode requirements). */
+	requirements?: RequirementDeclaration[];
 }

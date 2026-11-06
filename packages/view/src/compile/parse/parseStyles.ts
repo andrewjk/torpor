@@ -30,6 +30,7 @@ export default function parseStyles(source: string, status: ParseStatus): void {
 		script: [],
 		components: [],
 		stack: [],
+		requirements: [],
 		errors: [],
 	};
 

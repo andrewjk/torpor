@@ -10,6 +10,7 @@ import trimQuotes from "../utils/trimQuotes";
 import type ParseStatus from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
 import parseMarkup, { parseMarkupInto } from "./parseMarkup";
+import { applyRequirementSubstitutions, default as tryParseRequirement } from "./parseRequirement";
 import parseStyleElement from "./parseStyles";
 import scopeStyles from "./scopeStyles";
 import accept from "./utils/accept";
@@ -28,6 +29,7 @@ export default function parseCode(source: string): ParseResult {
 		script: [],
 		components: [],
 		stack: [],
+		requirements: [],
 		errors: [],
 	};
 
@@ -109,6 +111,8 @@ export default function parseCode(source: string): ParseResult {
 			parseComponentHead(status);
 		} else if (accept("@style", status, false)) {
 			parseComponentStyle(status);
+		} else if (accept("data", status, false) && tryParseRequirement(status)) {
+			// A file-level `data` requirement declaration
 		}
 	}
 
@@ -127,6 +131,8 @@ export default function parseCode(source: string): ParseResult {
 		span: { start: status.marker, end: source.length },
 	});
 
+	applyRequirementSubstitutions(status);
+
 	scopeStyles(status);
 
 	const ok = !status.errors.length;
@@ -142,6 +148,7 @@ export default function parseCode(source: string): ParseResult {
 					imports: status.imports,
 					script: status.script,
 					components: status.components,
+					requirements: status.requirements.length > 0 ? status.requirements : undefined,
 				}
 			: undefined,
 	};
@@ -258,6 +265,7 @@ function parseComponentStart(status: ParseStatus) {
 					script: [],
 					components: [],
 					stack: [],
+					requirements: [],
 					errors: [],
 				};
 				const propsType = parseInlineScript(status2);
