@@ -8,7 +8,16 @@ import evaluateExpr from "./evaluateExpr";
 import resolveDerive from "./derive/resolveDerive";
 import type { RenderRestrictedOptions, RestrictedRenderResult, RestrictedSource } from "./types";
 
-/** The HTML void elements (the JS server build treats these as self-closing). */
+/**
+ * Hydration markers. The JS server build emits these as HTML "bogus comments"
+ * (`<![]>`, `<!^0>`, ...), which the client's hydrate() walks; restricted
+ * output emits the identical markers so hydration works unchanged.
+ */
+const ANCHOR_COMMENT = "<!>";
+const HYDRATION_START_COMMENT = "<![>";
+const HYDRATION_END_COMMENT = "<!]>";
+
+/** The JS server build treats these as self-closing (see view's voidTags). */
 const VOID_TAGS = new Set([
 	"area",
 	"base",
@@ -143,12 +152,15 @@ function renderNode(node: RestrictedNode, scope: Scope): string {
 		}
 
 		case "if": {
-			for (const branch of node.branches) {
+			for (let index = 0; index < node.branches.length; index++) {
+				const branch = node.branches[index];
 				if (branch.test === undefined || evaluateExpr(branch.test, scope)) {
-					return renderNodes(branch.children, scope);
+					return `${HYDRATION_START_COMMENT}<!^${index}>${renderNodes(branch.children, scope)}${HYDRATION_END_COMMENT}${ANCHOR_COMMENT}`;
 				}
 			}
-			return "";
+			// The JS server build injects a synthetic @else branch, so no match
+			// renders that branch (index = declared branch count).
+			return `${HYDRATION_START_COMMENT}<!^${node.branches.length}>${HYDRATION_END_COMMENT}${ANCHOR_COMMENT}`;
 		}
 
 		case "for": {
@@ -167,11 +179,12 @@ function renderNode(node: RestrictedNode, scope: Scope): string {
 					`@for list evaluated to a non-iterable ${typeof list}. Compute an array in the data layer.`,
 				);
 			}
-			let html = "";
+			let html = HYDRATION_START_COMMENT;
 			for (const row of rows) {
-				html += renderNodes(node.children, { ...scope, [node.item]: row });
+				// The JS server build emits one break marker per row
+				html += `<!^>${renderNodes(node.children, { ...scope, [node.item]: row })}`;
 			}
-			return html;
+			return `${html}${HYDRATION_END_COMMENT}${ANCHOR_COMMENT}`;
 		}
 	}
 }
@@ -193,14 +206,17 @@ function renderAttributes(node: Extract<RestrictedNode, { t: "el" }>, scope: Sco
 		const value = evaluateExpr(attribute.expr, scope);
 		if (attribute.format === "class") {
 			// t_class returns the whole `class="…"` attribute, or "" when empty
-			const className = t_class(value as never, attribute.scoped);
-			if (className) parts.push(className);
+			parts.push(t_class(value as never, attribute.scoped));
 		} else if (attribute.format === "style") {
-			const style = t_style(value as never);
-			if (style) parts.push(style);
+			parts.push(t_style(value as never));
 		} else if (value) {
 			// Conditional attribute: only set when truthy (server behavior)
 			parts.push(`${attribute.name}="${t_attr(value)}"`);
+		} else {
+			// The server build pushes an empty string for a falsy conditional
+			// attribute; mirror it so byte output matches (including its
+			// resulting spaces when joined)
+			parts.push("");
 		}
 	}
 	return parts.length === 0 ? "" : ` ${parts.join(" ")}`;

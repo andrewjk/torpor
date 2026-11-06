@@ -68,6 +68,12 @@ export default function parseText(status: ParseStatus, element: ElementNode): vo
 		if (content || spaceContent) {
 			const previousNode = element.children[element.children.length - 1];
 			if (previousNode && isTextNode(previousNode)) {
+				if (previousNode.start === undefined) {
+					// The previous node was a bare whitespace node from
+					// addSpaceElement; anchor the merged content in the source
+					// so span-based consumers (restricted mode) can map it
+					previousNode.start = start - previousNode.content.length;
+				}
 				previousNode.content += content + spaceContent;
 				previousNode.spans.push(...spans);
 				//previousNode.range.endIndex += content.length + spaceContent.length;

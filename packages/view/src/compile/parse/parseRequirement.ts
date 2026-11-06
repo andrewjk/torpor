@@ -133,9 +133,15 @@ export function applyRequirementSubstitutions(status: ParseStatus): void {
 		chunk.script = text;
 	}
 
-	for (const chunk of status.script) {
-		if (chunk.script.trim() === "/* @start */") {
-			chunk.script += " let $data = $props?.$data ?? {};";
+	// Insert the binding as its own chunk after the `/* @start */` marker:
+	// the builds match that marker by exact string, so it must stay intact.
+	for (let i = 0; i < status.script.length; i++) {
+		if (status.script[i].script === "/* @start */") {
+			status.script.splice(i + 1, 0, {
+				script: " let $data = $props?.$data ?? {};",
+				span: { start: 0, end: 0 },
+			});
+			i += 1;
 		}
 	}
 }

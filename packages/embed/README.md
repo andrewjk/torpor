@@ -77,9 +77,10 @@ const artifact = compileEmbed(id, source); // version defaults to RUNTIME_VERSIO
 ```
 
 `@torpor/embed/server` re-exports all of it plus the Node-only renderers
-(`renderEmbed`, worker isolation, render service). Server-side rendering
-requires Node: workerd bans `new Function`, so on Workers the supported
-mode is client-only (store the artifact, mount it in the browser).
+(`renderEmbed`, worker isolation, render service). Server-side rendering of
+**JS-format** artifacts requires Node (workerd bans `new Function`); on
+Workers, compile to a **restricted** artifact and render it with
+`renderRestricted` from `@torpor/embed/restricted` — that entry is edge-safe.
 
 The compiler also takes `maxSourceBytes` as a backstop against runaway
 author input (rejected with a compile error, so the editor can show it
@@ -208,9 +209,11 @@ data tickets from tickets { queue: $props.queue, sort: "recency" };
   full JS, so formatting helpers are fine there via `scope`.
 - Rendering reuses the server build's value helpers (`t_fmt`, `t_class`,
   `t_style`, `t_attr`), so output matches the Node SSR path.
-- Paint-then-mount: `renderRestricted` returns HTML + styles; the client mounts
-  the same artifact with `mountEmbed(target, artifact, { $data: data })` (the
-  data bag is passed in props). `$data.x` works in both builds.
+- **Hydration**: `renderRestricted` emits the same hydration markers as the
+  Node server build, so `hydrateEmbed(target, artifact, { $data: data }, {
+  styles: false })` adopts the painted HTML (byte-parity with the full server
+  build is enforced by the parity suite). `mountEmbed(...)` still works for
+  client-only rendering; the data bag is passed in props in both cases.
 - v1 supports elements, text/interpolations, static/dynamic attributes,
   `@if`/`@else if`/`@else`, and `@for` (single variable, `of`, optional
   `@key`). Deferred with clear compile errors: slots, nested components,

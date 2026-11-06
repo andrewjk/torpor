@@ -8,6 +8,7 @@ import type TextNode from "../../types/nodes/TextNode";
 import buildStyles from "../client/buildStyles";
 import { skipStringOrComment } from "../../utils/codeScanner";
 import isControlNode from "../../utils/isControlNode";
+import trimWhitespace from "../../utils/trimWhitespace";
 import isTextNode from "../../utils/isTextNode";
 import trimQuotes from "../../utils/trimQuotes";
 import voidTags from "../../utils/voidTags";
@@ -46,8 +47,9 @@ interface Context {
  * legal on workerd).
  *
  * Must be called on a **freshly parsed** template: it maps text
- * interpolations through the parse-time source spans, and `build()` trims
- * whitespace nodes in place (which invalidates those spans).
+ * interpolations through the parse-time source spans. Trimming whitespace
+ * nodes here is safe (only whitespace-only nodes change), and matches the
+ * JS build; `build()` calling `trimWhitespace` again is idempotent.
  */
 export default function buildRestricted(
 	template: Template,
@@ -81,6 +83,12 @@ export default function buildRestricted(
 			errors,
 			report,
 		};
+		// Match the JS build exactly: trim/collapse whitespace-only text nodes.
+		// Safe for interpolation spans: only whitespace-only nodes change, and
+		// mixed text nodes keep their content (and therefore their spans).
+		if (component.markup && options?.preserveWhitespace !== true) {
+			trimWhitespace(component.markup);
+		}
 		const markup = component.markup ? serializeChildren(component.markup.children, context) : [];
 		components.push({ name: component.name, default: component.default, markup });
 	}
