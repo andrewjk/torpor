@@ -9,12 +9,16 @@ export { default as hydrateModuleEmbed } from "./loader/hydrateModuleEmbed";
 // Host ↔ embed bridge
 export { default as createBridge } from "./bridge/createBridge";
 export { default as scopeBridge } from "./bridge/scopeBridge";
+export type { EmbedApi, EmbedApiBridge, EmbedApiMethod } from "./bridge/apiTypes";
 
 // Sandboxed iframe embeds (untrusted authors)
 export { default as mountEmbedFrame } from "./frame/mountEmbedFrame";
 export { default as listenEmbedFrame } from "./frame/listenEmbedFrame";
-export { default as frameScript } from "./frame/frameScript";
+export { default as frameScript, createFrameScript } from "./frame/frameScript";
+export { default as frameBridgeScript, createFrameBridgeScript } from "./frame/frameBridgeScript";
 export { default as frameDocument, safeJson, safeAttribute } from "./frame/frameDocument";
+export { EMBED_CHANNEL } from "./frame/protocol";
+export type { FrameToHost, HostToFrame } from "./frame/protocol";
 
 // Version compatibility
 export { default as checkVersion } from "./checkVersion";

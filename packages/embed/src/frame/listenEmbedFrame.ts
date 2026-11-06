@@ -1,12 +1,6 @@
 import scopeBridge from "../bridge/scopeBridge";
 import type EmbedBridge from "../types/EmbedBridge";
-
-const CHANNEL = "torpor-embed";
-
-type FrameMessage =
-	| { channel: string; kind: "event"; type: string; detail?: unknown }
-	| { channel: string; kind: "invoke"; call: number; method: string; payload?: unknown }
-	| { channel: string; kind: "height"; value: number };
+import { EMBED_CHANNEL, type FrameToHost } from "./protocol";
 
 export interface ListenEmbedFrameOptions {
 	/**
@@ -27,6 +21,13 @@ export interface ListenEmbedFrameOptions {
 	 * runaway frame can't grow forever. Default: no limit.
 	 */
 	maxHeight?: number;
+
+	/**
+	 * The protocol channel to filter messages on. Must match the channel
+	 * the frame's document was built with; mismatches fail silently
+	 * (unknown channels are ignored). Defaults to `EMBED_CHANNEL`.
+	 */
+	channel?: string;
 }
 
 export interface EmbedFrameListener {
@@ -37,24 +38,10 @@ export interface EmbedFrameListener {
 }
 
 /**
- * The host side of the frame protocol, usable on its own: listens for
- * messages from an iframe whose document was produced by `frameDocument()`
- * -- whether you mounted it with `mountEmbedFrame` or served it yourself
- * from a URL.
- *
- * The protocol (all messages carry `channel: "torpor-embed"`):
- * - frame -> host: `{ kind: "event", type, detail }`,
- *   `{ kind: "invoke", call, method, payload }`,
- *   `{ kind: "height", value }`
- * - host -> frame: `{ kind: "invoke-result", call, value }`,
- *   `{ kind: "invoke-error", call, message }`
- *
- * Security note: the frame has an opaque origin, so `event.origin` is
- * "null" and useless -- `event.source === iframe.contentWindow` is the
- * definitive check, and it is enforced here. Replies target `"*"`, which
- * is safe only because the frame's document is host-authored (runtime +
- * artifact + bootstrap). If a frame ever loads remote content, that
- * assumption breaks.
+ * The host side of the frame protocol (see src/frame/protocol.ts for the
+ * message contract): listens for messages from an iframe whose document
+ * contains `frameScript` or `frameBridgeScript` -- whether you mounted it
+ * with `mountEmbedFrame` or served it yourself from a URL.
  */
 export default function listenEmbedFrame(
 	iframe: HTMLIFrameElement,
@@ -64,11 +51,12 @@ export default function listenEmbedFrame(
 		options?.bridge &&
 		scopeBridge(options.bridge, { artifactId: options?.artifactId ?? "unknown" });
 	const maxHeight = options?.maxHeight;
+	const channel = options?.channel ?? EMBED_CHANNEL;
 
 	async function onMessage(event: MessageEvent): Promise<void> {
 		if (event.source !== iframe.contentWindow) return;
-		const data = event.data as FrameMessage;
-		if (!data || data.channel !== CHANNEL) return;
+		const data = event.data as FrameToHost;
+		if (!data || data.channel !== channel) return;
 
 		if (data.kind === "event") {
 			bridge?.emit(data.type, data.detail);
@@ -77,7 +65,7 @@ export default function listenEmbedFrame(
 			try {
 				const value = await bridge?.invoke(data.method, data.payload);
 				frame?.postMessage(
-					{ channel: CHANNEL, kind: "invoke-result", call: data.call, value },
+					{ channel, kind: "invoke-result", call: data.call, value },
 					// The frame has an opaque origin, so "*" is the only usable
 					// targetOrigin; its content is fully authored by us
 					"*",
@@ -85,7 +73,7 @@ export default function listenEmbedFrame(
 			} catch (error) {
 				frame?.postMessage(
 					{
-						channel: CHANNEL,
+						channel,
 						kind: "invoke-error",
 						call: data.call,
 						message: error instanceof Error ? error.message : String(error),

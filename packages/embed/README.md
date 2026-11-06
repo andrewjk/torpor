@@ -152,10 +152,12 @@ const { body, head, styles } = await renderEmbed(artifact, {
 });
 ```
 
-Place `head` in the page `<head>` -- it carries the embed's `@head` output
-_and_ its scoped styles, so server-rendered content is styled from the
-first paint (pass `styles: false` to `hydrateEmbed` when the server already
-inlined them, to avoid duplicate style tags).
+Place `head` in the page `<head>` -- for artifacts with `@style` it carries
+the embed's scoped styles alongside its `@head` output, so server-rendered
+content is styled from the first paint. `styles` exposes the same CSS
+separately, for hosts that place styles themselves -- pick one (using both
+double-injects), and pass `styles: false` to `hydrateEmbed` when the
+server side already handled it.
 
 `isolate: true` runs the render in a worker thread and terminates it at the
 timeout, so a runaway embed can't take your server down. It's fault
@@ -242,20 +244,25 @@ instead of silently doing nothing. Embeds can also be given a bridge
 explicitly through props (a `$embed` prop wins over `options.bridge`).
 
 Typing: `EmbedBridge.invoke` is intentionally loose so hand-written bridges
-work. To type a specific embed's calls, declare the method overloads once
-and cast:
+work. For a typed contract, declare the method map once and derive a typed
+bridge with `EmbedApiBridge` -- method names are checked, payloads are
+required exactly when declared, and results are typed:
 
 ```ts
 // shared between host and embed author
 type SectionApi = {
-	invoke(method: "fetch-data"): Promise<string>;
-	invoke(method: "save-section", payload: { name: string }): Promise<"ok">;
-	emit(type: "submitted", detail?: { ok: boolean }): void;
-	emit(type: string, detail?: unknown): void;
+	"fetch-data": { result: string };
+	"save-section": { payload: { name: string }; result: "ok" };
 };
 
-// in the embed: const embed = $props.$embed as SectionApi;
+// in the embed: const embed = $props.$embed as EmbedApiBridge<SectionApi>;
+const data = await embed.invoke("fetch-data"); // Promise<string>
+await embed.invoke("save-section", { name: "ada" }); // Promise<"ok">
+await embed.invoke("nope"); // type error: not in the contract
 ```
+
+A manual method-overload cast works the same way if you'd rather not use
+the helper type.
 
 For sandboxed embeds (see trust model below), mount the embed in a sandboxed
 iframe with `mountEmbedFrame` -- it uses the same bridge interface over
@@ -324,11 +331,53 @@ listener.dispose(); // stops listening
 
 `listenEmbedFrame` is the extracted host side of the frame protocol
 (`event.source` validation, call-id routing, height handling) -- use it
-whenever the frame document wasn't created by `mountEmbedFrame`. If you
-compose your own frame documents, `safeJson` (for JSON inside `<script>`)
+whenever the frame document wasn't created by `mountEmbedFrame`. If your
+frame document is raw HTML/CSS/JS (no torpor runtime at all), inline
+`frameBridgeScript` instead of the full `frameScript` -- it sets up
+`TorporEmbed.bridge` and height reporting without any component glue:
+
+```html
+<script>
+	${frameBridgeScript}
+</script>
+<script>
+	window.redraft = {
+		submit: (payload) => window.TorporEmbed.bridge.invoke("submit", payload),
+		get: (query) => window.TorporEmbed.bridge.invoke("get", query),
+	};
+</script>
+```
+
+If you compose your own frame documents, `safeJson` (for JSON inside `<script>`)
 and `safeAttribute` (for URLs in attributes) are exported and stable --
 they are exactly the escaping the built-in document builder uses, and
 other hosts depend on them.
+
+## Frame protocol
+
+The postMessage contract lives in `src/frame/protocol.ts` (`FrameToHost`,
+`HostToFrame`, `EMBED_CHANNEL`) -- that module is the authoritative
+description:
+
+- frame -> host: `{ channel, kind: "event", type, detail }`,
+  `{ channel, kind: "invoke", call, method, payload }`,
+  `{ channel, kind: "height", value }`
+- host -> frame: `{ channel, kind: "invoke-result", call, value }`,
+  `{ channel, kind: "invoke-error", call, message }`
+
+Validation rules (the part hosts re-implementing it most often get wrong):
+
+- With an opaque origin, `event.origin` is "null" and useless -- validate
+  `event.source` instead. The frame accepts only its direct parent; the
+  host accepts only the frame's `contentWindow`.
+- The host replies with targetOrigin `"*"`, safe only because the frame's
+  document is host-authored. If a frame ever loads remote content, that
+  assumption breaks.
+- Unknown channels are ignored, so a channel mismatch between the two
+  sides fails silently by design. Both sides default to `EMBED_CHANNEL`;
+  pass `channel` to `frameDocument`/`mountEmbedFrame`/`listenEmbedFrame`
+  (or build custom scripts with `createFrameScript(channel)` /
+  `createFrameBridgeScript(channel)`) only if you know both sides agree.
 
 ## CSP
 

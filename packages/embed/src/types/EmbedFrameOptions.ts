@@ -62,4 +62,11 @@ export default interface EmbedFrameOptions {
 	 * the parent page's CSP; URL-served frames set their own headers.
 	 */
 	nonce?: string;
+
+	/**
+	 * The protocol channel the frame script uses. Must match the channel
+	 * the host's `listenEmbedFrame` filters on; mismatches fail silently
+	 * (unknown channels are ignored). Defaults to `EMBED_CHANNEL`.
+	 */
+	channel?: string;
 }

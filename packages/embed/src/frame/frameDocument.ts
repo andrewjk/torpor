@@ -1,4 +1,5 @@
-import frameScript from "./frameScript";
+import { createFrameScript } from "./frameScript";
+import { EMBED_CHANNEL } from "./protocol";
 import type EmbedArtifact from "../types/EmbedArtifact";
 
 /**
@@ -39,6 +40,13 @@ export interface FrameDocumentInput {
 	 * A CSP nonce applied to the document's `<script>` and `<style>` tags.
 	 */
 	nonce?: string;
+
+	/**
+	 * The protocol channel the frame script uses. Must match the channel
+	 * the host's `listenEmbedFrame` filters on; defaults to
+	 * `EMBED_CHANNEL`.
+	 */
+	channel?: string;
 }
 
 /**
@@ -59,6 +67,7 @@ export default function frameDocument(input: FrameDocumentInput): string {
 	const styles = artifact.styles.map((s) => s.style).join("\n");
 	const head = [hostCss, styles].filter((css) => css.length > 0);
 	const nonce = input.nonce !== undefined ? ` nonce="${safeAttribute(input.nonce)}"` : "";
+	const frameScript = createFrameScript(input.channel ?? EMBED_CHANNEL);
 	// A classic <script src> blocks the scripts after it, so the runtime is
 	// always defined before the artifact code and bootstrap run
 	const runtimeTag = input.runtimeUrl

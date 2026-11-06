@@ -66,6 +66,29 @@ test("renders an artifact to HTML", async () => {
 	expect(head ?? "").toBe("");
 });
 
+test("styled artifacts ship their styles in both head and styles", async () => {
+	const styled = compileEmbed(
+		"styled-render",
+		`
+export default function S() {
+	@render {
+		<p>hello</p>
+	}
+	@style {
+		p { color: rebeccapurple; }
+	}
+}
+`,
+	);
+	const { body, head, styles } = await renderEmbed(styled, { props: {} });
+	expect(body).toContain("hello");
+	// The scoped styles ship in `head` -- place it in the page head
+	expect(head).toContain("rebeccapurple");
+	// ...and `styles` exposes the same CSS separately, for hosts that
+	// place styles themselves. If you use `head`, don't also inline these.
+	expect(styles.some((s) => s.style.includes("rebeccapurple"))).toBe(true);
+});
+
 test("injects the bridge as $embed during render", async () => {
 	const calls: { method: string; artifactId: string }[] = [];
 	const bridged = await renderEmbed(artifact(BRIDGE_SOURCE, "awaiter"), {

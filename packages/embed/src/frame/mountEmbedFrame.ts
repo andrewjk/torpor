@@ -46,12 +46,14 @@ export default function mountEmbedFrame(
 		runtimeUrl: options.runtimeUrl,
 		css: options.css,
 		nonce: options.nonce,
+		channel: options.channel,
 	});
 
 	const listener: EmbedFrameListener = listenEmbedFrame(iframe, {
 		bridge: options.bridge,
 		artifactId: artifact.id,
 		maxHeight: options.maxHeight,
+		channel: options.channel,
 	});
 
 	return {
