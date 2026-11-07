@@ -224,11 +224,12 @@ data tickets from tickets { queue: $props.queue, sort: "recency" };
   (`$props`/`$data`/state names/loop variables), so typos fail at save time.
 - v1 supports elements, text/interpolations, static/dynamic attributes,
   `@if`/`@else if`/`@else`, `@for` (single variable, `of`, optional `@key`),
-  host components (`<Card title={x}>…</Card>`), and `<slot>` elements (a
-  slot renders its fallback; incoming fills are a host-side concern).
+  host components (`<Card title={x}>…</Card>`), `<slot>` elements (a
+  slot renders its fallback; incoming fills are a host-side concern), and
+  slot props on fills (a fill reads `$slot.<name>` for the props the host
+  component passes to its slot).
   Deferred with clear compile errors: `@head`, `@html`, `@switch`, `@await`,
-  `@try`, form bindings, mixed static/dynamic attribute values, fills with
-  slot props.
+  `@try`, form bindings, mixed static/dynamic attribute values.
 
 ### Host components in restricted mode
 

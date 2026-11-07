@@ -294,34 +294,42 @@ function serializeComponentProps(node: ElementNode, context: Context): Restricte
 }
 
 /**
- * Component children are slot fills: `<fill name="x">` for named fills and
- * loose children for the default fill (`_`). Fills with slot props
- * (attributes on the fill) aren't supported yet.
+ * Component children are slot fills: loose children become the default fill
+ * (`_`) and `<fill name="x">` children become named fills. Fill children may
+ * read `$slot.<name>` for the slot props the host component passes; other
+ * attributes on fills aren't supported.
  */
 function serializeComponent(node: ElementNode, context: Context): RestrictedNode {
-	void (node as ElementNode);
 	const fills: RestrictedFill[] = [];
 	const defaultFill: RestrictedNode[] = [];
 
+	// All fill children (named fills and loose children, which become the
+	// default fill) may read `$slot.<prop>` for the slot props the host
+	// component passes per row.
+	const fillContext: Context = {
+		...context,
+		allowedRefs: new Set([...context.allowedRefs, "$slot"]),
+	};
+
 	for (const child of node.children) {
 		if (isFill(child)) {
-			const name = (child as ElementNode).attributes.find((attribute) => attribute.name === "name");
-			if (child.attributes.some((attribute) => attribute.name !== "name")) {
+			const extra = child.attributes.filter((attribute) => attribute.name !== "name");
+			if (extra.length > 0) {
 				context.report(
-					"Slot props on fills aren't supported in restricted mode yet.",
+					`Unexpected attributes on <fill>. Slot props are read as $slot.<name> inside the fill; only "name" is allowed here.`,
 					child.span.start,
 					child.span.end,
 				);
 				continue;
 			}
-			fills.push({
-				name: name ? trimQuotes(name.value ?? "") || "_" : "_",
-				children: serializeChildren(child.children, context),
-			});
+			const nameAttribute = child.attributes.find((attribute) => attribute.name === "name");
+			const name = nameAttribute ? trimQuotes(nameAttribute.value ?? "") || "_" : "_";
+
+			fills.push({ name, children: serializeChildren(child.children, fillContext) });
 		} else if (isTextNode(child) && child.content.trim() === "") {
 			continue;
 		} else {
-			const serialized = serializeNode(child, context);
+			const serialized = serializeNode(child, fillContext);
 			if (serialized !== undefined) defaultFill.push(serialized);
 		}
 	}

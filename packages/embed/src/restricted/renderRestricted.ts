@@ -193,17 +193,25 @@ async function renderNode(node: RestrictedNode, context: RenderContext): Promise
 				($slot?: Record<PropertyKey, any>, $context?: Record<PropertyKey, any>) => Promise<string>
 			> = {};
 			for (const fill of node.fills) {
-				slots[fill.name] = async () => renderNodes(fill.children, context);
+				// The host component calls the slot render with the slot props
+				// (e.g. per-row data); the fill reads them as $slot.<prop>.
+				slots[fill.name] = async ($slot?: Record<PropertyKey, any>) => {
+					const fillScope = { ...scope, $slot: $slot ?? {} };
+					return renderNodes(fill.children, { ...context, scope: fillScope });
+				};
 			}
 			const result = await component(props, undefined, slots);
 			context.head += result.head;
-			return result.body;
+			// The JS server build wraps component regions in hydration
+			// markers (see buildServerComponentNode); match it exactly.
+			return `${HYDRATION_START_COMMENT}${result.body}${HYDRATION_END_COMMENT}${ANCHOR_COMMENT}`;
 		}
 
 		case "slot": {
 			// A restricted template's own <slot> renders its fallback: there is
 			// no incoming slot content at the top level of renderRestricted.
-			return renderNodes(node.children, context);
+			// The JS server build wraps slot regions in hydration markers too.
+			return `${HYDRATION_START_COMMENT}${await renderNodes(node.children, context)}${HYDRATION_END_COMMENT}${ANCHOR_COMMENT}`;
 		}
 
 		case "if": {

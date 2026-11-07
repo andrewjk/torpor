@@ -2,4 +2,4 @@
 "@torpor/view": minor
 ---
 
-Feat: restricted build serializes component usage (props + named fills) and slot elements with fallbacks
+Feat: restricted build serializes component usage, slot elements, and $slot.<prop> reads in fills
