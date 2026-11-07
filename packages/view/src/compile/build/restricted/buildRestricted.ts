@@ -12,10 +12,12 @@ import trimWhitespace from "../../utils/trimWhitespace";
 import isTextNode from "../../utils/isTextNode";
 import trimQuotes from "../../utils/trimQuotes";
 import voidTags from "../../utils/voidTags";
+import scanStateInitializers from "./scanState";
 import parseExpression, { RestrictedSyntaxError } from "./parseExpression";
 import parseRequirementSpec from "./parseRequirementSpec";
 import type {
 	RestrictedAttribute,
+	RestrictedStateInit,
 	RestrictedBuildResult,
 	RestrictedComponent,
 	RestrictedExpr,
@@ -39,6 +41,12 @@ interface Context {
 	preserveWhitespace: boolean;
 	errors: CompileError[];
 	report: (message: string, start: number, end?: number) => void;
+	/** Roots a template expression may reference ($props, $data, state names). */
+	allowedRefs: ReadonlySet<string>;
+	/** Client state binding names declared in this component. */
+	stateNames: string[];
+	/** Loop variables in scope (innermost last), for ref validation. */
+	loopVars: string[];
 }
 
 /**
@@ -65,7 +73,8 @@ export default function buildRestricted(
 	const components: RestrictedComponent[] = [];
 	const styles: { style: string; hash: string }[] = [];
 
-	for (const component of template.components) {
+	for (let componentIndex = 0; componentIndex < template.components.length; componentIndex++) {
+		const component = template.components[componentIndex];
 		const styleHash = component.style?.hash ?? "";
 		if (component.style) {
 			styles.push({ style: buildStyles(component.style, styleHash), hash: styleHash });
@@ -76,21 +85,64 @@ export default function buildRestricted(
 		if (component.error) {
 			report("@error blocks aren't supported in restricted mode yet.", component.start ?? 0);
 		}
+
+		const state: RestrictedStateInit[] = [];
+		const stateNames: string[] = [];
+		const allowedRefs = new Set(["$props", "$data"]);
 		const context: Context = {
 			source,
 			styleHash,
 			preserveWhitespace: options?.preserveWhitespace === true,
 			errors,
 			report,
+			allowedRefs,
+			stateNames,
+			loopVars: [],
 		};
+
 		// Match the JS build exactly: trim/collapse whitespace-only text nodes.
 		// Safe for interpolation spans: only whitespace-only nodes change, and
 		// mixed text nodes keep their content (and therefore their spans).
 		if (component.markup && options?.preserveWhitespace !== true) {
 			trimWhitespace(component.markup);
 		}
+
+		// Scan this component's script chunks for `$watch` client state.
+		// Initializers may only reference $props (the server evaluates them
+		// per request); each scanned name becomes an allowed template root.
+		const nextStart =
+			template.components[componentIndex + 1]?.scriptStart ?? template.script.length;
+		const componentChunks = template.script.slice(component.scriptStart ?? 0, nextStart);
+		for (const scanned of scanStateInitializers(componentChunks)) {
+			try {
+				const init = parseExprAt(scanned.initSource, scanned.start, context);
+				validateRefs(
+					init,
+					new Set(["$props"]),
+					context,
+					scanned.start,
+					`state initializer "${scanned.name}"`,
+					[],
+				);
+				state.push({ name: scanned.name, init });
+				stateNames.push(scanned.name);
+				allowedRefs.add(scanned.name);
+			} catch (error) {
+				if (error instanceof RestrictedSyntaxError) {
+					report(error.message, error.start, error.end);
+				} else {
+					throw error;
+				}
+			}
+		}
+
 		const markup = component.markup ? serializeChildren(component.markup.children, context) : [];
-		components.push({ name: component.name, default: component.default, markup });
+		components.push({
+			name: component.name,
+			default: component.default,
+			markup,
+			state: state.length > 0 ? state : undefined,
+		});
 	}
 
 	const requirements: RestrictedRequirement[] = [];
@@ -386,6 +438,8 @@ function serializeControl(node: ControlNode, context: Context): RestrictedNode |
 		);
 		let key: RestrictedExpr | undefined;
 		if (keyNode) {
+			// @key expressions can reference the loop variable
+			const keyContext: Context = { ...context, loopVars: [...context.loopVars, item] };
 			const equal = keyNode.statement.indexOf("=");
 			const keySource = keyNode.statement
 				.substring(equal + 1)
@@ -394,10 +448,11 @@ function serializeControl(node: ControlNode, context: Context): RestrictedNode |
 			key = parseExprAt(
 				keySource,
 				keyNode.span.start + keyNode.statement.indexOf(keySource),
-				context,
+				keyContext,
 			);
 		}
 
+		const childContext: Context = { ...context, loopVars: [...context.loopVars, item] };
 		return {
 			t: "for",
 			item,
@@ -405,7 +460,7 @@ function serializeControl(node: ControlNode, context: Context): RestrictedNode |
 			key,
 			children: serializeChildren(
 				forNode.children.filter((child) => !(isControlNode(child) && child.operation === "@key")),
-				context,
+				childContext,
 			),
 		};
 	}
@@ -460,12 +515,69 @@ function extractBalanced(
 
 function parseExprAt(source: string, offset: number, context: Context): RestrictedExpr {
 	try {
-		return parseExpression(source, offset);
+		const expr = parseExpression(source, offset);
+		validateRefs(expr, context.allowedRefs, context, offset, "template");
+		return expr;
 	} catch (error) {
 		if (error instanceof RestrictedSyntaxError) {
 			context.report(error.message, error.start, error.end);
 			return { op: "lit", value: null };
 		}
 		throw error;
+	}
+}
+
+/**
+ * Validates that every identifier reference in a serialized expression is
+ * available in the scope the interpreter will run it with -- so typos and
+ * unknown roots are compile errors instead of render errors.
+ */
+function validateRefs(
+	expr: RestrictedExpr,
+	allowed: ReadonlySet<string>,
+	context: Context,
+	start: number,
+	where: string,
+	loopVars: ReadonlyArray<string> = context.loopVars,
+): void {
+	switch (expr.op) {
+		case "ref": {
+			if (!allowed.has(expr.name) && !loopVars.includes(expr.name)) {
+				const available = [...allowed, ...loopVars].join(", ");
+				context.report(
+					`Unknown identifier "${expr.name}" in ${where}. Available: ${available || "(none)"}.`,
+					start,
+					start + expr.name.length + 2,
+				);
+			}
+			return;
+		}
+		case "get":
+			validateRefs(expr.object, allowed, context, start, where, loopVars);
+			return;
+		case "index":
+			validateRefs(expr.object, allowed, context, start, where, loopVars);
+			validateRefs(expr.index, allowed, context, start, where, loopVars);
+			return;
+		case "unary":
+			validateRefs(expr.operand, allowed, context, start, where, loopVars);
+			return;
+		case "binary":
+			validateRefs(expr.left, allowed, context, start, where, loopVars);
+			validateRefs(expr.right, allowed, context, start, where, loopVars);
+			return;
+		case "ternary":
+			validateRefs(expr.test, allowed, context, start, where, loopVars);
+			validateRefs(expr.consequent, allowed, context, start, where, loopVars);
+			validateRefs(expr.alternate, allowed, context, start, where, loopVars);
+			return;
+		case "array":
+			for (const item of expr.items) validateRefs(item, allowed, context, start, where, loopVars);
+			return;
+		case "object":
+			for (const value of Object.values(expr.entries)) {
+				validateRefs(value, allowed, context, start, where, loopVars);
+			}
+			return;
 	}
 }

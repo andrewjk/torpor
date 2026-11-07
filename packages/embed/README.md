@@ -214,6 +214,14 @@ data tickets from tickets { queue: $props.queue, sort: "recency" };
   styles: false })` adopts the painted HTML (byte-parity with the full server
   build is enforced by the parity suite). `mountEmbed(...)` still works for
   client-only rendering; the data bag is passed in props in both cases.
+- **Client state works**: script bodies are stripped on the server but run on
+  the client. `let $state = $watch({ count: $props.start ?? 0 })` initializers
+  are serialized as restricted expressions over props — the server renders
+  the initial paint from them, and the client build binds the real reactive
+  `$watch` state, so counters, toggles and list mutations work after
+  hydration. Initializers may reference only `$props` (plus literals and
+  operators); template identifiers are validated at compile time
+  (`$props`/`$data`/state names/loop variables), so typos fail at save time.
 - v1 supports elements, text/interpolations, static/dynamic attributes,
   `@if`/`@else if`/`@else`, and `@for` (single variable, `of`, optional
   `@key`). Deferred with clear compile errors: slots, nested components,

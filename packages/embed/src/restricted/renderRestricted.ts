@@ -91,7 +91,19 @@ export default async function renderRestricted(
 		throw new Error(`Embed "${artifact.id}" has no components to render.`);
 	}
 
-	const body = renderNodes(component.markup, { $props: props, $data: data });
+	if (component === undefined) {
+		throw new Error(`Embed "${artifact.id}" has no components to render.`);
+	}
+
+	// Client state: initializers are restricted expressions over $props, so
+	// the initial paint is computed without running author code. The client
+	// build binds the real `$watch` state from the same props.
+	const state: Record<string, unknown> = {};
+	for (const init of component.state ?? []) {
+		state[init.name] = evaluateExpr(init.init, { $props: props });
+	}
+
+	const body = renderNodes(component.markup, { $props: props, $data: data, ...state });
 	return { body, head: "", styles: artifact.styles };
 }
 

@@ -115,6 +115,18 @@ export interface RestrictedComponent {
 	name?: string;
 	default?: boolean;
 	markup: RestrictedNode[];
+	/**
+	 * Client state declarations extracted from the component's script:
+	 * `let $state = $watch(<init>)` where `<init>` is a restricted
+	 * expression over `$props`. SSR evaluates the initializers for the
+	 * initial paint; the client build binds the real `$watch` state.
+	 */
+	state?: RestrictedStateInit[];
+}
+
+export interface RestrictedStateInit {
+	name: string;
+	init: RestrictedExpr;
 }
 
 export interface RestrictedProgram {
