@@ -1,3 +1,4 @@
+import type { ServerComponent } from "@torpor/view/ssr";
 import type EmbedBridge from "../types/EmbedBridge";
 import type EmbedStyle from "../types/EmbedStyle";
 import type { DeriveLimits } from "./derive/resolveDerive";
@@ -40,6 +41,15 @@ export interface RenderRestrictedOptions {
 	 * every kind used by the artifact (unless `data` is provided).
 	 */
 	sources?: Record<string, RestrictedSource>;
+
+	/**
+	 * Host **server components** available to the template, keyed by usage
+	 * name: `<Card title={x}>…</Card>` calls `components.Card` (a server
+	 * component — e.g. the server build of a JS-format embed or a host UI
+	 * component) and its HTML is inlined. Fill children are interpreted in
+	 * the ambient scope and passed as the default slot.
+	 */
+	components?: Record<string, ServerComponent>;
 
 	/**
 	 * Host functions available to **data-layer** expressions only

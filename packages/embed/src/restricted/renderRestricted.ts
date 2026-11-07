@@ -1,4 +1,5 @@
 import type { RestrictedNode, RestrictedProgram } from "@torpor/view/compile";
+import type { ServerComponent } from "@torpor/view/ssr";
 import { t_attr, t_class, t_fmt, t_style } from "@torpor/view/ssr";
 import embedProps from "../bridge/embedProps";
 import checkVersion from "../checkVersion";
@@ -103,8 +104,14 @@ export default async function renderRestricted(
 		state[init.name] = evaluateExpr(init.init, { $props: props });
 	}
 
-	const body = renderNodes(component.markup, { $props: props, $data: data, ...state });
-	return { body, head: "", styles: artifact.styles };
+	const components = options?.components;
+	const renderContext: RenderContext = {
+		scope: { $props: props, $data: data, ...state },
+		components,
+		head: "",
+	};
+	const body = await renderNodes(component.markup, renderContext);
+	return { body, head: renderContext.head, styles: artifact.styles };
 }
 
 async function resolveData(
@@ -141,13 +148,20 @@ async function resolveData(
 	return data;
 }
 
-function renderNodes(nodes: RestrictedNode[], scope: Scope): string {
+interface RenderContext {
+	scope: Scope;
+	components: Record<string, ServerComponent> | undefined;
+	head: string;
+}
+
+async function renderNodes(nodes: RestrictedNode[], context: RenderContext): Promise<string> {
 	let html = "";
-	for (const node of nodes) html += renderNode(node, scope);
+	for (const node of nodes) html += await renderNode(node, context);
 	return html;
 }
 
-function renderNode(node: RestrictedNode, scope: Scope): string {
+async function renderNode(node: RestrictedNode, context: RenderContext): Promise<string> {
+	const scope = context.scope;
 	switch (node.t) {
 		case "text": {
 			let html = "";
@@ -160,14 +174,43 @@ function renderNode(node: RestrictedNode, scope: Scope): string {
 		case "el": {
 			const open = `<${node.tag}${renderAttributes(node, scope)}>`;
 			if (VOID_TAGS.has(node.tag)) return open;
-			return `${open}${renderNodes(node.children, scope)}</${node.tag}>`;
+			return `${open}${await renderNodes(node.children, context)}</${node.tag}>`;
+		}
+
+		case "component": {
+			const component = context.components?.[node.name];
+			if (component === undefined) {
+				throw new Error(
+					`No server component "${node.name}" was provided to renderRestricted (pass components: { "${node.name}": … }).`,
+				);
+			}
+			const props: Record<string, unknown> = {};
+			for (const attr of node.props) {
+				props[attr.name] = "expr" in attr ? evaluateExpr(attr.expr, scope) : attr.value;
+			}
+			const slots: Record<
+				string,
+				($slot?: Record<PropertyKey, any>, $context?: Record<PropertyKey, any>) => Promise<string>
+			> = {};
+			for (const fill of node.fills) {
+				slots[fill.name] = async () => renderNodes(fill.children, context);
+			}
+			const result = await component(props, undefined, slots);
+			context.head += result.head;
+			return result.body;
+		}
+
+		case "slot": {
+			// A restricted template's own <slot> renders its fallback: there is
+			// no incoming slot content at the top level of renderRestricted.
+			return renderNodes(node.children, context);
 		}
 
 		case "if": {
 			for (let index = 0; index < node.branches.length; index++) {
 				const branch = node.branches[index];
 				if (branch.test === undefined || evaluateExpr(branch.test, scope)) {
-					return `${HYDRATION_START_COMMENT}<!^${index}>${renderNodes(branch.children, scope)}${HYDRATION_END_COMMENT}${ANCHOR_COMMENT}`;
+					return `${HYDRATION_START_COMMENT}<!^${index}>${await renderNodes(branch.children, context)}${HYDRATION_END_COMMENT}${ANCHOR_COMMENT}`;
 				}
 			}
 			// The JS server build injects a synthetic @else branch, so no match
@@ -194,9 +237,10 @@ function renderNode(node: RestrictedNode, scope: Scope): string {
 			let html = HYDRATION_START_COMMENT;
 			for (const row of rows) {
 				// The JS server build emits one break marker per row
-				html += `<!^>${renderNodes(node.children, { ...scope, [node.item]: row })}`;
+				html += `<!^>${await renderNodes(node.children, { ...context, scope: { ...scope, [node.item]: row } })}`;
 			}
-			return `${html}${HYDRATION_END_COMMENT}${ANCHOR_COMMENT}`;
+			html += HYDRATION_END_COMMENT + ANCHOR_COMMENT;
+			return html;
 		}
 	}
 }

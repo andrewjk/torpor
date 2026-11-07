@@ -8,6 +8,8 @@ import type TextNode from "../../types/nodes/TextNode";
 import buildStyles from "../client/buildStyles";
 import { skipStringOrComment } from "../../utils/codeScanner";
 import isControlNode from "../../utils/isControlNode";
+import isComponentNode from "../../utils/isComponentNode";
+import isSpecialNode from "../../utils/isSpecialNode";
 import trimWhitespace from "../../utils/trimWhitespace";
 import isTextNode from "../../utils/isTextNode";
 import trimQuotes from "../../utils/trimQuotes";
@@ -17,6 +19,7 @@ import parseExpression, { RestrictedSyntaxError } from "./parseExpression";
 import parseRequirementSpec from "./parseRequirementSpec";
 import type {
 	RestrictedAttribute,
+	RestrictedFill,
 	RestrictedStateInit,
 	RestrictedBuildResult,
 	RestrictedComponent,
@@ -233,7 +236,135 @@ function serializeNode(node: TemplateNode, context: Context): RestrictedNode | u
 		// Comments don't affect rendered content; dropped in restricted mode.
 		return undefined;
 	}
+	if (isComponentNode(node)) return serializeComponent(node, context);
+	if (isSpecialNode(node)) {
+		// `<slot>` parses as a special element; it renders its fallback children.
+		if (node.tagName === "slot") {
+			return serializeSlotElement(node, context);
+		}
+		context.report(
+			`Special elements ("<${node.tagName}>") aren't supported in restricted mode yet.`,
+			node.span.start,
+			node.span.end,
+		);
+		return undefined;
+	}
 	return serializeElement(node as ElementNode, context);
+}
+
+/** Component attributes: static values and fully-reactive expressions only. */
+function serializeComponentProps(node: ElementNode, context: Context): RestrictedAttribute[] {
+	const attributes: RestrictedAttribute[] = [];
+	for (const attribute of node.attributes) {
+		const { name, value, fullyReactive, reactive } = attribute;
+		if (name.startsWith("on") || name.startsWith(":on")) continue;
+		if (name.startsWith("&")) {
+			context.report(
+				`Bindings ("${name}") aren't supported on components in restricted mode.`,
+				attribute.span.start,
+				attribute.span.end,
+			);
+			continue;
+		}
+		if (name.startsWith(":")) {
+			context.report(
+				`Directives ("${name}") aren't supported on components in restricted mode.`,
+				attribute.span.start,
+				attribute.span.end,
+			);
+			continue;
+		}
+		if (value === undefined) {
+			attributes.push({ name });
+			continue;
+		}
+		if (fullyReactive) {
+			attributes.push({ name, expr: parseExprAt(value, attribute.span.start, context) });
+		} else if (reactive) {
+			context.report(
+				`Mixed static/dynamic prop values aren't supported in restricted mode; compute the whole "${name}" value with an expression.`,
+				attribute.span.start,
+				attribute.span.end,
+			);
+		} else {
+			attributes.push({ name, value: trimQuotes(value) });
+		}
+	}
+	return attributes;
+}
+
+/**
+ * Component children are slot fills: `<fill name="x">` for named fills and
+ * loose children for the default fill (`_`). Fills with slot props
+ * (attributes on the fill) aren't supported yet.
+ */
+function serializeComponent(node: ElementNode, context: Context): RestrictedNode {
+	void (node as ElementNode);
+	const fills: RestrictedFill[] = [];
+	const defaultFill: RestrictedNode[] = [];
+
+	for (const child of node.children) {
+		if (isFill(child)) {
+			const name = (child as ElementNode).attributes.find((attribute) => attribute.name === "name");
+			if (child.attributes.some((attribute) => attribute.name !== "name")) {
+				context.report(
+					"Slot props on fills aren't supported in restricted mode yet.",
+					child.span.start,
+					child.span.end,
+				);
+				continue;
+			}
+			fills.push({
+				name: name ? trimQuotes(name.value ?? "") || "_" : "_",
+				children: serializeChildren(child.children, context),
+			});
+		} else if (isTextNode(child) && child.content.trim() === "") {
+			continue;
+		} else {
+			const serialized = serializeNode(child, context);
+			if (serialized !== undefined) defaultFill.push(serialized);
+		}
+	}
+
+	if (defaultFill.length > 0) {
+		fills.unshift({ name: "_", children: defaultFill });
+	}
+
+	return {
+		t: "component",
+		name: node.tagName,
+		props: serializeComponentProps(node, context),
+		fills,
+	};
+}
+
+function isFill(node: TemplateNode): node is ElementNode {
+	return isSpecialNode(node) && (node.tagName === "fill" || node.tagName === "filldef");
+}
+
+/** `<slot name="…">fallback</slot>` in a restricted template. */
+function serializeSlotElement(node: ElementNode, context: Context): RestrictedNode {
+	const nameAttribute = node.attributes.find((attribute) => attribute.name === "name");
+	const name = nameAttribute?.value ? trimQuotes(nameAttribute.value) : "_";
+	if (node.attributes.some((attribute) => attribute.name !== "name")) {
+		context.report(
+			'Slot elements only support the "name" attribute in restricted mode.',
+			node.span.start,
+			node.span.end,
+		);
+	}
+	// The parser wraps slot children in filldef/fill special nodes; unwrap
+	// them so the slot node carries its content directly.
+	const children: RestrictedNode[] = [];
+	for (const child of node.children) {
+		if (isFill(child)) {
+			children.push(...serializeChildren(child.children, context));
+		} else {
+			const serialized = serializeNode(child, context);
+			if (serialized !== undefined) children.push(serialized);
+		}
+	}
+	return { t: "slot", name, children };
 }
 
 function serializeElement(node: ElementNode, context: Context): RestrictedNode | undefined {

@@ -100,7 +100,18 @@ export type RestrictedNode =
 			/** `@key` expression, when present */
 			key?: RestrictedExpr;
 			children: RestrictedNode[];
-	  };
+	  }
+	/** A host component usage: `<Card title={x}>children</Card>`. Props are
+	 * passed raw (data, not HTML); `children` is the default fill. */
+	| { t: "component"; name: string; props: RestrictedAttribute[]; fills: RestrictedFill[] }
+	/** A `<slot name="…">` element with fallback children. */
+	| { t: "slot"; name: string; children: RestrictedNode[] };
+
+export interface RestrictedFill {
+	/** Slot name; "_" is the default fill. */
+	name: string;
+	children: RestrictedNode[];
+}
 
 /** A resolved data declaration: kind + inert spec expressions. */
 export interface RestrictedRequirement {

@@ -251,6 +251,49 @@ export default function List() {
 	expect(server.code).not.toContain("data tickets from");
 });
 
+test("serializes component usage as component nodes with fills", () => {
+	const { program, errors } = compile(`
+import { Widget } from "@mallet/ui";
+
+export default function Dash($props: { show: boolean }) {
+	@render {
+		<Widget size={$props.show ? 2 : 1}>
+			<p>content</p>
+			<fill name="header">Header</fill>
+		</Widget>
+	}
+}
+`);
+	expect(errors).toEqual([]);
+	const componentNode = program.components[0].markup.find((node) => node.t === "component");
+	expect(componentNode).toMatchObject({
+		t: "component",
+		name: "Widget",
+	});
+	const fills = (componentNode as { fills: { name: string; children: unknown[] }[] }).fills;
+	expect(fills.map((fill) => fill.name)).toEqual(["_", "header"]);
+	expect(
+		(componentNode as { props: { name: string; expr?: unknown; value?: unknown }[] }).props,
+	).toMatchObject([{ name: "size", expr: { op: "ternary" } }]);
+});
+
+test("serializes <slot> elements with fallbacks", () => {
+	const { program, errors } = compile(`
+export default function WithSlot() {
+	@render {
+		<slot name="header">Fallback</slot>
+	}
+}
+`);
+	expect(errors).toEqual([]);
+	const slotNode = program.components[0].markup.find((node) => node.t === "slot");
+	expect(slotNode).toMatchObject({ t: "slot", name: "header" });
+	expect((slotNode as { children: { t: string; parts?: unknown[] }[] }).children[0]).toMatchObject({
+		t: "text",
+		parts: ["Fallback"],
+	});
+});
+
 test("rejects unsupported constructs with positioned errors", () => {
 	const cases: [string, RegExp][] = [
 		[
@@ -284,14 +327,6 @@ test("rejects unsupported constructs with positioned errors", () => {
 	}
 }`,
 			/@await group/,
-		],
-		[
-			`export default function D() {
-	@render {
-		<Widget />
-	}
-}`,
-			/Nested components/,
 		],
 		[
 			`export default function E() {

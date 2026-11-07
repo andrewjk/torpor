@@ -223,10 +223,35 @@ data tickets from tickets { queue: $props.queue, sort: "recency" };
   operators); template identifiers are validated at compile time
   (`$props`/`$data`/state names/loop variables), so typos fail at save time.
 - v1 supports elements, text/interpolations, static/dynamic attributes,
-  `@if`/`@else if`/`@else`, and `@for` (single variable, `of`, optional
-  `@key`). Deferred with clear compile errors: slots, nested components,
-  `@head`, `@html`, `@switch`, `@await`, `@try`, form bindings, mixed
-  static/dynamic attribute values.
+  `@if`/`@else if`/`@else`, `@for` (single variable, `of`, optional `@key`),
+  host components (`<Card title={x}>…</Card>`), and `<slot>` elements (a
+  slot renders its fallback; incoming fills are a host-side concern).
+  Deferred with clear compile errors: `@head`, `@html`, `@switch`, `@await`,
+  `@try`, form bindings, mixed static/dynamic attribute values, fills with
+  slot props.
+
+### Host components in restricted mode
+
+Components resolve like everything else — host-side. At render time, pass
+**server components** (their server builds); at mount time, pass the client
+builds via `scope`:
+
+```ts
+const { body } = await renderRestricted(artifact, {
+	components: { Card: cardServerComponent }, // server build: (props, ctx, slots) => {body, head}
+});
+
+mountEmbed(target, artifact, props, {
+	scope: { "@mallet/ui": { Card: cardClientComponent } }, // client build
+});
+```
+
+Fill children are interpreted in the ambient scope and passed as the
+default slot; named fills (`<fill name="header">`) work the same. Slot
+props on fills aren't accessible in restricted mode yet. Unknown components
+fail at render time with their name — the host decides whether that's a
+build failure or a graceful fallback.
+
 - `recompileRestricted(artifact)` is the upgrade path for these artifacts
   (`recompileEmbed` covers the JS formats).
 
