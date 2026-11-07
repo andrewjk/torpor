@@ -264,3 +264,131 @@ test("derive input must be an array", async () => {
 		}),
 	).rejects.toThrow(/expects "tickets" to be an array/);
 });
+
+test("aggregate values over filtered rows", async () => {
+	const source = `
+data tickets from rows { };
+data stats from derive {
+	of: "tickets",
+	where: $item.priority >= 2,
+	count: true,
+	sum: $item.points,
+	average: $item.points,
+	min: $item.points,
+	max: $item.points,
+};
+
+export default function Stats() {
+	@render {
+		<p data-count>{ $data.stats.count }</p>
+		<p data-sum>{ $data.stats.sum }</p>
+		<p data-average>{ $data.stats.average }</p>
+		<p data-min>{ $data.stats.min }</p>
+		<p data-max>{ $data.stats.max }</p>
+	}
+}
+`;
+	const rows = [
+		{ priority: 1, points: 100 },
+		{ priority: 3, points: 3 },
+		{ priority: 2, points: 5 },
+		{ priority: 2, points: null },
+	];
+	const { body } = await renderRestricted(artifact(source), {
+		sources: { rows: () => rows },
+	});
+	// Rows passing where: 3, 5 (null row counts toward count, skips numeric aggregates)
+	const doc = new DOMParser().parseFromString(body, "text/html");
+	expect(doc.querySelector("[data-count]")?.textContent).toBe("3");
+	expect(doc.querySelector("[data-sum]")?.textContent).toBe("8");
+	expect(doc.querySelector("[data-average]")?.textContent).toBe("4");
+	expect(doc.querySelector("[data-min]")?.textContent).toBe("3");
+	expect(doc.querySelector("[data-max]")?.textContent).toBe("5");
+});
+
+test("aggregates over an empty set", async () => {
+	const source = `
+data tickets from rows { };
+data stats from derive {
+	of: "tickets",
+	count: true,
+	sum: $item.points,
+	min: $item.points,
+	max: $item.points,
+	average: $item.points,
+};
+
+export default function Stats() {
+	@render {
+		<p data-count>{ $data.stats.count }</p>
+		<p data-sum>{ $data.stats.sum }</p>
+		<p data-min>{ $data.stats.min }</p>
+		<p data-max>{ $data.stats.max }</p>
+		<p data-average>{ $data.stats.average }</p>
+	}
+}
+`;
+	const { body } = await renderRestricted(artifact(source), {
+		sources: { rows: () => [] },
+	});
+	const doc = new DOMParser().parseFromString(body, "text/html");
+	expect(doc.querySelector("[data-count]")?.textContent).toBe("0");
+	expect(doc.querySelector("[data-sum]")?.textContent).toBe("0");
+	expect(doc.querySelector("[data-min]")?.textContent).toBe("");
+	expect(doc.querySelector("[data-max]")?.textContent).toBe("");
+	expect(doc.querySelector("[data-average]")?.textContent).toBe("");
+});
+
+test("aggregates can't combine with the row pipeline", () => {
+	const error = compileErrorOf(`
+data tickets from rows { };
+data stats from derive {
+	of: "tickets",
+	count: true,
+	limit: 5,
+};
+
+export default function S() {
+	@render { <p>{ $data.stats.count }</p> }
+}
+`);
+	expect(error.errors.map((e) => e.message).join("\n")).toContain(
+		'Aggregates (count) produce a single value, so "limit" doesn\'t apply',
+	);
+});
+
+test('aggregate "count" must be literal true', () => {
+	const error = compileErrorOf(`
+data tickets from rows { };
+data stats from derive {
+	of: "tickets",
+	count: 1,
+};
+
+export default function S() {
+	@render { <p>{ $data.stats.count }</p> }
+}
+`);
+	expect(error.errors.map((e) => e.message).join("\n")).toContain(
+		'derive "count" must be literal true',
+	);
+});
+
+test("sum over non-numbers fails at resolve time", async () => {
+	const source = `
+data tickets from rows { };
+data stats from derive {
+	of: "tickets",
+	sum: $item.title,
+};
+
+export default function Stats() {
+	@render { <p>{ $data.stats.sum }</p> }
+}
+`;
+	await expect(
+		renderRestricted(artifact(source), {
+			sources: { rows: () => ROWS },
+		}),
+	).rejects.toThrow(/sum must evaluate to a number/);
+});

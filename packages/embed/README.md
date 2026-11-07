@@ -341,6 +341,27 @@ const { body } = await renderRestricted(artifact, {
   are expressions. Derives resolve in declaration order, so `of` must name an
   earlier requirement (enforced at compile time with
   `requirementKinds: { derive: deriveRequirementKind }`).
+- **Aggregates** — `count`, `sum`, `min`, `max`, `average` — produce a single
+  object instead of rows, over the rows passing `where`:
+
+  ```torp
+  data stats from derive {
+  	of: "tickets",
+  	where: $item.open,
+  	count: true,
+  	sum: $item.estimate,
+  	average: $item.estimate,
+  	max: $item.priority,
+  };
+  ```
+
+  The template reads `$data.stats.count`, `$data.stats.sum`, … Nulls are
+  skipped by the numeric aggregates (SQL-style); `count` counts filtered
+  rows; an empty set gives `count: 0`, `sum: 0`, and `null` for
+  `min`/`max`/`average`. Aggregates can't combine with `map`/`sortBy`/
+  `order`/`limit` (compile error) — `sum`/`average` throw at resolve time on
+  non-numeric values.
+
 - Budgets are enforced (input rows, output rows, wall clock) and reported as
   render errors. Cross-source joins are deliberately out — correlate in the
   template or in a host-shaped source.

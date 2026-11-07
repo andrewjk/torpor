@@ -20,6 +20,8 @@ type Formatters = Record<string, (...args: unknown[]) => unknown>;
  * Resolves a `data <name> from derive { … }` requirement: filters, maps,
  * sorts and limits an earlier requirement's rows, using the restricted
  * expression language (with host function calls available for formatting).
+ * With an aggregate (`count`/`sum`/`min`/`max`/`average`), returns a single
+ * object keyed by the aggregates instead of rows.
  *
  * Runs with budgets (input rows, output rows, wall clock) because it is the
  * one place the data layer can iterate. Joins are deliberately absent —
@@ -62,6 +64,70 @@ export default function resolveDerive(
 	}
 
 	const deadline = Date.now() + timeoutMs;
+
+	// Aggregate form: any of count/sum/min/max/average in the spec produces a
+	// single object (keyed by the aggregates) over the rows passing `where`.
+	// Nulls/undefined are skipped per SQL semantics; `count` counts filtered
+	// rows regardless. Must match AGGREGATE_KEYS in deriveRequirementKind.
+	const aggregateKeys = Object.keys(spec).filter((key) =>
+		["count", "sum", "min", "max", "average"].includes(key),
+	);
+	if (aggregateKeys.length > 0) {
+		let count = 0;
+		let sumTotal = 0;
+		let averageTotal = 0;
+		let averageCount = 0;
+		let min: unknown;
+		let max: unknown;
+		for (let index = 0; index < input.length; index++) {
+			if (Date.now() > deadline) {
+				throw new Error(
+					`derive "${requirement.name}" exceeded its ${timeoutMs}ms budget after ${index} rows.`,
+				);
+			}
+			const scope: Record<string, unknown> = {
+				$props: props,
+				$item: input[index],
+				$index: index,
+			};
+			if (spec.where !== undefined && !evaluateExpr(spec.where, scope, formatters)) {
+				continue;
+			}
+			count++;
+			for (const key of aggregateKeys) {
+				if (key === "count") continue;
+				const value = evaluateExpr(spec[key], scope, formatters);
+				if (value === null || value === undefined) continue;
+				if (key === "sum" || key === "average") {
+					if (typeof value !== "number" || Number.isNaN(value)) {
+						throw new Error(
+							`derive "${requirement.name}" ${key} must evaluate to a number (got ${describe(value)}).`,
+						);
+					}
+					if (key === "sum") sumTotal += value;
+					else {
+						averageTotal += value;
+						averageCount++;
+					}
+				} else if (key === "min") {
+					min = min === undefined || compareKeys(value, min) < 0 ? value : min;
+				} else {
+					max = max === undefined || compareKeys(value, max) > 0 ? value : max;
+				}
+			}
+		}
+		const totals: Record<string, unknown> = {};
+		for (const key of aggregateKeys) {
+			if (key === "count") totals.count = count;
+			else if (key === "sum") totals.sum = sumTotal;
+			else if (key === "average")
+				totals.average = averageCount > 0 ? averageTotal / averageCount : null;
+			else if (key === "min") totals.min = min === undefined ? null : min;
+			else totals.max = max === undefined ? null : max;
+		}
+		return totals;
+	}
+
 	const orderName = spec.order?.op === "lit" && spec.order.value === "desc" ? -1 : 1;
 
 	const kept: { value: unknown; key: unknown; index: number }[] = [];

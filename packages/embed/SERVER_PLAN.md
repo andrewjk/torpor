@@ -347,6 +347,18 @@ run on the client.**
   locale-sensitive `formatDue`-style formatter used only client-side will
   differ from SSR text unless the same value ships in `$data`.
 
+### Aggregates in derive
+
+Status: **implemented** (2026-11-08).
+
+- `count`, `sum`, `min`, `max`, `average` spec keys turn a derive into a
+  single-object result over the rows passing `where` (SQL-style null
+  skipping; empty set gives `count: 0`, `sum: 0`, `null` otherwise).
+- Aggregates are mutually exclusive with `map`/`sortBy`/`order`/`limit`
+  (compile error from `deriveRequirementKind`); `where` still filters.
+- `resolveDerive` computes them in the same budgeted single pass.
+- Joins and `group by` remain out of scope.
+
 ### Components and slots in restricted mode
 
 Status: **implemented** (2026-11-07).

@@ -18,11 +18,40 @@ import type {
  * };
  * ```
  *
+ * Aggregate form — returns a single object instead of rows:
+ *
+ * ```torp
+ * data stats from derive {
+ * 	of: "tickets",
+ * 	where: $item.open,                                // optional filter
+ * 	count: true,                                      // rows passing the filter
+ * 	sum: $item.estimate,                              // numeric aggregates
+ * 	average: $item.estimate,
+ * 	min: $item.due,
+ * 	max: $item.priority,
+ * };
+ * ```
+ *
  * This is the one data-layer construct whose expressions are evaluated per
  * row; host formatters are callable here (and in requirement specs), never
  * in template expressions.
  */
-const DERIVE_SPEC_KEYS = new Set(["of", "where", "map", "sortBy", "order", "limit"]);
+const DERIVE_SPEC_KEYS = new Set([
+	"of",
+	"where",
+	"map",
+	"sortBy",
+	"order",
+	"limit",
+	// Aggregates — produce a single object; can't combine with the row pipeline
+	"count",
+	"sum",
+	"min",
+	"max",
+	"average",
+]);
+const AGGREGATE_KEYS = new Set(["count", "sum", "min", "max", "average"]);
+const PIPELINE_KEYS = new Set(["map", "sortBy", "order", "limit"]);
 
 function literalString(entry: RestrictedSpecEntry | undefined): string | undefined {
 	if (entry === undefined) return undefined;
@@ -64,6 +93,34 @@ const deriveRequirementKind: RestrictedRequirementKindValidator = (entries, repo
 		}
 	}
 
+	// Aggregates produce a single object, so the row pipeline (map/sort/
+	// limit) doesn't apply. `where` still filters the rows being aggregated.
+	const aggregates = [...AGGREGATE_KEYS].filter((key) => byKey.has(key));
+	if (aggregates.length > 0) {
+		for (const key of PIPELINE_KEYS) {
+			const entry = byKey.get(key);
+			if (entry !== undefined) {
+				report(
+					`Aggregates (${aggregates.join(", ")}) produce a single value, so "${key}" doesn't apply. Split into two derives or drop the aggregate.`,
+					entry.valueStart,
+					entry.valueEnd,
+				);
+			}
+		}
+	}
+
+	const countEntry = byKey.get("count");
+	if (countEntry !== undefined) {
+		const value = countEntry.expr.op === "lit" ? countEntry.expr.value : undefined;
+		if (value !== true) {
+			report(
+				'derive "count" must be literal true (it counts the rows passing "where").',
+				countEntry.valueStart,
+				countEntry.valueEnd,
+			);
+		}
+	}
+
 	const orderEntry = byKey.get("order");
 	if (orderEntry !== undefined) {
 		const order = literalString(orderEntry);
@@ -84,9 +141,12 @@ const deriveRequirementKind: RestrictedRequirementKindValidator = (entries, repo
 		}
 	}
 
-	for (const key of ["where", "map", "sortBy"]) {
+	for (const key of ["where", "map", "sortBy", "sum", "min", "max", "average"]) {
 		const entry = byKey.get(key);
-		if (entry !== undefined && !isExpression(entry.expr)) {
+		if (entry === undefined) continue;
+		// Pipeline keys are already reported when aggregates are present
+		if (aggregates.length > 0 && PIPELINE_KEYS.has(key)) continue;
+		if (!isExpression(entry.expr)) {
 			report(`derive "${key}" must be an expression.`, entry.valueStart, entry.valueEnd);
 		}
 	}
