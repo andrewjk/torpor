@@ -21,7 +21,7 @@ export default async function Let(
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
-		t_body += `<li><b>${t_fmt($slot.item.text)}</b></li>`;
+		t_body += `<b>${t_fmt($slot.item.text)}</b>`;
 		return t_body;
 	}
 	const t_comp_1 = await List(t_props_1, $context, t_slots_1);
@@ -41,17 +41,17 @@ async function List(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<ul><![>`;
+	t_body += `<![>`;
 	for (let item of $props.items) {
-		t_body += `<!^><li><![>`;
+		t_body += `<!^><div class="row"><![>`;
 		const t_slot_props_1: any = {};
 		t_slot_props_1["item"] = item;
 		if ($slots && $slots["_"]) {
 			t_body += await $slots["_"](t_slot_props_1, $context);
 		}
-		t_body += `<!]><!></li>`;
+		t_body += `<!]><!></div>`;
 	}
-	t_body += `<!]><!></ul>`;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

@@ -248,10 +248,12 @@ mountEmbed(target, artifact, props, {
 ```
 
 Fill children are interpreted in the ambient scope and passed as the
-default slot; named fills (`<fill name="header">`) work the same. Slot
-props on fills aren't accessible in restricted mode yet. Unknown components
-fail at render time with their name — the host decides whether that's a
-build failure or a graceful fallback.
+default slot; named fills (`<fill name="header">`) work the same, and fills
+read slot props as `$slot.<name>`. Scoped classes work on component usages
+too: a `class` that matches the template's `@style` selectors gets the
+style-hash class merged through to the host component, exactly like the JS
+builds. Unknown components fail at render time with their name — the host
+decides whether that's a build failure or a graceful fallback.
 
 - `recompileRestricted(artifact)` is the upgrade path for these artifacts
   (`recompileEmbed` covers the JS formats).

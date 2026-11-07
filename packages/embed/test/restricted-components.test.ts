@@ -7,13 +7,11 @@ import { compileRestricted, renderRestricted } from "../src/restricted";
 import { hydrateEmbed } from "../src";
 import type EmbedArtifact from "../src/types/EmbedArtifact";
 
-// SSR parity uses an element fill (the general shape); hydration uses a text
-// fill (see FOLLOWUP.md: eval-hydrated element-root fills mis-adopt regions).
 const PAGE_SOURCE = `
 export default function Page($props: { items: Row[] }) {
 	@render {
 		<List items={$props.items}>
-			<li><a href={"#/tickets/" + $slot.item.id}>{$slot.item.title}</a></li>
+			<a href={"#/tickets/" + $slot.item.id}>{$slot.item.title}</a>
 		</List>
 	}
 }
@@ -23,7 +21,7 @@ const PAGE_TEXT_SOURCE = `
 export default function PageText($props: { items: Row[] }) {
 	@render {
 		<List items={$props.items}>
-			{$slot.item.title}
+			<b>{$slot.item.title}</b>
 		</List>
 	}
 }
@@ -32,11 +30,9 @@ export default function PageText($props: { items: Row[] }) {
 const LIST_SOURCE = `
 export default function List($props: { items: Row[] }) {
 	@render {
-		<ul>
-			@for (row of $props.items) {
-				<li><slot item={row} /></li>
-			}
-		</ul>
+		@for (row of $props.items) {
+			<div><slot item={row} /></div>
+		}
 	}
 }
 `;
@@ -158,9 +154,59 @@ test("hydration: the client host component renders the restricted fills", async 
 		},
 	);
 
-	// Hydration adopts the SSR content
-	expect(target.querySelectorAll("li").length).toBe(2);
+	// Hydration adopts the SSR content, including the element fill
+	expect(target.querySelectorAll("div").length).toBeGreaterThanOrEqual(2);
+	expect(target.querySelectorAll("b").length).toBe(2);
 	expect(target.textContent).toContain("Fix login");
 
 	handle.unmount();
+});
+
+test("scoped class props on component usages match the JS build", async () => {
+	const CARD_SOURCE = `
+export default function Card($props: { class?: unknown }) {
+	@render {
+		<div class={$props.class}>
+			<slot />
+		</div>
+	}
+}
+`;
+	const PAGE_SOURCE = `
+export default function ScopedPage($props: { wide: boolean }) {
+	@style {
+		.card { color: red; }
+		.wide { width: 100%; }
+	}
+	@render {
+		<Card class="card">
+			<p>hello</p>
+		</Card>
+		<Card class={$props.wide ? "wide" : ""}>
+			<p>side</p>
+		</Card>
+	}
+}
+`;
+	const cardServer = compileServerComponent(CARD_SOURCE);
+	const artifact = compileRestricted("scoped", PAGE_SOURCE);
+	const { body, styles } = await renderRestricted(artifact, {
+		components: { Card: cardServer as never },
+		props: { wide: true },
+	});
+
+	// Byte parity with the real JS server composition
+	const parsedPage = parse(PAGE_SOURCE);
+	const builtPage = build(parsedPage.template!, { server: true, source: PAGE_SOURCE });
+	const codePage = builtPage.code.replace("export default ", "").replace(/^import\s.+\n/gm, "");
+	const jsPage = transform(codePage, { transforms: ["typescript"] }).code;
+	const namePage = parsedPage.template!.components.find((component) => component.default)!.name!;
+	const makePage = new Function(...Object.keys(ssr), "Card", `${jsPage}\nreturn ${namePage};`); // eslint-disable-line no-implied-eval
+	const page = makePage(...Object.values(ssr), cardServer);
+	const reference = (await page({ wide: true })) as { body: string };
+	expect(body).toBe(reference.body);
+
+	expect(body).toContain('class="card torp-');
+	expect(body).toContain('class="wide torp-');
+	expect(styles).toEqual(builtPage.styles);
 });

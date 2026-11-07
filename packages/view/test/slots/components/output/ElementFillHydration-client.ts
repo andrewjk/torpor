@@ -46,14 +46,14 @@ export default function Let(
 		$slot: Record<PropertyKey, any>,
 		$context?: Record<PropertyKey, any>
 	) => {
-		const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<li><b>#</b></li>`);
+		const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<b>#</b>`);
 		const t_root_2 = t_root_el(t_fragment_2);
-		const t_li_1 = t_root_2 as HTMLElement;
-		const t_text_1 = t_child(t_child(t_li_1));
+		const t_b_1 = t_root_2 as HTMLElement;
+		const t_text_1 = t_child(t_b_1);
 		$run(() => {
 			t_text_1.textContent = t_fmt($slot.item.text);
 		});
-		t_add_element(t_li_1, $sparent, $sanchor);
+		t_add_element(t_b_1, $sparent, $sanchor);
 	}
 	List(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 
@@ -70,18 +70,18 @@ function List(
 ): void {
 
 	/* User interface */
+	const t_fragments: DocumentFragment[] = [];
 	const t_fragment_els: Element[] = [];
 
-	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<ul><!></ul>`);
-	const t_root_0 = t_root_el(t_fragment_0);
-	const t_ul_1 = t_root_0 as HTMLElement;
-	let t_for_anchor_1 = t_anchor(t_child(t_ul_1)) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<!>`);
+	const t_root_0 = t_root(t_fragment_0);
+	let t_for_anchor_1 = t_anchor(t_root_0) as HTMLElement;
 
 	/* @for */
 	let t_for_region_1 = t_region();
 	t_run_list(
 		t_for_region_1,
-		t_ul_1,
+		t_fragment_0,
 		t_for_anchor_1,
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
@@ -92,10 +92,10 @@ function List(
 		},
 		(t_item_1, t_before_1) => {
 			const item = t_item_1.data;
-			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<li><!></li>`);
+			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<div class="row"><!></div>`);
 			const t_root_1 = t_root_el(t_fragment_1);
-			const t_li_1 = t_root_1 as HTMLElement;
-			let t_slot_anchor_1 = t_anchor(t_child(t_li_1)) as HTMLElement;
+			const t_div_1 = t_root_1 as HTMLDivElement;
+			let t_slot_anchor_1 = t_anchor(t_child(t_div_1)) as HTMLElement;
 			const t_slot_props_1 = $watch({
 				item: item,
 			});
@@ -104,9 +104,9 @@ function List(
 				t_slot_props_1["item"] = item;
 			}, undefined, { forVarMask: 1 });
 			if ($slots && $slots["_"]) {
-				$slots["_"](t_li_1, t_slot_anchor_1, t_slot_props_1, $context)
+				$slots["_"](t_div_1, t_slot_anchor_1, t_slot_props_1, $context)
 			}
-			t_add_element(t_li_1, t_ul_1, t_before_1);
+			t_add_element(t_div_1, t_fragment_0, t_before_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed_mask = 0;
@@ -119,6 +119,6 @@ function List(
 		true
 	);
 
-	t_add_element(t_ul_1, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_for_anchor_1, t_root_0);
 
 }

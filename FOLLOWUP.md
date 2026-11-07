@@ -486,36 +486,25 @@ builtins); unverified whether torpor's async SSR (`@await` boundaries,
 promise draining) works there, so it stays on the README roadmap as
 research rather than a built feature.
 
-### Eval-hydrated components mis-adopt element-root slot fills
+### Slot fills whose root is auto-closed by the HTML parser break hydration
 
-`hydrateEmbed`/`mountEmbed` evaluate artifact client code with `new Function`
-(runtime exports + flattened scope injected as parameters — the same
-mechanism for restricted artifacts' `scope` and JS-format embeds' imports).
-When the eval'd code composes components whose fill content starts with an
-**element** (e.g. `<List><li><a href={...}>{$slot.item.title}</a></li></List>`
-with `<slot item={row}/>` inside a `@for`), hydration mis-adopts the regions:
-the fill's root element is extracted out of the row, the hydration cursor
-ends up stale (an `addElement` trailing `nodeNext` can null it via
-`nodeCheckHydrationBreak(null)`, flipping the enclosing `addElement` into
-insert mode), and `nodeAnchor` throws "End hydration comment not found" —
-sometimes swallowed by the effect system, leaving broken-but-rendered DOM.
+When a component wraps each row in an element and the consumer's fill root
+is a tag the HTML parser auto-closes inside that wrapper (`<li>` fill inside
+`<li><slot/></li>`, likewise `p`, `tr`, `td`, `option`), the SSR markup is
+re-nested by the HTML parser: `<li><![><li>…</li><!]><!></li>` parses as
+`<li><!--[--></li><li>…</li><!--]--><!---->` — the slot region's markers end
+up as siblings of the row instead of children, and hydration throws
+"End hydration comment not found" (or swallows it in an effect and leaves
+mis-adopted DOM). This is plain HTML parsing, not a torpor bug, and it hits
+every rendering path identically (module imports and the embed eval harness
+behave the same).
 
-Reproduces with plain torpor code — no restricted mode involved — whenever
-the component functions are run through the eval harness instead of real
-module imports: the same sources hydrate perfectly when imported as modules
-(`packages/view/test/slots/let-slot.test.ts` text fills;
-`packages/view/test/slots/element-fill-hydration.test.ts` element fills via
-the view test loader). Deltas between the working module path and the
-failing eval path: sucrase's TS transform vs vite/esbuild, sloppy vs strict
-mode ("use strict" injection didn't help), and parameter injection vs module
-bindings. SSR is unaffected: the restricted interpreter's component/slot
-output is byte-identical to the real JS server composition (tested in
-`packages/embed/test/restricted-components.test.ts`).
-
-Next steps: pin down which delta breaks it (compare sucrase output vs the
-vite transform of the same built file), or make `hydrateEmbed`'s eval path
-hydrate element-root fills correctly; until then, restricted embeds that
-hydrate host components should keep fill roots text-shaped (or host
-components should render fills through module-format embeds).
-
-**Resolution:** (open)
+**Resolution (documented constraint, tests use valid shapes):** element-root
+fills hydrate fine when the nesting is parse-stable — host wraps rows in a
+`<div>`, fill root is anything that doesn't auto-close it
+(`packages/view/test/slots/element-fill-hydration.test.ts` covers the view
+loader path; the restricted embed hydration test covers the eval path).
+A possible future improvement is a compile-time warning when a fill's root
+tag would be auto-closed inside the usage site's wrapper, but detecting it
+requires cross-component analysis (the host template and the fill come from
+different files), so it stays research-grade.

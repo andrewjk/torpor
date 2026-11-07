@@ -255,6 +255,12 @@ function serializeNode(node: TemplateNode, context: Context): RestrictedNode | u
 /** Component attributes: static values and fully-reactive expressions only. */
 function serializeComponentProps(node: ElementNode, context: Context): RestrictedAttribute[] {
 	const attributes: RestrictedAttribute[] = [];
+	// Scoped class props: when the usage matches the component's styles, the
+	// class prop carries the style-hash class. The JS builds pass it as an
+	// array (`["<value>", "torp-<hash>"]`); the `scoped` field tells the
+	// interpreter to do the same.
+	let needsClass = node.scopeStyles === true && context.styleHash !== "";
+
 	for (const attribute of node.attributes) {
 		const { name, value, fullyReactive, reactive } = attribute;
 		if (name.startsWith("on") || name.startsWith(":on")) continue;
@@ -279,7 +285,13 @@ function serializeComponentProps(node: ElementNode, context: Context): Restricte
 			continue;
 		}
 		if (fullyReactive) {
-			attributes.push({ name, expr: parseExprAt(value, attribute.span.start, context) });
+			const expr = parseExprAt(value, attribute.span.start, context);
+			if (name === "class" && needsClass) {
+				attributes.push({ name, expr, scoped: `torp-${context.styleHash}` });
+				needsClass = false;
+			} else {
+				attributes.push({ name, expr });
+			}
 		} else if (reactive) {
 			context.report(
 				`Mixed static/dynamic prop values aren't supported in restricted mode; compute the whole "${name}" value with an expression.`,
@@ -287,9 +299,17 @@ function serializeComponentProps(node: ElementNode, context: Context): Restricte
 				attribute.span.end,
 			);
 		} else {
-			attributes.push({ name, value: trimQuotes(value) });
+			const literal = trimQuotes(value);
+			if (name === "class" && needsClass) {
+				attributes.push({ name, value: literal, scoped: `torp-${context.styleHash}` });
+				needsClass = false;
+			} else {
+				attributes.push({ name, value: literal });
+			}
 		}
 	}
+	// No trailing class prop here (unlike elements): the JS builds only scope
+	// an explicit `class` attribute on component usages.
 	return attributes;
 }
 

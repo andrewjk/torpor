@@ -69,6 +69,12 @@ export type RestrictedExpr =
 export interface RestrictedStaticAttribute {
 	name: string;
 	value?: string;
+	/**
+	 * On component `class` props: the component's style-hash class. The
+	 * interpreter passes the prop as `[value, scoped]`, matching the JS
+	 * server build.
+	 */
+	scoped?: string;
 }
 
 /**
@@ -79,6 +85,10 @@ export interface RestrictedStaticAttribute {
  * - `format: "class"` — class value semantics (arrays/objects); `scoped` is
  *   the component's style-hash class to append.
  * - `format: "style"` — style value semantics (objects/arrays).
+ *
+ * On **component props**, `scoped` has the same meaning but the interpreter
+ * passes the prop as `[value, scoped]` (an array), matching the JS builds'
+ * scoped class prop contract.
  */
 export interface RestrictedDynamicAttribute {
 	name: string;

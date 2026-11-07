@@ -186,7 +186,17 @@ async function renderNode(node: RestrictedNode, context: RenderContext): Promise
 			}
 			const props: Record<string, unknown> = {};
 			for (const attr of node.props) {
-				props[attr.name] = "expr" in attr ? evaluateExpr(attr.expr, scope) : attr.value;
+				if ("expr" in attr) {
+					props[attr.name] = evaluateExpr(attr.expr, scope);
+				} else {
+					// Bare attributes are passed as `true`, matching the JS builds
+					props[attr.name] = attr.value ?? true;
+				}
+				// Scoped class props go through as `[value, "torp-<hash>"]`,
+				// matching the JS server build's contract
+				if (attr.name === "class" && attr.scoped) {
+					props[attr.name] = [props[attr.name], attr.scoped];
+				}
 			}
 			const slots: Record<
 				string,

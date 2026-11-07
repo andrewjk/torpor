@@ -416,3 +416,52 @@ export default function A() {
 	expect(styles[0].style).toContain("rebeccapurple");
 	expect(styles[0].hash).toBeTruthy();
 });
+
+test("serializes scoped class props on component usages", () => {
+	const { program, errors } = compile(`
+export default function Dash($props: { wide: boolean }) {
+	@style {
+		.card { color: red; }
+		.wide { width: 100%; }
+	}
+	@render {
+		<Card class="card" size={2}>
+			<p>content</p>
+		</Card>
+		<Card class={$props.wide ? "wide" : ""}>
+			<p>side</p>
+		</Card>
+		<Card>
+			<p>plain</p>
+		</Card>
+	}
+}
+`);
+	expect(errors).toEqual([]);
+	const usages = program.components[0].markup.filter((node) => node.t === "component") as {
+		props: { name: string; value?: string; expr?: unknown; scoped?: string }[];
+	}[];
+
+	// Static scoped class: value kept, hash class marked for the interpreter
+	const static_ = usages[0]!;
+	const classProp = static_.props.find((prop) => prop.name === "class");
+	expect(classProp).toMatchObject({
+		name: "class",
+		value: "card",
+		scoped: expect.stringMatching(/^torp-/),
+	});
+
+	// Reactive scoped class: expression + hash class
+	const reactive = usages[1]!;
+	const reactiveClass = reactive.props.find((prop) => prop.name === "class");
+	expect(reactiveClass).toMatchObject({
+		name: "class",
+		scoped: expect.stringMatching(/^torp-/),
+	});
+	expect(reactiveClass!.scoped).toBe(static_.props.find((prop) => prop.name === "class")!.scoped);
+	expect((reactiveClass as { expr: unknown }).expr).toBeDefined();
+
+	// No class attribute: no class prop is synthesized (matches the JS builds)
+	const plain = usages[2]!;
+	expect(plain.props.find((prop) => prop.name === "class")).toBeUndefined();
+});
