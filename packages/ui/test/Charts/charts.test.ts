@@ -177,6 +177,45 @@ describe("Charts", () => {
 		expect(circles[0]!.getAttribute("r")).toBe("3");
 	});
 
+	it("multi-value series spread across the plot, not the series count", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+
+		// Two series of THREE values each: the points used to be spaced by
+		// the series count (itemWidth = plotWidth / labels.length), so the
+		// third value landed past the right edge of the svg
+		mount(container, NoAxisChartTest as any, {
+			series: [
+				{ name: "A", color: "#ff0000", data: [10, 30, 70] },
+				{ name: "B", color: "#00ff00", data: [20, 60, 40] },
+			],
+		});
+		await settle();
+
+		const width = 400;
+		const xs = [
+			...[...container.querySelectorAll("svg polyline")].flatMap((p) =>
+				p
+					.getAttribute("points")!
+					.split(" ")
+					.map((pt) => Number(pt.split(",")[0])),
+			),
+			...[...container.querySelectorAll("svg circle")].map((c) => Number(c.getAttribute("cx"))),
+		];
+		expect(xs.length).toBeGreaterThan(0);
+		for (const x of xs) {
+			expect(x).toBeGreaterThanOrEqual(0);
+			expect(x).toBeLessThanOrEqual(width);
+		}
+
+		// The lines end exactly at the right edge
+		const lines = [...container.querySelectorAll("svg polyline")];
+		for (const line of lines) {
+			const last = line.getAttribute("points")!.split(" ").at(-1)!;
+			expect(Number(last.split(",")[0])).toBe(width);
+		}
+	});
+
 	it("adding an axis takes space away from the marks", async () => {
 		const withAxis = document.createElement("div");
 		document.body.appendChild(withAxis);

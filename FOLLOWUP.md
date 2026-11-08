@@ -5,6 +5,18 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
+### `pnpm check` in packages/ui reports unused `$context` in three .torp components
+
+`LoadedListBoxItems.torp`, `TreeLoadedChildren.torp` and
+`LoadedItems.torp` all fail `pnpm check` with "'$context' is declared but its
+value is never read" (reported at 0:0 of the transformed document). Odd
+because `TreeLoadedChildren` clearly reads `$context` (line 51) and the other
+two never mention it at all — so the compiler's injected `$context`
+declaration interacts badly with the check pipeline for components whose
+generated scope doesn't read it (or the transform's unused-var analysis is
+misplaced). Noticed while adding a chart regression test; not investigated
+further there.
+
 ### ColorPicker hex-input tests failing (ui)
 
 `packages/ui/test/ColorPicker/colorPicker.test.ts` has 3 failing tests on
@@ -85,21 +97,6 @@ the component instance alive AND updates its props" makes the non-reactivity
 surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
-
-### ChartLines/ChartPoints x positions overflow the plot for multi-value series
-
-Pre-existing (visible before the reservation work, unchanged by it). Line
-and point marks place value `j` at `plotX + j * itemWidth + itemWidth/2`,
-where `itemWidth = plotWidth / labels.length` and `labels` are the _series
-names_ -- so with 2 series of 3 values each, the third point lands at
-`plotX + 2.5 * plotWidth/2`, past the right edge of the svg. The layered
-model currently conflates "series" (one per color) with "categories" (the
-x slots): ChartColumns/ChartBars treat each series as a category slot
-holding grouped values, while ChartLines treats data indexes as shared
-categories scaled by the series count. Fixing it properly wants the
-point-based data model (x per point or a shared category array), which was
-deferred when the reservation work landed -- see the DataSeries note in the
-Charts plan.
 
 ### Standard schema validation: remaining integration points
 
