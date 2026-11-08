@@ -2,6 +2,7 @@ import context from "../render/context";
 import type AsyncOptions from "../types/AsyncOptions";
 import type Computed from "../types/Computed";
 import { COMPUTED_TYPE } from "../types/constants";
+import devAssert from "../dev/devAssert";
 import batchEnd from "./batchEnd";
 import batchStart from "./batchStart";
 import { propagateFromSignal } from "./propagateSignal";
@@ -105,6 +106,12 @@ export default function $async<T>(fn: (serverValue?: T) => Promise<T>, _options?
 			(value as Promise<T>).then(
 				(v: T) => {
 					if (computed.generation !== gen) return;
+					// The generation guard passed, so this is still the run that
+					// suspended — the settle machine's pending flag must be set
+					devAssert(
+						computed.didSuspend,
+						"$async: resolved while not suspended (settle bookkeeping is broken)",
+					);
 					computed.value = v;
 					computed.didSuspend = false;
 					// Retain the resolved value for the next refresh suspend
@@ -116,6 +123,10 @@ export default function $async<T>(fn: (serverValue?: T) => Promise<T>, _options?
 				},
 				(e: any) => {
 					if (computed.generation !== gen) return;
+					devAssert(
+						computed.didSuspend,
+						"$async: rejected while not suspended (settle bookkeeping is broken)",
+					);
 					computed.value = e;
 					computed.didError = true;
 					computed.didSuspend = false;

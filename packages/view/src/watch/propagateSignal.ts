@@ -1,4 +1,5 @@
 import context from "../render/context";
+import devAssert from "../dev/devAssert";
 import type Computed from "../types/Computed";
 import type ProxyData from "../types/ProxyData";
 import type ProxySignal from "../types/ProxySignal";
@@ -94,6 +95,10 @@ export default function propagateSignal(proxy: ProxyData, key: PropertyKey): voi
 			// Add the signal to the context for updating after triggering.
 			// Append via a tail pointer so this stays O(1), rather than walking
 			// the whole chain on every write (which made batched mutations O(N²)).
+			devAssert(
+				(context.firstSignalToUpdate === null) === (context.lastSignalToUpdate === null),
+				"Signal update chain head/tail out of sync",
+			);
 			if (context.lastSignalToUpdate === null) {
 				context.firstSignalToUpdate = signal;
 				context.lastSignalToUpdate = signal;

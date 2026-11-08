@@ -37,7 +37,9 @@ multiple files, or have the most states/transitions.
   `computed.recalc = false` and, when the value didn't change, force-reactivates
   all target subs (the "subtree is clean" transition,
   `checkComputed.ts:30-43`). `clearSources` removes only `!active` subs —
-  and **all** subs when `target.didError`.
+  and **all** subs when `target.didError`. Dev-only invariant: the signal
+  update chain's head/tail pointers must be null together (`propagateSignal`
+  append, `devAssert`).
 
 ```ts
 // propagateSignal.ts:26-27
@@ -77,7 +79,8 @@ targetSub.recalc = false;
   link-based (comment at `propagateSignal.ts:32-39` explains an oscillation bug
   this prevents). Cycle detector counts `batchOperation` and throws at >100
   (`proxySet.ts:19-21`). Post-flush cleanup defensively resets every `queued`
-  (`triggerEffects.ts:84-89`).
+  (`triggerEffects.ts:84-89`). Dev-only invariant: `batchEnd` throws when
+  called without a matching `batchStart` (`devAssert`, dev builds only).
 
 ```ts
 // propagateSignal.ts:40-43
@@ -120,7 +123,9 @@ if (context.batch > 1) {
   booleans, so "resolved but never settled" and "errored with a retained
   stale value" are unrepresentable. `$refresh` distinguishes "initialization
   IS the refresh" via `context.refreshInitialized`. `$cache` throws if a
-  getter returns a Promise (`$cache.ts:48-54`).
+  getter returns a Promise (`$cache.ts:48-54`). Dev-only invariant: a
+  generation-guarded settle throws if `didSuspend` is false (the settle
+  machine's bookkeeping is broken).
 
 ```ts
 // $async.ts:108-121
@@ -666,3 +671,10 @@ Progress on the short list:
   implementation (`packages/build/src/server/runHooks.ts`), which also makes
   the documented "exit can replace the response" contract uniform across
   `Server.fetch`, route middleware, and global middleware.
+- **Done — dev-only invariant checks**: `dev/devAssert.ts` throws on machine
+  corruption when dev mode is enabled (`setDevMode`), and is one boolean read
+  in production. Currently guards: the batch counter (`batchEnd` without a
+  matching `batchStart`), the signal update chain's head/tail pairing
+  (`propagateSignal`), and the `$async` settle machine (a generation-guarded
+  settle arriving while `didSuspend` is false). Pinned by
+  `test/dev/devAssert.test.ts`.
