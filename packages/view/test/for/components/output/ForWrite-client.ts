@@ -16,7 +16,7 @@ import type SlotRender from "../../../../src/types/SlotRender";
 export default function ForWrite(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: { rows: Props["rows"] },
+	$props: { rows: { name: string; ok: boolean; tags: { ok: boolean }[] }[] },
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>,
 ): void {

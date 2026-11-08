@@ -21,7 +21,7 @@ interface Props {
 // textual data-path substitution: the write mutates the row object through the
 // shadowed reference. `row` stays shadow-bound, so its reads are lexical.
 const source = `
-export default function ForWrite($props: { rows: Props["rows"] }) {
+export default function ForWrite($props: { rows: { name: string; ok: boolean; tags: { ok: boolean }[] }[] }) {
 	@render {
 		<ul>
 			@for (let row of $props.rows) {

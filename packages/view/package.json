@@ -39,7 +39,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware && tsgo --noEmit -p tsconfig.goldens.json",
 		"build": "tsgo --noEmit && vp pack",
 		"build:watch": "vp pack --watch",
 		"test": "vp test",

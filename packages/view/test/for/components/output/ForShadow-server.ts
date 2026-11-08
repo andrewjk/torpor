@@ -3,7 +3,7 @@ import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function ForShadow(
-	$props: { rows: Props["rows"] },
+	$props: { rows: { name: string; ok: boolean; tags: { ok: boolean }[] }[] },
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
 ): Promise<{ body: string; head: string }> {

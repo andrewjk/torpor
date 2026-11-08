@@ -1,0 +1,4 @@
+{
+	"extends": "../../tsconfig.json",
+	"include": ["src/ambient.d.ts", "test/**/components/output/*-types.ts"]
+}

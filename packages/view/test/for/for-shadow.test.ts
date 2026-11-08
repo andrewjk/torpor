@@ -21,7 +21,7 @@ interface Props {
 // the data path and broke. The `&&`/no-space operators were blind spots of
 // that same text scan too.
 const source = `
-export default function ForShadow($props: { rows: Props["rows"] }) {
+export default function ForShadow($props: { rows: { name: string; ok: boolean; tags: { ok: boolean }[] }[] }) {
 	@render {
 		<ul>
 			@for (let row of $props.rows) {
