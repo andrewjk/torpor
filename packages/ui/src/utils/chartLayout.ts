@@ -1,4 +1,4 @@
-import { $watch } from "@torpor/view";
+import { $batch, $watch } from "@torpor/view";
 import type DataSeries from "../Charts/DataSeries";
 import {
 	calculateItemWidth,
@@ -196,20 +196,29 @@ export function createChartLayout(options: ChartLayoutOptions): ChartLayout {
 			const claims = this.claims as Record<string, SpaceClaim>;
 			const current = claims[id];
 			if (current && current.side === side && current.size === size) return;
-			claims[id] = { side, size };
-			this.claimsVersion++;
+			// One claim change is one state transition: adding a key to the
+			// claims object notifies both the per-key signal and the key-set
+			// (ownKeys) signal, so the writes are batched to a single flush
+			$batch(() => {
+				claims[id] = { side, size };
+				this.claimsVersion++;
+			});
 		},
 		release(id: string) {
 			const claims = this.claims as Record<string, SpaceClaim>;
 			if (!claims[id]) return;
-			delete claims[id];
-			this.claimsVersion++;
+			$batch(() => {
+				delete claims[id];
+				this.claimsVersion++;
+			});
 		},
 		announceMax(id: string, value: number) {
 			const claims = this.maxClaims as Record<string, number>;
 			if (claims[id] === value) return;
-			claims[id] = value;
-			this.maxVersion++;
+			$batch(() => {
+				claims[id] = value;
+				this.maxVersion++;
+			});
 		},
 
 		setTextSize(width: number, height: number) {
