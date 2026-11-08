@@ -19,6 +19,14 @@ interface ContextualHoverProps {
 	exitGrace?: number;
 	/** Whether hovering and focusing are ignored */
 	disabled?: boolean;
+	/**
+	 * How taps on touch screens open the contextual window (hover never
+	 * fires on touch). "auto" (default): tapping the trigger's inert surface
+	 * opens it, but tapping a control inside the trigger — a button, link,
+	 * … — runs that control's action without opening. "open": any tap opens
+	 * it, even over embedded controls. "ignore": taps never open it.
+	 */
+	touchBehavior?: "auto" | "open" | "ignore";
 }
 
 /**
@@ -77,6 +85,7 @@ export default function ContextualHover($props?: ContextualHoverProps) {
 		getContent: () => ($state.contentId ? document.getElementById($state.contentId) : undefined),
 		hoverDelay: $props?.hoverDelay,
 		exitGrace: $props?.exitGrace,
+		touchBehavior: $props?.touchBehavior,
 	});
 
 	$run(() => {
@@ -84,8 +93,10 @@ export default function ContextualHover($props?: ContextualHoverProps) {
 	});
 
 	function handleEnter() {
+		// Suppressed touch taps (a tap on an embedded control) don't anchor
+		// the content either — the tap belongs to the control's action
+		if (!hover.handleEnter()) return;
 		activate({ clientX: node.offsetWidth / 2, clientY: node.offsetHeight / 2 } as MouseEvent);
-		hover.handleEnter();
 	}
 
 	@render {
@@ -99,6 +110,7 @@ export default function ContextualHover($props?: ContextualHoverProps) {
 			aria-controls={$state.contentId}
 			onmouseenter={handleEnter}
 			onmouseleave={(e: MouseEvent) => hover.handleLeave(e)}
+			onpointerdown={(e: PointerEvent) => hover.handlePointerDown(e)}
 			onfocus={() => hover.handleFocus()}
 			onblur={(e: FocusEvent) => hover.handleBlur(e)}
 			onmount={(el) => {

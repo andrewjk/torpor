@@ -1,8 +1,9 @@
-import { queryByText } from "@testing-library/dom";
+import { fireEvent, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
-import { afterEach, describe, expect, it } from "vite-plus/test";
+import { afterEach, describe, expect, it, vi } from "vite-plus/test";
+import PopoverHoverButtonTest from "./components/PopoverHoverButtonTest.torp";
 import PopoverHoverPress from "./components/PopoverHoverTest.torp";
 import PopoverHoverContentTest from "./components/PopoverHoverContentTest.torp";
 
@@ -222,5 +223,100 @@ describe("Popover - hover trigger", () => {
 
 		await userEvent.click(container.querySelector("button.torp-popout-trigger")!);
 		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
+	});
+
+	// Touch taps synthesize the mouseenter/focus sequence the hover machine
+	// reacts to. The pointerdown is the only event carrying the modality, so
+	// it's dispatched manually (jsdom has no PointerEvent)
+	function touchPointerDown(target: HTMLElement) {
+		const e = new Event("pointerdown", { bubbles: true, cancelable: true });
+		Object.defineProperty(e, "pointerType", { value: "touch" });
+		target.dispatchEvent(e);
+	}
+
+	it("a touch tap on the trigger's inert surface opens the popout", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, PopoverHoverPress as any, { hoverDelay: 50, exitGrace: 20 });
+
+		const trigger = getTrigger(container);
+		touchPointerDown(trigger);
+		trigger.focus(); // the tap focuses the focusable trigger
+
+		expect(queryByText(document.body, "Popover content")).toBeInTheDocument();
+	});
+
+	it("a touch tap on an embedded control runs the action without opening", async () => {
+		const onclick = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, PopoverHoverButtonTest as any, { hoverDelay: 20, exitGrace: 20, onclick });
+
+		const button = container.querySelector("button")!;
+		const trigger = container.querySelector(".torp-popover-hover")!;
+
+		// The tap: pointerdown on the control, then the browser synthesizes
+		// mouseenter on the trigger and fires the control's click
+		touchPointerDown(button);
+		trigger.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+		fireEvent.click(button);
+		await wait(60);
+
+		// The action ran; the popout did not
+		expect(onclick).toHaveBeenCalledTimes(1);
+		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
+	});
+
+	it("touchBehavior open opens even over an embedded control", async () => {
+		const onclick = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, PopoverHoverButtonTest as any, {
+			hoverDelay: 20,
+			exitGrace: 20,
+			touchBehavior: "open",
+			onclick,
+		});
+
+		const button = container.querySelector("button")!;
+		const trigger = container.querySelector(".torp-popover-hover")!;
+		touchPointerDown(button);
+		trigger.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+		await wait(60);
+
+		expect(queryByText(document.body, "Popover content")).toBeInTheDocument();
+	});
+
+	it("touchBehavior ignore never opens from a tap, even on the inert surface", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, PopoverHoverPress as any, {
+			hoverDelay: 20,
+			exitGrace: 20,
+			touchBehavior: "ignore",
+		});
+
+		const trigger = getTrigger(container);
+		touchPointerDown(trigger);
+		trigger.focus();
+		await wait(40);
+
+		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
+	});
+
+	it("keyboard focus still opens after an interactive touch tap", async () => {
+		const onclick = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, PopoverHoverButtonTest as any, { hoverDelay: 20, exitGrace: 20, onclick });
+
+		// Tap the control (suppresses the synthesized mouseenter)...
+		touchPointerDown(container.querySelector("button")!);
+
+		// ...then keyboard-focus the trigger: not user "hover intent", but
+		// focus-open is the keyboard path and must keep working
+		getTrigger(container).focus();
+
+		expect(queryByText(document.body, "Popover content")).toBeInTheDocument();
 	});
 });

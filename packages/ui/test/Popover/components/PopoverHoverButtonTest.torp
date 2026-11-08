@@ -1,0 +1,22 @@
+import { Popover, PopoverContent, PopoverHover } from "../../../src/Popover/index";
+
+/**
+ * A hover trigger wrapping an actionable control — the touch case where the
+ * tap runs the control's action and must not also reveal the popout
+ */
+export default function PopoverHoverButtonTest($props: any) {
+	@render {
+		<Popover>
+			<PopoverHover
+				hoverDelay={$props.hoverDelay}
+				exitGrace={$props.exitGrace}
+				touchBehavior={$props.touchBehavior}
+			>
+				<button type="button" onclick={() => $props.onclick?.()}>
+					Tap
+				</button>
+			</PopoverHover>
+			<PopoverContent>Popover content</PopoverContent>
+		</Popover>
+	}
+}

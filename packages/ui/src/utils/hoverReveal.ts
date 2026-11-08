@@ -27,17 +27,42 @@ export interface HoverRevealOptions {
 	hoverDelay?: number;
 	/** Milliseconds to wait after the pointer leaves before closing (default 300) */
 	exitGrace?: number;
+	/**
+	 * How taps on touch screens open the popout (hover never fires on touch).
+	 * - "auto" (default): tapping the trigger's inert surface opens it;
+	 *   tapping an interactive control inside the trigger (a button, link,
+	 *   …) runs the control's action and does NOT open the popout.
+	 * - "open": any tap opens it, even over embedded controls — for pure
+	 *   hovercards whose content is the whole point.
+	 * - "ignore": taps never open it — the component provides its own touch
+	 *   trigger.
+	 */
+	touchBehavior?: "auto" | "open" | "ignore";
 }
 
 export interface HoverRevealHandlers {
-	/** Handles the pointer entering the trigger */
-	handleEnter: () => void;
+	/**
+	 * Handles the pointer entering the trigger. Returns false when the enter
+	 * was suppressed (a touch tap that shouldn't open the popout), so callers
+	 * with their own enter bookkeeping (e.g. Contextual's anchor positioning)
+	 * can skip it too.
+	 */
+	handleEnter: () => boolean;
 	/** Handles the pointer leaving the trigger; closes unless it moved into the content element */
 	handleLeave: (e: MouseEvent | FocusEvent) => void;
 	/** Handles focus landing on the trigger (opens immediately) */
 	handleFocus: () => void;
 	/** Handles focus leaving the trigger (closes unless focus moved into the content element) */
 	handleBlur: (e: FocusEvent) => void;
+	/**
+	 * Handles a pointerdown on the trigger. Touch taps synthesize the
+	 * mouseenter/focus sequence the hover machine reacts to — but a tap on an
+	 * interactive control is an *action*, not a request to see the popout, so
+	 * this records the modality and target for `handleEnter`/`handleFocus` to
+	 * discriminate (the compatibility mouse events carry no pointerType, and
+	 * focus carries none at all).
+	 */
+	handlePointerDown: (e: PointerEvent) => void;
 	/** Cancels pending open/close timers */
 	dispose: () => void;
 }
@@ -50,9 +75,44 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 	const getContent = options.getContent ?? (() => undefined);
 	const hoverDelay = options.hoverDelay ?? 500;
 	const exitGrace = options.exitGrace ?? 300;
+	const touchBehavior = options.touchBehavior ?? "auto";
 
 	let openTimer: ReturnType<typeof setTimeout> | undefined;
 	let closeTimer: ReturnType<typeof setTimeout> | undefined;
+
+	// The last touch/pen pointerdown on the trigger: a tap synthesizes the
+	// mouseenter and focus the machine reacts to, so the pointerdown is the
+	// only place where the input modality — and the tapped control — is
+	// observable. Time-boxed rather than reset manually, so a stale tap can't
+	// suppress a later real mouse hover for more than a moment.
+	const TOUCH_WINDOW = 1000;
+	let touchTapAt = 0;
+	let touchTapInteractive = false;
+
+	// Controls whose activation is an action in its own right: tapping them
+	// must not also reveal the popout ("don't punish the action"). Inert
+	// surfaces fall through, so the tap fallback still works for pure content.
+	const INTERACTIVE =
+		"button, a, input, select, textarea, label, [role='button'], [role='link'], [role='menuitem'], [role='tab'], [role='option'], [role='checkbox'], [role='radio'], [role='switch']";
+
+	function touchSuppressesEnter(): boolean {
+		if (Date.now() - touchTapAt > TOUCH_WINDOW) return false;
+		if (touchBehavior === "open") return false;
+		if (touchBehavior === "ignore") return true;
+		return touchTapInteractive;
+	}
+
+	/**
+	 * Focus is only suppressed in "ignore" mode: in "auto", a tap on an
+	 * embedded control focuses the *control* (focus doesn't bubble to the
+	 * trigger), so the trigger's focus handler only ever runs for inert
+	 * taps — which are exactly the fallback that should open — and for
+	 * keyboard focus, which must always open.
+	 */
+	function touchSuppressesFocus(): boolean {
+		if (touchBehavior !== "ignore") return false;
+		return Date.now() - touchTapAt <= TOUCH_WINDOW;
+	}
 
 	// The content element currently watched for pointer/focus leaving it. It
 	// is attached once the pointer or focus enters the content (which cancels
@@ -183,7 +243,13 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 
 	return {
 		handleEnter() {
-			if (disabled()) return;
+			if (disabled()) return false;
+			if (touchSuppressesEnter()) {
+				// A touch tap on an interactive control (or with "ignore"):
+				// the tap runs the control's action; it doesn't request the
+				// popout. Don't resume a closing popout or arm the timer
+				return false;
+			}
 
 			if (closeTimer !== undefined) {
 				clearTimeout(closeTimer);
@@ -191,11 +257,11 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 				stopListening();
 				unwatchContent();
 			}
-			if (isVisible()) return;
+			if (isVisible()) return true;
 
 			if (hoverDelay <= 0) {
 				reveal();
-				return;
+				return true;
 			}
 			if (openTimer === undefined) {
 				openTimer = setTimeout(() => {
@@ -203,6 +269,7 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 					reveal();
 				}, hoverDelay);
 			}
+			return true;
 		},
 
 		handleLeave(_e) {
@@ -218,6 +285,21 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 			scheduleClose();
 		},
 
+		handlePointerDown(e: PointerEvent) {
+			if (disabled()) return;
+			if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
+
+			const target = e.target as Element | null;
+			const interactive = target?.closest?.(INTERACTIVE) != null;
+			touchTapAt = Date.now();
+			touchTapInteractive = interactive;
+			if (touchSuppressesEnter()) {
+				// A tap that shouldn't reveal the popout must also cancel an
+				// open armed by the synthesized mouseenter that precedes it
+				cancelPendingOpen();
+			}
+		},
+
 		handleFocus() {
 			if (disabled()) return;
 
@@ -225,6 +307,12 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 			// (`refocusAnchorOnHide` + the scripted-focus guard); that
 			// refocus is not user intent, so don't re-open
 			if (consumeFocusOpenSuppress()) {
+				return;
+			}
+
+			// A touch tap that shouldn't reveal the popout focuses the
+			// trigger too (tapping its inert surface); don't open
+			if (touchSuppressesFocus()) {
 				return;
 			}
 

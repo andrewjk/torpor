@@ -9,6 +9,7 @@ export default function PopoverHoverTest($props: any) {
 				hoverDelay={$props.hoverDelay}
 				exitGrace={$props.exitGrace}
 				disabled={$props.disabled}
+				touchBehavior={$props.touchBehavior}
 			>
 				Hover area
 			</PopoverHover>

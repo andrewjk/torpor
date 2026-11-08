@@ -16,6 +16,14 @@ interface PopoverHoverProps {
 	exitGrace?: number;
 	/** Whether hovering and focusing are ignored */
 	disabled?: boolean;
+	/**
+	 * How taps on touch screens open the popover (hover never fires on
+	 * touch). "auto" (default): tapping the trigger's inert surface opens it,
+	 * but tapping a control inside the trigger — a button, link, … — runs
+	 * that control's action without opening. "open": any tap opens it, even
+	 * over embedded controls. "ignore": taps never open it.
+	 */
+	touchBehavior?: "auto" | "open" | "ignore";
 }
 
 /**
@@ -59,6 +67,7 @@ export default function PopoverHover($props?: PopoverHoverProps) {
 		getContent: () => ($state.contentId ? document.getElementById($state.contentId) : undefined),
 		hoverDelay: $props?.hoverDelay,
 		exitGrace: $props?.exitGrace,
+		touchBehavior: $props?.touchBehavior,
 	});
 
 	$run(() => {
@@ -80,6 +89,7 @@ export default function PopoverHover($props?: PopoverHoverProps) {
 			aria-controls={$state.contentId}
 			onmouseenter={() => hover.handleEnter()}
 			onmouseleave={(e: MouseEvent) => hover.handleLeave(e)}
+			onpointerdown={(e: PointerEvent) => hover.handlePointerDown(e)}
 			onfocus={() => hover.handleFocus()}
 			onblur={(e: FocusEvent) => hover.handleBlur(e)}
 			onmount={anchor}
