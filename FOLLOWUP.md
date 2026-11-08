@@ -354,17 +354,6 @@ cost of touching the path-building code in buildFragment.ts (which also does
 the `t_next(t_next(x))` → `t_skip(x, n)` shortening). Purely cosmetic; skipped
 to avoid churning every golden file for no behavior change.
 
-### Generated `-types.ts` goldens are drift-checked but never typechecked
-
-The committed `test/*/components/output/*-types.ts` files now fail the global
-teardown check when compiler type emission changes (same as client/server
-goldens), but nothing compiles them — the package tsconfig only includes
-`src/**/*`, so `pnpm check` never validates the generated declarations. A
-tsgo pass over a few generated types files (or folding the test tree into the
-typecheck, which the rest of the test code may not survive yet) would catch
-malformed `buildType` output, which `@torpor/ui`'s postbuild script relies on
-for its published `.d.ts` files.
-
 ### Embed client-code import stripping relies on line-anchored imports
 
 `@torpor/embed`'s `compileEmbed` strips imports from the client build with
