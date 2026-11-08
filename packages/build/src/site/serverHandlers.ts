@@ -6,6 +6,7 @@ import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";
 import { readResponseBody } from "../response/read.ts";
 import ServerEvent from "../server/ServerEvent.ts";
+import runHooks from "../server/runHooks.ts";
 import type MiddlewareFunction from "../server/types/MiddlewareFunction";
 import $page from "../state/$serverPage.ts";
 import type PageEndPoint from "../types/PageEndPoint.ts";
@@ -231,136 +232,117 @@ export function createServerLoad(
 
 		// Run the route's middleware around the handler: enter hooks in order
 		// (a Response short-circuits the request), exit hooks in reverse
-		let enteredRoute = 0;
-		let routeResponse: Response | undefined = undefined;
-		try {
-			for (; enteredRoute < routeMiddleware.length && !routeResponse; enteredRoute++) {
-				const result = await routeMiddleware[enteredRoute].enter?.(ev);
-				if (result) {
-					routeResponse = result;
-				}
-			}
-			if (routeResponse) {
-				return routeResponse;
-			}
-
-			switch (handler.type) {
-				case PAGE_ROUTE:
-				case LAYOUT_ROUTE: {
-					// It's a /+page.ts or /_layout.ts endpoint
-					if (ev.request.method === "GET") {
-						return handleResponse(
-							ev,
-							url,
-							template,
-							await loadView(ev, url, handler, params, template),
-						);
-					} else if (ev.request.method === "POST") {
-						// The server end point comes from the sibling /+page.server.ts, if applicable
-						const serverEndPoint: PageServerEndPoint | undefined =
-							handler.serverEndPoint && (await handler.serverEndPoint()).default;
-						return handleResponse(
-							ev,
-							url,
-							template,
-							await runAction(ev, url, handler, serverEndPoint, params, query, template),
-							true,
-						);
+		const { response: routeResponse, error } = await runHooks(
+			[{ hooks: routeMiddleware, arg: ev }],
+			async () => {
+				switch (handler.type) {
+					case PAGE_ROUTE:
+					case LAYOUT_ROUTE: {
+						// It's a /+page.ts or /_layout.ts endpoint
+						if (ev.request.method === "GET") {
+							return handleResponse(
+								ev,
+								url,
+								template,
+								await loadView(ev, url, handler, params, template),
+							);
+						} else if (ev.request.method === "POST") {
+							// The server end point comes from the sibling /+page.server.ts, if applicable
+							const serverEndPoint: PageServerEndPoint | undefined =
+								handler.serverEndPoint && (await handler.serverEndPoint()).default;
+							return handleResponse(
+								ev,
+								url,
+								template,
+								await runAction(ev, url, handler, serverEndPoint, params, query, template),
+								true,
+							);
+						}
+						break;
 					}
-					break;
-				}
-				case PAGE_SERVER_ROUTE:
-				case LAYOUT_SERVER_ROUTE: {
-					// It's a /+page.server.ts or /_layout.server.ts endpoint
-					if (ev.request.method === "GET") {
-						return await loadData(ev, url, handler, "load", params);
-					} else if (ev.request.method === "POST") {
-						const serverEndPoint: PageServerEndPoint | undefined = (await resolveModule(handler))
-							.default;
-						return handleResponse(
-							ev,
-							url,
-							template,
-							await runAction(ev, url, handler, serverEndPoint, params, query, template),
-							true,
-						);
+					case PAGE_SERVER_ROUTE:
+					case LAYOUT_SERVER_ROUTE: {
+						// It's a /+page.server.ts or /_layout.server.ts endpoint
+						if (ev.request.method === "GET") {
+							return await loadData(ev, url, handler, "load", params);
+						} else if (ev.request.method === "POST") {
+							const serverEndPoint: PageServerEndPoint | undefined = (await resolveModule(handler))
+								.default;
+							return handleResponse(
+								ev,
+								url,
+								template,
+								await runAction(ev, url, handler, serverEndPoint, params, query, template),
+								true,
+							);
+						}
+						break;
 					}
-					break;
+					case SERVER_ROUTE: {
+						// It's a /+server.ts endpoint
+						const functionName = ev.request.method.toLowerCase().replace("delete", "del");
+						return await loadData(ev, url, handler, functionName, params);
+					}
+					case HOOK_ROUTE:
+					case HOOK_SERVER_ROUTE: {
+						break;
+					}
+					case ERROR_ROUTE: {
+						// A direct request for the error page (e.g. a bookmark of
+						// the url it used to be redirected to, or the prerender
+						// writing 404.html). It responds with the requested status
+						// rather than 200
+						return await loadView(ev, url, handler, params, template, $page.status);
+					}
 				}
-				case SERVER_ROUTE: {
-					// It's a /+server.ts endpoint
-					const functionName = ev.request.method.toLowerCase().replace("delete", "del");
-					return await loadData(ev, url, handler, functionName, params);
-				}
-				case HOOK_ROUTE:
-				case HOOK_SERVER_ROUTE: {
-					break;
-				}
-				case ERROR_ROUTE: {
-					// A direct request for the error page (e.g. a bookmark of
-					// the url it used to be redirected to, or the prerender
-					// writing 404.html). It responds with the requested status
-					// rather than 200
-					return await loadView(ev, url, handler, params, template, $page.status);
-				}
-			}
-		} finally {
-			while (enteredRoute > 0) {
-				enteredRoute--;
-				await routeMiddleware[enteredRoute].exit?.(ev);
-			}
+				return undefined;
+			},
+			{ event: ev },
+		);
+		if (error) {
+			throw error;
 		}
 
-		return notFound();
+		return routeResponse ?? notFound();
 	};
 
 	return async function load(ev: ServerEvent, template?: string): Promise<Response> {
 		// Global middleware, from `site.middleware`: runs for every request
 		// before routing, including ones that won't match a route
 		// (maintenance mode, legacy url redirects, etc)
-		let entered = 0;
-		try {
-			let response: Response | undefined = undefined;
-			for (; entered < middleware.length && !response; entered++) {
-				const result = await middleware[entered].enter?.(ev);
-				if (result) {
-					response = result;
-				}
-			}
-			if (response) {
-				return response;
-			}
-			return await handle(ev, template);
-		} catch (error) {
-			// Middleware exits can inspect (and replace, in Server.fetch) the
-			// error via `ev.error`
-			ev.error = error;
-			// A thrown exception (a load or component crashing, say) gets the
-			// error page rendered at the requested url, like an error response
-			// would -- unless the request was for an api endpoint (json in,
-			// json out), or there is no error page, or rendering it failed, in
-			// which case the error is rethrown for the server adapters
-			try {
-				const url = stripBaseFromUrl(ev.url, basePath) ?? ev.url;
-				const match = router.match(url.pathname, url.searchParams);
-				if (match?.handler.type !== SERVER_ROUTE) {
-					$page.url = url;
-					const message = error instanceof Error ? error.message : String(error);
-					const response = await renderErrorPage(ev, url, template, router, 500, message);
-					if (response) {
-						return response;
+		const { response, error } = await runHooks(
+			[{ hooks: middleware, arg: ev }],
+			async () => {
+				return await handle(ev, template);
+			},
+			{
+				event: ev,
+				onError: async (ev, error) => {
+					// A thrown exception (a load or component crashing, say) gets the
+					// error page rendered at the requested url, like an error response
+					// would -- unless the request was for an api endpoint (json in,
+					// json out), or there is no error page, or rendering it failed, in
+					// which case the error is rethrown for the server adapters
+					try {
+						const url = stripBaseFromUrl(ev.url, basePath) ?? ev.url;
+						const match = router.match(url.pathname, url.searchParams);
+						if (match?.handler.type !== SERVER_ROUTE) {
+							$page.url = url;
+							const message = error instanceof Error ? error.message : String(error);
+							return await renderErrorPage(ev, url, template, router, 500, message);
+						}
+					} catch {
+						// Fall through to the rethrow
 					}
-				}
-			} catch {
-				// Fall through to the rethrow
-			}
+					throw error;
+				},
+			},
+		);
+		if (error && !response) {
 			throw error;
-		} finally {
-			while (entered > 0) {
-				entered--;
-				await middleware[entered].exit?.(ev);
-			}
 		}
+		// handle() always returns a Response (notFound() on a fall-through)
+		return response as Response;
 	};
 }
 
@@ -480,29 +462,17 @@ async function loadData(
 		// await anything here
 		const hooks = handler.serverHooks ? await loadServerHooks(handler) : [];
 
-		let entered = 0;
-		let enterResponse: Response | undefined = undefined;
-		try {
-			// Hooks run from the root down; a hook's enter can return a
-			// Response to short-circuit the request
-			for (; entered < hooks.length && !enterResponse; entered++) {
-				const hookResult = await hooks[entered].enter?.(serverParams);
-				if (hookResult) {
-					enterResponse = hookResult;
-				}
-			}
-
-			// A hook's enter response short-circuits the request; otherwise, if
-			// there was no response returned from load (such as errors or a
-			// redirect), send an ok response
-			return enterResponse || (await handlerFn(serverParams)) || ok();
-		} finally {
-			// Run exit hooks in reverse order for hooks that were entered
-			while (entered > 0) {
-				entered--;
-				await hooks[entered].exit?.(serverParams);
-			}
+		const { response, error } = await runHooks([{ hooks, arg: serverParams }], async () => {
+			return (await handlerFn(serverParams)) || undefined;
+		});
+		if (error) {
+			throw error;
 		}
+
+		// A hook's enter response short-circuits the request; otherwise, if
+		// there was no response returned from load (such as errors or a
+		// redirect), send an ok response
+		return response || ok();
 	} catch (error) {
 		const response = validationErrorResponse(error);
 		if (response) return response;
@@ -565,59 +535,42 @@ async function loadPageData(
 	// One entry per layout (root to leaf) followed by the page itself
 	const loads: (Record<string, any> | null)[] = [];
 
-	let enteredMiddleware = 0;
-	let entered = 0;
-	let enterResponse: Response | undefined = undefined;
-	try {
-		for (; enteredMiddleware < routeMiddleware.length && !enterResponse; enteredMiddleware++) {
-			const middlewareResult = await routeMiddleware[enteredMiddleware].enter?.(ev);
-			if (middlewareResult) {
-				enterResponse = middlewareResult;
+	const { response, error } = await runHooks(
+		[
+			// Route middleware, declared on the page's server endpoint. Runs
+			// before the folder hooks, like it does for a normal request
+			{ hooks: routeMiddleware, arg: ev },
+			// Hooks run from the root down; a hook's enter can return a Response
+			// to short-circuit the request (e.g. an auth redirect)
+			{ hooks: serverHooks, arg: serverParams },
+		],
+		async () => {
+			for (const layout of handler.layouts ?? []) {
+				// A reused layout keeps its cached data on the client, so skip its
+				// load (and any side effects) but keep the slot aligned
+				if (reusedLayouts.has(layout.path)) {
+					loads.push(null);
+					continue;
+				}
+				const layoutServerEndPoint: PageServerEndPoint | undefined =
+					layout.serverEndPoint && (await layout.serverEndPoint())?.default;
+				const result = await loadRouteServerData(layoutServerEndPoint, serverParams);
+				if (result instanceof Response) return result;
+				loads.push(result);
 			}
-		}
 
-		// Hooks run from the root down; a hook's enter can return a Response
-		// to short-circuit the request (e.g. an auth redirect)
-		for (; entered < serverHooks.length && !enterResponse; entered++) {
-			const hookResult = await serverHooks[entered].enter?.(serverParams);
-			if (hookResult) {
-				enterResponse = hookResult;
-			}
-		}
-		if (enterResponse) {
-			return enterResponse;
-		}
+			const pageResult = await loadRouteServerData(serverEndPoint, serverParams);
+			if (pageResult instanceof Response) return pageResult;
+			loads.push(pageResult);
 
-		for (const layout of handler.layouts ?? []) {
-			// A reused layout keeps its cached data on the client, so skip its
-			// load (and any side effects) but keep the slot aligned
-			if (reusedLayouts.has(layout.path)) {
-				loads.push(null);
-				continue;
-			}
-			const layoutServerEndPoint: PageServerEndPoint | undefined =
-				layout.serverEndPoint && (await layout.serverEndPoint())?.default;
-			const result = await loadRouteServerData(layoutServerEndPoint, serverParams);
-			if (result instanceof Response) return result;
-			loads.push(result);
-		}
-
-		const pageResult = await loadRouteServerData(serverEndPoint, serverParams);
-		if (pageResult instanceof Response) return pageResult;
-		loads.push(pageResult);
-
-		return serverDataResponse(loads);
-	} finally {
-		// Run exit hooks in reverse order for hooks that were entered
-		while (entered > 0) {
-			entered--;
-			await serverHooks[entered].exit?.(serverParams);
-		}
-		while (enteredMiddleware > 0) {
-			enteredMiddleware--;
-			await routeMiddleware[enteredMiddleware].exit?.(ev);
-		}
+			return serverDataResponse(loads);
+		},
+		{ event: ev },
+	);
+	if (error) {
+		throw error;
 	}
+	return response as Response;
 }
 
 type LoadDeferredEntry = {
@@ -810,212 +763,202 @@ async function loadView(
 	// see the same data (e.g. the user set by an auth hook) as the action did
 	const serverParams = buildServerParams(ev, url, params, query ? { query } : {}, appData);
 	const serverHooks = fromForm ? [] : await loadServerHooks(handler);
-	let entered = 0;
-	let enterResponse: Response | undefined = undefined;
 	// Promise-valued server data, streamed to the client after the critical
 	// data (see the embedding block below)
 	let deferredEntries: LoadDeferredEntry[] = [];
-	try {
-		// Hooks run from the root down; a hook's enter can return a Response
-		// to short-circuit the request
-		for (; entered < serverHooks.length && !enterResponse; entered++) {
-			const hookResult = await serverHooks[entered].enter?.(serverParams);
-			if (hookResult) {
-				enterResponse = hookResult;
-			}
-		}
-		if (enterResponse) {
-			return enterResponse;
-		}
 
-		// Pass the data into $props
-		// TODO: Promise.all
-		// NOTE: We're loading data from top to bottom, overriding as we go, and I'm
-		// not sure if this is the best way to go
-		let data = {};
-		// Each route's server-only data (root layout to page), embedded into
-		// the HTML so the first hydration doesn't refetch it (nav/loadData.ts)
-		const loads: (Record<string, any> | null)[] = [];
-		if (handler.layouts) {
-			for (let layout of handler.layouts) {
-				const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
-				const layoutServerEndPoint: PageServerEndPoint | undefined =
-					layout.serverEndPoint && (await layout.serverEndPoint())?.default;
-				const layoutResponse = await loadClientAndServerData(
-					url,
-					params,
-					serverParams,
-					data,
-					layoutEndPoint,
-					layoutServerEndPoint,
-					loads,
-				);
-				if (layoutResponse?.ok === false) {
-					return layoutResponse;
-				}
-			}
-		}
-		let endPointResponse = await loadClientAndServerData(
-			url,
-			params,
-			serverParams,
-			data,
-			clientEndPoint,
-			serverEndPoint,
-			loads,
-		);
-		if (endPointResponse?.ok === false) {
-			return endPointResponse;
-		}
-		let $props: Record<string, any> = { data, form };
-
-		let styles = "";
-
-		// If there are layouts, work our way upwards, pushing each component into
-		// the default slot of its parent
-		// TODO: Also handle layout server data
-		// TODO: There's probably a nicer way to do this with reducers or something
-		let component = clientEndPoint.component as ServerComponent;
-		let slots: Record<string, ServerSlotRender> | undefined = undefined;
-		// Which slot levels actually ran during the render below, so a layout
-		// that never rendered its <slot /> (silently dropping the page
-		// content) can be reported (see findMissingSlotLayout)
-		const invokedLevels = new Set<number>();
-		const trackSlot = (level: number, slot: ServerSlotRender): ServerSlotRender => {
-			return ($slot, $context) => {
-				invokedLevels.add(level);
-				return slot($slot, $context);
-			};
-		};
-		if (handler.layouts) {
-			let slotFunctions: ServerSlotRender[] = [];
-			// The last slot function will render the client component
-			slotFunctions[handler.layouts.length] = trackSlot(
-				handler.layouts.length,
-				async (_, $context) => {
-					let { body, head } = await (clientEndPoint.component as ServerComponent)(
-						$props,
-						$context,
+	// Hooks run around the view render: enter hooks in order (a Response
+	// short-circuits the render), exit hooks in reverse
+	const { response, error } = await runHooks(
+		[{ hooks: serverHooks, arg: serverParams }],
+		async () => {
+			// Pass the data into $props
+			// TODO: Promise.all
+			// NOTE: We're loading data from top to bottom, overriding as we go, and I'm
+			// not sure if this is the best way to go
+			let data = {};
+			// Each route's server-only data (root layout to page), embedded into
+			// the HTML so the first hydration doesn't refetch it (nav/loadData.ts)
+			const loads: (Record<string, any> | null)[] = [];
+			if (handler.layouts) {
+				for (let layout of handler.layouts) {
+					const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
+					const layoutServerEndPoint: PageServerEndPoint | undefined =
+						layout.serverEndPoint && (await layout.serverEndPoint())?.default;
+					const layoutResponse = await loadClientAndServerData(
+						url,
+						params,
+						serverParams,
+						data,
+						layoutEndPoint,
+						layoutServerEndPoint,
+						loads,
 					);
-					styles += head;
-					return body;
-				},
-			);
-			for (let i = handler.layouts.length - 1; i >= 0; i--) {
-				const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint())
-					?.default;
-				if (layoutEndPoint?.component) {
-					if (i === 0) {
-						component = layoutEndPoint.component as ServerComponent;
-						slots = { _: slotFunctions[i + 1] };
-					} else {
-						slotFunctions[i] = trackSlot(i, async (_, $context) => {
-							let { body, head } = await (layoutEndPoint.component as ServerComponent)(
-								$props,
-								$context,
-								{
-									_: slotFunctions[i + 1],
-								},
-							);
-							styles += head;
-							return body;
-						});
+					if (layoutResponse?.ok === false) {
+						return layoutResponse;
 					}
 				}
 			}
-		}
-
-		let html;
-		try {
-			let { body, head } = await component($props, undefined, slots);
-
-			// Render the page's (and its layouts') head element data, if the
-			// endpoint declared any. Layouts lose to the page (the nearest
-			// endpoint wins, as with @head content), and everything loses to
-			// the first title in the compiled head -- which mergeHead keeps
-			let headData = "";
-			const event = { url, params, data } as PageLoadEvent;
-			const layoutEndPoints = await Promise.all(
-				(handler.layouts ?? []).map(async (layout) => await layout.endPoint()),
+			let endPointResponse = await loadClientAndServerData(
+				url,
+				params,
+				serverParams,
+				data,
+				clientEndPoint,
+				serverEndPoint,
+				loads,
 			);
-			const headPoints = [clientEndPoint, ...layoutEndPoints].reverse();
-			for (const endPoint of headPoints) {
-				const headElements =
-					typeof endPoint.head === "function" ? await endPoint.head(event) : endPoint.head;
-				if (headElements) {
-					headData += headElements.map((element: HeadElement) => markupOf(element)).join("");
+			if (endPointResponse?.ok === false) {
+				return endPointResponse;
+			}
+			let $props: Record<string, any> = { data, form };
+
+			let styles = "";
+
+			// If there are layouts, work our way upwards, pushing each component into
+			// the default slot of its parent
+			// TODO: Also handle layout server data
+			// TODO: There's probably a nicer way to do this with reducers or something
+			let component = clientEndPoint.component as ServerComponent;
+			let slots: Record<string, ServerSlotRender> | undefined = undefined;
+			// Which slot levels actually ran during the render below, so a layout
+			// that never rendered its <slot /> (silently dropping the page
+			// content) can be reported (see findMissingSlotLayout)
+			const invokedLevels = new Set<number>();
+			const trackSlot = (level: number, slot: ServerSlotRender): ServerSlotRender => {
+				return ($slot, $context) => {
+					invokedLevels.add(level);
+					return slot($slot, $context);
+				};
+			};
+			if (handler.layouts) {
+				let slotFunctions: ServerSlotRender[] = [];
+				// The last slot function will render the client component
+				slotFunctions[handler.layouts.length] = trackSlot(
+					handler.layouts.length,
+					async (_, $context) => {
+						let { body, head } = await (clientEndPoint.component as ServerComponent)(
+							$props,
+							$context,
+						);
+						styles += head;
+						return body;
+					},
+				);
+				for (let i = handler.layouts.length - 1; i >= 0; i--) {
+					const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint())
+						?.default;
+					if (layoutEndPoint?.component) {
+						if (i === 0) {
+							component = layoutEndPoint.component as ServerComponent;
+							slots = { _: slotFunctions[i + 1] };
+						} else {
+							slotFunctions[i] = trackSlot(i, async (_, $context) => {
+								let { body, head } = await (layoutEndPoint.component as ServerComponent)(
+									$props,
+									$context,
+									{
+										_: slotFunctions[i + 1],
+									},
+								);
+								styles += head;
+								return body;
+							});
+						}
+					}
 				}
 			}
 
-			// Put the form info in a hidden input so that it can be accessed on the client
-			if (form) {
-				body += `\n<input type="hidden" id="t-form-data" value='${JSON.stringify(form).replaceAll("'", "\\'")}' />`;
-			}
+			let html;
+			try {
+				let { body, head } = await component($props, undefined, slots);
 
-			// Embed the routes' server-only data as json so the client's first
-			// hydration reads it instead of making a `/~server` round trip
-			// (nav/loadData.ts consumes it once and removes it). The condition
-			// mirrors the client's `hasServerData`, so a route with only hooks or
-			// actions still ships an all-null array that saves the refetch.
-			// Promise values are left out and streamed as small scripts after
-			// the page, so the render doesn't wait for them.
-			if (routeHasServerData(handler)) {
-				const { criticalLoads, entries } = splitLoads(loads);
-				deferredEntries = entries;
-				const payload: {
-					loads: (Record<string, any> | null)[];
-					deferred?: DeferredMeta[];
-				} = { loads: criticalLoads };
-				if (entries.length > 0) {
-					payload.deferred = entries.map((entry) => entry.meta);
+				// Render the page's (and its layouts') head element data, if the
+				// endpoint declared any. Layouts lose to the page (the nearest
+				// endpoint wins, as with @head content), and everything loses to
+				// the first title in the compiled head -- which mergeHead keeps
+				let headData = "";
+				const event = { url, params, data } as PageLoadEvent;
+				const layoutEndPoints = await Promise.all(
+					(handler.layouts ?? []).map(async (layout) => await layout.endPoint()),
+				);
+				const headPoints = [clientEndPoint, ...layoutEndPoints].reverse();
+				for (const endPoint of headPoints) {
+					const headElements =
+						typeof endPoint.head === "function" ? await endPoint.head(event) : endPoint.head;
+					if (headElements) {
+						headData += headElements.map((element: HeadElement) => markupOf(element)).join("");
+					}
 				}
-				const json = JSON.stringify(payload).replaceAll("<", "\\u003c");
-				body += `\n<script type="application/json" id="t-server-data">${json}</script>`;
-				// Nudge towards an explicit cache policy only when real data
-				// was embedded (a payload of only nulls carries nothing)
-				if (loads.some((load) => load !== null)) {
-					warnUncachedEmbeddedData(ev, handler.path);
+
+				// Put the form info in a hidden input so that it can be accessed on the client
+				if (form) {
+					body += `\n<input type="hidden" id="t-form-data" value='${JSON.stringify(form).replaceAll("'", "\\'")}' />`;
+				}
+
+				// Embed the routes' server-only data as json so the client's first
+				// hydration reads it instead of making a `/~server` round trip
+				// (nav/loadData.ts consumes it once and removes it). The condition
+				// mirrors the client's `hasServerData`, so a route with only hooks or
+				// actions still ships an all-null array that saves the refetch.
+				// Promise values are left out and streamed as small scripts after
+				// the page, so the render doesn't wait for them.
+				if (routeHasServerData(handler)) {
+					const { criticalLoads, entries } = splitLoads(loads);
+					deferredEntries = entries;
+					const payload: {
+						loads: (Record<string, any> | null)[];
+						deferred?: DeferredMeta[];
+					} = { loads: criticalLoads };
+					if (entries.length > 0) {
+						payload.deferred = entries.map((entry) => entry.meta);
+					}
+					const json = JSON.stringify(payload).replaceAll("<", "\\u003c");
+					body += `\n<script type="application/json" id="t-server-data">${json}</script>`;
+					// Nudge towards an explicit cache policy only when real data
+					// was embedded (a payload of only nulls carries nothing)
+					if (loads.some((load) => load !== null)) {
+						warnUncachedEmbeddedData(ev, handler.path);
+					}
+				}
+
+				styles += head;
+				html = rewriteBaseInHtml(
+					mergeHead(template, styles + headData).replace("%COMPONENT_BODY%", body),
+					getBasePath(),
+				);
+			} catch (error) {
+				// TODO: Show a proper Error component
+				html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
+				deferredEntries = [];
+				console.log(error);
+			}
+
+			// A layout that never rendered <slot /> silently drops the whole page
+			// content from the output; find and report the outermost one
+			if (handler.layouts) {
+				const missingLayout = findMissingSlotLayout(handler.layouts, invokedLevels);
+				if (missingLayout !== undefined) {
+					warnMissingSlotContent(missingLayout);
 				}
 			}
 
-			styles += head;
-			html = rewriteBaseInHtml(
-				mergeHead(template, styles + headData).replace("%COMPONENT_BODY%", body),
-				getBasePath(),
-			);
-		} catch (error) {
-			// TODO: Show a proper Error component
-			html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
-			deferredEntries = [];
-			console.log(error);
-		}
-
-		// A layout that never rendered <slot /> silently drops the whole page
-		// content from the output; find and report the outermost one
-		if (handler.layouts) {
-			const missingLayout = findMissingSlotLayout(handler.layouts, invokedLevels);
-			if (missingLayout !== undefined) {
-				warnMissingSlotContent(missingLayout);
+			if (deferredEntries.length > 0) {
+				return streamHtmlResponse(html, status ?? 200, deferredEntries);
 			}
-		}
 
-		if (deferredEntries.length > 0) {
-			return streamHtmlResponse(html, status ?? 200, deferredEntries);
-		}
-
-		return new Response(html, {
-			status: status ?? 200,
-			headers: {
-				"Content-Type": "text/html",
-			},
-		});
-	} finally {
-		// Run exit hooks in reverse order for hooks that were entered
-		while (entered > 0) {
-			entered--;
-			await serverHooks[entered].exit?.(serverParams);
-		}
+			return new Response(html, {
+				status: status ?? 200,
+				headers: {
+					"Content-Type": "text/html",
+				},
+			});
+		},
+	);
+	if (error) {
+		throw error;
 	}
+	return response as Response;
 }
 
 /**
@@ -1150,26 +1093,19 @@ async function runAction(
 				serverParams = buildServerParams(ev, url, params, form ? { form } : {});
 
 				const serverHooks = await loadServerHooks(handler);
-				let entered = 0;
-				let enterResponse: Response | undefined = undefined;
-				try {
-					// Hooks run from the root down; a hook's enter can return a
-					// Response to short-circuit the action
-					for (; entered < serverHooks.length && !enterResponse; entered++) {
-						const hookResult = await serverHooks[entered].enter?.(serverParams);
-						if (hookResult) {
-							enterResponse = hookResult;
-						}
-					}
-
-					result = enterResponse || (await action(serverParams));
-				} finally {
-					// Run exit hooks in reverse order for hooks that were entered
-					while (entered > 0) {
-						entered--;
-						await serverHooks[entered].exit?.(serverParams);
-					}
+				// Hooks run from the root down; a hook's enter can return a
+				// Response to short-circuit the action
+				const actionParams = serverParams;
+				const { response: hookResponse, error: hookError } = await runHooks(
+					[{ hooks: serverHooks, arg: actionParams }],
+					async () => {
+						return (await action(actionParams)) || undefined;
+					},
+				);
+				if (hookError) {
+					throw hookError;
 				}
+				result = hookResponse;
 			} catch (error) {
 				const response = validationErrorResponse(error);
 				if (response) return response;

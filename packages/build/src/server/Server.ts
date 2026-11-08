@@ -1,5 +1,6 @@
 import PathTrie from "../utils/pathTrie";
 import ServerEvent from "./ServerEvent";
+import runHooks from "./runHooks";
 import type MiddlewareFunction from "./types/MiddlewareFunction";
 import type ServerFunction from "./types/ServerFunction";
 
@@ -35,44 +36,14 @@ export default class Server {
 		if (this.middleware.length) {
 			// Route-scoped middleware is set on server endpoints (or globally on
 			// `site.middleware`); this list is the low-level, per-Server primitive
-			let entered = 0;
-			let response: Response | undefined = undefined;
-			let error: unknown = undefined;
-			try {
-				for (; entered < this.middleware.length && !response; entered++) {
-					// A middleware returns a Response to short-circuit the request
-					const result = await this.middleware[entered].enter?.(ev);
-					if (result) {
-						response = result;
-					}
-				}
-				if (!response && match) {
-					const result = await match.fn(ev);
-					if (result) {
-						response = result;
-					}
-				}
-			} catch (e) {
-				// Exits can handle the error by returning a Response; if none
-				// does, it is rethrown below
-				error = e;
-				ev.error = e;
-			} finally {
-				if (response) {
-					ev.response = response;
-				}
-				// Run exit hooks in reverse order for the middleware that were
-				// entered. An exit hook can return a Response to replace the
-				// response, or to handle ev.error
-				while (entered > 0) {
-					entered--;
-					const result = await this.middleware[entered].exit?.(ev);
-					if (result) {
-						response = result;
-						ev.response = result;
-					}
-				}
-			}
+			const { response, error } = await runHooks(
+				[{ hooks: this.middleware, arg: ev }],
+				async (): Promise<Response | undefined> => {
+					if (!match) return undefined;
+					return (await match.fn(ev)) || undefined;
+				},
+				{ event: ev },
+			);
 			if (error && !response) {
 				throw error;
 			}

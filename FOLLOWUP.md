@@ -5,6 +5,15 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
+### ColorPicker hex-input tests failing (ui)
+
+`packages/ui/test/ColorPicker/colorPicker.test.ts` has 3 failing tests on
+`main` (hex input commits valid values / accepts 3-digit shorthand / composed
+input with its own props) — `onchange` is never called after
+`fireEvent.input`. Pre-existing (verified on a clean tree while unifying the
+middleware enter/exit machinery in `@torpor/build`; unrelated to that
+change), left out of scope there.
+
 ### Loop-var resolution in @for bodies: read-only bindings (view compiler)
 
 Loop vars are read-only. The compiler emits a per-scope shadow binding

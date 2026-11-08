@@ -285,28 +285,27 @@ pendingNavigation = result.catch(() => {});
 
 ### 9. Middleware/hook enter–exit
 
-- **Where:** `packages/build/src/server/Server.ts:35-90`;
-  `site/serverHandlers.ts` — global `load` (317-364), route middleware
-  (232-312), hooks in `loadData.ts` (483-505), `loadPageData` (568-620),
-  `loadView` (812-1018), `runAction` (1152-1172). **Implemented three separate
-  times.**
+- **Where:** the shared implementation in
+  `packages/build/src/server/runHooks.ts` (`runHooks`), called from:
+  `packages/build/src/server/Server.ts:35-90` (the low-level per-Server
+  primitive, `event: ev` so exits can replace the response);
+  `site/serverHandlers.ts` — route middleware in `handle`, global middleware
+  in `load` (with an `onError` that renders the error page before exits run),
+  `loadPageData` (middleware + server-hook phases), and `loadData` /
+  `runAction` / `loadView` (server-hook flavor, no event).
 - **States:** entering (in order, tracked by an `entered` counter) →
   response-set (short-circuit stops the loop) → exiting (reverse, only the
   entered ones).
-- **Enforcement:**
-
-```ts
-for (; entered < n && !response; entered++) {
-	/* enter */
-}
-while (entered > 0) {
-	entered--; /* exit */
-}
-```
-
-An exit hook's returned Response "handles the error";
-`if (error && !response) throw error`. `ServerEvent.addHeaders()` throws
-`"Response not created yet"` when the response hasn't been set yet.
+- **Enforcement:** one shared `runHooks` implementation — enter hooks run in
+  phase order until one returns a Response; the handler runs only if no enter
+  responded; exit hooks run in reverse entry order (across phases) even when
+  the handler or an enter hook threw. Errors are captured (and set on
+  `ev.error`) rather than thrown, so `onError` can render an error response
+  before exits run — callers rethrow `error` when the result carries no
+  response. With `event` (the middleware flavor), `ev.response` is kept in
+  sync and an exit's returned Response replaces the response, per the
+  `MiddlewareFunction` contract. `ServerEvent.addHeaders()` throws
+  `"Response not created yet"` when the response hasn't been set yet.
 
 ### 10. Parser component boundary
 
@@ -507,7 +506,7 @@ if (data.kind === "invoke-result" || data.kind === "invoke-error") {
 | **Cookie/header overrides**        | two-state per name: request-value → overridden (Map wins); `delete()` = set-to-empty + `expires: epoch` (state encoded as an expired cookie)                                                                                                                                                                                      | `server/CookieHelper.ts:11-22`, `server/HeaderHelper.ts:9-16`                            |
 | **NDJSON/HTML streams**            | open → cancelled (`cancelled` latch checked in `finally` and try/catch) \| closed; frames: first `{type: "data", loads, deferred}` then `{type: "value"\|"error", id}`; bootstrap store guard won't replace a store that still holds pending promises                                                                             | `site/serverHandlers.ts:661-713, 1028-1093`                                              |
 | **Response body variants**         | plain string \| critical JSON + `[INTERNAL_RESPONSE_BODY]` original + `[INTERNAL_RESPONSE_DEFERRED]` (only when deferreds exist); read side prefers raw body "so deferred promises survive"                                                                                                                                       | `response/response.ts:13-42`, `response/internal.ts:8-16`, `response/read.ts:8-29`       |
-| **Middleware enter/exit**          | see Tier 1 #9                                                                                                                                                                                                                                                                                                                     | `server/Server.ts:35-90`, `serverHandlers.ts` (×3)                                       |
+| **Middleware enter/exit**          | see Tier 1 #9                                                                                                                                                                                                                                                                                                                     | `server/runHooks.ts`; `server/Server.ts`, `site/serverHandlers.ts` (call sites)          |
 | **Navigation mutex**               | see Tier 1 #8                                                                                                                                                                                                                                                                                                                     | `nav/navigate.ts:13-50`                                                                  |
 | **Navigation outcomes**            | each ending in `return false` = "caller must full-page load": no `#app` → no route → error route rendered → no client component → load redirected → load errored (layout stack reset) → error page's own load failed → success                                                                                                    | `nav/navigate.ts:52-173`                                                                 |
 | **Dev startup ordering**           | config → dep cache validated → env loaded → **`warmServerEntry` before `vite.listen()`** ("dropping any request in flight at that moment") → watching; warmup failure swallowed unless `TORPOR_DEBUG_WARMUP`                                                                                                                      | `run/runDev.ts:39-178`                                                                   |
@@ -640,9 +639,10 @@ is missing a state:
   boundaries' `recent` flags; one late event extends everyone's highlight.
 - **Dead code** — `mount/clickPopover.ts` and `mount/hoverPopover.ts` are
   fully commented out, superseded by `popoutContent.ts`/`hoverReveal.ts`.
-- **Duplicated logic** — the middleware enter/exit pattern is implemented
-  three separate times in `packages/build/src` (`Server.ts` + two variants in
-  `serverHandlers.ts`).
+- **Duplicated logic** — ~~the middleware enter/exit pattern was implemented
+  three separate times in `packages/build/src`~~ **fixed**: all eight
+  enter/exit sites now share one `runHooks` implementation
+  (`packages/build/src/server/runHooks.ts`).
 
 ---
 
@@ -661,3 +661,8 @@ Progress on the short list:
   `staleValue` cluster on `Computed` was collapsed into a single
   `settle: AsyncSettle | undefined` union (`types/AsyncSettle.ts`), mirroring
   the SSR side's `ServerPromiseEntry.result` shape.
+- **Done — middleware enter/exit dedupe**: the eight copies of the
+  enter/short-circuit/reverse-exit machine now share one `runHooks`
+  implementation (`packages/build/src/server/runHooks.ts`), which also makes
+  the documented "exit can replace the response" contract uniform across
+  `Server.fetch`, route middleware, and global middleware.
