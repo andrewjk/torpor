@@ -6,6 +6,11 @@ import check from "../check";
 import checkFile from "../checkFile";
 import printErrors from "../printErrors";
 import type Diagnostic from "../types/Diagnostic";
+import warnStaleView from "../warnStaleView";
+
+// Warn before checking when the compiler dist is older than its src (results
+// would describe stale compiler output)
+warnStaleView();
 
 let errors: Diagnostic[] = [];
 
