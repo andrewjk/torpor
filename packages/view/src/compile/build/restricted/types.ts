@@ -116,8 +116,16 @@ export type RestrictedNode =
 	| { t: "component"; name: string; props: RestrictedAttribute[]; fills: RestrictedFill[] }
 	/** A `<slot name="…">fallback</slot>` element. Slot props (`item={row}`)
 	 * are evaluated in the artifact's scope and passed to the incoming slot
-	 * render; `children` is the fallback. */
-	| { t: "slot"; name: string; props: RestrictedAttribute[]; children: RestrictedNode[] };
+	 * render; `children` is the fallback. `autoClose` lists the enclosing
+	 * tags the HTML parser could auto-close — fill content starting with a
+	 * tag that implies one of their ends is rejected at render time. */
+	| {
+			t: "slot";
+			name: string;
+			props: RestrictedAttribute[];
+			children: RestrictedNode[];
+			autoClose?: string[];
+	  };
 
 export interface RestrictedFill {
 	/** Slot name; "_" is the default fill. */

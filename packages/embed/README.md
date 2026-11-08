@@ -209,6 +209,12 @@ data tickets from tickets { queue: $props.queue, sort: "recency" };
   full JS, so formatting helpers are fine there via `scope`.
 - Rendering reuses the server build's value helpers (`t_fmt`, `t_class`,
   `t_style`, `t_attr`), so output matches the Node SSR path.
+- **Auto-close guard**: a slot fill whose root tag the HTML parser would
+  auto-close inside the host's wrapper (an `<li>` fill inside
+  `<li><slot/></li>`, likewise `p`/`tr`/`td` shapes) re-nests the markup and
+  breaks hydration — this fails at SSR with an error naming both tags and
+  the fix. Wrap rows in a `<div>` (or start fills with a nesting-safe tag).
+  Slot **fallbacks** with the same problem are rejected at compile time.
 - **Hydration**: `renderRestricted` emits the same hydration markers as the
   Node server build, so `hydrateEmbed(target, artifact, { $data: data }, {
   styles: false })` adopts the painted HTML (byte-parity with the full server

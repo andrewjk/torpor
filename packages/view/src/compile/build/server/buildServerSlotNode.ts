@@ -1,3 +1,4 @@
+import { AUTO_CLOSEABLE } from "../../utils/slotAutoClose";
 import {
 	ANCHOR_COMMENT,
 	HYDRATION_END_COMMENT,
@@ -43,12 +44,25 @@ export default function buildServerSlotNode(
 		}
 	}
 
+	// When the slot sits inside a wrapper the HTML parser can auto-close
+	// (li, p, table parts, ...), guard the fill content: a fill starting
+	// with a tag that implies the wrapper's end re-nests the region and
+	// breaks hydration
+	const closeTags = status.elementStack.filter((tag) => AUTO_CLOSEABLE.has(tag));
+
 	b.append(`if ($slots && $slots["${slotName}"]) {`);
 	// Slot fills are async (they may contain an @await boundary), so await
 	// the string they resolve to
-	b.append(
-		`${status.inHead ? "t_head" : "t_body"} += await $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context);`,
-	);
+	if (closeTags.length > 0) {
+		status.imports.add("t_slot_guard");
+		b.append(
+			`${status.inHead ? "t_head" : "t_body"} += t_slot_guard([${closeTags.map((tag) => `"${tag}"`).join(", ")}], await $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context), "${slotName}");`,
+		);
+	} else {
+		b.append(
+			`${status.inHead ? "t_head" : "t_body"} += await $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context);`,
+		);
+	}
 
 	// TODO: Not if there's only a single space node -- maybe check in parse
 	const fill = node.children.find(

@@ -9,6 +9,7 @@ import {
 	restrictedComponent,
 } from "../src/restricted";
 import { hydrateEmbed, loadComponent } from "../src";
+import EmbedCompileError from "../src/types/EmbedCompileError";
 import type EmbedArtifact from "../src/types/EmbedArtifact";
 
 const ROWS = [
@@ -221,4 +222,67 @@ test("inner artifact styles flow through the boundary like the JS build", async 
 	expect(head).toBe(reference.head);
 	expect(head).toContain("<style id='");
 	expect(head).toContain("padding: 4px");
+});
+
+const INNER_LI_SOURCE = `
+data tickets from rows { };
+
+export default function TicketListLi() {
+	@render {
+		@for (t of $data.tickets) {
+			<li><slot item={t} /></li>
+		}
+	}
+}
+`;
+
+const OUTER_LI_SOURCE = `
+export default function BoardLi() {
+	@render {
+		<TicketListLi>
+			<li><b>{$slot.item.title}</b></li>
+		</TicketListLi>
+	}
+}
+`;
+
+test("slot fills that auto-close the wrapper throw at render time", async () => {
+	const inner = compileRestricted("ticket-list-li", INNER_LI_SOURCE, {
+		requirementKinds: KINDS,
+	});
+	const outer = compileRestricted("board-li", OUTER_LI_SOURCE);
+	await expect(
+		renderRestricted(outer, {
+			components: {
+				TicketListLi: restrictedComponent(inner, { sources: { rows: () => ROWS } }),
+			},
+		}),
+	).rejects.toThrow(/re-nested by the HTML parser/);
+	await expect(
+		renderRestricted(outer, {
+			components: {
+				TicketListLi: restrictedComponent(inner, { sources: { rows: () => ROWS } }),
+			},
+		}),
+	).rejects.toThrow(/auto-closes the enclosing <li>/);
+});
+
+test("slot fallbacks that auto-close the wrapper are compile errors", () => {
+	const source = `
+export default function Bad() {
+	@render {
+		<li><slot item={t}><li>bad fallback</li></slot></li>
+	}
+}
+`;
+	let thrown: unknown;
+	try {
+		compileRestricted("bad-fallback", source);
+	} catch (error) {
+		thrown = error;
+	}
+	expect(thrown).toBeInstanceOf(EmbedCompileError);
+	const messages = (thrown as EmbedCompileError).errors.map((error) => error.message).join("\n");
+	expect(messages).toContain("auto-closes the enclosing <li>");
+	expect(messages).toContain("re-nested by the HTML parser");
 });

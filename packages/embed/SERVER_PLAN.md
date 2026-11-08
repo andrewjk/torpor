@@ -364,6 +364,9 @@ Status: **implemented** (2026-11-08).
 - Styles: the wrapper inlines the inner artifact's styles into `head` as
   `<style id='…'>…</style>`, matching the JS server build byte-for-byte
   (tested against a JS host component doing the same job).
+- Auto-close guard: slot regions whose wrapper the HTML parser can
+  auto-close reject violating fill content at SSR with an actionable error;
+  violating restricted fallbacks are compile errors (see FOLLOWUP.md).
 
 ### Aggregates in derive
 

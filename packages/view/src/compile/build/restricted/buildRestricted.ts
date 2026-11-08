@@ -7,6 +7,7 @@ import type TemplateNode from "../../types/nodes/TemplateNode";
 import type TextNode from "../../types/nodes/TextNode";
 import buildStyles from "../client/buildStyles";
 import { skipStringOrComment } from "../../utils/codeScanner";
+import { AUTO_CLOSEABLE, autoCloseMessage, closesAncestor } from "../../utils/slotAutoClose";
 import isControlNode from "../../utils/isControlNode";
 import isComponentNode from "../../utils/isComponentNode";
 import isSpecialNode from "../../utils/isSpecialNode";
@@ -50,6 +51,13 @@ interface Context {
 	stateNames: string[];
 	/** Loop variables in scope (innermost last), for ref validation. */
 	loopVars: string[];
+	/**
+	 * The open element tags around the node being serialized (nearest last).
+	 * Slot regions record the auto-closeable subset, so the interpreter can
+	 * reject fill content the HTML parser would re-nest — see
+	 * compile/utils/slotAutoClose.
+	 */
+	elementStack: string[];
 }
 
 /**
@@ -101,6 +109,7 @@ export default function buildRestricted(
 			allowedRefs,
 			stateNames,
 			loopVars: [],
+			elementStack: [],
 		};
 
 		// Match the JS build exactly: trim/collapse whitespace-only text nodes.
@@ -326,9 +335,14 @@ function serializeComponent(node: ElementNode, context: Context): RestrictedNode
 	// All fill children (named fills and loose children, which become the
 	// default fill) may read `$slot.<prop>` for the slot props the host
 	// component passes per row.
+	// Fill children may read `$slot.<prop>` for the slot props the host
+	// component passes per row, and render inside the host's slot wrapper —
+	// the consumer's own ancestors don't wrap them, so the element stack
+	// resets.
 	const fillContext: Context = {
 		...context,
 		allowedRefs: new Set([...context.allowedRefs, "$slot"]),
+		elementStack: [],
 	};
 
 	for (const child of node.children) {
@@ -416,6 +430,25 @@ function serializeSlotElement(node: ElementNode, context: Context): RestrictedNo
 		}
 	}
 
+	// The wrapper context the fill must not auto-close (nearest last). Only
+	// auto-closeable tags matter — see compile/utils/slotAutoClose.
+	const autoClose = context.elementStack.filter((tag) => AUTO_CLOSEABLE.has(tag));
+
+	// Static fallback: reject a fallback whose first element would auto-close
+	// the wrapper (positioned, so the author can fix it at save time).
+	const fallbackTag = firstFallbackTag(node.children);
+	if (fallbackTag !== undefined && closesAncestor(fallbackTag, context.elementStack)) {
+		const ancestor = [...context.elementStack]
+			.reverse()
+			.find((ancestor) => closesAncestor(fallbackTag, [ancestor]));
+		context.report(
+			`Slot fallback starts with <${fallbackTag}>, which auto-closes the enclosing <${ancestor}>: ` +
+				autoCloseMessage(fallbackTag, ancestor!),
+			node.span.start,
+			node.span.end,
+		);
+	}
+
 	// The parser wraps slot children in filldef/fill special nodes; unwrap
 	// them so the slot node carries its content directly.
 	const children: RestrictedNode[] = [];
@@ -427,7 +460,25 @@ function serializeSlotElement(node: ElementNode, context: Context): RestrictedNo
 			if (serialized !== undefined) children.push(serialized);
 		}
 	}
-	return { t: "slot", name, props, children };
+	const slot: RestrictedNode = { t: "slot", name, props, children };
+	if (autoClose.length > 0) {
+		(slot as { autoClose?: string[] }).autoClose = autoClose;
+	}
+	return slot;
+}
+
+/** The tag of the first meaningful child (skipping whitespace text). */
+function firstFallbackTag(children: TemplateNode[]): string | undefined {
+	for (const child of children) {
+		if (isFill(child)) return firstFallbackTag(child.children);
+		if (isTextNode(child)) {
+			if (child.content.trim() === "") continue;
+			return undefined; // text first — no auto-closable root
+		}
+		if (child.type === "element") return (child as ElementNode).tagName;
+		return undefined; // comment/control — not statically known
+	}
+	return undefined;
 }
 
 function serializeElement(node: ElementNode, context: Context): RestrictedNode | undefined {
@@ -453,11 +504,21 @@ function serializeElement(node: ElementNode, context: Context): RestrictedNode |
 			? { ...context, preserveWhitespace: true }
 			: context;
 
+	if (!voidTags.includes(node.tagName)) {
+		childContext.elementStack.push(node.tagName);
+	}
+	const children = voidTags.includes(node.tagName)
+		? []
+		: serializeChildren(node.children, childContext);
+	if (!voidTags.includes(node.tagName)) {
+		childContext.elementStack.pop();
+	}
+
 	return {
 		t: "el",
 		tag: node.tagName,
 		attrs: serializeAttributes(node, context),
-		children: voidTags.includes(node.tagName) ? [] : serializeChildren(node.children, childContext),
+		children,
 	};
 }
 

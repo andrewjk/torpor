@@ -1,4 +1,5 @@
 import t_fmt from "../../../../src/ssr/formatText";
+import t_slot_guard from "../../../../src/ssr/slotGuard";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function Let(
@@ -47,7 +48,7 @@ async function List(
 		const t_slot_props_1: any = {};
 		t_slot_props_1["item"] = item;
 		if ($slots && $slots["_"]) {
-			t_body += await $slots["_"](t_slot_props_1, $context);
+			t_body += t_slot_guard(["li"], await $slots["_"](t_slot_props_1, $context), "_");
 		}
 		t_body += `<!]><!></li>`;
 	}

@@ -2,6 +2,13 @@ import t_attr from "./render/formatAttributeText";
 import t_fmt from "./ssr/formatText";
 import t_class from "./ssr/buildClasses";
 import t_style from "./ssr/buildStyles";
+import t_slot_guard from "./ssr/slotGuard";
+import {
+	AUTO_CLOSEABLE,
+	autoCloseMessage,
+	closesAncestor,
+	firstElementTag,
+} from "./compile/utils/slotAutoClose";
 import $async from "./ssr/$serverAsync";
 import $batch from "./ssr/$serverBatch";
 import $bind from "./ssr/$serverBind";
@@ -46,6 +53,11 @@ export {
 	t_attr,
 	t_class,
 	t_style,
+	t_slot_guard,
+	closesAncestor,
+	firstElementTag,
+	autoCloseMessage,
+	AUTO_CLOSEABLE,
 };
 
 // Client-only exports, stubbed so client-compiled code (or shared helpers that

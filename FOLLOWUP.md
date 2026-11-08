@@ -499,12 +499,18 @@ mis-adopted DOM). This is plain HTML parsing, not a torpor bug, and it hits
 every rendering path identically (module imports and the embed eval harness
 behave the same).
 
-**Resolution (documented constraint, tests use valid shapes):** element-root
-fills hydrate fine when the nesting is parse-stable — host wraps rows in a
-`<div>`, fill root is anything that doesn't auto-close it
-(`packages/view/test/slots/element-fill-hydration.test.ts` covers the view
-loader path; the restricted embed hydration test covers the eval path).
-A possible future improvement is a compile-time warning when a fill's root
-tag would be auto-closed inside the usage site's wrapper, but detecting it
-requires cross-component analysis (the host template and the fill come from
-different files), so it stays research-grade.
+**Resolution (detected and rejected loudly):** the JS server build and the
+restricted interpreter now guard slot regions whose wrapper the parser can
+auto-close. `buildServerSlotNode` tracks the enclosing element stack and
+emits a `t_slot_guard([...], content, name)` call around `$slots[...]` for
+slots inside auto-closeable wrappers (`li`, `p`, table parts, …); the
+restricted serializer records the same context on the slot node
+(`autoClose`) and the interpreter applies the same guard to incoming fills
+and fallbacks. A violating shape now fails SSR with an actionable message
+naming both tags and the fix, instead of shipping markup hydration can't
+adopt (`test/slots/auto-close.test.ts`, restricted-components and
+cross-artifact embed tests). Restricted slot fallbacks are rejected at
+**compile** time (positioned error), since their content is static. Valid
+shapes are unaffected — the guard is a no-op for parse-stable fills. A
+hypothetical "make li-in-li work" (replace-mode slots) remains a language
+feature, not a bug fix.

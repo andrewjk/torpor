@@ -10,5 +10,11 @@ export default interface BuildServerStatus {
 	inHead?: boolean;
 	/** Counter for `@await` boundary site ids within this build chunk */
 	awaitCount: number;
+	/**
+	 * The open element tags around the node being built (nearest last).
+	 * Used to guard slot regions whose wrapper the HTML parser can
+	 * auto-close — see ssr/slotAutoClose.
+	 */
+	elementStack: string[];
 	options?: BuildOptions;
 }

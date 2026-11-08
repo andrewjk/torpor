@@ -29,9 +29,12 @@ export default function buildServerElementNode(
 	if (!voidTags.includes(tagName)) {
 		const oldPreserveWhitespace = status.preserveWhitespace;
 		status.preserveWhitespace = ["pre", "code"].includes(tagName);
+		// `@element` has a runtime tag expression, which we can't analyze
+		if (!tagName.startsWith("@")) status.elementStack.push(tagName);
 		for (let child of node.children) {
 			buildServerNode(child, status, b);
 		}
+		if (!tagName.startsWith("@")) status.elementStack.pop();
 		status.preserveWhitespace = oldPreserveWhitespace;
 		status.output += `</${tagName}>`;
 	}

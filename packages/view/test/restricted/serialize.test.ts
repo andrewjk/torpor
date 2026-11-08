@@ -465,3 +465,54 @@ export default function Dash($props: { wide: boolean }) {
 	const plain = usages[2]!;
 	expect(plain.props.find((prop) => prop.name === "class")).toBeUndefined();
 });
+
+test("slot regions record their auto-close context", () => {
+	const { program, errors } = compile(`
+export default function A() {
+	@render {
+		<ul>
+			@for (let item of $props.items) {
+				<li><slot item={item}><span>fallback</span></slot></li>
+			}
+		</ul>
+	}
+}
+`);
+	expect(errors).toEqual([]);
+	const findNode = (nodes: { t: string }[], t: string): any =>
+		nodes.find((node) => node.t === t) ??
+		nodes.flatMap((node) => {
+			const kids = (node as { children?: { t: string }[] }).children ?? [];
+			return kids.length > 0 ? findNode(kids, t) : [];
+		})[0];
+	const slot = findNode(program.components[0].markup as { t: string }[], "slot") as {
+		autoClose?: string[];
+	};
+	expect(slot).toBeDefined();
+	expect(slot.autoClose).toEqual(["li"]);
+
+	// A slot directly in the component root has no auto-close context
+	const bare = compile(`
+export default function B() {
+	@render {
+		<slot><span>fallback</span></slot>
+	}
+}
+`);
+	expect(errorsOf(bare)).toEqual([]);
+	const bareSlot = bare.program.components[0].markup.find((node) => node.t === "slot") as {
+		autoClose?: string[];
+	};
+	expect(bareSlot.autoClose).toBeUndefined();
+});
+
+test("slot fallbacks that auto-close the wrapper are compile errors", () => {
+	const result = compile(`
+export default function A() {
+	@render {
+		<li><slot item={item}><li>bad fallback</li></slot></li>
+	}
+}
+`);
+	expect(errorsOf(result).join("\n")).toContain("auto-closes the enclosing <li>");
+});

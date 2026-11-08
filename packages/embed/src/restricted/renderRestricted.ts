@@ -1,6 +1,6 @@
 import type { RestrictedNode, RestrictedProgram } from "@torpor/view/compile";
 import type { ServerComponent } from "@torpor/view/ssr";
-import { t_attr, t_class, t_fmt, t_style } from "@torpor/view/ssr";
+import { t_attr, t_class, t_fmt, t_slot_guard, t_style } from "@torpor/view/ssr";
 import embedProps from "../bridge/embedProps";
 import checkVersion from "../checkVersion";
 import { RUNTIME_VERSION } from "../generated/version";
@@ -241,6 +241,12 @@ async function renderNode(node: RestrictedNode, context: RenderContext): Promise
 				content = await incoming(Object.keys(slotProps).length > 0 ? slotProps : undefined);
 			} else {
 				content = await renderNodes(node.children, context);
+			}
+			// Reject fill content the HTML parser would re-nest (e.g. an <li>
+			// fill inside <li><slot/></li>) — it shreds the slot region and
+			// hydration can't adopt it
+			if (node.autoClose !== undefined && node.autoClose.length > 0) {
+				content = t_slot_guard(node.autoClose, content, node.name);
 			}
 			return `${HYDRATION_START_COMMENT}${content}${HYDRATION_END_COMMENT}${ANCHOR_COMMENT}`;
 		}

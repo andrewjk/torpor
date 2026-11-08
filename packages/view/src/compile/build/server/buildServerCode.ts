@@ -34,6 +34,7 @@ const importsMap: Record<string, string> = {
 	t_attr: 'import { t_attr } from "${folder}";',
 	t_class: 'import { t_class } from "${folder}";',
 	t_style: 'import { t_style } from "${folder}";',
+	t_slot_guard: 'import { t_slot_guard } from "${folder}";',
 	ServerSlotRender: 'import { type ServerSlotRender } from "${folder}";',
 };
 
@@ -167,6 +168,7 @@ function buildServerTemplate(
 					varNames: {},
 					preserveWhitespace: false,
 					awaitCount: 0,
+					elementStack: [],
 					options,
 				};
 
@@ -198,6 +200,7 @@ function buildServerTemplate(
 					varNames: {},
 					preserveWhitespace: false,
 					awaitCount: 0,
+					elementStack: [],
 					options,
 				};
 
@@ -229,6 +232,7 @@ function buildServerTemplate(
 					preserveWhitespace: false,
 					inHead: true,
 					awaitCount: 0,
+					elementStack: [],
 					options,
 				};
 
