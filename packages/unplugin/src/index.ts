@@ -22,6 +22,12 @@ const styles = new Map<string, string>();
  */
 const missing = new Set<string>();
 
+/**
+ * Compile warnings already printed, keyed by file + message, so a warning
+ * shows once instead of on every recompile.
+ */
+const warnedTransforms = new Set<string>();
+
 export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) => ({
 	name: "unplugin-torpor",
 	enforce: "pre",
@@ -336,6 +342,21 @@ function torpFilesUnder(folder: string): string[] {
 function transform(template: Template, id: string, options?: Options, override?: "client") {
 	const built = build(template, options);
 	let transformed = built.code;
+
+	// Non-fatal diagnostics (e.g. a plain `let` initialized from $props read
+	// from markup — silent stale capture in keyed lists). Printed once per
+	// file+message, so recompiles don't re-warn
+	if (built.warnings?.length) {
+		for (const warning of built.warnings) {
+			const key = `${id}:${warning.message}`;
+			if (!warnedTransforms.has(key)) {
+				warnedTransforms.add(key);
+				console.warn(
+					`\nWARNING in ${id}:${warning.startLine + 1},${warning.startChar}: ${warning.message}`,
+				);
+			}
+		}
+	}
 
 	// When a component is compiled with a `?client` override in a test run,
 	// any child components it imports must be compiled the same way --

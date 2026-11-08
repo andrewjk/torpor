@@ -113,6 +113,18 @@ let $state = $watch({
 			In other frameworks cached signals may be called computed, derived, or memo(ized).
 		</p>
 
+		<h2>Plain variables are not reactive</h2>
+		<p>
+			A plain <code>let</code> declared in a component body is evaluated once, at setup &mdash; it is
+			not a signal, so template expressions that read it never re-run when it (or what it was
+			initialized from) changes. This matters most with <code>$props</code>: a component rendered
+			from a keyed <code>@for</code> stays alive across list mutations while its props are updated
+			in place, so a plain <code>let prefix = `children[{$props.i}]`</code> silently keeps the
+			<em>previous</em> row's value. Use a getter or <code>$cache</code> when the derived value
+			should stay live (the compiler warns when a template expression reads a plain{" "}
+			<code>let</code> initialized from <code>$props</code>).
+		</p>
+
 		<h2>Playground</h2>
 		<Repl
 			input={`

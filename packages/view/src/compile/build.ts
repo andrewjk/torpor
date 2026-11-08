@@ -29,9 +29,10 @@ export default function build(template: Template, options?: BuildOptions): Build
 
 	let map: SourceMapping[] = [];
 	let errors: CompileError[] = [];
+	let warnings: CompileError[] = [];
 	let code = options?.server
 		? buildServerCode(template, options)
-		: buildCode(template, map, options, errors);
+		: buildCode(template, map, options, errors, warnings);
 	let styles = template.components
 		.map((c) =>
 			c.style ? { style: buildStyles(c.style, c.style.hash), hash: c.style.hash } : undefined,
@@ -42,5 +43,6 @@ export default function build(template: Template, options?: BuildOptions): Build
 		styles,
 		map,
 		errors,
+		warnings,
 	};
 }

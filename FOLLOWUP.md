@@ -64,21 +64,6 @@ conservative (an extra binding is harmless, a missing one is a
 scope. Control-node callbacks still bind every var in scope, which could be
 tightened if it shows up in profiles.
 
-### Plain `let` initialized from `$props` is a silent stale-capture trap in keyed lists
-
-Found in redraft's PostInputFields.torp (multi-part post editor). A component
-instantiated from a keyed `@for` gets its props updated in place on list
-reconciliation -- the compiler emits a `$watch`ed props bag plus a
-`forVarMask`-tagged effect that writes the new `i`/item values into it, and
-`t_rerun_region_effects` re-runs matching effects -- so reads of `$props.i` in
-template expressions track correctly. But `let prefix = \`children[${$props.i}]\``in the component body is evaluated once at setup: template effects reading`prefix` never re-run, so after children were spliced out the surviving
-components kept the *previous* child's form field names (`children[1]...`instead of`children[0]...`) and the submitted form data was silently wrong.
-By design a plain `let`isn't reactive, but the combination "keyed list keeps
-the component instance alive AND updates its props" makes the non-reactivity
-surprising and the failure invisible. Options: a compiler warning when a
-template expression references a plain`let`whose initializer reads`$props`
-(detectable syntactically), and/or a note in the reactivity docs.
-
 ### Standard schema validation: remaining integration points
 
 Endpoints now support standard schemas for request bodies (`json()`), form

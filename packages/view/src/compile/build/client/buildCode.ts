@@ -7,6 +7,7 @@ import Builder from "../../utils/Builder";
 import { codeRanges } from "../../utils/codeScanner";
 import collectMarkupExpressions from "../../utils/collectMarkupExpressions";
 import markupRendersComponent from "../../utils/markupRendersComponent";
+import stalePropLets from "../../utils/stalePropLets";
 import type BuildStatus from "./BuildStatus";
 import addMappedText from "./addMappedText";
 import addPopDevBoundary from "./addPopDevBoundary";
@@ -81,6 +82,7 @@ export default function buildCode(
 	map: SourceMapping[],
 	options?: BuildOptions,
 	errors: CompileError[] = [],
+	warnings: CompileError[] = [],
 ): string {
 	let b = new Builder(options?.mapped);
 
@@ -89,7 +91,7 @@ export default function buildCode(
 	imports.add("SlotRender");
 
 	// Build the component
-	buildTemplate(template, map, imports, b, options, errors);
+	buildTemplate(template, map, imports, b, options, errors, warnings);
 
 	let startSize = b.toString().length;
 
@@ -125,6 +127,7 @@ function buildTemplate(
 	b: Builder,
 	options?: BuildOptions,
 	errors: CompileError[] = [],
+	warnings: CompileError[] = [],
 ) {
 	// TODO: Do this while looping chunks
 	let script = template.script.map((s) => s.script).join("\n");
@@ -166,6 +169,11 @@ function buildTemplate(
 	let current = template.components[0];
 	let status: BuildStatus = makeStatus(imports, map, current, options, errors);
 	let first = true;
+	// The current component's script chunks, accumulated for the stale-prop-
+	// let check (see stalePropLets). Script chunks aren't contiguous in the
+	// source — sentinel chunks sit between them — so each segment carries its
+	// own file offset
+	let componentScript: { text: string; fileStart: number }[] = [];
 
 	for (let chunk of template.script) {
 		if (chunk.script === "/* @params */") {
@@ -174,6 +182,7 @@ function buildTemplate(
 				status = makeStatus(imports, map, current, options, errors);
 			}
 			first = false;
+			componentScript = [];
 
 			// TODO: Support other params, like the user setting $context
 			b.append(`
@@ -251,11 +260,17 @@ function buildTemplate(
 		} else if (chunk.script === "/* @style */") {
 			// No styles in the client
 		} else if (chunk.script === "/* @end */") {
+			// Warn when a template expression reads a plain `let` whose
+			// initializer captured $props (stale capture in keyed lists)
+			if (current.markup && warnings !== undefined) {
+				warnings.push(...stalePropLets(componentScript, current.markup, options?.source));
+			}
 			addPopDevBoundary(status, b);
 			currentIndex += 1;
 			current = template.components[currentIndex];
 		} else {
 			addMappedText("", chunk.script, "", chunk.span, status, b);
+			componentScript.push({ text: chunk.script, fileStart: chunk.span.start });
 		}
 	}
 }
