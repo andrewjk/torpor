@@ -32,7 +32,7 @@ export interface RefreshOptions {
  * *loud*: `$pending(fn)` returns `true` while the re-fetch is in flight and
  * subscribers are notified at suspend *start*, so an inline "updating…"
  * indicator appears immediately. Readers keep displaying the previous
- * resolved value (`Computed.staleValue`) until the new promise resolves and
+ * resolved value (`Computed.settle.value`) until the new promise resolves and
  * propagates through the reactive graph; an `@await` boundary keeps its
  * content mounted instead of flashing fallback.
  *
@@ -92,14 +92,14 @@ export default function $refresh(fn: () => any, options?: RefreshOptions): void 
 			// resolve dropped by the generation guard), so the
 			// initialization IS the refresh — skip the re-run and its
 			// notifications. First loads are loud regardless of `silent`
-			// (`suspendQuiet` is false while `hasResolved` is false), so
+			// (`suspendQuiet` is false while `settle` is undefined), so
 			// `$pending` still reads `true` for it.
 			continue;
 		}
 		// Bare refresh: recalc must be true when `$async`'s run captures
 		// suspendQuiet so the suspend reads as loud (suspendQuiet =
-		// hasResolved && !recalc = false), and false for a silent refresh
-		// (quiet). Restore it after the run.
+		// settle !== undefined && !recalc = false), and false for a silent
+		// refresh (quiet). Restore it after the run.
 		computed.recalc = !silent;
 		deactivateSources(computed);
 		// Re-run with no active target so the refresh doesn't subscribe the
@@ -122,7 +122,7 @@ export default function $refresh(fn: () => any, options?: RefreshOptions): void 
 			// A loud refresh notifies subscribers at suspend *start* so
 			// `$pending` indicators (which subscribe to the computed) flip on
 			// immediately and show the "updating…" UI while the fetch is in
-			// flight. Readers re-read the retained staleValue, so content
+			// flight. Readers re-read the retained settle value, so content
 			// doesn't flicker. A silent refresh stays quiet until resolve.
 			batchStart();
 			propagateFromSignal(computed);

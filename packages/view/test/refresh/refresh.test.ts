@@ -267,7 +267,7 @@ test("$refresh on a never-read getter is single-fetch even when silent", async (
 	$refresh(() => $state.data, { silent: true });
 	expect(call).toBe(1);
 
-	// A first load is loud regardless of silent (hasResolved is false)
+	// A first load is loud regardless of silent (settle is undefined)
 	expect($pending(() => $state.data)).toBe(true);
 
 	resolvers[0]("fresh");
@@ -333,8 +333,8 @@ test("$refresh recovers after an error (retry-after-error)", async () => {
 	expect(errors).toEqual(["boom"]);
 
 	// Retry the failed fetch (loud by default). The error is NOT retained as
-	// stale content (lastErrored), so the retry suspend reads as a plain
-	// undefined while the fresh promise is in flight.
+	// stale content (settle.ok is false), so the retry suspend reads as a
+	// plain undefined while the fresh promise is in flight.
 	$refresh(() => $state.data);
 	expect(values).toEqual([undefined, undefined]);
 

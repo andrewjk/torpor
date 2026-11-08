@@ -18,7 +18,7 @@ import context from "../render/context";
  * re-asking the same question shouldn't ping the user. First loads and
  * dependency-change refreshes are loud (`true`), as is the default (loud)
  * `$refresh(fn)`. Quiet-ness is captured per computed at suspend time via
- * `suspendQuiet` (computed in `$async`'s run from `hasResolved` and `recalc`).
+ * `suspendQuiet` (computed in `$async`'s run from `settle` and `recalc`).
  *
  * @param fn A function that reads the reactive values to check.
  */

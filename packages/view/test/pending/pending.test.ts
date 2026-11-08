@@ -141,19 +141,19 @@ test("$pending: first load is loud, dependency-change refresh is loud", async ()
 	expect(pending).toEqual([true]);
 	const data = ($state as any)[proxyDataSymbol];
 	const computed = data.signals.get("data") as Computed;
-	expect(computed.hasResolved).toBe(false);
+	expect(computed.settle).toBeUndefined();
 	expect(computed.suspendQuiet).toBe(false);
 
 	resolveFirst("first");
 	await new Promise((r) => setTimeout(r));
 	expect(pending).toEqual([true, false]);
-	expect(computed.hasResolved).toBe(true);
+	expect(computed.settle).toEqual({ ok: true, value: "first" });
 
 	// Dependency change → refresh: loud
 	$state.version = 1;
 	await new Promise((r) => setTimeout(r));
 	expect(pending).toEqual([true, false, true]);
-	expect(computed.hasResolved).toBe(true);
+	expect(computed.settle).toEqual({ ok: true, value: "first" });
 	expect(computed.suspendQuiet).toBe(false);
 
 	resolveSecond("second");
@@ -166,7 +166,7 @@ test("$pending is quiet on a bare refresh (no dependency change)", async () => {
 	// must be quiet: $pending returns false even though the computed is
 	// suspended. Torpor has no `refresh()` primitive yet, so this simulates
 	// one by re-running the computed directly (recalc === false,
-	// hasResolved === true → suspendQuiet === true), exactly what a future
+	// settle !== undefined → suspendQuiet === true), exactly what a future
 	// refresh() would do.
 	let resolveFirst!: (v: string) => void;
 	let resolveBare!: (v: string) => void;
@@ -195,7 +195,7 @@ test("$pending is quiet on a bare refresh (no dependency change)", async () => {
 
 	const data = ($state as any)[proxyDataSymbol];
 	const computed = data.signals.get("data") as Computed;
-	expect(computed.hasResolved).toBe(true);
+	expect(computed.settle).toEqual({ ok: true, value: "first" });
 
 	// Simulate a bare refresh: re-run the computed with no source change.
 	runComputed(computed);

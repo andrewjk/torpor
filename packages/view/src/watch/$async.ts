@@ -55,10 +55,8 @@ export default function $async<T>(fn: (serverValue?: T) => Promise<T>, _options?
 		didError: false,
 		didSuspend: false,
 		generation: 0,
-		hasResolved: false,
-		lastErrored: false,
+		settle: undefined,
 		suspendQuiet: false,
-		staleValue: undefined,
 		rollback: null,
 	};
 
@@ -82,13 +80,11 @@ export default function $async<T>(fn: (serverValue?: T) => Promise<T>, _options?
 	// initial call and every recalc, so stale resolves are handled by the
 	// generation guard without any changes to runComputed or checkComputed.
 	//
-	// `staleValue` is maintained by the settle handlers below — it always
-	// holds the last RESOLVED value, cleared on rejection. It is NOT derived
-	// here from `computed.value`: when changes overlap (a re-suspend while an
-	// earlier fetch is still in flight), `computed.value` holds that earlier
-	// run's pending promise, and handing it to readers would render
-	// "[object Promise]" — a superseded generation's value leaking into the
-	// UI. The settle handlers are generation-guarded, so `staleValue` is
+	// `settle` is maintained by the settle handlers below — it always holds
+	// the last SETTLED result, so readers never see a superseded run's
+	// in-flight promise (rapid prop changes would otherwise render "[object
+	// Promise]" — a superseded generation's value leaking into the UI). The
+	// settle handlers are generation-guarded, so `settle` is
 	// generation-safe by construction: the read-side token matching the
 	// resolve-side one (ASYNC.md → "Generation guards").
 	computed.run = () => {
@@ -100,22 +96,20 @@ export default function $async<T>(fn: (serverValue?: T) => Promise<T>, _options?
 			// Capture the quiet-on-refresh decision at suspend time
 			// (ASYNC.md → "Loud vs quiet"). `recalc` is still true during a source-driven
 			// re-run — `checkComputed` clears it only after `runComputed`
-			// returns — so a suspend is quiet iff the computed has resolved
+			// returns — so a suspend is quiet iff the computed has settled
 			// before AND this run wasn't triggered by a dependency change
 			// (i.e. a silent `$refresh(fn, { silent: true })`).
-			// First loads are loud (`hasResolved` is false); dep-change
+			// First loads are loud (`settle` is undefined); dep-change
 			// refreshes and loud `$refresh` calls are loud (`recalc` is true).
-			computed.suspendQuiet = computed.hasResolved && !computed.recalc;
+			computed.suspendQuiet = computed.settle !== undefined && !computed.recalc;
 			(value as Promise<T>).then(
 				(v: T) => {
 					if (computed.generation !== gen) return;
 					computed.value = v;
 					computed.didSuspend = false;
-					computed.hasResolved = true;
-					computed.lastErrored = false;
 					// Retain the resolved value for the next refresh suspend
 					// (stale-while-revalidate, ASYNC.md → "Stale-while-revalidate")
-					computed.staleValue = v;
+					computed.settle = { ok: true, value: v };
 					batchStart();
 					propagateFromSignal(computed);
 					batchEnd();
@@ -125,11 +119,10 @@ export default function $async<T>(fn: (serverValue?: T) => Promise<T>, _options?
 					computed.value = e;
 					computed.didError = true;
 					computed.didSuspend = false;
-					computed.hasResolved = true;
-					computed.lastErrored = true;
 					// A retry-after-error re-suspend must not hand the previous
 					// error (or a pre-error value) to readers as "stale content"
-					computed.staleValue = undefined;
+					// — the `ok: false` settle leaves no stale value to serve
+					computed.settle = { ok: false, error: e };
 					batchStart();
 					propagateFromSignal(computed);
 					batchEnd();
@@ -151,10 +144,8 @@ export default function $async<T>(fn: (serverValue?: T) => Promise<T>, _options?
 		computed.generation++;
 		computed.didSuspend = false;
 		computed.didError = false;
-		computed.hasResolved = true;
-		computed.lastErrored = false;
 		computed.value = serverValues.values[serverValues.index++];
-		computed.staleValue = computed.value;
+		computed.settle = { ok: true, value: computed.value };
 	}
 
 	return computed.value;

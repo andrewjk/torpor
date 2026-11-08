@@ -47,7 +47,7 @@ const SERVER_VALUES_PREFIX = "t-await:";
  * Stale-while-revalidate (ASYNC.md): once content has been produced
  * (`hasContent`), a subsequent suspend during a refresh does NOT switch to
  * the `with` branch — the boundary keeps the stale content mounted. `$async`
- * retains the previous resolved value (`Computed.staleValue`) and
+ * retains the previous resolved value (`Computed.settle.value`) and
  * `suspendRead` returns it, so child effects keep displaying the old value
  * until the new promise resolves and updates them in place. The `with` branch
  * is shown only on the first load, before content has ever rendered
@@ -211,9 +211,8 @@ export default function runAwait(
 					// with-branch. When hasContent, a refresh suspend keeps
 					// the stale content mounted instead of flashing the
 					// with-branch — stale-while-revalidate (ASYNC.md).
-					// Child effects read the retained value via $async's
-					// staleValue and re-render with the new value when the
-					// promise resolves.
+					// Child effects read the retained settle value and re-render
+					// with the new value when the promise resolves.
 					if (renderWith !== null) {
 						renderBranch(1, renderWith);
 					} else {

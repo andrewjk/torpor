@@ -21,8 +21,8 @@ import trackSignal from "./trackSignal";
  * nearest `@await` boundary.
  *
  * Return value (ASYNC.md → "Stale-while-revalidate"): on a refresh suspend
- * (the computed has resolved before) returns the previously resolved value
- * held in `staleValue`, so readers keep displaying the old content instead of
+ * (the computed has settled before) returns the previously resolved value
+ * held in `settle`, so readers keep displaying the old content instead of
  * a placeholder — an `@await` boundary thus keeps its content mounted
  * rather than flashing the `with` branch. On a first load (or a retry after a
  * rejection, both of which have no stale value), inside an `@await` boundary,
@@ -74,15 +74,17 @@ function suspendRead(signal: Computed): any {
 			trackSignal(signal);
 			context.activeTarget = oldActive;
 		}
-		// First load (or a retry after a rejection, which clears the stale
+		// First load (or a retry after a rejection, which leaves no settled
 		// value): there is no value to display, and returning `undefined`
 		// would let dereferences throw before the boundary can switch
 		// branches. Abort the speculative render instead.
-		if (!signal.hasResolved || signal.lastErrored) {
+		if (signal.settle === undefined || !signal.settle.ok) {
 			throw new AwaitSuspend();
 		}
 	}
-	return signal.staleValue;
+	// Stale-while-revalidate: the last resolved value, if any. `undefined`
+	// before the first settle and after a rejection.
+	return signal.settle !== undefined && signal.settle.ok ? signal.settle.value : undefined;
 }
 
 export default function proxyGet(

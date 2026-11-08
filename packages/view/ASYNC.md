@@ -125,7 +125,7 @@ A suspend is _loud_ (a first load, a dependency-change refresh, a default
 `$refresh`) or _quiet_ (a `$refresh(fn, { silent: true })` background
 revalidate — re-asking the same question shouldn't ping the user). `$pending`
 returns `true` only for loud suspends. Loudness is captured at suspend time
-from `hasResolved && !recalc`, so `$pending` needs no per-source
+from `settle !== undefined && !recalc`, so `$pending` needs no per-source
 configuration.
 
 ### Generation guards
@@ -138,7 +138,7 @@ prop changes on both sides:
   `$async` attaches handlers to every promise it adopts, its rejection is
   consumed — no `unhandledrejection`.
 - **Read side:** the value retained during a refresh suspend
-  (`Computed.staleValue`) is maintained by those same generation-guarded settle
+  (`Computed.settle.value`) is maintained by those same generation-guarded settle
   handlers — never derived from `computed.value` at suspend time, which (when
   runs overlap) is the superseded run's _pending promise_ and rendered as
   `[object Promise]`.

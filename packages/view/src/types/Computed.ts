@@ -1,3 +1,4 @@
+import type AsyncSettle from "./AsyncSettle";
 import type Subscription from "./Subscription";
 import { COMPUTED_TYPE } from "./constants";
 
@@ -76,22 +77,29 @@ export default interface Computed<T = any> {
 	generation: number;
 
 	/**
-	 * True once an `$async` computed's promise has resolved or rejected at
-	 * least once. Used by `$pending` to distinguish a first load (never
-	 * resolved) from a refresh. Monotonic — once true it stays true across
-	 * subsequent re-suspends. Unused by plain `$cache` computeds.
+	 * The result of the most recent generation-guarded settle of an `$async`
+	 * computed: `{ ok: true, value }` on resolve, `{ ok: false, error }` on
+	 * rejection — or `undefined` until the first settle. Read side:
+	 * - `settle !== undefined` ⇔ "has resolved before" — used by `$async` to
+	 *   capture `suspendQuiet`, and by the proxy get trap to distinguish a
+	 *   first load (throw `AwaitSuspend`) from a refresh (stale-while-
+	 *   revalidate). Monotonic — once set it stays set across subsequent
+	 *   re-suspends.
+	 * - `settle.ok` ⇔ the last settle resolved. On `false`, a retry-after-
+	 *   error re-suspend must not hand the previous error to readers as
+	 *   "stale content" (it renders as a raw value, bypassing the error
+	 *   boundary).
+	 * - `settle.value` on `ok === true` is the previously resolved value,
+	 *   retained across a refresh suspend for stale-while-revalidate
+	 *   (ASYNC.md → "Stale-while-revalidate") — read by `suspendRead` so
+	 *   readers keep displaying the old value instead of a placeholder while
+	 *   the new promise is in flight.
+	 *
+	 * Written only by `$async`'s settle handlers (and hydration seeding), so
+	 * it is generation-safe by construction. Unused by plain `$cache`
+	 * computeds (always `undefined`).
 	 */
-	hasResolved: boolean;
-
-	/**
-	 * True when the last settled result of an `$async` computed was a
-	 * rejection. Set by the `.then` reject handler, cleared by the resolve
-	 * handler, which also clears `staleValue` — a retry-after-error
-	 * re-suspend must not hand the previous error to readers as "stale
-	 * content" (it renders as a raw value, bypassing the error boundary).
-	 * Unused by plain `$cache` computeds.
-	 */
-	lastErrored: boolean;
+	settle: AsyncSettle | undefined;
 
 	/**
 	 * True when the current suspend is a "bare refresh" — a re-fetch with no
@@ -101,27 +109,13 @@ export default interface Computed<T = any> {
 	 * matching Solid's stale-while-revalidate default.
 	 *
 	 * Captured at suspend time inside `$async`'s run: a suspend is quiet iff
-	 * the computed has resolved before (`hasResolved`) AND the run was NOT
-	 * source-driven (`recalc === false`, i.e. not triggered by `checkComputed`
-	 * and not a loud `$refresh`). First loads are always loud (`hasResolved`
-	 * is false); dependency-change refreshes and loud `$refresh` calls are
-	 * always loud (`recalc` is true).
+	 * the computed has settled before (`settle !== undefined`) AND the run was
+	 * NOT source-driven (`recalc === false`, i.e. not triggered by
+	 * `checkComputed` and not a loud `$refresh`). First loads are always loud
+	 * (`settle` is undefined); dependency-change refreshes and loud `$refresh`
+	 * calls are always loud (`recalc` is true).
 	 */
 	suspendQuiet: boolean;
-
-	/**
-	 * The previously resolved value, retained across a refresh suspend for
-	 * stale-while-revalidate (ASYNC.md → "Stale-while-revalidate"). Maintained by `$async`'s
-	 * generation-guarded settle handlers — set on resolve, cleared on
-	 * rejection — so it always holds the last RESOLVED value, never a
-	 * superseded run's in-flight promise (rapid prop changes would otherwise
-	 * render "[object Promise]"). Read by `suspendRead` so readers keep
-	 * displaying the old value instead of a placeholder while the new promise
-	 * is in flight. `undefined` on first load (never resolved) and for plain
-	 * `$cache` computeds (which never suspend, so `suspendRead` is never
-	 * reached for them).
-	 */
-	staleValue: any;
 
 	/**
 	 * A subscription to roll back to when recursively updating signal targets.
