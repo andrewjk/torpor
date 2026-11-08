@@ -1,5 +1,6 @@
 import type ElementNode from "../types/nodes/ElementNode";
 import type TemplateNode from "../types/nodes/TemplateNode";
+import forLoopVarNames from "./forLoopVarNames";
 import isControlNode from "./isControlNode";
 import isTextNode from "./isTextNode";
 
@@ -52,9 +53,15 @@ function scan(
 	const found = new Set<string>();
 	if (forVars.length === 0) return found;
 
-	const collected: string[] = [];
+	// Each collected string carries the loop-variable names declared by the
+	// nested `@for` loops it lives under: a nested loop that redeclares a
+	// name shadows the outer binding, so writes to it in that subtree belong
+	// to the *inner* binding (reported by the inner loop's own scan). Without
+	// this, an inner `@for (let item of B)` reusing an outer `item`'s name
+	// would get its writes misattributed to the outer binding.
+	const collected: { text: string; shadows: Set<string> }[] = [];
 	for (const child of children) {
-		collectExpressionStrings(child, collected);
+		collectExpressionStrings(child, collected, new Set());
 	}
 
 	for (const varName of forVars) {
@@ -73,8 +80,11 @@ function scan(
 				// prefix ++/--
 				`(?<![\\w$.])(?:\\+\\+|--)\\s*${escaped}(?![\\w$])`,
 		);
-		for (const text of collected) {
-			if (writePattern.test(text)) {
+		for (const entry of collected) {
+			if (entry.shadows.has(varName)) {
+				continue;
+			}
+			if (writePattern.test(entry.text)) {
 				found.add(varName);
 				break;
 			}
@@ -91,10 +101,20 @@ function isElementLike(node: TemplateNode): node is ElementNode {
  * Collects every expression-like string from the body, including attribute
  * values (with `&`-binding targets marked by a trailing `=`), text
  * interpolations, and control statements (recursing into nested controls).
+ *
+ * Nested `@for` loops are special: their own statement is skipped entirely
+ * (its declarations and init/update expressions belong to the inner loop's
+ * variables — a C-style header's `i++` is the inner loop's own bookkeeping,
+ * not a write of an outer loop's variable), and every string beneath it is
+ * recorded with the inner loop's variable names as shadowing it.
  */
-export function collectExpressionStrings(node: TemplateNode, out: string[]): void {
+function collectExpressionStrings(
+	node: TemplateNode,
+	out: { text: string; shadows: Set<string> }[],
+	shadows: Set<string>,
+): void {
 	if (isTextNode(node)) {
-		out.push(node.content);
+		out.push({ text: node.content, shadows });
 		return;
 	}
 	if (isElementLike(node)) {
@@ -109,31 +129,44 @@ export function collectExpressionStrings(node: TemplateNode, out: string[]): voi
 					// expression is a *write* target, not just a read.
 					// Appending ` =` lets the regex flag any for-var that
 					// appears in it as assigned.
-					out.push(`${attr.value} =`);
+					out.push({ text: `${attr.value} =`, shadows });
 				} else {
-					out.push(attr.value);
+					out.push({ text: attr.value, shadows });
 				}
 			}
 			// Fully-reactive attribute spreads / dynamic attribute names are
 			// emitted verbatim too — the value carries the expression.
 			if (attr.fullyReactive && attr.name !== attr.value) {
-				out.push(attr.name);
+				out.push({ text: attr.name, shadows });
 			}
 		}
 		for (const child of node.children) {
-			collectExpressionStrings(child, out);
+			collectExpressionStrings(child, out, shadows);
 		}
 		return;
 	}
 	if (isControlNode(node)) {
+		if (node.operation === "@for") {
+			// A nested loop: its header belongs to its own variables
+			// (declarations, init, update), and its loop variables shadow any
+			// same-named outer variables for the entire subtree beneath it
+			const nested = new Set(shadows);
+			for (const name of forLoopVarNames(node.statement)) {
+				nested.add(name);
+			}
+			for (const child of node.children) {
+				collectExpressionStrings(child, out, nested);
+			}
+			return;
+		}
 		// `@key = row.id` is a *read* of `row.id`; we still scan the
 		// statement because the key expression is the most common place a
 		// for-var shows up, and reads are correctly ignored by the regex
 		// (no assignment operator follows). For nested `@if`/`@for`/etc.,
 		// the statement may also read for-vars.
-		out.push(node.statement);
+		out.push({ text: node.statement, shadows });
 		for (const child of node.children) {
-			collectExpressionStrings(child, out);
+			collectExpressionStrings(child, out, shadows);
 		}
 	}
 }

@@ -42,9 +42,6 @@ Open points:
   `entries()` destructures an index that isn't the source, `{ name }` isn't
   addressable). If we want per-form hints, the loop header has to be parsed
   more richly.
-- **`forVarsReassignedIn` recurses into nested `@for` bodies**, so an inner loop
-  that reuses an outer var's name and writes it could misattribute the error to
-  the outer binding. Pre-existing scanner behavior.
 - **The `@for` header parser** (`forLoopVarsRegex`'s "Handle destructuring,
   quotes, comments etc" TODO) is still heuristic.
 - **Code is still generated for an erroring program** (it just assigns a `const`

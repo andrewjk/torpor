@@ -4,8 +4,8 @@ import isControlNode from "../../utils/isControlNode";
 import isForBodyLeafSafe from "../../utils/isForBodyLeafSafe";
 import isForBodyNoProxySafe from "../../utils/isForBodyNoProxySafe";
 import { forVarsReassignedIn } from "../../utils/forVarsWrittenIn";
+import forLoopVarNames from "../../utils/forLoopVarNames";
 import forVarsReadDirectlyIn from "../../utils/forVarsReadDirectlyIn";
-import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
 import addBuildError from "./addBuildError";
@@ -17,10 +17,6 @@ import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { appendForVarBindings, appendForVarBindingsFor } from "./forVars";
 
-const forLoopRegex = /for\s*\((.+?);.*?;.*?\)/;
-const forLoopVarsRegex = /(?:let\s+|var\s+){0,1}([^\s,;+=]+)(?:\s*=\s*[^,;]+){0,1}/g;
-const forOfRegex = /for\s*\(\s*(?:let\s*|var\s*){0,1}(.+?)\s+(?:of|in).*?\)/;
-
 export default function buildForNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const parentName = node.parentName!;
 	const anchorName = node.varName ?? "null";
@@ -30,31 +26,7 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 
 	// HACK: Need to wrangle the declaration(s) out of the for loop and put them in data
 	// TODO: Handle destructuring, quotes, comments etc
-	const forVarNames: string[] = [];
-	const forLoopMatch = node.statement.match(forLoopRegex);
-	if (forLoopMatch) {
-		const forVarMatches = forLoopMatch[1].matchAll(forLoopVarsRegex);
-		for (let match of forVarMatches) {
-			forVarNames.push(match[1]);
-		}
-	} else {
-		const forOfMatch = node.statement.match(forOfRegex);
-		if (forOfMatch) {
-			const match = forOfMatch[1];
-			if (
-				(match.startsWith("{") && match.endsWith("}")) ||
-				(match.startsWith("[") && match.endsWith("]"))
-			) {
-				forVarNames.push(
-					...trimMatched(trimMatched(match, "{", "}"), "[", "]")
-						.split(",")
-						.map((m) => m.trim()),
-				);
-			} else {
-				forVarNames.push(match);
-			}
-		}
-	}
+	const forVarNames: string[] = forLoopVarNames(node.statement);
 
 	const regionName = nextVarName("for_region", status);
 	const listItemsName = nextVarName("new_items", status);
