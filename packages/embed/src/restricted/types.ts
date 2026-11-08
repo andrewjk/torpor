@@ -52,6 +52,16 @@ export interface RenderRestrictedOptions {
 	components?: Record<string, ServerComponent>;
 
 	/**
+	 * Incoming slot renders, keyed by slot name: the fills a **parent**
+	 * provides when this artifact is itself used as a component
+	 * (cross-artifact, via `restrictedComponent`). A `<slot name="x">` region
+	 * calls the incoming render with the slot props evaluated in this
+	 * artifact's scope, falling back to its fallback children when absent —
+	 * the same contract as the JS server build.
+	 */
+	slots?: Record<string, RestrictedSlotRender>;
+
+	/**
 	 * Host functions available to **data-layer** expressions only
 	 * (requirement specs and `derive`): formatting and pure helpers. Template
 	 * expressions never see these; their results ship in `$data` with the
@@ -84,3 +94,13 @@ export interface RestrictedRenderResult {
 	head: string;
 	styles: EmbedStyle[];
 }
+
+/**
+ * A slot render for incoming fills, matching the server slot render
+ * contract: called with the slot props the `<slot>` element evaluates
+ * (e.g. per-row data), returning the fill's HTML.
+ */
+export type RestrictedSlotRender = (
+	$slot?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
+) => string | Promise<string>;

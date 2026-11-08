@@ -231,6 +231,55 @@ data tickets from tickets { queue: $props.queue, sort: "recency" };
   Deferred with clear compile errors: `@head`, `@html`, `@switch`, `@await`,
   `@try`, form bindings, mixed static/dynamic attribute values.
 
+### Cross-artifact components
+
+A restricted artifact can render **another restricted artifact** as a
+component. Wrap the inner artifact with `restrictedComponent` — it becomes a
+server component for the outer template's `components` map, with its own
+data layer:
+
+```ts
+import { restrictedComponent } from "@torpor/embed/restricted";
+
+const { body } = await renderRestricted(outerArtifact, {
+	props,
+	components: {
+		TicketList: restrictedComponent(innerArtifact, {
+			sources, // the inner artifact's own requirement sources
+			formatters,
+			deriveLimits,
+		}),
+	},
+});
+```
+
+The outer template's fills become the inner artifact's incoming slots: the
+inner `<slot item={row}>` evaluates its slot props in its own scope, calls
+the outer fill's render, and falls back to its fallback children when the
+outer passes no fill for that name. `renderRestricted` also takes `slots`
+directly, so a host can supply fills for a top-level restricted template.
+
+On the **client**, pass the inner artifact's client build via the outer's
+`scope` — it handles slots natively. An inner artifact with data
+requirements needs its `$data` bag through props (the same contract as
+hydration), so the host adapts:
+
+```ts
+import { loadComponent } from "@torpor/embed";
+const inner = loadComponent(innerArtifact, scope);
+hydrateEmbed(target, outerArtifact, props, {
+	scope: {
+		ui: {
+			TicketList: ($p, $a, usageProps, $c, slots) =>
+				inner($p, $a, { ...usageProps, $data }, $c, slots),
+		},
+	},
+});
+```
+
+Wrapper cycles (`A` renders `B` renders `A`) recurse until the stack
+overflows — construct component maps acyclically.
+
 ### Host components in restricted mode
 
 Components resolve like everything else — host-side. At render time, pass

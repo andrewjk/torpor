@@ -347,6 +347,21 @@ run on the client.**
   locale-sensitive `formatDue`-style formatter used only client-side will
   differ from SSR text unless the same value ships in `$data`.
 
+### Cross-artifact restricted components
+
+Status: **implemented** (2026-11-08).
+
+- `restrictedComponent(artifact, options)` wraps a restricted artifact as a
+  server component for another restricted template's `components` map; the
+  inner artifact renders recursively with its own sources/formatters/limits.
+- `renderRestricted` gained `slots` — incoming slot renders — and `<slot>`
+  regions call them with slot props evaluated in the inner scope
+  (`<slot item={row}>`), falling back to their fallback children. The
+  restricted serializer now serializes slot props.
+- Client side: the inner artifact's client build rides the outer's `scope`;
+  `loadComponent` is exported for the `$data` adapter. Wrapper cycles
+  overflow the stack (documented; construct acyclically).
+
 ### Aggregates in derive
 
 Status: **implemented** (2026-11-08).

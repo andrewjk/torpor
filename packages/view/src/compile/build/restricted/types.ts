@@ -114,8 +114,10 @@ export type RestrictedNode =
 	/** A host component usage: `<Card title={x}>children</Card>`. Props are
 	 * passed raw (data, not HTML); `children` is the default fill. */
 	| { t: "component"; name: string; props: RestrictedAttribute[]; fills: RestrictedFill[] }
-	/** A `<slot name="…">` element with fallback children. */
-	| { t: "slot"; name: string; children: RestrictedNode[] };
+	/** A `<slot name="…">fallback</slot>` element. Slot props (`item={row}`)
+	 * are evaluated in the artifact's scope and passed to the incoming slot
+	 * render; `children` is the fallback. */
+	| { t: "slot"; name: string; props: RestrictedAttribute[]; children: RestrictedNode[] };
 
 export interface RestrictedFill {
 	/** Slot name; "_" is the default fill. */

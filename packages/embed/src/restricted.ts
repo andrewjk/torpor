@@ -4,6 +4,8 @@
 export { default as compileRestricted } from "./restricted/compileRestricted";
 export { default as renderRestricted } from "./restricted/renderRestricted";
 export { default as recompileRestricted } from "./restricted/recompileRestricted";
+export { default as restrictedComponent } from "./restricted/restrictedComponent";
+export type { RestrictedComponentOptions } from "./restricted/restrictedComponent";
 export { default as createHttpSource } from "./restricted/http/createHttpSource";
 export { default as httpRequirementKind } from "./restricted/http/httpRequirementKind";
 export { default as deriveRequirementKind } from "./restricted/derive/deriveRequirementKind";

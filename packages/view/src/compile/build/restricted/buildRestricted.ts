@@ -370,17 +370,52 @@ function isFill(node: TemplateNode): node is ElementNode {
 	return isSpecialNode(node) && (node.tagName === "fill" || node.tagName === "filldef");
 }
 
-/** `<slot name="…">fallback</slot>` in a restricted template. */
+/** `<slot name="…">fallback</slot>` in a restricted template. Slot props
+ * (`<slot item={row}/>` — anything but `name`) are evaluated in the
+ * artifact's scope and passed to the incoming slot render, matching the JS
+ * server build. */
 function serializeSlotElement(node: ElementNode, context: Context): RestrictedNode {
 	const nameAttribute = node.attributes.find((attribute) => attribute.name === "name");
 	const name = nameAttribute?.value ? trimQuotes(nameAttribute.value) : "_";
-	if (node.attributes.some((attribute) => attribute.name !== "name")) {
-		context.report(
-			'Slot elements only support the "name" attribute in restricted mode.',
-			node.span.start,
-			node.span.end,
-		);
+
+	const props: RestrictedAttribute[] = [];
+	for (const attribute of node.attributes) {
+		const { name: propName, value, fullyReactive, reactive } = attribute;
+		if (propName === "name") continue;
+		if (propName.startsWith("on") || propName.startsWith(":on")) continue;
+		if (propName.startsWith("&")) {
+			context.report(
+				`Bindings ("${propName}") aren't supported on slot elements in restricted mode.`,
+				attribute.span.start,
+				attribute.span.end,
+			);
+			continue;
+		}
+		if (propName.startsWith(":")) {
+			context.report(
+				`Directives ("${propName}") aren't supported on slot elements in restricted mode.`,
+				attribute.span.start,
+				attribute.span.end,
+			);
+			continue;
+		}
+		if (value === undefined) {
+			props.push({ name: propName });
+			continue;
+		}
+		if (fullyReactive) {
+			props.push({ name: propName, expr: parseExprAt(value, attribute.span.start, context) });
+		} else if (reactive) {
+			context.report(
+				`Mixed static/dynamic slot prop values aren't supported in restricted mode; compute the whole "${propName}" value with an expression.`,
+				attribute.span.start,
+				attribute.span.end,
+			);
+		} else {
+			props.push({ name: propName, value: trimQuotes(value) });
+		}
 	}
+
 	// The parser wraps slot children in filldef/fill special nodes; unwrap
 	// them so the slot node carries its content directly.
 	const children: RestrictedNode[] = [];
@@ -392,7 +427,7 @@ function serializeSlotElement(node: ElementNode, context: Context): RestrictedNo
 			if (serialized !== undefined) children.push(serialized);
 		}
 	}
-	return { t: "slot", name, children };
+	return { t: "slot", name, props, children };
 }
 
 function serializeElement(node: ElementNode, context: Context): RestrictedNode | undefined {

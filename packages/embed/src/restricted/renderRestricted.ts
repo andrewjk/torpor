@@ -7,7 +7,12 @@ import { RUNTIME_VERSION } from "../generated/version";
 import type EmbedArtifact from "../types/EmbedArtifact";
 import evaluateExpr from "./evaluateExpr";
 import resolveDerive from "./derive/resolveDerive";
-import type { RenderRestrictedOptions, RestrictedRenderResult, RestrictedSource } from "./types";
+import type {
+	RenderRestrictedOptions,
+	RestrictedRenderResult,
+	RestrictedSlotRender,
+	RestrictedSource,
+} from "./types";
 
 /**
  * Hydration markers. The JS server build emits these as HTML "bogus comments"
@@ -108,6 +113,7 @@ export default async function renderRestricted(
 	const renderContext: RenderContext = {
 		scope: { $props: props, $data: data, ...state },
 		components,
+		slots: options?.slots,
 		head: "",
 	};
 	const body = await renderNodes(component.markup, renderContext);
@@ -151,6 +157,7 @@ async function resolveData(
 interface RenderContext {
 	scope: Scope;
 	components: Record<string, ServerComponent> | undefined;
+	slots: Record<string, RestrictedSlotRender> | undefined;
 	head: string;
 }
 
@@ -218,10 +225,24 @@ async function renderNode(node: RestrictedNode, context: RenderContext): Promise
 		}
 
 		case "slot": {
-			// A restricted template's own <slot> renders its fallback: there is
-			// no incoming slot content at the top level of renderRestricted.
-			// The JS server build wraps slot regions in hydration markers too.
-			return `${HYDRATION_START_COMMENT}${await renderNodes(node.children, context)}${HYDRATION_END_COMMENT}${ANCHOR_COMMENT}`;
+			// An incoming slot render (cross-artifact: this artifact is being
+			// used as a component and the parent passed a fill) wins over the
+			// fallback. Slot props (<slot item={row}/>) are evaluated in this
+			// artifact's scope and passed to the render — the same contract
+			// as the JS server build. The region keeps its hydration markers.
+			const incoming = context.slots?.[node.name];
+			let content: string;
+			if (incoming !== undefined) {
+				const slotProps: Record<string, unknown> = {};
+				for (const attr of node.props) {
+					slotProps[attr.name] =
+						"expr" in attr ? evaluateExpr(attr.expr, scope) : (attr.value ?? true);
+				}
+				content = await incoming(Object.keys(slotProps).length > 0 ? slotProps : undefined);
+			} else {
+				content = await renderNodes(node.children, context);
+			}
+			return `${HYDRATION_START_COMMENT}${content}${HYDRATION_END_COMMENT}${ANCHOR_COMMENT}`;
 		}
 
 		case "if": {

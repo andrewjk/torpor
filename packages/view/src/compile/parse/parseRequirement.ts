@@ -144,4 +144,13 @@ export function applyRequirementSubstitutions(status: ParseStatus): void {
 			i += 1;
 		}
 	}
+
+	// The injected read keeps every component's `$props` param named: both
+	// builds rename unused params to `_$props`, which would leave the
+	// binding referencing an undefined `$props`. The "$data" entry starts
+	// with "$", so it is also excluded from the root-component extra-prop
+	// binding loop (it is not a real declared prop).
+	for (const component of status.components) {
+		if (!component.props?.length) component.props = ["$data"];
+	}
 }

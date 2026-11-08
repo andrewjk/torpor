@@ -1,6 +1,7 @@
 // Loading and running embeds (client side)
 export { default as mountEmbed } from "./loader/mountEmbed";
 export { default as hydrateEmbed } from "./loader/hydrateEmbed";
+export { default as loadComponent } from "./loader/loadComponent";
 
 // Module-format embeds (real ES modules)
 export { default as mountModuleEmbed } from "./loader/mountModuleEmbed";
