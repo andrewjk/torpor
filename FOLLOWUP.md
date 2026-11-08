@@ -391,17 +391,6 @@ remember sucrase hoists helpers above imports, so saved modules have
 statements before their imports — valid ESM, but worth a smoke test in
 whatever runtime evaluates them first.
 
-### Package-level `fmt` blocks replace the root fmt config
-
-Running `vp fmt .` inside packages/view reformatted the whole package to
-2-space indentation, because the package's `fmt: { ignorePatterns }` block
-_replaces_ the root `fmt` settings (including `useTabs: true`) instead of
-merging with them. Packages without any `fmt` block (e.g. the new
-packages/embed) inherit the root config and format correctly. Either the
-root fmt settings should be merged into partial package blocks, or each
-package block should spell out the full settings — until then, format from
-the repo root only (`pnpm format`).
-
 ### Embed server render isolation is fault isolation, not a security boundary
 
 `renderEmbed({ isolate: true })` renders in a worker thread with a hard

@@ -37,7 +37,22 @@ export default defineConfig({
 		},
 	},
 	fmt: {
-		// TODO: Why doesn't this work?
-		ignorePatterns: ["test/**/output"],
+		// NOTE: a package-level fmt block REPLACES the root fmt config
+		// (vite-plus doesn't merge partial blocks), so this must spell out the
+		// full settings — a partial block here would make `vp fmt .` inside
+		// this package format with tool defaults (2-space, no import order).
+		// Ignore patterns are relative to this package.
+		useTabs: true,
+		printWidth: 100,
+		trailingComma: "all",
+		importOrder: ["^[../]", "^[./]"],
+		importOrderSortSpecifiers: true,
+		sortPackageJson: false,
+		ignorePatterns: [
+			"test/**/*-client.ts",
+			"test/**/*-server.ts",
+			"test/**/*-types.ts",
+			"test/**/output",
+		],
 	},
 }) satisfies UserConfig as UserConfig;
