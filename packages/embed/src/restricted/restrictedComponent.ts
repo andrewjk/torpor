@@ -73,6 +73,14 @@ export default function restrictedComponent(
 			props: (props ?? undefined) as Record<string, any> | undefined,
 			slots: slots as Record<string, RestrictedSlotRender> | undefined,
 		});
-		return { body: result.body, head: result.head };
+		// Inline the artifact's styles into head, matching the JS server
+		// build's component emission (`t_head += "<style id='…'>…</style>"`,
+		// with the same whitespace collapsing) — otherwise a scoped-styled
+		// inner artifact renders unstyled through the boundary. Children'
+		// heads come first, then the artifact's own styles, like the JS build.
+		const styleTags = (artifact.styles ?? [])
+			.map((style) => `<style id='${style.hash}'>${style.style.replaceAll(/\s+/g, " ")}</style>`)
+			.join("");
+		return { body: result.body, head: result.head + styleTags };
 	};
 }

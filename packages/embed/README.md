@@ -258,6 +258,9 @@ inner `<slot item={row}>` evaluates its slot props in its own scope, calls
 the outer fill's render, and falls back to its fallback children when the
 outer passes no fill for that name. `renderRestricted` also takes `slots`
 directly, so a host can supply fills for a top-level restricted template.
+The inner artifact's styles are inlined into `head` as
+`<style id='…'>…</style>` — the same emission as the JS server build — so
+scoped-styled inner components render styled through the boundary.
 
 On the **client**, pass the inner artifact's client build via the outer's
 `scope` — it handles slots natively. An inner artifact with data

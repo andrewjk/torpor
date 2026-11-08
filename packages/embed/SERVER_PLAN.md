@@ -361,6 +361,9 @@ Status: **implemented** (2026-11-08).
 - Client side: the inner artifact's client build rides the outer's `scope`;
   `loadComponent` is exported for the `$data` adapter. Wrapper cycles
   overflow the stack (documented; construct acyclically).
+- Styles: the wrapper inlines the inner artifact's styles into `head` as
+  `<style id='…'>…</style>`, matching the JS server build byte-for-byte
+  (tested against a JS host component doing the same job).
 
 ### Aggregates in derive
 

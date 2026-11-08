@@ -1,3 +1,6 @@
+import { build, parse } from "@torpor/view/compile";
+import * as ssr from "@torpor/view/ssr";
+import { transform } from "sucrase";
 import { expect, test } from "vite-plus/test";
 import {
 	compileRestricted,
@@ -149,4 +152,73 @@ test("hydration: the inner artifact's client build renders via scope", async () 
 	expect(target.querySelectorAll("div.row").length).toBe(2);
 	expect(target.textContent).toContain("Fix login");
 	handle.unmount();
+});
+
+const INNER_STYLED_SOURCE = `
+data tickets from rows { };
+
+export default function TicketList() {
+	@style {
+		.row { padding: 4px; }
+	}
+	@render {
+		@for (t of $data.tickets) {
+			<div class="row">
+				<slot item={t}><span>{t.title}</span></slot>
+			</div>
+		}
+	}
+}
+`;
+
+/** Compiles a torp source into a server component, with the SSR runtime
+ * exports in scope (same harness as restricted-components.test.ts). */
+function compileServerComponent(source: string): unknown {
+	const parsed = parse(source);
+	const built = build(parsed.template!, { server: true, source });
+	// Strip imports before the TS transform (sucrase hoists helpers above them)
+	const code = built.code.replace("export default ", "").replace(/^import\s.+\n/gm, "");
+	const js = transform(code, { transforms: ["typescript"] }).code;
+	const name = parsed.template!.components.find((component) => component.default)!.name!;
+	const make = new Function(...Object.keys(ssr), `${js}\nreturn ${name};`); // eslint-disable-line no-implied-eval
+	return make(...Object.values(ssr));
+}
+
+test("inner artifact styles flow through the boundary like the JS build", async () => {
+	const inner = compileRestricted("ticket-list-styled", INNER_STYLED_SOURCE, {
+		requirementKinds: KINDS,
+	});
+	const outer = compileRestricted("board-styled", OUTER_SOURCE);
+
+	const { body, head } = await renderRestricted(outer, {
+		components: {
+			TicketList: restrictedComponent(inner, { sources: { rows: () => ROWS } }),
+		},
+	});
+
+	// Reference: the same outer source through the real JS server build,
+	// with the JS-built inner component in scope (its style tag lands in
+	// head exactly the way the wrapper must emit it).
+	const parsedPage = parse(OUTER_SOURCE);
+	const builtPage = build(parsedPage.template!, { server: true, source: OUTER_SOURCE });
+	const codePage = builtPage.code.replace("export default ", "").replace(/^import\s.+\n/gm, "");
+	const jsPage = transform(codePage, { transforms: ["typescript"] }).code;
+	const namePage = parsedPage.template!.components.find((component) => component.default)!.name!;
+	const makePage = new Function(
+		...Object.keys(ssr),
+		"TicketList",
+		`${jsPage}\nreturn ${namePage};`,
+	); // eslint-disable-line no-implied-eval
+	// The JS inner reads $data through props, exactly like the restricted
+	// client build — adapt it the same way the host adapts at hydration.
+	const innerJs = compileServerComponent(INNER_STYLED_SOURCE) as any;
+	const adaptedInner = async (props: any, context: any, slots: any) =>
+		innerJs({ ...props, $data: { tickets: ROWS } }, context, slots);
+	const page = makePage(...Object.values(ssr), adaptedInner);
+	const reference = (await page({})) as { body: string; head: string };
+
+	expect(body).toBe(reference.body);
+	expect(head).toBe(reference.head);
+	expect(head).toContain("<style id='");
+	expect(head).toContain("padding: 4px");
 });
