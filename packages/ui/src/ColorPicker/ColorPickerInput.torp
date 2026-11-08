@@ -63,8 +63,15 @@ export default function ColorPickerInput($props: ColorPickerInputProps | undefin
 
 	function handleInput(e: Event) {
 		const el = e.currentTarget as HTMLInputElement;
-		$state.editing = true;
+		// Order matters: while `editing` is false, `display()` only reads the
+		// committed value, so assigning `text` first doesn't re-trigger the
+		// reactive `value` attribute. Flipping `editing` last re-applies
+		// `display()` — which by then returns the new text. The other order
+		// flushes the attribute effect with `text` still at its old value,
+		// wiping the input mid-keystroke (the bug that made hex commits
+		// silently read "" and never fire onchange)
 		$state.text = el.value;
+		$state.editing = true;
 	}
 
 	function handleKey(e: KeyboardEvent) {
