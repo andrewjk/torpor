@@ -2,7 +2,7 @@ import devContext from "../dev/devContext";
 import context from "../render/context";
 import deepWrap from "./deepWrap";
 import propagateSignal from "./propagateSignal";
-import { proxyDataSymbol } from "./symbols";
+import { proxyDataSymbol, proxyKeysSymbol } from "./symbols";
 
 export default function proxySet(
 	target: Record<PropertyKey, any>,
@@ -39,11 +39,19 @@ export default function proxySet(
 			value = deepWrap(value);
 		}
 
+		// Adding a key changes the key set, so effects that enumerated the
+		// object (`Object.keys` etc.) must re-run. (Checked before the set:
+		// `ownKeys`-visible membership is what changed, value or not.)
+		const isNewKey = !Object.prototype.hasOwnProperty.call(target, key);
+
 		// Set the property value on the target
 		Reflect.set(target, key, value, receiver);
 
 		// Re-run effects
 		propagateSignal(data, key);
+		if (isNewKey) {
+			propagateSignal(data, proxyKeysSymbol);
+		}
 
 		// If an item in an array is being set directly, trigger the length to
 		// cause any lists to be re-run and data re-bound

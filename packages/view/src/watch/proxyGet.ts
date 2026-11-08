@@ -10,7 +10,7 @@ import checkComputed from "./checkComputed";
 import deepWrap from "./deepWrap";
 import $unwrap from "./$unwrap";
 import propagateSignal from "./propagateSignal";
-import { proxyDataSymbol } from "./symbols";
+import { proxyDataSymbol, proxyKeysSymbol } from "./symbols";
 import trackProxySignal from "./trackProxySignal";
 import trackSignal from "./trackSignal";
 
@@ -372,6 +372,13 @@ function arrayHandle(data: ProxyData, target: any, key: PropertyKey): Function {
 		const func = target[key];
 		const result = func.apply(target, args);
 		propagateSignal(data, "length");
+		// Structural mutations (push/pop/shift/unshift/splice) change the key
+		// set, so effects that enumerated the array (`Object.keys` etc.) must
+		// re-run too. sort/reverse keep the same keys, so they don't notify
+		// the key-set signal
+		if (key !== "sort" && key !== "reverse") {
+			propagateSignal(data, proxyKeysSymbol);
+		}
 		return result;
 	};
 }

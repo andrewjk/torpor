@@ -1,9 +1,11 @@
 import devContext from "../dev/devContext";
 import type ProxyData from "../types/ProxyData";
 import type WatchOptions from "../types/WatchOptions";
+import propagateSignal from "./propagateSignal";
 import proxyGet from "./proxyGet";
 import proxySet from "./proxySet";
-import { proxyDataSymbol } from "./symbols";
+import trackProxySignal from "./trackProxySignal";
+import { proxyDataSymbol, proxyKeysSymbol } from "./symbols";
 
 // The Proxy handler is stateless — every trap looks up state via the
 // `proxyDataSymbol` property on the target itself — so a single shared
@@ -14,6 +16,29 @@ import { proxyDataSymbol } from "./symbols";
 const sharedHandler: ProxyHandler<Record<PropertyKey, any>> = {
 	get: proxyGet,
 	set: proxySet,
+	ownKeys: (target) => {
+		// Key enumeration (`Object.keys/values/entries`, spread, `for…in`,
+		// `JSON.stringify`) subscribes the reading effect to the key-set
+		// membership signal, so adding or deleting a key re-runs it (the
+		// mutation side propagates the signal in the `set`/`deleteProperty`
+		// traps and the array mutation handles)
+		const data = target[proxyDataSymbol];
+		if (data !== undefined) {
+			trackProxySignal(data, proxyKeysSymbol);
+		}
+		return Reflect.ownKeys(target);
+	},
+	deleteProperty: (target, key) => {
+		const deleted = Reflect.deleteProperty(target, key);
+		const data = target[proxyDataSymbol];
+		if (deleted && data !== undefined) {
+			propagateSignal(data, key);
+			// The key set changed, so effects that enumerated the object
+			// (`Object.keys` etc.) must re-run too
+			propagateSignal(data, proxyKeysSymbol);
+		}
+		return deleted;
+	},
 };
 
 /**
