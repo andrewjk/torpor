@@ -117,7 +117,14 @@ export default async function renderRestricted(
 		head: "",
 	};
 	const body = await renderNodes(component.markup, renderContext);
-	return { body, head: renderContext.head, styles: artifact.styles, data, props };
+	// The renderer injects the *server* bridge into the props it renders with
+	// (`$embed`), but the result is what the host passes to the CLIENT at
+	// hydration — the client bridge is supplied there, and returning a
+	// serialized/empty `$embed` would make the loader skip injecting the real
+	// one (a `$embed` prop wins over `options.bridge`).
+	const clientProps = { ...props };
+	delete (clientProps as Record<string, unknown>).$embed;
+	return { body, head: renderContext.head, styles: artifact.styles, data, props: clientProps };
 }
 
 async function resolveData(
