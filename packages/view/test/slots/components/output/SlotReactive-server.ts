@@ -14,7 +14,7 @@ export default async function SlotReactive(
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = async (
 		_$slot?: Record<PropertyKey, any>,
-		$context?: Record<PropertyKey, any>
+		_$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
 		t_body += `<p>${t_fmt($props.label)}</p>`;

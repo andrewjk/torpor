@@ -13,7 +13,7 @@ export default async function Named(
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = async (
 		_$slot?: Record<PropertyKey, any>,
-		$context?: Record<PropertyKey, any>
+		_$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
 		t_body += `<p> The article's body </p>`;
@@ -21,7 +21,7 @@ export default async function Named(
 	}
 	t_slots_1["header"] = async (
 		_$slot?: Record<PropertyKey, any>,
-		$context?: Record<PropertyKey, any>
+		_$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
 		t_body += ` The article's header `;

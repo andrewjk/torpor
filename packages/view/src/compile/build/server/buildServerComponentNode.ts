@@ -5,6 +5,7 @@ import {
 } from "../../types/comments";
 import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
+import fillUsesContext from "../../utils/fillUsesContext";
 import isSpecialNode from "../../utils/isSpecialNode";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
@@ -91,7 +92,13 @@ export default function buildServerComponentNode(
 					slot.hasSlotProps
 						? "$slot: Record<PropertyKey, any>"
 						: "_$slot?: Record<PropertyKey, any>",
-					"$context?: Record<PropertyKey, any>",
+					// NOTE: Same treatment for $context — only declared with its
+					// real name when the fill forwards it (renders a component
+					// or slot) or reads it directly, otherwise it would be
+					// reported as unused
+					fillUsesContext(slot)
+						? "$context?: Record<PropertyKey, any>"
+						: "_$context?: Record<PropertyKey, any>",
 				];
 				// NOTE: The @ts-ignore suppresses the assignability error from
 				// the required $slot param, which is not compatible with the

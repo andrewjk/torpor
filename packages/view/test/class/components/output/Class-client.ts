@@ -41,7 +41,7 @@ export default function Class(
 		$sparent: ParentNode,
 		$sanchor: Node | null,
 		_$slot?: Record<PropertyKey, any>,
-		$context?: Record<PropertyKey, any>
+		_$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` Class filtered `);
 		const t_root_2 = t_root(t_fragment_2, true);
@@ -64,7 +64,7 @@ export default function Class(
 		$sparent: ParentNode,
 		$sanchor: Node | null,
 		_$slot?: Record<PropertyKey, any>,
-		$context?: Record<PropertyKey, any>
+		_$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_4 = t_fragment($parent.ownerDocument!, t_fragments, 4, ` Child class 1 `);
 		const t_root_4 = t_root(t_fragment_4, true);
@@ -84,7 +84,7 @@ export default function Class(
 		$sparent: ParentNode,
 		$sanchor: Node | null,
 		_$slot?: Record<PropertyKey, any>,
-		$context?: Record<PropertyKey, any>
+		_$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_6 = t_fragment($parent.ownerDocument!, t_fragments, 6, ` Child class 2 `);
 		const t_root_6 = t_root(t_fragment_6, true);

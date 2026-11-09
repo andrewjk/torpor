@@ -53,7 +53,7 @@ export default function Component(
 			$sparent: ParentNode,
 			$sanchor: Node | null,
 			_$slot?: Record<PropertyKey, any>,
-			$context?: Record<PropertyKey, any>
+			_$context?: Record<PropertyKey, any>
 		) => {
 			const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` Hello! `);
 			const t_root_3 = t_root(t_fragment_3, true);

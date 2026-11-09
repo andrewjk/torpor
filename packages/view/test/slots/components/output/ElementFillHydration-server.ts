@@ -18,7 +18,7 @@ export default async function Let(
 	// @ts-ignore
 	t_slots_1["_"] = async (
 		$slot: Record<PropertyKey, any>,
-		$context?: Record<PropertyKey, any>
+		_$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
 		t_body += `<b>${t_fmt($slot.item.text)}</b>`;

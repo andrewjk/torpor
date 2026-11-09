@@ -56,7 +56,7 @@ test("dynamic element with reactive attrs and events -- hydrated", async () => {
 
 test("dynamic element with a static tag renders the tag with children", async () => {
 	const staticSource = `
-export default function StaticTag($props) {
+export default function StaticTag($props: Record<PropertyKey, any>) {
 	@render {
 		<@element self="button" id="target">
 			Content

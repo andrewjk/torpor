@@ -32,7 +32,7 @@ export default function MultipleChildren(
 		$sparent: ParentNode,
 		$sanchor: Node | null,
 		_$slot?: Record<PropertyKey, any>,
-		$context?: Record<PropertyKey, any>
+		_$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<h1>Title</h1> <p>Body text</p> <footer>Footer</footer>`);
 		const t_root_2 = t_root(t_fragment_2);

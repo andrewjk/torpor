@@ -7,7 +7,7 @@ import type SlotRender from "../../../../src/types/SlotRender";
 export default function StaticTag(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props,
+	$props: Record<PropertyKey, any>,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>,
 ): void {

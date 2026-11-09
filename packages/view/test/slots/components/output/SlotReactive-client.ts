@@ -33,7 +33,7 @@ export default function SlotReactive(
 		$sparent: ParentNode,
 		$sanchor: Node | null,
 		_$slot?: Record<PropertyKey, any>,
-		$context?: Record<PropertyKey, any>
+		_$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p>#</p>`);
 		const t_root_2 = t_root_el(t_fragment_2);

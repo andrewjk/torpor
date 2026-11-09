@@ -5,8 +5,6 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
-### `pnpm check` in packages/ui reports unused `$context` in three .torp components
-
 ### Loop-var resolution in @for bodies: read-only bindings (view compiler)
 
 Loop vars are read-only. The compiler emits a per-scope shadow binding

@@ -17,7 +17,7 @@ export default async function Class(
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = async (
 		_$slot?: Record<PropertyKey, any>,
-		$context?: Record<PropertyKey, any>
+		_$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
 		t_body += ` Class filtered `;
@@ -33,7 +33,7 @@ export default async function Class(
 	const t_slots_2: Record<string, ServerSlotRender> = {};
 	t_slots_2["_"] = async (
 		_$slot?: Record<PropertyKey, any>,
-		$context?: Record<PropertyKey, any>
+		_$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
 		t_body += ` Child class 1 `;
@@ -49,7 +49,7 @@ export default async function Class(
 	const t_slots_3: Record<string, ServerSlotRender> = {};
 	t_slots_3["_"] = async (
 		_$slot?: Record<PropertyKey, any>,
-		$context?: Record<PropertyKey, any>
+		_$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
 		t_body += ` Child class 2 `;
