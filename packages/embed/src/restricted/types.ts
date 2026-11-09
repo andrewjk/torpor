@@ -26,6 +26,35 @@ export type RestrictedSource = (
 	context: RestrictedSourceContext,
 ) => unknown; // may be a promise; awaited by the renderer
 
+/**
+ * One resolved data requirement, reported to `renderRestricted`'s
+ * `onAudit` hook — the "record what was read" half of the trusted
+ * boundary. One entry per requirement per render, for host sources and
+ * `derive` alike, on success and failure.
+ */
+export interface RestrictedAuditEntry {
+	/** The artifact whose requirement was resolved. */
+	artifactId: string;
+	/** The requirement name, as it appears in `$data`. */
+	name: string;
+	/** The requirement kind (`"http"`, a host kind, or `"derive"`). */
+	kind: string;
+	/**
+	 * The requirement's inert declaration — the url, the credential
+	 * *name*, the pick path — never fetched data or secrets. Evaluated
+	 * (props resolved) for host source kinds; for `derive`, only the
+	 * fields that evaluate statically (`of`, `limit`, `order`, aggregate
+	 * flags — per-row expressions like `where` are omitted).
+	 */
+	spec: Record<string, unknown>;
+	/** Wall-clock duration of the resolution in milliseconds. */
+	durationMs: number;
+	/** Whether the resolution succeeded. */
+	ok: boolean;
+	/** The error message when the resolution failed. */
+	error?: string;
+}
+
 export interface RenderRestrictedOptions {
 	/** Props for the component (`$props` in the template). */
 	props?: Record<string, any>;
@@ -41,6 +70,15 @@ export interface RenderRestrictedOptions {
 	 * every kind used by the artifact (unless `data` is provided).
 	 */
 	sources?: Record<string, RestrictedSource>;
+
+	/**
+	 * Audit hook: called once per resolved data requirement with what was
+	 * read (see {@link RestrictedAuditEntry}). Fires for host sources and
+	 * `derive` alike, on success and failure — failures are reported, then
+	 * rethrown, so auditing never swallows an error. Not called when the
+	 * host passes pre-resolved `data`, because nothing was read.
+	 */
+	onAudit?: (entry: RestrictedAuditEntry) => void;
 
 	/**
 	 * Host **server components** available to the template, keyed by usage

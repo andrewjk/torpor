@@ -1,6 +1,8 @@
 import { expect, test } from "vite-plus/test";
 import { compileEmbed } from "../src/compile";
 import { compileRestricted, recompileRestricted, renderRestricted } from "../src/restricted";
+import type { RestrictedAuditEntry } from "../src/restricted";
+import { deriveRequirementKind } from "../src/restricted";
 import { mountEmbed } from "../src/index";
 import EmbedCompileError from "../src/types/EmbedCompileError";
 import EmbedVersionError from "../src/types/EmbedVersionError";
@@ -101,6 +103,82 @@ test("async sources are awaited", async () => {
 		sources: { tickets: async () => Promise.resolve(ROWS) },
 	});
 	expect(body).toContain("Printer on fire");
+});
+
+test("onAudit reports each requirement resolution", async () => {
+	const entries: RestrictedAuditEntry[] = [];
+	const { body } = await renderRestricted(artifact(), {
+		props: { queue: "open" },
+		sources: { tickets: () => ROWS },
+		onAudit: (entry) => entries.push(entry),
+	});
+
+	expect(body).toContain("Printer on fire");
+	expect(entries).toHaveLength(1);
+	expect(entries[0].artifactId).toBe("inbox");
+	expect(entries[0].name).toBe("tickets");
+	expect(entries[0].kind).toBe("tickets");
+	expect(entries[0].spec).toEqual({ queue: "open", sort: "recency" });
+	expect(entries[0].ok).toBe(true);
+	expect(entries[0].durationMs).toBeTypeOf("number");
+	expect(entries[0].error).toBeUndefined();
+});
+
+test("onAudit reports failures, then the error still throws", async () => {
+	const entries: RestrictedAuditEntry[] = [];
+	await expect(
+		renderRestricted(artifact(), {
+			props: { queue: "open" },
+			sources: {
+				tickets: () => {
+					throw new Error("tenant forbidden");
+				},
+			},
+			onAudit: (entry) => entries.push(entry),
+		}),
+	).rejects.toThrow(/tenant forbidden/);
+
+	expect(entries).toHaveLength(1);
+	expect(entries[0].ok).toBe(false);
+	expect(entries[0].error).toBe("tenant forbidden");
+});
+
+test("onAudit is not called when data is pre-resolved", async () => {
+	let calls = 0;
+	const { body } = await renderRestricted(artifact(), {
+		props: { queue: "open" },
+		data: { tickets: ROWS },
+		onAudit: () => calls++,
+	});
+	expect(body).toContain("Printer on fire");
+	expect(calls).toBe(0);
+});
+
+test("onAudit covers derive requirements with their static spec", async () => {
+	const statsArtifact = compileRestricted(
+		"stats",
+		`
+data tickets from tickets { queue: "open" };
+data stats from derive { of: "tickets", count: true };
+
+export default function Stats() {
+	@render { <p>{$data.stats.count}</p> }
+}
+`,
+		{ requirementKinds: { tickets: () => {}, derive: deriveRequirementKind } },
+	);
+	const entries: RestrictedAuditEntry[] = [];
+	await renderRestricted(statsArtifact, {
+		sources: { tickets: () => ROWS },
+		onAudit: (entry) => entries.push(entry),
+	});
+
+	// Both requirements audit, in declaration order
+	expect(entries.map((entry) => entry.name)).toEqual(["tickets", "stats"]);
+	// The derive entry carries its statically-evaluable fields only
+	expect(entries[1].kind).toBe("derive");
+	expect(entries[1].spec).toEqual({ of: "tickets", count: true });
+	expect(entries[1].ok).toBe(true);
 });
 
 test("rejects non-restricted artifacts", async () => {

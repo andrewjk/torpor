@@ -9,6 +9,7 @@ import evaluateExpr from "./evaluateExpr";
 import resolveDerive from "./derive/resolveDerive";
 import type {
 	RenderRestrictedOptions,
+	RestrictedAuditEntry,
 	RestrictedRenderResult,
 	RestrictedSlotRender,
 	RestrictedSource,
@@ -89,6 +90,7 @@ export default async function renderRestricted(
 			options?.formatters,
 			props,
 			options?.deriveLimits,
+			options?.onAudit,
 		));
 
 	const component =
@@ -134,13 +136,38 @@ async function resolveData(
 	formatters: Record<string, (...args: unknown[]) => unknown> | undefined,
 	props: Record<string, any>,
 	deriveLimits: import("./derive/resolveDerive").DeriveLimits | undefined,
+	onAudit: ((entry: RestrictedAuditEntry) => void) | undefined,
 ): Promise<Record<string, unknown>> {
 	const data: Record<string, unknown> = {};
 	for (const requirement of program.requirements) {
 		// `derive` is built in: it computes over earlier requirements' rows
 		// with per-row scope, so its expressions are not pre-evaluated here.
 		if (requirement.kind === "derive") {
-			data[requirement.name] = resolveDerive(requirement, data, props, formatters, deriveLimits);
+			const started = nowMs();
+			try {
+				data[requirement.name] = resolveDerive(requirement, data, props, formatters, deriveLimits);
+			} catch (error) {
+				onAudit?.(
+					auditEntry(
+						artifact.id,
+						requirement,
+						auditSpec(requirement, props, formatters),
+						started,
+						false,
+						error,
+					),
+				);
+				throw error;
+			}
+			onAudit?.(
+				auditEntry(
+					artifact.id,
+					requirement,
+					auditSpec(requirement, props, formatters),
+					started,
+					true,
+				),
+			);
 			continue;
 		}
 
@@ -156,9 +183,86 @@ async function resolveData(
 			// formatters); the evaluator reports anything else.
 			spec[key] = evaluateExpr(expr, { $props: props }, formatters);
 		}
-		data[requirement.name] = await source(spec, { artifactId: artifact.id, props });
+		const started = nowMs();
+		try {
+			data[requirement.name] = await source(spec, { artifactId: artifact.id, props });
+		} catch (error) {
+			onAudit?.(auditEntry(artifact.id, requirement, spec, started, false, error));
+			throw error;
+		}
+		onAudit?.(auditEntry(artifact.id, requirement, spec, started, true));
 	}
 	return data;
+}
+
+/** Wall-clock for audit entries (performance where available, Date otherwise). */
+const nowMs = (): number =>
+	typeof performance !== "undefined" && typeof performance.now === "function"
+		? performance.now()
+		: Date.now();
+
+/**
+ * The `derive` spec for an audit entry: its expressions run per row, so
+ * only the fields that evaluate statically (`of`, `limit`, `order`,
+ * aggregate flags) make it in — per-row expressions like `where` are
+ * skipped rather than mis-evaluated without row scope.
+ */
+function auditSpec(
+	requirement: RestrictedProgram["requirements"][number],
+	props: Record<string, any>,
+	formatters: Record<string, (...args: unknown[]) => unknown> | undefined,
+): Record<string, unknown> {
+	const spec: Record<string, unknown> = {};
+	for (const [key, expr] of Object.entries(requirement.spec)) {
+		let value: unknown;
+		try {
+			value = evaluateExpr(expr, { $props: props }, formatters);
+		} catch {
+			continue; // references row scope ($item/$index) — not a static field
+		}
+		if (
+			value === null ||
+			typeof value === "string" ||
+			typeof value === "number" ||
+			typeof value === "boolean"
+		) {
+			spec[key] = value;
+		}
+	}
+	return spec;
+}
+
+function auditEntry(
+	artifactId: string,
+	requirement: RestrictedProgram["requirements"][number],
+	spec: Record<string, unknown>,
+	started: number,
+	ok: boolean,
+	error?: unknown,
+): RestrictedAuditEntry {
+	return {
+		artifactId,
+		name: requirement.name,
+		kind: requirement.kind,
+		spec,
+		durationMs: nowMs() - started,
+		ok,
+		error: error === undefined ? undefined : errorMessage(error),
+	};
+}
+
+function errorMessage(error: unknown): string {
+	if (error instanceof Error) return error.message;
+	if (typeof error === "string") return error;
+	if (typeof error === "number" || typeof error === "boolean" || typeof error === "bigint") {
+		return String(error);
+	}
+	// Objects (and anything else JSON can't represent) stringify or fall back
+	try {
+		return JSON.stringify(error) ?? "Unknown error";
+	} catch {
+		return "Unknown error";
+	}
 }
 
 interface RenderContext {

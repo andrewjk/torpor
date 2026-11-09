@@ -437,6 +437,27 @@ const { body } = await renderRestricted(artifact, {
 - Host functions are not available to template expressions; a missing
   formatter fails loudly, naming it.
 
+### Audit trail
+
+`renderRestricted` takes `onAudit`, called once per resolved data
+requirement with what was read — the "record what was read" half of the
+trusted boundary:
+
+```ts
+const { body } = await renderRestricted(artifact, {
+	sources,
+	onAudit: (entry) => log.info("embed-read", entry), // artifactId, name, kind, spec, durationMs, ok, error?
+});
+```
+
+Entries fire for host sources and `derive` alike, in declaration order, on
+success and failure (failures are reported, then rethrown — auditing never
+swallows an error). No entries when the host passes pre-resolved `data`,
+because nothing was read. The `spec` in an entry is the inert declaration —
+the url, the credential _name_, the pick path — never fetched data or
+secrets. Wrapping an inner artifact with `restrictedComponent` passes your
+`onAudit` through, so reads behind the component boundary are audited too.
+
 ## Module-format artifacts
 
 By default artifacts compile to _globals format_: imports stripped, run by

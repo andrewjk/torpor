@@ -18,6 +18,7 @@ export type {
 export type { CompileRestrictedOptions } from "./restricted/compileRestricted";
 export type {
 	RenderRestrictedOptions,
+	RestrictedAuditEntry,
 	RestrictedRenderResult,
 	RestrictedSlotRender,
 	RestrictedSource,
