@@ -93,6 +93,18 @@ export interface RestrictedRenderResult {
 	body: string;
 	head: string;
 	styles: EmbedStyle[];
+	/**
+	 * The resolved data bag: the requirement values the program was rendered
+	 * against (from `sources`, or passed pre-resolved via `data`), keyed by
+	 * requirement name. Hosts need this to hydrate — the client build binds
+	 * `$data` from props, per the paint-then-mount contract.
+	 */
+	data: Record<string, unknown>;
+	/**
+	 * The props the program was rendered with (embed defaults merged with the
+	 * caller's), which the client build must also receive at hydration.
+	 */
+	props: Record<string, any>;
 }
 
 /**

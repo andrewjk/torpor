@@ -1,7 +1,7 @@
 import { unmount } from "@torpor/view";
 import checkVersion from "../checkVersion";
 import embedProps from "../bridge/embedProps";
-import getRuntimeVersion from "../server/getRuntimeVersion";
+import { RUNTIME_VERSION } from "../generated/version";
 import type EmbedArtifact from "../types/EmbedArtifact";
 import type EmbedHandle from "../types/EmbedHandle";
 import type EmbedOptions from "../types/EmbedOptions";
@@ -29,15 +29,18 @@ const namespaceCache = new WeakMap<EmbedArtifact, Promise<{ default: unknown }>>
 
 /**
  * The parts of mountModuleEmbed/hydrateModuleEmbed that differ from the
- * globals loader: async component loading plus a version check against the
- * installed runtime by default (module code imports the runtime itself, so
- * a mismatch is a broken page, not a subtle behavior change).
+ * globals loader: async component loading plus a version check. The default
+ * expected version is the one this package was built against — the installed
+ * package version is deliberately NOT read here, because this loader runs in
+ * browsers too (the Node-only `getRuntimeVersion` remains available from
+ * `@torpor/embed/server` for hosts that want it, and can be passed explicitly
+ * via `runtimeVersion`).
  */
 export async function prepareModule(
 	artifact: EmbedArtifact,
 	options?: ModuleEmbedOptions,
 ): Promise<{ component: unknown }> {
-	const expected = options?.runtimeVersion ?? getRuntimeVersion();
+	const expected = options?.runtimeVersion ?? RUNTIME_VERSION;
 	checkVersion(artifact.version, expected, {
 		allowMismatch: options?.allowVersionMismatch,
 	});

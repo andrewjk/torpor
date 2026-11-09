@@ -1,4 +1,5 @@
 import type RequirementDeclaration from "../types/RequirementDeclaration";
+import type Template from "../../types/Template";
 import type ParseStatus from "./ParseStatus";
 import { skipStringOrComment } from "../utils/codeScanner";
 import addError from "./utils/addError";
@@ -115,7 +116,6 @@ export default function tryParseRequirement(status: ParseStatus): boolean {
  */
 export function applyRequirementSubstitutions(status: ParseStatus): void {
 	if (status.requirements.length === 0) return;
-
 	for (const chunk of status.script) {
 		const replacements = status.requirements
 			.filter(
@@ -151,6 +151,29 @@ export function applyRequirementSubstitutions(status: ParseStatus): void {
 	// with "$", so it is also excluded from the root-component extra-prop
 	// binding loop (it is not a real declared prop).
 	for (const component of status.components) {
+		if (!component.props?.length) component.props = ["$data"];
+	}
+}
+
+/**
+ * Binds `$data` in a parsed template whose requirements come from an **app
+ * manifest** instead of in-source `data … from …` declarations. Same effect
+ * as the binding `applyRequirementSubstitutions` installs at parse time —
+ * without it the client build references an undeclared `$data`.
+ */
+export function bindDataTemplate(template: Template): void {
+	// Insert the binding as its own chunk after the `/* @start */` marker:
+	// the builds match that marker by exact string, so it must stay intact.
+	for (let i = 0; i < template.script.length; i++) {
+		if (template.script[i].script === "/* @start */") {
+			template.script.splice(i + 1, 0, {
+				script: " let $data = $props?.$data ?? {};",
+				span: { start: 0, end: 0 },
+			});
+			i += 1;
+		}
+	}
+	for (const component of template.components) {
 		if (!component.props?.length) component.props = ["$data"];
 	}
 }

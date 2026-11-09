@@ -27,6 +27,12 @@
 			"types": "./dist/restricted.d.mts",
 			"import": "./dist/restricted.mjs",
 			"require": "./dist/restricted.cjs"
+		},
+		"./app": {
+			"torpor:source": "./src/app.ts",
+			"types": "./dist/app.d.mts",
+			"import": "./dist/app.mjs",
+			"require": "./dist/app.cjs"
 		}
 	},
 	"files": [

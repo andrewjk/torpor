@@ -117,7 +117,7 @@ export default async function renderRestricted(
 		head: "",
 	};
 	const body = await renderNodes(component.markup, renderContext);
-	return { body, head: renderContext.head, styles: artifact.styles };
+	return { body, head: renderContext.head, styles: artifact.styles, data, props };
 }
 
 async function resolveData(

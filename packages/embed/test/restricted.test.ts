@@ -58,7 +58,7 @@ test("compiles a restricted artifact with a serialized server build", () => {
 
 test("renders with a first-party source, resolving props in the spec", async () => {
 	const specs: Record<string, unknown>[] = [];
-	const { body, head, styles } = await renderRestricted(artifact(), {
+	const { body, head, styles, data } = await renderRestricted(artifact(), {
 		props: { queue: "open" },
 		sources: {
 			tickets: (spec) => {
@@ -77,6 +77,8 @@ test("renders with a first-party source, resolving props in the spec", async () 
 	expect(body).toContain("&lt;script&gt;");
 	expect(head).toBe("");
 	expect(styles.length).toBe(1);
+	// The resolved bag comes back for hydration (paint-then-mount)
+	expect(data.tickets).toEqual(ROWS);
 });
 
 test("accepts pre-resolved data and skips sources", async () => {

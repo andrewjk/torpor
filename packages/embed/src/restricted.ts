@@ -15,6 +15,7 @@ export type { CompileRestrictedOptions } from "./restricted/compileRestricted";
 export type {
 	RenderRestrictedOptions,
 	RestrictedRenderResult,
+	RestrictedSlotRender,
 	RestrictedSource,
 	RestrictedSourceContext,
 } from "./restricted/types";

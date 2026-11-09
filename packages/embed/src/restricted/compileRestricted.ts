@@ -1,5 +1,6 @@
-import { build, buildRestricted, parse } from "@torpor/view/compile";
+import { bindDataTemplate, build, buildRestricted, parse } from "@torpor/view/compile";
 import type { CompileError, RestrictedRequirementKindValidator } from "@torpor/view/compile";
+import { type ManifestRequirement, manifestRequirements } from "../app";
 import { checkMaxSourceBytes, scanImports, toClientCode } from "../compile/compileEmbed";
 import { RUNTIME_VERSION } from "../generated/version";
 import EmbedCompileError from "../types/EmbedCompileError";
@@ -24,6 +25,13 @@ export interface CompileRestrictedOptions {
 	 * source the host doesn't enable finds out at save time.
 	 */
 	requirementKinds?: Record<string, RestrictedRequirementKindValidator>;
+
+	/**
+	 * Data requirements as an app manifest (`defineApp().data`) instead of
+	 * in-torp `data … from …` declarations, so the template stays plain
+	 * torpor. Use one style or the other, not both.
+	 */
+	data?: Record<string, ManifestRequirement>;
 
 	/** Host metadata carried through recompiles. */
 	meta?: Record<string, unknown>;
@@ -79,6 +87,34 @@ export default function compileRestricted(
 		throw new EmbedCompileError(restricted.errors);
 	}
 
+	// Data requirements come from the manifest (plain-torpor templates) or
+	// the in-torp `data … from …` declarations, never both
+	let requirements = restricted.program.requirements;
+	if (options?.data !== undefined) {
+		if (requirements.length > 0) {
+			const error: CompileError = {
+				message:
+					"Declare data requirements in the app manifest or as `data … from …` in the source, not both.",
+				startIndex: 0,
+				startLine: 0,
+				startChar: 0,
+				endIndex: 0,
+				endLine: 0,
+				endChar: 0,
+			};
+			throw new EmbedCompileError([error]);
+		}
+		const manifest = manifestRequirements(options.data, options.requirementKinds);
+		if (manifest.errors.length > 0) {
+			throw new EmbedCompileError(manifest.errors);
+		}
+		requirements = manifest.requirements;
+		// The in-source path binds `$data` at parse time; a manifest has no
+		// declarations to scan, so install the same binding for the client
+		// build (`$props.$data` is where the host passes the resolved bag)
+		bindDataTemplate(template);
+	}
+
 	const client = build(template, { preserveWhitespace: options?.preserveWhitespace });
 	if (client.errors.length > 0) {
 		throw new EmbedCompileError(client.errors);
@@ -94,7 +130,7 @@ export default function compileRestricted(
 		format: "restricted",
 		imports: imports.length > 0 ? imports : undefined,
 		client: { code: toClientCode(client.code) },
-		server: { template: restricted.program },
+		server: { template: { ...restricted.program, requirements } },
 		styles: restricted.styles,
 		meta: options?.meta,
 	};
