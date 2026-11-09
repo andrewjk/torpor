@@ -1,0 +1,34 @@
+export default function SubmissionsPage($props: {
+	data: { submissions: { app: string; text: string; at: string }[] };
+}) {
+	@head {
+		<title>Submissions | Embed host</title>
+	}
+
+	@render {
+		<h1>Submissions</h1>
+		<p>Anything an embedded app sends through the bridge lands here.</p>
+		@if ($props.data.submissions.length === 0) {
+			<p>Nothing yet — try the guest book or word lookup.</p>
+		} @else {
+			<table>
+				<thead>
+					<tr>
+						<th>App</th>
+						<th>Text</th>
+						<th>When</th>
+					</tr>
+				</thead>
+				<tbody>
+					@for (entry of $props.data.submissions) {
+						<tr>
+							<td>{entry.app}</td>
+							<td>{entry.text}</td>
+							<td>{entry.at}</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+	}
+}

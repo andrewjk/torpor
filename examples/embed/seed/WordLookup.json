@@ -1,0 +1,17 @@
+{
+	"id": "word-lookup",
+	"props": { "word": "serendipity" },
+	"data": {
+		"entry": {
+			"kind": "http",
+			"url": "https://api.datamuse.com/words",
+			"params": {
+				"sp": "$props.word",
+				"md": "d",
+				"max": 1
+			},
+			"pick": "0",
+			"limit": 1
+		}
+	}
+}

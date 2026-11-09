@@ -1,0 +1,153 @@
+/**
+ * GuestBook — sign the host's guest book from inside an embedded app, and
+ * see who else has signed.
+ *
+ * No data requirement: the app is a form whose handlers call the bridge
+ * (`$props.$embed.invoke`). The host stores signatures and answers with the
+ * running count; `signatures` returns the names, which land in `$watch`
+ * state and render reactively.
+ */
+export default function GuestBook($props: {
+	$embed?: { invoke?: (method: string, payload?: unknown) => Promise<any> };
+}) {
+	let $state = $watch({ name: "", status: "", signing: false, names: [] });
+
+	async function refresh() {
+		try {
+			const reply = await $props.$embed?.invoke?.("signatures");
+			if (Array.isArray(reply?.names)) $state.names = reply.names;
+		} catch {
+			// Leave the current list; the form still works
+		}
+	}
+
+	$onmount(() => {
+		refresh();
+	});
+
+	async function sign() {
+		const text = $state.name.trim();
+		if (text === "" || $state.signing) return;
+		$state.signing = true;
+		$state.status = "Signing…";
+		try {
+			const reply = await $props.$embed?.invoke?.("submit", { app: "guest-book", text });
+			if (reply?.ok) {
+				$state.status = `Thanks, ${text}!`;
+				$state.name = "";
+				await refresh();
+			} else {
+				$state.status = "Couldn't sign the guest book.";
+			}
+		} catch {
+			$state.status = "Couldn't sign the guest book.";
+		}
+		$state.signing = false;
+	}
+
+	@render {
+		<div class="gb-app">
+			<p class="gb-title">Guest book</p>
+			<p class="gb-blurb">Leave your name — it's submitted to the host, not stored in this app.</p>
+			<div class="gb-row">
+				<input
+					class="gb-input"
+					type="text"
+					placeholder="Your name"
+					value={$state.name}
+					oninput={(e: InputEvent) => {
+						$state.name = (e.currentTarget as HTMLInputElement).value;
+					}}
+					onkeydown={(e: KeyboardEvent) => {
+						if (e.key === "Enter") sign();
+					}}
+				/>
+				<button class="gb-btn" type="button" onclick={sign} disabled={$state.signing}>
+					Sign
+				</button>
+			</div>
+			@if ($state.status) {
+				<p class="gb-status">{$state.status}</p>
+			}
+
+			<p class="gb-heading">Signed so far ({$state.names.length})</p>
+			@if ($state.names.length === 0) {
+				<p class="gb-empty">No signatures yet.</p>
+			} @else {
+				<ul class="gb-names">
+					@for (name of $state.names) {
+						<li>{name}</li>
+					}
+				</ul>
+			}
+		</div>
+	}
+
+	@style {
+		.gb-app {
+			font-family: system-ui, sans-serif;
+			max-width: 340px;
+			margin: 0 auto;
+			padding: 14px;
+			color: #e8eaf2;
+			background: #14161f;
+			border-radius: 12px;
+		}
+		.gb-title {
+			font-size: 20px;
+			font-weight: 700;
+			margin: 0 0 4px;
+		}
+		.gb-blurb {
+			color: #9aa1b5;
+			font-size: 13px;
+			margin: 0 0 12px;
+		}
+		.gb-row {
+			display: flex;
+			gap: 8px;
+		}
+		.gb-input {
+			flex: 1;
+			min-width: 0;
+			padding: 8px 10px;
+			border-radius: 8px;
+			border: 1px solid #2b3147;
+			background: #0f1118;
+			color: #e8eaf2;
+		}
+		.gb-btn {
+			padding: 8px 14px;
+			border-radius: 8px;
+			border: 1px solid #2b3147;
+			background: #1d2130;
+			color: #e8eaf2;
+			cursor: pointer;
+		}
+		.gb-btn:disabled {
+			opacity: 0.5;
+			cursor: wait;
+		}
+		.gb-status {
+			margin: 10px 0 0;
+			color: #9aa1b5;
+			font-size: 13px;
+		}
+		.gb-heading {
+			margin: 14px 0 4px;
+			color: #9aa1b5;
+			font-size: 13px;
+		}
+		.gb-empty {
+			margin: 0;
+			color: #9aa1b5;
+			font-size: 13px;
+		}
+		.gb-names {
+			margin: 4px 0 0;
+			padding-left: 18px;
+			color: #c9cee0;
+			font-size: 14px;
+		}
+	}
+}

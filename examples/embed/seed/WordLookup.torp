@@ -1,0 +1,147 @@
+/**
+ * WordLookup — a dictionary card over Datamuse (WordNet definitions).
+ *
+ * The initial word comes from the manifest's `data entry from http`
+ * requirement (free, keyless Datamuse). The form looks up any other word
+ * through the bridge — the host resolves it server-side through the same
+ * data policy and returns `{ word, defs }`, which lands in `$watch` state
+ * and renders reactively. The host also records looked-up words.
+ *
+ * Template expressions can't call the bridge; the component's event handlers
+ * are client JS and can, receiving it as the reserved `$props.$embed` prop.
+ */
+export default function WordLookup($props: {
+	word: string;
+	$embed?: { invoke?: (method: string, payload?: unknown) => Promise<any> };
+}) {
+	let $state = $watch({
+		show: false,
+		query: "",
+		status: "",
+		lookup: null,
+	});
+
+	function toggle() {
+		$state.show = !$state.show;
+	}
+
+	async function lookUp() {
+		const word = $state.query.trim();
+		if (word === "") return;
+		$state.status = "Looking up…";
+		try {
+			const reply = await $props.$embed?.invoke?.("lookup", { word });
+			if (reply?.ok && Array.isArray(reply.defs)) {
+				$state.lookup = { word: reply.word, defs: reply.defs };
+				$state.status = "";
+				$state.query = "";
+			} else {
+				$state.status = reply?.error ?? "Lookup failed";
+			}
+		} catch {
+			$state.status = "Lookup failed";
+		}
+	}
+
+	@render {
+		<div class="wl-app">
+			<p class="wl-word">{$state.lookup ? $state.lookup.word : $props.word}</p>
+
+			@if ($state.lookup) {
+				@if ($state.lookup.defs.length === 0) {
+					<p class="wl-def">No definitions found.</p>
+				} @else {
+					@for (def of $state.lookup.defs) {
+						<p class="wl-def">{def}</p>
+					}
+				}
+			} @else {
+				<button class="wl-btn" type="button" onclick={toggle}>
+					@if ($state.show) {
+						<span>Hide definitions</span>
+					} @else {
+						<span>Show definitions</span>
+					}
+				</button>
+				@if ($state.show) {
+					@if ($data.entry.defs.length === 0) {
+						<p class="wl-def">No definitions found.</p>
+					} @else {
+						@for (def of $data.entry.defs) {
+							<p class="wl-def">{def}</p>
+						}
+					}
+				}
+			}
+
+			<div class="wl-submit">
+				<input
+					class="wl-input"
+					type="text"
+					placeholder="Look up a word"
+					value={$state.query}
+					oninput={(e: InputEvent) => {
+						$state.query = (e.currentTarget as HTMLInputElement).value;
+					}}
+					onkeydown={(e: KeyboardEvent) => {
+						if (e.key === "Enter") lookUp();
+					}}
+				/>
+				<button class="wl-btn" type="button" onclick={lookUp}>Look up</button>
+			</div>
+			@if ($state.status) {
+				<p class="wl-status">{$state.status}</p>
+			}
+		</div>
+	}
+
+	@style {
+		.wl-app {
+			font-family: system-ui, sans-serif;
+			max-width: 340px;
+			margin: 0 auto;
+			padding: 14px;
+			color: #e8eaf2;
+			background: #14161f;
+			border-radius: 12px;
+		}
+		.wl-word {
+			font-size: 22px;
+			font-weight: 700;
+			margin: 0 0 8px;
+		}
+		.wl-btn {
+			padding: 8px 14px;
+			border-radius: 8px;
+			border: 1px solid #2b3147;
+			background: #1d2130;
+			color: #e8eaf2;
+			cursor: pointer;
+		}
+		.wl-def {
+			margin: 10px 0 0;
+			color: #c9cee0;
+			font-size: 14px;
+			line-height: 1.45;
+		}
+		.wl-submit {
+			display: flex;
+			gap: 8px;
+			margin-top: 14px;
+		}
+		.wl-input {
+			flex: 1;
+			min-width: 0;
+			padding: 8px 10px;
+			border-radius: 8px;
+			border: 1px solid #2b3147;
+			background: #0f1118;
+			color: #e8eaf2;
+		}
+		.wl-status {
+			margin: 8px 0 0;
+			color: #9aa1b5;
+			font-size: 13px;
+		}
+	}
+}

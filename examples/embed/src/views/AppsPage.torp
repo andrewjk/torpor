@@ -1,0 +1,26 @@
+export default function AppsPage($props: { data: { apps: { id: string; name: string }[] } }) {
+	@head {
+		<title>Deployed apps</title>
+	}
+
+	@render {
+		<h1>Deployed apps</h1>
+		@if ($props.data.apps.length === 0) {
+			<p>No apps deployed yet.</p>
+		} @else {
+			<ul>
+				@for (let app of $props.data.apps) {
+					<li>
+						<a href={`/apps/${app.id}`}>{app.name} ({app.id})</a>
+					</li>
+				}
+			</ul>
+		}
+		<p>
+			Deploy another with <code>POST /artifacts</code> — the site needs no changes.
+		</p>
+		<p>
+			Bridge submissions: <a href="/submissions">/submissions</a>
+		</p>
+	}
+}

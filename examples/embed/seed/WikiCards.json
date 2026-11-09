@@ -1,0 +1,26 @@
+{
+	"id": "wiki-cards",
+	"props": { "titles": "Sun|Moon|Mars|Jupiter|Saturn|Venus" },
+	"data": {
+		"cards": {
+			"kind": "http",
+			"url": "https://en.wikipedia.org/w/api.php",
+			"params": {
+				"action": "query",
+				"format": "json",
+				"formatversion": 2,
+				"redirects": 1,
+				"prop": "extracts|pageimages",
+				"exintro": 1,
+				"explaintext": 1,
+				"exlimit": 12,
+				"pilimit": 12,
+				"piprop": "thumbnail",
+				"pithumbsize": 320,
+				"titles": "$props.titles"
+			},
+			"pick": "query.pages",
+			"limit": 12
+		}
+	}
+}

@@ -1,0 +1,50 @@
+import { hydrateEmbed } from "@torpor/embed";
+import { bridge } from "@/lib/bridge";
+
+interface AppPageData {
+	id: string;
+	name: string;
+	html: string;
+	styles: { style: string; hash: string }[];
+	props: Record<string, unknown>;
+	data: Record<string, unknown>;
+}
+
+/**
+ * The app page: the site renders the embed fragment server-side (in
+ * `+page.server.ts`) and this component hydrates it after mount. The site
+ * bundles the embed SDK + runtime itself, so no import map or inline scripts
+ * are needed — and client-side navigation to another app works too.
+ */
+export default function AppPage($props: { data: AppPageData }) {
+	let root: HTMLElement | undefined;
+
+	$onmount(() => {
+		// The paint is already in the DOM; bind the embed's client build to it
+		// with the same props and data bag the server rendered with
+		fetch(`/artifact.json?id=${encodeURIComponent($props.data.id)}`)
+			.then((response) => response.json())
+			.then((artifact) => {
+				if (!root) return;
+				hydrateEmbed(
+					root,
+					artifact,
+					{ ...$props.data.props, $data: $props.data.data },
+					{ styles: false, bridge },
+				);
+			});
+	});
+
+	@head {
+		<title>{$props.data.name} | Embed host</title>
+	}
+
+	@render {
+		<div id="embed-root" &ref={root}>
+			@html($props.data.html)
+		</div>
+		@for (let style of $props.data.styles) {
+			<style>{style.style}</style>
+		}
+	}
+}

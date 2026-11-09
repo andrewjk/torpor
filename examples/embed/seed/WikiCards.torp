@@ -1,0 +1,239 @@
+/**
+ * WikiCards — a flashcard game over a curated subset of Wikipedia.
+ *
+ * A **restricted** embed: no arbitrary client JS ever ships from this file.
+ * The server build is a serialized instruction tree (no JS, no eval) that
+ * the host renders to HTML; the client build hydrates that HTML with real
+ * `@torpor/view` reactivity.
+ *
+ * The data requirement lives in the app manifest (`WikiCards.json`), not in
+ * this file: the template stays plain torpor, and the host compiles the
+ * manifest against its registered requirement kinds. The manifest's http
+ * request is gated at render time by the operator's egress policy
+ * (`host.config.ts`).
+ *
+ * State: `$watch` initializers may only read `$props`; everything else is
+ * mutated by the client handlers after hydration, so the initial paint is
+ * computed without running author code.
+ */
+export default function WikiCards($props: { titles: string }) {
+	let $state = $watch({ index: 0, flipped: false, got: 0, missed: 0, done: false });
+
+	function flip() {
+		if ($state.done) return;
+		$state.flipped = !$state.flipped;
+	}
+
+	function next() {
+		if ($state.index + 1 >= $data.cards.length) {
+			$state.done = true;
+		} else {
+			$state.index++;
+		}
+		$state.flipped = false;
+	}
+
+	function got() {
+		if ($state.done || !$state.flipped) return;
+		$state.got++;
+		next();
+	}
+
+	function missed() {
+		if ($state.done || !$state.flipped) return;
+		$state.missed++;
+		next();
+	}
+
+	@render {
+		<div class="wc-app">
+			<div class="wc-header">
+				<span class="wc-title">WikiCards</span>
+				<span class="wc-score">✓ {$state.got} · ✗ {$state.missed}</span>
+			</div>
+
+			@if ($data.cards.length === 0) {
+				<p class="wc-status" aria-live="polite">No cards loaded.</p>
+			} @else if ($state.done) {
+				<div class="wc-done" aria-live="polite">
+					<p class="wc-done-score">{$state.got} / {$data.cards.length}</p>
+					<p>Reload the page for a fresh deck.</p>
+				</div>
+			} @else {
+				<p class="wc-progress">Card {$state.index + 1} of {$data.cards.length}</p>
+				<div
+					class={["wc-card", $state.flipped ? "wc-flipped" : ""]}
+					role="button"
+					tabindex="0"
+					aria-label={$state.flipped ? "Show the term" : "Show the description"}
+					onclick={flip}
+				>
+					<span class="wc-inner">
+						<span class="wc-face wc-front">
+							<span class="wc-term">{$data.cards[$state.index].title}</span>
+							<span class="wc-hint">Tap to reveal</span>
+						</span>
+						<span class="wc-face wc-back">
+							@if ($data.cards[$state.index].thumbnail) {
+								<img
+									class="wc-img"
+									src={$data.cards[$state.index].thumbnail.source}
+									alt=""
+								/>
+							}
+							<span class="wc-text">{$data.cards[$state.index].extract}</span>
+							<a
+								class="wc-link"
+								href={"https://en.wikipedia.org/wiki/" + $data.cards[$state.index].title}
+								target="_blank"
+								rel="noreferrer"
+							>Read on Wikipedia ↗</a>
+						</span>
+					</span>
+				</div>
+				@if ($state.flipped) {
+					<div class="wc-actions">
+						<button class="wc-btn wc-bad" type="button" onclick={missed}>
+							Missed it
+						</button>
+						<button class="wc-btn wc-good" type="button" onclick={got}>
+							Got it
+						</button>
+					</div>
+				}
+			}
+		</div>
+	}
+
+	@style {
+		.wc-app {
+			font-family: system-ui, sans-serif;
+			max-width: 340px;
+			margin: 0 auto;
+			padding: 14px;
+			color: #e8eaf2;
+			background: #14161f;
+			border-radius: 12px;
+		}
+		.wc-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: baseline;
+			margin-bottom: 10px;
+		}
+		.wc-title {
+			font-weight: 700;
+			font-size: 15px;
+		}
+		.wc-score {
+			font-variant-numeric: tabular-nums;
+			color: #9aa1b5;
+			font-size: 13px;
+		}
+		.wc-progress,
+		.wc-status {
+			color: #9aa1b5;
+			font-size: 13px;
+			margin: 4px 0 8px;
+		}
+		.wc-card {
+			perspective: 900px;
+			display: block;
+			width: 100%;
+			cursor: pointer;
+		}
+		.wc-card:focus .wc-inner {
+			outline: 2px solid #7aa2ff;
+			border-radius: 12px;
+		}
+		.wc-inner {
+			display: block;
+			position: relative;
+			width: 100%;
+			height: 230px;
+			transform-style: preserve-3d;
+			transition: transform 0.35s ease;
+		}
+		.wc-card.wc-flipped .wc-inner {
+			transform: rotateY(180deg);
+		}
+		.wc-face {
+			position: absolute;
+			inset: 0;
+			backface-visibility: hidden;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			padding: 14px;
+			border-radius: 12px;
+			background: #1d2130;
+			border: 1px solid #2b3147;
+			text-align: center;
+		}
+		.wc-back {
+			transform: rotateY(180deg);
+			justify-content: flex-start;
+			overflow: auto;
+		}
+		.wc-term {
+			font-size: 26px;
+			font-weight: 700;
+		}
+		.wc-hint {
+			color: #9aa1b5;
+			font-size: 12px;
+		}
+		.wc-img {
+			width: 100%;
+			height: 90px;
+			object-fit: cover;
+			border-radius: 8px;
+		}
+		.wc-text {
+			font-size: 13px;
+			line-height: 1.45;
+			color: #c9cee0;
+		}
+		.wc-link {
+			color: #7aa2ff;
+			font-size: 12px;
+		}
+		.wc-actions {
+			display: flex;
+			gap: 8px;
+			margin-top: 10px;
+		}
+		.wc-btn {
+			flex: 1;
+			padding: 9px 0;
+			border-radius: 8px;
+			border: 1px solid #2b3147;
+			background: #1d2130;
+			color: #e8eaf2;
+			font-size: 14px;
+			cursor: pointer;
+		}
+		.wc-btn:hover {
+			background: #262b3d;
+		}
+		.wc-good {
+			background: #1d3a2a;
+			border-color: #2f5c41;
+		}
+		.wc-bad {
+			background: #3a1d1d;
+			border-color: #5c2f2f;
+		}
+		.wc-done {
+			text-align: center;
+			padding: 24px 0;
+		}
+		.wc-done-score {
+			font-size: 34px;
+			font-weight: 700;
+			margin: 0 0 6px;
+		}
+	}
+}
