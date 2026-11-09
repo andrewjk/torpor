@@ -141,3 +141,66 @@ test("the default bridge warns on first use when nothing is wired up", async () 
 		console.warn = warn;
 	}
 });
+
+test("push targets by artifactId and unsubscribe stops delivery", () => {
+	const bridge = createBridge({});
+	const seen: unknown[] = [];
+	const scoped = scopeBridge(bridge, { artifactId: "e1" });
+	const off = scoped.on?.("data", (detail) => seen.push(detail));
+	expect(typeof off).toBe("function");
+
+	bridge.push("data", 1); // broadcast
+	bridge.push("data", 2, "e1"); // targeted match
+	bridge.push("data", 3, "other"); // targeted miss
+	expect(seen).toEqual([1, 2]);
+
+	off?.();
+	bridge.push("data", 4);
+	expect(seen).toEqual([1, 2]);
+});
+
+test("the scoped bridge omits push", () => {
+	const scoped = scopeBridge(createBridge({}), { artifactId: "e1" });
+	expect((scoped as { push?: unknown }).push).toBeUndefined();
+	expect(typeof scoped.on).toBe("function");
+});
+
+const LIVE_SOURCE = `
+export default function LiveCounter($props: { $embed: any }) {
+	let state = $watch({ count: 0 });
+	$props.$embed.on("count", (detail: any) => {
+		state.count = Number(detail);
+	});
+	@render {
+		<p>{state.count}</p>
+	}
+}
+`;
+
+function liveArtifact(): EmbedArtifact {
+	return compileEmbed("live-counter", LIVE_SOURCE);
+}
+
+test("push updates a mounted embed reactively", async () => {
+	const bridge = createBridge({});
+	const target = document.createElement("div");
+	document.body.appendChild(target);
+	mountEmbed(target, liveArtifact(), {}, { bridge });
+
+	expect(target.querySelector("p")?.textContent).toBe("0");
+
+	// Broadcast reaches the embed; the handler's $watch update re-renders
+	bridge.push("count", 5);
+	await tick();
+	expect(target.querySelector("p")?.textContent).toBe("5");
+
+	// Targeted at another artifact: no update
+	bridge.push("count", 9, "other-embed");
+	await tick();
+	expect(target.querySelector("p")?.textContent).toBe("5");
+
+	// Targeted at this artifact: update
+	bridge.push("count", 9, "live-counter");
+	await tick();
+	expect(target.querySelector("p")?.textContent).toBe("9");
+});

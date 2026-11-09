@@ -11,8 +11,9 @@ export interface ListenEmbedFrameOptions {
 
 	/**
 	 * The bridge the frame's embed talks to: events are forwarded to its
-	 * `onEvent`, invokes resolved through its `invoke`. Same interface and
-	 * scoping as in-process embeds.
+	 * `onEvent`, invokes resolved through its `invoke`, and push
+	 * subscriptions registered on it so host `push` calls relay into the
+	 * frame. Same interface and scoping as in-process embeds.
 	 */
 	bridge?: EmbedBridge;
 
@@ -52,6 +53,8 @@ export default function listenEmbedFrame(
 		scopeBridge(options.bridge, { artifactId: options?.artifactId ?? "unknown" });
 	const maxHeight = options?.maxHeight;
 	const channel = options?.channel ?? EMBED_CHANNEL;
+	const subscriptions: Array<() => void> = [];
+	const subscribedTypes = new Set<string>();
 
 	async function onMessage(event: MessageEvent): Promise<void> {
 		if (event.source !== iframe.contentWindow) return;
@@ -81,6 +84,18 @@ export default function listenEmbedFrame(
 					"*",
 				);
 			}
+		} else if (data.kind === "subscribe") {
+			// The frame's embed called bridge.on(type, …): register with the
+			// (artifact-scoped) bridge so host pushes relay into the frame.
+			// One subscription per type; the frame fans out locally.
+			const type = data.type;
+			if (typeof type !== "string" || subscribedTypes.has(type)) return;
+			const unsubscribe = bridge?.on?.(type, (detail) => {
+				iframe.contentWindow?.postMessage({ channel, kind: "push", type, detail }, "*");
+			});
+			if (unsubscribe === undefined) return;
+			subscribedTypes.add(type);
+			subscriptions.push(unsubscribe);
 		} else if (data.kind === "height") {
 			const height = maxHeight !== undefined ? Math.min(data.value, maxHeight) : data.value;
 			iframe.style.height = `${height}px`;
@@ -91,6 +106,7 @@ export default function listenEmbedFrame(
 	return {
 		dispose() {
 			window.removeEventListener("message", onMessage);
+			for (const unsubscribe of subscriptions) unsubscribe();
 		},
 	};
 }

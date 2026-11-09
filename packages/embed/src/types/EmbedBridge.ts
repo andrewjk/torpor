@@ -36,4 +36,22 @@ export default interface EmbedBridge {
 	 * embeds should not pass this
 	 */
 	invoke(method: string, payload?: unknown, source?: EmbedEventSource): Promise<any>;
+
+	/**
+	 * Subscribes to pushes from the host — the counterpart of `emit`, for
+	 * data that changes while the embed is mounted (live pages: poll
+	 * counts, shared checklists, dashboards). The host's `push` — never
+	 * the embed — decides when data arrives; update your own `$watch`
+	 * state in the handler and the component re-renders.
+	 *
+	 * Optional (host-created bridges always have it; hand-written bridges
+	 * may not).
+	 *
+	 * @param type The push type, e.g. "votes-changed"
+	 * @param handler Called with the pushed detail
+	 * @param source Set by the loader when it scopes a bridge to a mount;
+	 * embeds should not pass this
+	 * @returns An unsubscribe function
+	 */
+	on?(type: string, handler: (detail: unknown) => void, source?: EmbedEventSource): () => void;
 }

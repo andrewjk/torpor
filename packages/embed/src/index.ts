@@ -32,6 +32,7 @@ export type {
 	EmbedArtifact,
 	EmbedArtifactImport,
 	EmbedBridge,
+	EmbedBridgeController,
 	EmbedBridgeHandlers,
 	EmbedEventSource,
 	EmbedFrameHandle,

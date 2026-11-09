@@ -530,6 +530,29 @@ export default function FeedbackSection($props: { $embed: any }) {
 - `invoke(method, payload)` is request/response: form submissions, tenant
   data. Values or promises the host handler returns are handed back to the
   embed.
+- `on(type, handler)` receives pushes from the host -- the counterpart of
+  `emit`, for data that changes while the embed is mounted (poll counts,
+  shared checklists, dashboards). Update your own `$watch` state in the
+  handler and the component re-renders. Returns an unsubscribe function.
+
+Pushes go **host → embed only**. `createBridge` returns a controller whose
+`push` fans out to every embed subscribed to a type, or to one artifact's
+embeds:
+
+```ts
+// every mounted poll widget re-renders with the new count
+bridge.push("votes-changed", { count: 18 });
+// only this artifact's embeds
+bridge.push("votes-changed", { count: 18 }, "poll-7");
+```
+
+`push` lives on the controller, not on the scoped `$embed` view embeds
+receive -- subscribing is the embed's job, deciding what to push is the
+host's. Frame embeds subscribe through the same `on`; the host listener
+relays pushes across the postMessage boundary (see the frame protocol
+below). Pushing requires passing a bridge: embeds mounted without one get
+a private default bridge you can't reach. With no subscriber for a type,
+a push is a silent no-op.
 
 If a host mounts an embed without a bridge, a default bridge is injected
 that warns on first use -- unwired embeds fail loudly in the console
@@ -654,9 +677,13 @@ description:
 
 - frame -> host: `{ channel, kind: "event", type, detail }`,
   `{ channel, kind: "invoke", call, method, payload }`,
-  `{ channel, kind: "height", value }`
+  `{ channel, kind: "height", value }`,
+  `{ channel, kind: "subscribe", type }` (sent once per type, on the first
+  `bridge.on` for it)
 - host -> frame: `{ channel, kind: "invoke-result", call, value }`,
-  `{ channel, kind: "invoke-error", call, message }`
+  `{ channel, kind: "invoke-error", call, message }`,
+  `{ channel, kind: "push", type, detail }` (relays `bridge.push` to
+  subscribers registered on the host bridge by the frame's listener)
 
 Validation rules (the part hosts re-implementing it most often get wrong):
 

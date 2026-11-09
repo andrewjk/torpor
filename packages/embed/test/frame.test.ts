@@ -175,6 +175,45 @@ test("resolves invokes through the bridge and replies to the frame", async () =>
 	errorIframe.remove();
 });
 
+test("push: subscribe registers with the bridge and relays into the frame", () => {
+	const iframe = document.createElement("iframe");
+	document.body.appendChild(iframe);
+
+	const posted: any[] = [];
+	iframe.contentWindow!.postMessage = (message: any) => posted.push(message);
+
+	const bridge = createBridge({});
+	const handle = mountEmbedFrame(iframe, artifact(), {}, { runtime: RUNTIME, bridge });
+
+	// The frame's embed subscribed through the protocol
+	window.dispatchEvent(
+		frameEvent(iframe, { channel: "torpor-embed", kind: "subscribe", type: "data" }),
+	);
+
+	// Broadcast reaches the frame; targeted at another artifact doesn't
+	bridge.push("data", { n: 1 });
+	bridge.push("data", { n: 2 }, "frame-counter");
+	bridge.push("data", { n: 3 }, "other-embed");
+	expect(posted).toEqual([
+		{ channel: "torpor-embed", kind: "push", type: "data", detail: { n: 1 } },
+		{ channel: "torpor-embed", kind: "push", type: "data", detail: { n: 2 } },
+	]);
+
+	// A duplicate subscribe is deduped: still one relay per push
+	window.dispatchEvent(
+		frameEvent(iframe, { channel: "torpor-embed", kind: "subscribe", type: "data" }),
+	);
+	bridge.push("data", { n: 4 });
+	expect(posted.length).toBe(3);
+
+	// Unmounting tears down the subscription
+	handle.unmount();
+	bridge.push("data", { n: 5 });
+	expect(posted.length).toBe(3);
+
+	iframe.remove();
+});
+
 test("updates the iframe height", () => {
 	const iframe = document.createElement("iframe");
 	document.body.appendChild(iframe);
@@ -461,6 +500,77 @@ test("frame bootstrap mounts and speaks the protocol", async () => {
 			data: { channel: "torpor-embed", kind: "invoke-result", call: 3, value: "hijacked" },
 		}),
 	);
+});
+
+test("frame bridge on() subscribes once per type and delivers pushes locally", () => {
+	const listeners: ((event: { data?: unknown; source?: unknown }) => void)[] = [];
+	const posted: any[] = [];
+	const fakeWindow: Record<string, any> = {
+		parent: { postMessage: (message: any) => posted.push(message) },
+		addEventListener: (type: string, listener: any) => {
+			if (type === "message") listeners.push(listener);
+		},
+		TorporView: { mount: () => {} },
+	};
+	fakeWindow.window = fakeWindow;
+	fakeWindow.document = {
+		getElementById: () => ({ id: "torpor-embed" }),
+		documentElement: { scrollHeight: 10 },
+		body: {},
+	};
+
+	const context = createContext(fakeWindow);
+	new Script(frameScript).runInContext(context);
+
+	const seen: unknown[] = [];
+	const off = (fakeWindow.TorporEmbed as any).bridge.on("data", (detail: unknown) =>
+		seen.push(["first", detail]),
+	);
+	// Exactly one subscribe message, sent on the first on()
+	expect(posted.filter((m: any) => m.kind === "subscribe")).toEqual([
+		{ channel: "torpor-embed", kind: "subscribe", type: "data" },
+	]);
+
+	// A second handler for the same type does not re-subscribe
+	(fakeWindow.TorporEmbed as any).bridge.on("data", (detail: unknown) =>
+		seen.push(["second", detail]),
+	);
+	expect(posted.filter((m: any) => m.kind === "subscribe").length).toBe(1);
+
+	// A host push delivers to both handlers
+	listeners.forEach((listener) =>
+		listener({
+			source: fakeWindow.parent,
+			data: { channel: "torpor-embed", kind: "push", type: "data", detail: 7 },
+		}),
+	);
+	expect(seen).toEqual([
+		["first", 7],
+		["second", 7],
+	]);
+
+	// Unsubscribe removes only that handler
+	off();
+	listeners.forEach((listener) =>
+		listener({
+			source: fakeWindow.parent,
+			data: { channel: "torpor-embed", kind: "push", type: "data", detail: 8 },
+		}),
+	);
+	expect(seen).toEqual([
+		["first", 7],
+		["second", 7],
+		["second", 8],
+	]);
+
+	// Pushes for types nobody subscribed to are ignored
+	listeners.forEach((listener) =>
+		listener({
+			source: fakeWindow.parent,
+			data: { channel: "torpor-embed", kind: "push", type: "other", detail: 9 },
+		}),
+	);
+	expect(seen.length).toBe(3);
 });
 
 test("full protocol round-trip: frame invoke reaches the host bridge and back", async () => {

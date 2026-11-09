@@ -11,5 +11,10 @@ export default function scopeBridge(bridge: EmbedBridge, source: EmbedEventSourc
 	return {
 		emit: (type, detail) => bridge.emit(type, detail, source),
 		invoke: (method, payload) => bridge.invoke(method, payload, source),
+		// Optional (hand-written bridges may not have it). Stamped with the
+		// scope so targeted pushes reach this artifact's embeds only -- and
+		// `push` itself is deliberately NOT forwarded: the embed can
+		// subscribe, but pushing stays host-side.
+		on: bridge.on && ((type, handler) => bridge.on!(type, handler, source)),
 	};
 }

@@ -2,9 +2,10 @@ import { EMBED_CHANNEL } from "./protocol";
 
 /**
  * Builds the frame-side protocol bootstrap as a standalone classic script:
- * the postMessage bridge (`TorporEmbed.bridge.emit`/`.invoke`), the
- * invoke call-id correlation, and the auto-height reporter (initial report
- * on load + `ResizeObserver` on body).
+ * the postMessage bridge (`TorporEmbed.bridge.emit`/`.invoke`/`.on`), the
+ * invoke call-id correlation, push subscription relaying, and the
+ * auto-height reporter (initial report on load + `ResizeObserver` on
+ * body).
  *
  * Unlike `frameScript`, there is no `TorporEmbed.mount()` and no reference
  * to `TorporView` -- use this for frame documents that are not built by
@@ -35,6 +36,7 @@ function createFrameBridgeScript(channel: string = EMBED_CHANNEL): string {
 	var parent = window.parent;
 	var calls = {};
 	var callId = 0;
+	var subs = {};
 
 	function post(message) {
 		var data = { channel: CHANNEL };
@@ -53,6 +55,10 @@ function createFrameBridgeScript(channel: string = EMBED_CHANNEL): string {
 			delete calls[data.call];
 			if (data.kind === "invoke-error") pending.reject(new Error(data.message));
 			else pending.resolve(data.value);
+		} else if (data.kind === "push") {
+			var handlers = subs[data.type];
+			if (!handlers) return;
+			for (var i = 0; i < handlers.length; i++) handlers[i](data.detail);
 		}
 	});
 
@@ -79,6 +85,21 @@ function createFrameBridgeScript(channel: string = EMBED_CHANNEL): string {
 					calls[id] = { resolve: resolve, reject: reject };
 					post({ kind: "invoke", call: id, method: method, payload: payload });
 				});
+			},
+			on: function (type, handler) {
+				// The host learns about the subscription once per type (an
+				// empty array stays truthy, so unsubscribing never re-sends)
+				if (!subs[type]) {
+					subs[type] = [];
+					post({ kind: "subscribe", type: type });
+				}
+				subs[type].push(handler);
+				return function () {
+					var handlers = subs[type];
+					if (!handlers) return;
+					var index = handlers.indexOf(handler);
+					if (index !== -1) handlers.splice(index, 1);
+				};
 			},
 		},
 	};

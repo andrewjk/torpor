@@ -1,6 +1,7 @@
 import type EmbedArtifact from "./EmbedArtifact";
 import type EmbedArtifactImport from "./EmbedArtifactImport";
 import type EmbedBridge from "./EmbedBridge";
+import type EmbedBridgeController from "./EmbedBridgeController";
 import type EmbedBridgeHandlers from "./EmbedBridgeHandlers";
 import type EmbedCompileError from "./EmbedCompileError";
 import type EmbedEventSource from "./EmbedEventSource";
@@ -16,6 +17,7 @@ export type {
 	EmbedArtifact,
 	EmbedArtifactImport,
 	EmbedBridge,
+	EmbedBridgeController,
 	EmbedBridgeHandlers,
 	EmbedCompileError,
 	EmbedEventSource,

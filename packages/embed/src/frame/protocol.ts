@@ -25,11 +25,13 @@ export const EMBED_CHANNEL = "torpor-embed";
 export type FrameToHost =
 	| { channel: string; kind: "event"; type: string; detail?: unknown }
 	| { channel: string; kind: "invoke"; call: number; method: string; payload?: unknown }
-	| { channel: string; kind: "height"; value: number };
+	| { channel: string; kind: "height"; value: number }
+	| { channel: string; kind: "subscribe"; type: string };
 
 /**
  * Host -> frame.
  */
 export type HostToFrame =
 	| { channel: string; kind: "invoke-result"; call: number; value?: unknown }
-	| { channel: string; kind: "invoke-error"; call: number; message: string };
+	| { channel: string; kind: "invoke-error"; call: number; message: string }
+	| { channel: string; kind: "push"; type: string; detail?: unknown };
