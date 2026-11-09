@@ -200,9 +200,11 @@ data tickets from tickets { queue: $props.queue, sort: "recency" };
 ```
 
 - `sources` is the trusted boundary: authorization, tenant scoping and network
-  access live there, never in the artifact. Unknown kinds fail at compile time
-  (`requirementKinds`). Pass `data` instead of `sources` when the host already
-  fetched the data.
+  access live there, never in the artifact. Data resolves per render under the
+  _viewer's_ authority, so a shared embed only ever shows what its viewer
+  could already see (see "Private when shared" under Trust model). Unknown
+  kinds fail at compile time (`requirementKinds`). Pass `data` instead of
+  `sources` when the host already fetched the data.
 - Template expressions are a restricted op set — reads, literals, operators,
   optional chaining, array/object literals — **no calls**. Compute formatted
   values in a requirement spec or a `derive` (see below); the client build is
@@ -721,6 +723,12 @@ strictest model and loosen deliberately:
 - **Server-side rendering of embeds executes author code on your
   infrastructure.** Contain it before rendering embeds from authors you
   don't fully trust (see the render service below).
+- **Private when shared**: rendered output must only ever be visible to
+  viewers who already have access to the data behind it. Data resolves
+  per render under the _viewer's_ authority -- per-user/tenant props,
+  sources scoped to the requesting user -- never baked into the artifact,
+  never cached across viewers, and never fetched with the _author's_
+  credentials.
 
 Props in, events out: hosts pass data as props (per user/tenant -- never in
 module scope) and embeds talk back through the `$embed` bridge (see above),
