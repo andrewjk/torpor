@@ -13,13 +13,35 @@ export interface HttpCredential {
 	prefix?: string;
 }
 
+/**
+ * An operator policy for one allowed origin. Beyond allowing the origin
+ * itself, it can narrow which fields of the response the artifact may see —
+ * the "limit fields" half of the operator's gatekeeping, independent of
+ * author intent.
+ */
+export interface HttpOriginPolicy {
+	/** The exact origin, e.g. "https://api.corp.example". */
+	origin: string;
+	/**
+	 * Field names the artifact may receive from this origin. Every JSON
+	 * object in the response — at every nesting level — is narrowed to
+	 * these fields **before** the requirement's `pick` runs, so a `pick`
+	 * into a stripped path fails loudly ("pick path wasn't found") instead
+	 * of surfacing `undefined`. Arrays are traversed; non-plain values are
+	 * left untouched. Default: all fields.
+	 */
+	allowFields?: string[];
+}
+
 export interface HttpSourceOptions {
 	/**
-	 * Exact origins (`"https://api.example.com"`) admins may point `url` at.
-	 * **Default: deny all.** This is the operator's egress policy; enabling
-	 * an unknown API is a deliberate deployment decision.
+	 * Exact origins (`"https://api.example.com"`) admins may point `url` at,
+	 * optionally as {@link HttpOriginPolicy} objects that also narrow the
+	 * response's fields. **Default: deny all.** This is the operator's
+	 * egress policy; enabling an unknown API is a deliberate deployment
+	 * decision.
 	 */
-	allowOrigins?: string[];
+	allowOrigins?: Array<string | HttpOriginPolicy>;
 
 	/**
 	 * Credential name → binding. Requirements reference a name via `auth`;
@@ -54,12 +76,23 @@ const DEFAULT_MAX_ROWS = 1000;
 const DANGEROUS_KEYS = new Set(["__proto__", "prototype", "constructor"]);
 
 /**
+ * Depth cap for field narrowing. JSON.parse output is a tree, so recursion
+ * is bounded — but a hand-crafted response from an allowlisted origin can't
+ * be trusted to be shallow, and the walk must not overflow the stack.
+ */
+const MAX_NARROW_DEPTH = 100;
+
+/**
  * Creates the generic `http` source kind: one implementation serves every
  * JSON API the operator enables, so admins can point requirements at APIs
  * the host was never told about — under operator policy.
  *
  * Security posture:
  * - **Default deny**: only origins listed in `allowOrigins` are fetched.
+ * - **Field narrowing**: a per-origin `allowFields` strips every
+ *   non-allowlisted field from the response before the author's `pick`
+ *   runs, so the operator limits what the artifact can see regardless of
+ *   author intent.
  * - Literal private/loopback hosts are blocked even when allowlisted;
  *   DNS-level egress control (a proxy or `globalOutbound`) remains the
  *   deployment's job.
@@ -69,7 +102,7 @@ const DANGEROUS_KEYS = new Set(["__proto__", "prototype", "constructor"]);
  *   and row count are capped.
  */
 export default function createHttpSource(options?: HttpSourceOptions): RestrictedSource {
-	const allowOrigins = new Set(options?.allowOrigins ?? []);
+	const originPolicies = buildOriginPolicies(options?.allowOrigins ?? []);
 	const credentials = options?.credentials ?? {};
 	const timeout = options?.timeout ?? DEFAULT_TIMEOUT;
 	const maxResponseBytes = options?.maxResponseBytes ?? DEFAULT_MAX_RESPONSE_BYTES;
@@ -94,12 +127,13 @@ export default function createHttpSource(options?: HttpSourceOptions): Restricte
 		if (url.username || url.password) {
 			throw new Error("http requirement url must not embed credentials; use auth.");
 		}
-		if (!allowOrigins.has(url.origin)) {
-			const allowed = [...allowOrigins].join(", ") || "(none)";
+		if (!originPolicies.has(url.origin)) {
+			const allowed = [...originPolicies.keys()].join(", ") || "(none)";
 			throw new Error(
 				`http requirement origin "${url.origin}" is not allowed by this deployment. Allowed origins: ${allowed}.`,
 			);
 		}
+		const allowedFields = originPolicies.get(url.origin);
 		if (isBlockedHostname(url.hostname)) {
 			throw new Error(
 				`http requirement host "${url.hostname}" is a private or local address and is blocked.`,
@@ -173,6 +207,13 @@ export default function createHttpSource(options?: HttpSourceOptions): Restricte
 			throw new Error(`http requirement got invalid JSON from ${url.origin}${url.pathname}.`);
 		}
 
+		// Field narrowing runs BEFORE the author's `pick`: the operator's
+		// allowlist describes what this origin may expose at all, so a pick
+		// into a stripped path fails loudly instead of leaking through.
+		if (allowedFields !== undefined) {
+			payload = narrowValue(payload, allowedFields, url, 0);
+		}
+
 		let value = payload;
 		const pick = spec.pick;
 		if (typeof pick === "string" && pick.length > 0) {
@@ -195,6 +236,86 @@ export default function createHttpSource(options?: HttpSourceOptions): Restricte
 
 		return value;
 	};
+}
+
+/**
+ * Validates the origin list at creation time and maps each origin to its
+ * field allowlist (`undefined` = unrestricted). Misconfiguration throws
+ * here, naming the origin and field, instead of failing per render.
+ */
+function buildOriginPolicies(
+	entries: Array<string | HttpOriginPolicy>,
+): Map<string, Set<string> | undefined> {
+	const policies = new Map<string, Set<string> | undefined>();
+	for (const entry of entries) {
+		const origin = typeof entry === "string" ? entry : entry?.origin;
+		if (typeof origin !== "string" || origin.length === 0) {
+			throw new Error(
+				"createHttpSource origin entries must be origin strings or { origin, allowFields } objects.",
+			);
+		}
+		if (policies.has(origin)) {
+			throw new Error(`createHttpSource lists origin "${origin}" more than once.`);
+		}
+		const allowFields = typeof entry === "string" ? undefined : entry?.allowFields;
+		if (allowFields === undefined) {
+			policies.set(origin, undefined);
+			continue;
+		}
+		if (!Array.isArray(allowFields)) {
+			throw new Error(
+				`createHttpSource allowFields for "${origin}" must be an array of field names.`,
+			);
+		}
+		const fields = new Set<string>();
+		for (const field of allowFields) {
+			if (typeof field !== "string" || field.length === 0) {
+				throw new Error(
+					`createHttpSource allowFields for "${origin}" must contain non-empty field names.`,
+				);
+			}
+			if (DANGEROUS_KEYS.has(field)) {
+				throw new Error(
+					`createHttpSource allowFields for "${origin}" contains the dangerous key "${field}".`,
+				);
+			}
+			fields.add(field);
+		}
+		policies.set(origin, fields);
+	}
+	return policies;
+}
+
+/**
+ * Deep-narrows a parsed JSON value to an origin's allowlisted fields: every
+ * plain object — at every nesting level, including array elements — keeps
+ * only the allowlisted keys. This also strips dangerous keys (`__proto__`
+ * & co.), which are rejected from allowlists at creation time.
+ */
+function narrowValue(value: unknown, allowed: Set<string>, url: URL, depth: number): unknown {
+	if (depth > MAX_NARROW_DEPTH) {
+		throw new Error(
+			`http requirement response from ${url.origin}${url.pathname} nests more than ${MAX_NARROW_DEPTH} levels deep.`,
+		);
+	}
+	if (Array.isArray(value)) {
+		return value.map((item) => narrowValue(item, allowed, url, depth + 1));
+	}
+	if (isPlainObject(value)) {
+		const narrowed: Record<string, unknown> = {};
+		for (const [key, item] of Object.entries(value)) {
+			if (!allowed.has(key)) continue;
+			narrowed[key] = narrowValue(item, allowed, url, depth + 1);
+		}
+		return narrowed;
+	}
+	return value;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+	if (value === null || typeof value !== "object") return false;
+	const proto = Object.getPrototypeOf(value);
+	return proto === Object.prototype || proto === null;
 }
 
 function timeoutSignal(timeout: number): AbortSignal | undefined {

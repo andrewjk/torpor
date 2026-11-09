@@ -332,7 +332,11 @@ const artifact = compileRestricted(id, source, {
 const { body } = await renderRestricted(artifact, {
 	sources: {
 		http: createHttpSource({
-			allowOrigins: ["https://api.corp.example"], // default: deny all
+			allowOrigins: [
+				"https://api.corp.example", // default: deny all
+				// per-origin policy: narrow which fields the artifact may see
+				{ origin: "https://people.corp.example", allowFields: ["id", "name", "team"] },
+			],
 			credentials: { "corp-key": { value: process.env.CORP_KEY!, prefix: "Bearer " } },
 			timeout: 5000,
 			maxResponseBytes: 1_000_000,
@@ -355,6 +359,13 @@ data tickets from http {
 Security posture, all enforced by `createHttpSource`:
 
 - **Default deny** — origins not in `allowOrigins` are never fetched.
+- **Field narrowing** — an origin given as `{ origin, allowFields }` limits
+  what the artifact may see from it: every JSON object in the response (at
+  every nesting level) is stripped to the allowlisted fields _before_ the
+  author's `pick` runs, so a pick into a stripped path fails loudly instead
+  of surfacing `undefined`. Narrowing also drops dangerous keys
+  (`__proto__` & co.); misconfigured policies (duplicate origins,
+  non-string fields, dangerous keys) throw at creation.
 - Credentials are referenced by name; an unconfigured name errors with the
   _names_ configured, never another credential's value. Secrets never enter
   the artifact.

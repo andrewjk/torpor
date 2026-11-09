@@ -5,6 +5,7 @@ import {
 	httpRequirementKind,
 	renderRestricted,
 } from "../src/restricted";
+import type { HttpOriginPolicy } from "../src/restricted";
 import EmbedCompileError from "../src/types/EmbedCompileError";
 
 const SOURCE = `
@@ -330,4 +331,134 @@ test("response data is inert: markup in rows is escaped", async () => {
 	});
 	expect(body).toContain("&lt;img src=x onerror=");
 	expect(body).not.toContain("<img");
+});
+
+const ROOT_SOURCE = `
+data payload from http {
+	url: "https://api.example.test/tickets",
+};
+
+export default function Inbox() {
+	@render {
+		@for (t of $data.payload.items) {
+			<p>{t.title}</p>
+		}
+	}
+}
+`;
+
+test("allowFields strips disallowed fields from rows, at every level", async () => {
+	const { data } = await renderRestricted(artifact(), {
+		props: { queue: "open" },
+		sources: {
+			http: createHttpSource({
+				allowOrigins: [
+					{
+						origin: "https://api.example.test",
+						allowFields: ["items", "id", "title", "assignee", "name"],
+					},
+				],
+				credentials: { "corp-key": { value: "x" } },
+				fetch: mockFetch(() =>
+					jsonResponse({
+						items: [
+							{ id: 1, title: "One", assignee: { name: "a", email: "a@x.test" } },
+							{ id: 2, title: "Two", internal: "nope" },
+						],
+					}),
+				),
+			}),
+		},
+	});
+	// Rows keep only allowlisted fields; nested objects are narrowed by the
+	// same allowlist (assignee.email is stripped, assignee.name survives).
+	expect(data.tickets).toEqual([
+		{ id: 1, title: "One", assignee: { name: "a" } },
+		{ id: 2, title: "Two" },
+	]);
+});
+
+test("allowFields narrows the response root when there is no pick", async () => {
+	const { data } = await renderRestricted(artifact(ROOT_SOURCE), {
+		sources: {
+			http: createHttpSource({
+				allowOrigins: [{ origin: "https://api.example.test", allowFields: ["items", "title"] }],
+				fetch: mockFetch(() => jsonResponse({ meta: { total: 2 }, items: [{ title: "One" }] })),
+			}),
+		},
+	});
+	expect(data.payload).toEqual({ items: [{ title: "One" }] });
+});
+
+test("a pick into a stripped field fails loudly", async () => {
+	const source = compileRestricted(
+		"stripped-pick",
+		`
+data t from http { url: "https://api.example.test/tickets", pick: "items.0.internal" };
+export default function A() { @render { <p>x</p> } }
+`,
+		{ requirementKinds: { http: httpRequirementKind } },
+	);
+	await expect(
+		renderRestricted(source, {
+			sources: {
+				http: createHttpSource({
+					allowOrigins: [{ origin: "https://api.example.test", allowFields: ["items", "id"] }],
+					fetch: mockFetch(() => jsonResponse({ items: [{ id: 1, internal: "nope" }] })),
+				}),
+			},
+		}),
+	).rejects.toThrow(/pick path "items\.0\.internal" wasn't found/);
+});
+
+/**
+ * createHttpSource validates its options at runtime; these tests pass
+ * values the types don't allow, so they arrive pre-cast.
+ */
+function sourceWith(allowOrigins: unknown) {
+	return createHttpSource({ allowOrigins: allowOrigins as Array<string | HttpOriginPolicy> });
+}
+
+test("origin policy misconfiguration throws at creation", () => {
+	expect(() => sourceWith(["https://a.test", { origin: "https://a.test" }])).toThrow(
+		/more than once/,
+	);
+	expect(() => sourceWith([{ origin: "https://a.test", allowFields: ["__proto__"] }])).toThrow(
+		/dangerous key "__proto__"/,
+	);
+	expect(() => sourceWith([{ origin: "https://a.test", allowFields: ["ok", 42] }])).toThrow(
+		/non-empty field names/,
+	);
+	expect(() => sourceWith([{ allowFields: ["x"] }])).toThrow(
+		/origin strings or \{ origin, allowFields \}/,
+	);
+});
+
+test("deeply nested responses hit the narrowing depth cap", async () => {
+	let deep: unknown = { title: "leaf" };
+	for (let i = 0; i < 150; i++) deep = { inner: deep };
+	await expect(
+		renderRestricted(artifact(ROOT_SOURCE), {
+			sources: {
+				http: createHttpSource({
+					allowOrigins: [{ origin: "https://api.example.test", allowFields: ["inner"] }],
+					fetch: mockFetch(() => jsonResponse(deep)),
+				}),
+			},
+		}),
+	).rejects.toThrow(/nests more than 100 levels/);
+});
+
+test("string and policy origin entries can be mixed", async () => {
+	const { body } = await renderRestricted(artifact(), {
+		props: { queue: "open" },
+		sources: {
+			http: createHttpSource({
+				allowOrigins: ["https://other.test", { origin: "https://api.example.test" }],
+				credentials: { "corp-key": { value: "x" } },
+				fetch: mockFetch(() => jsonResponse({ items: [{ title: "One" }] })),
+			}),
+		},
+	});
+	expect(body).toContain("One");
 });

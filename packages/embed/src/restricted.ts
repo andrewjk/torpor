@@ -10,7 +10,11 @@ export { default as createHttpSource } from "./restricted/http/createHttpSource"
 export { default as httpRequirementKind } from "./restricted/http/httpRequirementKind";
 export { default as deriveRequirementKind } from "./restricted/derive/deriveRequirementKind";
 export type { DeriveLimits } from "./restricted/derive/resolveDerive";
-export type { HttpCredential, HttpSourceOptions } from "./restricted/http/createHttpSource";
+export type {
+	HttpCredential,
+	HttpOriginPolicy,
+	HttpSourceOptions,
+} from "./restricted/http/createHttpSource";
 export type { CompileRestrictedOptions } from "./restricted/compileRestricted";
 export type {
 	RenderRestrictedOptions,
