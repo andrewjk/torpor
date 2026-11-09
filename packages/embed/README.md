@@ -726,6 +726,35 @@ Props in, events out: hosts pass data as props (per user/tenant -- never in
 module scope) and embeds talk back through the `$embed` bridge (see above),
 whose handlers the host controls.
 
+Writes deserve more friction than reads. `invoke` is the embed's write
+path, so classify methods up front and gate the mutating ones behind an
+approval step -- the handler, not the embed, decides whether the write
+happens:
+
+```ts
+const WRITES = new Set(["save-section", "delete-section"]);
+
+createBridge({
+	invoke: async (method, payload, source) => {
+		if (!WRITES.has(method)) return api.call(method, { payload, embedId: source.artifactId });
+		// Mutating methods queue for human approval; the embed gets a
+		// pending receipt and shows its own waiting state
+		const request = await approvals.queue(source.artifactId, method, payload);
+		return { status: "pending", requestId: request.id };
+	},
+});
+```
+
+The approved request should execute in the approver's session, not the
+viewer's; until then the embed sees only the pending receipt. No API
+changes are needed for this -- it is a discipline for `invoke` handlers.
+
+When the author is an AI (an agent building sections from a prompt), treat
+it as untrusted by default: restricted mode (`compileRestricted` +
+`renderRestricted`) keeps the author's code off your servers entirely, and
+its compile-time validation catches hallucinated syntax and spec shapes at
+save time, where the editing UI can show them.
+
 ## Render service
 
 `isolate: true` renders in a worker thread, which is **fault isolation,
