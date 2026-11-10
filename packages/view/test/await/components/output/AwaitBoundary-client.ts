@@ -14,6 +14,7 @@ import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_await from "../../../../src/render/runAwait";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function AwaitRapid(
@@ -70,7 +71,7 @@ export default function AwaitRapid(
 		t_add_element(t_p_2, t_fragment_0, t_before);
 	});
 
-	const t_button_1 = t_next(t_next(t_await_anchor_1, true)) as HTMLButtonElement;
+	const t_button_1 = t_skip(t_await_anchor_1, 2, 1) as HTMLButtonElement;
 	t_event(t_button_1, "click", refresh);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_button_1, t_root_0);
 

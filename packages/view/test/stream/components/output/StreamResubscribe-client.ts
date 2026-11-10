@@ -15,6 +15,7 @@ import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
+import t_skip from "../../../../src/render/nodeSkip";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -53,7 +54,7 @@ export default function StreamResubscribe(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<button>Switch</button> <ul><!></ul>`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_button_1 = t_root_0 as HTMLButtonElement;
-	const t_ul_1 = t_next(t_next(t_button_1, true)) as HTMLElement;
+	const t_ul_1 = t_skip(t_button_1, 2, 1) as HTMLElement;
 	let t_for_anchor_1 = t_anchor(t_child(t_ul_1)) as HTMLElement;
 
 	/* @for */

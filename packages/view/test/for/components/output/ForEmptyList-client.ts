@@ -12,6 +12,7 @@ import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
+import t_skip from "../../../../src/render/nodeSkip";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -67,7 +68,7 @@ export default function ForEmpty(
 		true
 	);
 
-	const t_p_1 = t_next(t_next(t_for_parent_1, true)) as HTMLElement;
+	const t_p_1 = t_skip(t_for_parent_1, 2, 1) as HTMLElement;
 	const t_text_2 = t_child(t_p_1);
 	$run(() => {
 		t_text_2.textContent = `Count: ${t_fmt($props.items.length)}`;

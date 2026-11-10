@@ -3,6 +3,7 @@ import t_add_fragment from "../../../../src/render/addFragment";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import t_skip from "../../../../src/render/nodeSkip";
 import t_style from "../../../../src/render/buildStyles";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -20,7 +21,7 @@ export default function StyleClear(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div class="object">Object</div> <div class="string">String</div>`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_div_1 = t_root_0 as HTMLDivElement;
-	const t_div_2 = t_next(t_next(t_div_1, true)) as HTMLDivElement;
+	const t_div_2 = t_skip(t_div_1, 2, 1) as HTMLDivElement;
 	$run(() => {
 		t_div_1.style.cssText = t_style({ display: $props.hidden ? "none" : undefined });
 		t_div_2.style.cssText = t_style(`color: ${$props.color}`);

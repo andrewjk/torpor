@@ -11,6 +11,7 @@ import t_next from "../../../../src/render/nodeNext";
 import t_region from "../../../../src/render/newRegion";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_control from "../../../../src/render/runControl";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function HtmlTextarea(
@@ -35,8 +36,8 @@ export default function HtmlTextarea(
 	const t_root_0 = t_root_el(t_fragment_0);
 	const t_div_1 = t_root_0 as HTMLDivElement;
 	const t_textarea_1 = t_child(t_div_1) as HTMLTextAreaElement;
-	const t_html_parent_1 = t_next(t_next(t_textarea_1, true)) as HTMLElement;
-	let t_html_anchor_1 = t_anchor(t_child(t_next(t_next(t_textarea_1, true)))) as HTMLElement;
+	const t_html_parent_1 = t_skip(t_textarea_1, 2, 1) as HTMLElement;
+	let t_html_anchor_1 = t_anchor(t_child(t_skip(t_textarea_1, 2, 1))) as HTMLElement;
 
 	/* @html */
 	let t_html_first_1: ChildNode | null = null;

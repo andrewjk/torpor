@@ -11,6 +11,7 @@ import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_try from "../../../../src/render/runTry";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function TryHydrationMismatch(
@@ -39,7 +40,7 @@ export default function TryHydrationMismatch(
 	t_run_try(t_try_region_1, t_try_anchor_1, (t_before) => {
 		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<p>safe</p> <p>#</p>`);
 		const t_root_1 = t_root(t_fragment_1);
-		const t_p_1 = t_next(t_next(t_root_1, true)) as HTMLElement;
+		const t_p_1 = t_skip(t_root_1, 2, 1) as HTMLElement;
 		const t_text_1 = t_child(t_p_1);
 		$run(() => {
 			t_text_1.textContent = t_fmt(boom());

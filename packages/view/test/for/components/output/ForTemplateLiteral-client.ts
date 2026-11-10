@@ -12,6 +12,7 @@ import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
+import t_skip from "../../../../src/render/nodeSkip";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -49,7 +50,7 @@ export default function ForTemplateLiteral(
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<p>Slide</p> <p>Constant</p>`);
 			const t_root_1 = t_root(t_fragment_1);
 			const t_p_1 = t_root_1 as HTMLElement;
-			const t_p_2 = t_next(t_next(t_p_1, true)) as HTMLElement;
+			const t_p_2 = t_skip(t_p_1, 2, 1) as HTMLElement;
 			$run(() => {
 				const slide = t_item_1.data;
 				t_attribute(t_p_1, "aria-label", `Go to slide ${slide.index + 1}`);

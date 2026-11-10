@@ -15,6 +15,7 @@ import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
 import t_run_list from "../../../../src/render/runList";
+import t_skip from "../../../../src/render/nodeSkip";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -122,7 +123,7 @@ function Card(
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<div class="card"><h2>Card title</h2> <!></div>`);
 	const t_root_0 = t_root_el(t_fragment_0);
 	const t_div_1 = t_root_0 as HTMLDivElement;
-	let t_slot_anchor_1 = t_anchor(t_next(t_next(t_child(t_div_1), true))) as HTMLElement;
+	let t_slot_anchor_1 = t_anchor(t_skip(t_child(t_div_1), 2, 1)) as HTMLElement;
 	if ($slots && $slots["_"]) {
 		$slots["_"](t_div_1, t_slot_anchor_1, undefined, $context)
 	}

@@ -11,6 +11,7 @@ import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function Reactive(
@@ -29,7 +30,7 @@ export default function Reactive(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<button>Update text</button> <!>`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_button_1 = t_root_0 as HTMLButtonElement;
-	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_button_1, true))) as HTMLElement;
+	let t_comp_anchor_1 = t_anchor(t_skip(t_button_1, 2, 1)) as HTMLElement;
 
 	/* @component */
 	let t_props_1 = $watch({

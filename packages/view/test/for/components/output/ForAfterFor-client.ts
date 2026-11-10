@@ -9,6 +9,7 @@ import t_region from "../../../../src/render/newRegion";
 import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
+import t_skip from "../../../../src/render/nodeSkip";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -63,7 +64,7 @@ export default function ForAfterFor(
 		true
 	);
 
-	let t_for_anchor_2 = t_anchor(t_next(t_next(t_for_anchor_1, true))) as HTMLElement;
+	let t_for_anchor_2 = t_anchor(t_skip(t_for_anchor_1, 2, 1)) as HTMLElement;
 
 	/* @for */
 	let t_for_region_2 = t_region();

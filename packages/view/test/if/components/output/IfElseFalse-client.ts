@@ -11,6 +11,7 @@ import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function IfElse(
@@ -39,7 +40,7 @@ export default function IfElse(
 			const t_old_region = t_push_region(t_new_region, true);
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<p> It's true! </p> <p> That's right </p>`);
 			const t_root_1 = t_root(t_fragment_1);
-			const t_p_1 = t_next(t_next(t_root_1, true)) as HTMLElement;
+			const t_p_1 = t_skip(t_root_1, 2, 1) as HTMLElement;
 			t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_p_1, t_root_1);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 0;

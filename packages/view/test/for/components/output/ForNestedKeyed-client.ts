@@ -14,6 +14,7 @@ import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
+import t_skip from "../../../../src/render/nodeSkip";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -55,8 +56,8 @@ export default function ForNestedKeyed(
 			const t_root_1 = t_root_el(t_fragment_1);
 			const t_section_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_child(t_section_1));
-			const t_for_parent_2 = t_next(t_next(t_child(t_section_1), true)) as HTMLElement;
-			let t_for_anchor_2 = t_anchor(t_child(t_next(t_next(t_child(t_section_1), true)))) as HTMLElement;
+			const t_for_parent_2 = t_skip(t_child(t_section_1), 2, 1) as HTMLElement;
+			let t_for_anchor_2 = t_anchor(t_child(t_skip(t_child(t_section_1), 2, 1))) as HTMLElement;
 
 			/* @for */
 			let t_for_region_2 = t_region();
@@ -106,7 +107,7 @@ export default function ForNestedKeyed(
 		}
 	);
 
-	const t_footer_1 = t_next(t_next(t_for_parent_1, true)) as HTMLElement;
+	const t_footer_1 = t_skip(t_for_parent_1, 2, 1) as HTMLElement;
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_footer_1, t_root_0);
 
 }

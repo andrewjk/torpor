@@ -16,6 +16,7 @@ import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function TrafficLight(
@@ -45,8 +46,8 @@ export default function TrafficLight(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<button>Next light</button> <p>#</p> <p> You must <!></p>`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_button_1 = t_root_0 as HTMLButtonElement;
-	const t_text_1 = t_child(t_next(t_next(t_button_1, true)));
-	const t_p_1 = t_next(t_next(t_next(t_next(t_button_1, true)), true)) as HTMLElement;
+	const t_text_1 = t_child(t_skip(t_button_1, 2, 1));
+	const t_p_1 = t_skip(t_button_1, 4, 5) as HTMLElement;
 	let t_if_anchor_1 = t_anchor(t_next(t_child(t_p_1))) as HTMLElement;
 
 	/* @if */

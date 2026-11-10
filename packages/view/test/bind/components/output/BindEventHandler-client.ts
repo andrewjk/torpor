@@ -16,6 +16,7 @@ import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function BindEventHandler(
@@ -35,8 +36,8 @@ export default function BindEventHandler(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<input> <p>#</p> <!>`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_input_1 = t_root_0 as HTMLInputElement;
-	const t_text_1 = t_child(t_next(t_next(t_input_1, true)));
-	let t_if_anchor_1 = t_anchor(t_next(t_next(t_next(t_next(t_input_1, true)), true))) as HTMLElement;
+	const t_text_1 = t_child(t_skip(t_input_1, 2, 1));
+	let t_if_anchor_1 = t_anchor(t_skip(t_input_1, 4, 5)) as HTMLElement;
 
 	/* @if */
 	const t_if_region_1 = t_region();

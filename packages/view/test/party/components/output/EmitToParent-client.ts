@@ -8,6 +8,7 @@ import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function AnswerButtonApp(
@@ -35,7 +36,7 @@ export default function AnswerButtonApp(
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<p>Are you happy?</p> <!> <p style="font-size: 50px;">#</p>`);
 	const t_root_0 = t_root(t_fragment_0);
-	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_root_0, true))) as HTMLElement;
+	let t_comp_anchor_1 = t_anchor(t_skip(t_root_0, 2, 1)) as HTMLElement;
 
 	/* @component */
 	let t_props_1 = $watch({
@@ -48,7 +49,7 @@ export default function AnswerButtonApp(
 	});
 	AnswerButton(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
-	const t_p_1 = t_next(t_next(t_comp_anchor_1, true)) as HTMLElement;
+	const t_p_1 = t_skip(t_comp_anchor_1, 2, 1) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	$run(() => {
 		t_text_1.textContent = t_fmt($state.isHappy ? "😀" : "😥");
@@ -71,7 +72,7 @@ function AnswerButton(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<button>YES</button> <button>NO</button>`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_button_1 = t_root_0 as HTMLButtonElement;
-	const t_button_2 = t_next(t_next(t_button_1, true)) as HTMLButtonElement;
+	const t_button_2 = t_skip(t_button_1, 2, 1) as HTMLButtonElement;
 	t_event(t_button_1, "click", $props.onYes);
 	t_event(t_button_2, "click", $props.onNo);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_button_2, t_root_0);

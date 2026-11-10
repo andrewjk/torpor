@@ -8,6 +8,7 @@ import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function OnmountOnce(
@@ -36,7 +37,7 @@ export default function OnmountOnce(
 		$state.count += 1
 	};
 
-	const t_button_1 = t_next(t_next(t_root_0, true)) as HTMLButtonElement;
+	const t_button_1 = t_skip(t_root_0, 2, 1) as HTMLButtonElement;
 	t_event(t_button_1, "click", increment);
 	$run(() => {
 		t_text_1.textContent = `Count: ${t_fmt($state.count)}`;

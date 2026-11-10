@@ -7,6 +7,7 @@ import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function BindRadio(
@@ -25,9 +26,9 @@ export default function BindRadio(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<label><input type="radio" name="color" value="red"> Red </label> <label><input type="radio" name="color" value="green"> Green </label> <label><input type="radio" name="color" value="blue"> Blue </label> <p>#</p>`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_input_1 = t_child(t_root_0) as HTMLInputElement;
-	const t_input_2 = t_child(t_next(t_next(t_root_0, true))) as HTMLInputElement;
-	const t_input_3 = t_child(t_next(t_next(t_next(t_next(t_root_0, true)), true))) as HTMLInputElement;
-	const t_p_1 = t_next(t_next(t_next(t_next(t_next(t_next(t_root_0, true)), true)), true)) as HTMLElement;
+	const t_input_2 = t_child(t_skip(t_root_0, 2, 1)) as HTMLInputElement;
+	const t_input_3 = t_child(t_skip(t_root_0, 4, 5)) as HTMLInputElement;
+	const t_p_1 = t_skip(t_root_0, 6, 21) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	$run(() => {
 		t_input_1.checked = $state.color == "red";

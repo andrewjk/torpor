@@ -341,17 +341,6 @@ wants real static analysis (the "TODO: Need to be more fancy" in isReactive:
 matching braces, skipping strings/comments) to avoid silently changing
 reactivity. Same heuristic gap drives `as const` on static string props.
 
-### Generated element walks are hard to eyeball in golden diffs
-
-Element variables are emitted as nested walker chains —
-`const t_a_1 = t_next(t_next(t_next(t_next(t_root_0, true)), true)) as ...`
-(test/class/components/output/Class-client.ts) — where each `t_next` is a
-required hydration-cursor step, not a no-op. Flat sequential statements (or
-element comments) would make the committed goldens easier to review, at the
-cost of touching the path-building code in buildFragment.ts (which also does
-the `t_next(t_next(x))` → `t_skip(x, n)` shortening). Purely cosmetic; skipped
-to avoid churning every golden file for no behavior change.
-
 ### Slot fills whose root is auto-closed by the HTML parser break hydration
 
 When a component wraps each row in an element and the consumer's fill root

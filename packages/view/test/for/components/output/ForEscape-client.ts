@@ -15,6 +15,7 @@ import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
+import t_skip from "../../../../src/render/nodeSkip";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -54,10 +55,10 @@ export default function ForEscape(
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<p>#</p> <div data-testid=""></div> <div data-testid=""></div> <div data-testid=""></div> <input>`);
 			const t_root_1 = t_root(t_fragment_1);
 			const t_text_1 = t_child(t_root_1);
-			const t_div_1 = t_next(t_next(t_root_1, true)) as HTMLDivElement;
-			const t_div_2 = t_next(t_next(t_div_1, true)) as HTMLDivElement;
-			const t_div_3 = t_next(t_next(t_div_2, true)) as HTMLDivElement;
-			const t_input_1 = t_next(t_next(t_div_3, true)) as HTMLInputElement;
+			const t_div_1 = t_skip(t_root_1, 2, 1) as HTMLDivElement;
+			const t_div_2 = t_skip(t_div_1, 2, 1) as HTMLDivElement;
+			const t_div_3 = t_skip(t_div_2, 2, 1) as HTMLDivElement;
+			const t_input_1 = t_skip(t_div_3, 2, 1) as HTMLInputElement;
 			$run(() => {
 				const i = t_item_1.data;
 				t_input_1.value = String($state.things[i] || "");

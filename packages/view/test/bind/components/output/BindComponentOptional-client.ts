@@ -12,6 +12,7 @@ import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function BindComponentOptional(
@@ -45,8 +46,8 @@ export default function BindComponentOptional(
 	});
 	BindText(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
-	const t_text_1 = t_child(t_next(t_next(t_comp_anchor_1, true)));
-	const t_button_1 = t_next(t_next(t_next(t_next(t_comp_anchor_1, true)), true)) as HTMLButtonElement;
+	const t_text_1 = t_child(t_skip(t_comp_anchor_1, 2, 1));
+	const t_button_1 = t_skip(t_comp_anchor_1, 4, 5) as HTMLButtonElement;
 	t_event(t_button_1, "click", () => $state.user = { name: "Alice" });
 	$run(() => {
 		t_text_1.textContent = `Hello, ${t_fmt($state.user?.name)}`;

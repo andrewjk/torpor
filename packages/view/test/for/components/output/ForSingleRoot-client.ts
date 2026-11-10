@@ -10,6 +10,7 @@ import t_region from "../../../../src/render/newRegion";
 import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
+import t_skip from "../../../../src/render/nodeSkip";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -49,7 +50,7 @@ export default function ForSingleRoot(
 			const suffix = "!";
 			const t_li_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_child(t_li_1));
-			const t_button_1 = t_next(t_next(t_child(t_li_1), true)) as HTMLButtonElement;
+			const t_button_1 = t_skip(t_child(t_li_1), 2, 1) as HTMLButtonElement;
 			t_event(t_button_1, "click", () => {
 				const row = t_item_1.data;
 				return $props.onSelect(row)

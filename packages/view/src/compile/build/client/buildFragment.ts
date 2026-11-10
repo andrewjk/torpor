@@ -803,33 +803,73 @@ function getFragmentVarPath(
 		varPaths.set(name, name);
 	}
 
-	// Shorten `t_next(t_next(x))` to `t_skip(x, 2)`
-	while (varPath.includes("t_next(t_next(")) {
+	// Collapse runs of `t_next` / `t_next_text` steps into a single `t_skip`
+	// call with a text bitmask (bit i set = the i-th step, counting from the
+	// base, lands on a text node), so hydration walks the run in one call
+	// with per-step text handling instead of a chain of nested calls
+	while (/(?:t_next_text\(|t_next\(){2,}/.test(varPath)) {
 		status.imports.add("t_skip");
-		const match = varPath.match(/(t_next\(){2,}/)![0];
-		const count = match.length / "t_next(".length;
-		const pos = varPath.indexOf("t_next(t_next(");
-		const head = varPath.substring(0, pos);
-		let level = 0;
-		let end = 0;
-		for (let i = pos + match.length; i < varPath.length; i++) {
-			if (varPath[i] === "(") {
-				level++;
-			} else if (varPath[i] === ")") {
-				if (level === 0) {
-					end = i;
+		const runStart = /(?:t_next_text\(|t_next\(){2,}/.exec(varPath)!.index;
+		// Walk the consecutive openings
+		const openings: { text: boolean; openEnd: number }[] = [];
+		let j = runStart;
+		for (;;) {
+			const open = /^(t_next_text|t_next)\(/.exec(varPath.slice(j));
+			if (!open) break;
+			openings.push({ text: open[1] === "t_next_text", openEnd: j + open[0].length });
+			j += open[0].length;
+		}
+		if (openings.length < 2) break;
+		const count = openings.length;
+		// The innermost call wraps the base expression
+		const innermostOpenEnd = openings[openings.length - 1].openEnd;
+		let innerDepth = 0;
+		let innermostClose = -1;
+		for (let k = innermostOpenEnd; k < varPath.length; k++) {
+			if (varPath[k] === "(") {
+				innerDepth++;
+			} else if (varPath[k] === ")") {
+				if (innerDepth === 0) {
+					innermostClose = k;
 					break;
-				} else {
-					level--;
+				}
+				innerDepth--;
+			}
+		}
+		if (innermostClose === -1) break;
+		// The outermost call's closing paren bounds the strip
+		let outerDepth = 1; // already inside openings[0]'s parens
+		let outerClose = -1;
+		for (let k = openings[0].openEnd; k < varPath.length; k++) {
+			if (varPath[k] === "(") {
+				outerDepth++;
+			} else if (varPath[k] === ")") {
+				outerDepth--;
+				if (outerDepth === 0) {
+					outerClose = k;
+					break;
 				}
 			}
 		}
-		const tail = varPath.substring(end + count);
-		const param = varPath.substring(pos + match.length, end);
-		varPath = `${head}t_skip(${param}, ${count})${tail}`;
+		if (outerClose === -1) break;
+		// Opening k (0 = outermost, applied last) is step count - 1 - k
+		let mask = 0;
+		for (let k = 0; k < count; k++) {
+			if (openings[k].text) mask |= 1 << (count - 1 - k);
+		}
+		// The base expression: the innermost call's argument list, minus the
+		// innermost step's text flag (which moves into the mask)
+		let param = varPath.substring(innermostOpenEnd, innermostClose);
+		if (openings[openings.length - 1].text && param.endsWith(", true")) {
+			param = param.slice(0, -", true".length);
+		}
+		const head = varPath.substring(0, runStart);
+		const tail = varPath.substring(outerClose + 1);
+		varPath = `${head}t_skip(${param}, ${count}${mask ? `, ${mask}` : ""})${tail}`;
 	}
 
-	// Set t_next_text back to t_next
+	// Set t_next_text back to t_next (single text steps that weren't part of
+	// a collapsed run)
 	varPath = varPath.replaceAll("t_next_text", "t_next");
 
 	return varPath;

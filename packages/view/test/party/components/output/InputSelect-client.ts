@@ -15,6 +15,7 @@ import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
+import t_skip from "../../../../src/render/nodeSkip";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -44,7 +45,7 @@ export default function ColorSelect(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div>#</div> <select><!></select>`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_text_1 = t_child(t_root_0);
-	const t_select_1 = t_next(t_next(t_root_0, true)) as HTMLSelectElement;
+	const t_select_1 = t_skip(t_root_0, 2, 1) as HTMLSelectElement;
 	let t_for_anchor_1 = t_anchor(t_child(t_select_1)) as HTMLElement;
 
 	/* @for */

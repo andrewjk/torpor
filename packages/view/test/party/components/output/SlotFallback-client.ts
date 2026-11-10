@@ -7,6 +7,7 @@ import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function FunnyButtonApp(
@@ -27,7 +28,7 @@ export default function FunnyButtonApp(
 	/* @component */
 	FunnyButton(t_fragment_0, t_comp_anchor_1, undefined, $context);
 
-	let t_comp_anchor_2 = t_anchor(t_next(t_next(t_comp_anchor_1, true))) as HTMLElement;
+	let t_comp_anchor_2 = t_anchor(t_skip(t_comp_anchor_1, 2, 1)) as HTMLElement;
 
 	/* @component */
 	const t_slots_1: Record<string, SlotRender> = {};

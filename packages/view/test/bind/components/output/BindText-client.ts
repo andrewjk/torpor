@@ -7,6 +7,7 @@ import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function BindText(
@@ -25,9 +26,9 @@ export default function BindText(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<input> <select><option value=0>First</option><option value=1>Second</option><option value=2>Third</option></select> <p>#</p> <p>#</p>`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_input_1 = t_root_0 as HTMLInputElement;
-	const t_select_1 = t_next(t_next(t_input_1, true)) as HTMLSelectElement;
-	const t_text_1 = t_child(t_next(t_next(t_select_1, true)));
-	const t_p_1 = t_next(t_next(t_next(t_next(t_select_1, true)), true)) as HTMLElement;
+	const t_select_1 = t_skip(t_input_1, 2, 1) as HTMLSelectElement;
+	const t_text_1 = t_child(t_skip(t_select_1, 2, 1));
+	const t_p_1 = t_skip(t_select_1, 4, 5) as HTMLElement;
 	const t_text_2 = t_child(t_p_1);
 	$run(() => {
 		t_input_1.value = String($state.name || "");

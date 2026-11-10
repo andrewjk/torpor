@@ -7,6 +7,7 @@ import t_fmt from "../../../../src/render/formatText";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root_el from "../../../../src/render/nodeRootElement";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function MultiComponent(
@@ -26,7 +27,7 @@ export default function MultiComponent(
 	const t_root_0 = t_root_el(t_fragment_0);
 	const t_div_1 = t_root_0 as HTMLDivElement;
 	const t_text_1 = t_child(t_child(t_div_1));
-	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_child(t_div_1), true))) as HTMLElement;
+	let t_comp_anchor_1 = t_anchor(t_skip(t_child(t_div_1), 2, 1)) as HTMLElement;
 
 	/* @component */
 	let t_props_1 = $watch({

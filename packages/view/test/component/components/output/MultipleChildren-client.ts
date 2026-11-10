@@ -9,6 +9,7 @@ import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function MultipleChildren(
@@ -36,12 +37,12 @@ export default function MultipleChildren(
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<h1>Title</h1> <p>Body text</p> <footer>Footer</footer>`);
 		const t_root_2 = t_root(t_fragment_2);
-		const t_footer_1 = t_next(t_next(t_next(t_next(t_root_2, true)), true)) as HTMLElement;
+		const t_footer_1 = t_skip(t_root_2, 4, 5) as HTMLElement;
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_footer_1, t_root_2);
 	}
 	Card(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 
-	const t_p_1 = t_next(t_next(t_comp_anchor_1, true)) as HTMLElement;
+	const t_p_1 = t_skip(t_comp_anchor_1, 2, 1) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	$run(() => {
 		t_text_1.textContent = t_fmt($props.text);

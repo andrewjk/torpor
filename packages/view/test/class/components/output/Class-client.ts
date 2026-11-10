@@ -10,6 +10,7 @@ import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function Class(
@@ -25,12 +26,12 @@ export default function Class(
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div id="divid" class="torp-16s1yph"> From id </div> <div class="divclass torp-16s1yph"> From string </div> <a class="torp-16s1yph"> From state </a> <div class="torp-16s1yph"> From state with scope </div> <div class="torp-16s1yph"> Class object </div> <div class="torp-16s1yph"> Class array </div> <div class="torp-16s1yph"> Class nested </div> <!> <!> <!>`);
 	const t_root_0 = t_root(t_fragment_0);
-	const t_a_1 = t_next(t_next(t_next(t_next(t_root_0, true)), true)) as HTMLAnchorElement;
-	const t_div_1 = t_next(t_next(t_a_1, true)) as HTMLDivElement;
-	const t_div_2 = t_next(t_next(t_div_1, true)) as HTMLDivElement;
-	const t_div_3 = t_next(t_next(t_div_2, true)) as HTMLDivElement;
-	const t_div_4 = t_next(t_next(t_div_3, true)) as HTMLDivElement;
-	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_div_4, true))) as HTMLElement;
+	const t_a_1 = t_skip(t_root_0, 4, 5) as HTMLAnchorElement;
+	const t_div_1 = t_skip(t_a_1, 2, 1) as HTMLDivElement;
+	const t_div_2 = t_skip(t_div_1, 2, 1) as HTMLDivElement;
+	const t_div_3 = t_skip(t_div_2, 2, 1) as HTMLDivElement;
+	const t_div_4 = t_skip(t_div_3, 2, 1) as HTMLDivElement;
+	let t_comp_anchor_1 = t_anchor(t_skip(t_div_4, 2, 1)) as HTMLElement;
 
 	/* @component */
 	let t_props_1 = $watch({
@@ -50,7 +51,7 @@ export default function Class(
 	}
 	Child(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 
-	let t_comp_anchor_2 = t_anchor(t_next(t_next(t_comp_anchor_1, true))) as HTMLElement;
+	let t_comp_anchor_2 = t_anchor(t_skip(t_comp_anchor_1, 2, 1)) as HTMLElement;
 
 	/* @component */
 	let t_props_2 = $watch({
@@ -73,7 +74,7 @@ export default function Class(
 	}
 	Child(t_fragment_0, t_comp_anchor_2, t_props_2, $context, t_slots_2);
 
-	let t_comp_anchor_3 = t_anchor(t_next(t_next(t_comp_anchor_2, true))) as HTMLElement;
+	let t_comp_anchor_3 = t_anchor(t_skip(t_comp_anchor_2, 2, 1)) as HTMLElement;
 
 	/* @component */
 	let t_props_3 = $watch({

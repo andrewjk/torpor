@@ -7,6 +7,7 @@ import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function EventsKeyboard(
@@ -29,7 +30,7 @@ export default function EventsKeyboard(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<input id="keyinput"> <p>#</p>`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_input_1 = t_root_0 as HTMLInputElement;
-	const t_p_1 = t_next(t_next(t_input_1, true)) as HTMLElement;
+	const t_p_1 = t_skip(t_input_1, 2, 1) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	t_event(t_input_1, "keydown", handleKeyDown);
 	$run(() => {

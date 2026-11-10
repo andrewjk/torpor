@@ -6,6 +6,7 @@ import t_event from "../../../../src/render/addEvent";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function OnmountNestedRun(
@@ -40,7 +41,7 @@ export default function OnmountNestedRun(
 		$state.count += 1
 	};
 
-	const t_button_1 = t_next(t_next(t_span_1, true)) as HTMLButtonElement;
+	const t_button_1 = t_skip(t_span_1, 2, 1) as HTMLButtonElement;
 	t_event(t_button_1, "click", increment);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_button_1, t_root_0);
 

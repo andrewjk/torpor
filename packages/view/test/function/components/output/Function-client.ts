@@ -7,6 +7,7 @@ import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function Function(
@@ -31,7 +32,7 @@ export default function Function(
 		$state.counter += 1;
 	};
 
-	const t_p_1 = t_next(t_next(t_button_1, true)) as HTMLElement;
+	const t_p_1 = t_skip(t_button_1, 2, 1) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	t_event(t_button_1, "click", increment);
 	$run(() => {

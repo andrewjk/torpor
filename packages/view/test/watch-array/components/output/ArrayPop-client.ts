@@ -9,6 +9,7 @@ import t_region from "../../../../src/render/newRegion";
 import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
+import t_skip from "../../../../src/render/nodeSkip";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -26,7 +27,7 @@ export default function Array(
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<section><p>^</p> <!> <p>$</p></section>`);
 	const t_root_0 = t_root_el(t_fragment_0);
 	const t_section_1 = t_root_0 as HTMLElement;
-	let t_for_anchor_1 = t_anchor(t_next(t_next(t_child(t_section_1), true))) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_skip(t_child(t_section_1), 2, 1)) as HTMLElement;
 
 	/* @for */
 	let t_for_region_1 = t_region();

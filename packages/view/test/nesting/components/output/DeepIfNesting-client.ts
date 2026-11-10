@@ -11,6 +11,7 @@ import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function DeepNesting(
@@ -39,7 +40,7 @@ export default function DeepNesting(
 			const t_old_region = t_push_region(t_new_region, true);
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<p>L1</p> <!>`);
 			const t_root_1 = t_root(t_fragment_1);
-			let t_if_anchor_2 = t_anchor(t_next(t_next(t_root_1, true))) as HTMLElement;
+			let t_if_anchor_2 = t_anchor(t_skip(t_root_1, 2, 1)) as HTMLElement;
 
 			/* @if */
 			const t_if_region_2 = t_region();
@@ -51,7 +52,7 @@ export default function DeepNesting(
 					const t_old_region = t_push_region(t_new_region, true);
 					const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<p>L2</p> <!>`);
 					const t_root_2 = t_root(t_fragment_2);
-					let t_if_anchor_3 = t_anchor(t_next(t_next(t_root_2, true))) as HTMLElement;
+					let t_if_anchor_3 = t_anchor(t_skip(t_root_2, 2, 1)) as HTMLElement;
 
 					/* @if */
 					const t_if_region_3 = t_region();
@@ -63,7 +64,7 @@ export default function DeepNesting(
 							const t_old_region = t_push_region(t_new_region, true);
 							const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, `<p>L3</p> <!>`);
 							const t_root_3 = t_root(t_fragment_3);
-							let t_if_anchor_4 = t_anchor(t_next(t_next(t_root_3, true))) as HTMLElement;
+							let t_if_anchor_4 = t_anchor(t_skip(t_root_3, 2, 1)) as HTMLElement;
 
 							/* @if */
 							const t_if_region_4 = t_region();
@@ -116,7 +117,7 @@ export default function DeepNesting(
 		}
 	});
 
-	let t_if_anchor_5 = t_anchor(t_next(t_next(t_if_anchor_1, true))) as HTMLElement;
+	let t_if_anchor_5 = t_anchor(t_skip(t_if_anchor_1, 2, 1)) as HTMLElement;
 
 	/* @if */
 	const t_if_region_5 = t_region();

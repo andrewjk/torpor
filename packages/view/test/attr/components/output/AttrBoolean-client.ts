@@ -4,6 +4,7 @@ import t_attribute from "../../../../src/render/setAttribute";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function AttrBoolean(
@@ -20,8 +21,8 @@ export default function AttrBoolean(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<button>Click</button> <input type="checkbox"> <input type="text">`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_button_1 = t_root_0 as HTMLButtonElement;
-	const t_input_1 = t_next(t_next(t_button_1, true)) as HTMLInputElement;
-	const t_input_2 = t_next(t_next(t_input_1, true)) as HTMLInputElement;
+	const t_input_1 = t_skip(t_button_1, 2, 1) as HTMLInputElement;
+	const t_input_2 = t_skip(t_input_1, 2, 1) as HTMLInputElement;
 	$run(() => {
 		t_attribute(t_button_1, "disabled", $props.disabled);
 		t_attribute(t_input_1, "checked", $props.checked);

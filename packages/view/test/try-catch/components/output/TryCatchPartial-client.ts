@@ -15,6 +15,7 @@ import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
 import t_run_try from "../../../../src/render/runTry";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 function Thrower(
@@ -83,12 +84,12 @@ export default function TryCatchPartial(
 	t_run_try(t_try_region_1, t_try_anchor_1, (t_before) => {
 		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<p>First</p> <!> <p>Third</p>`);
 		const t_root_1 = t_root(t_fragment_1);
-		let t_comp_anchor_1 = t_anchor(t_next(t_next(t_root_1, true))) as HTMLElement;
+		let t_comp_anchor_1 = t_anchor(t_skip(t_root_1, 2, 1)) as HTMLElement;
 
 		/* @component */
 		Thrower(t_fragment_1, t_comp_anchor_1, undefined, $context);
 
-		const t_p_1 = t_next(t_next(t_comp_anchor_1, true)) as HTMLElement;
+		const t_p_1 = t_skip(t_comp_anchor_1, 2, 1) as HTMLElement;
 		t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_p_1, t_root_1);
 	},(t_before, err) => {
 		const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p class="error">#</p>`);

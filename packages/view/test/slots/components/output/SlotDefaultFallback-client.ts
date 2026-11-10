@@ -13,6 +13,7 @@ import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
+import t_skip from "../../../../src/render/nodeSkip";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -47,7 +48,7 @@ export default function SlotDefault(
 	}
 	List(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 
-	let t_comp_anchor_2 = t_anchor(t_next(t_next(t_comp_anchor_1, true))) as HTMLElement;
+	let t_comp_anchor_2 = t_anchor(t_skip(t_comp_anchor_1, 2, 1)) as HTMLElement;
 
 	/* @component */
 	let t_props_1 = $watch({

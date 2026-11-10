@@ -11,6 +11,7 @@ import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
+import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function BindComponent(
@@ -42,7 +43,7 @@ export default function BindComponent(
 	});
 	BindText(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
-	const t_p_1 = t_next(t_next(t_comp_anchor_1, true)) as HTMLElement;
+	const t_p_1 = t_skip(t_comp_anchor_1, 2, 1) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	$run(() => {
 		t_text_1.textContent = `Hello, ${t_fmt($state.name)}`;

@@ -12,6 +12,7 @@ import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
+import t_skip from "../../../../src/render/nodeSkip";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -30,8 +31,8 @@ export default function NestedReactive(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<p>#</p> <ul><!></ul> <p>#</p>`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_text_1 = t_child(t_root_0);
-	const t_for_parent_1 = t_next(t_next(t_root_0, true)) as HTMLElement;
-	let t_for_anchor_1 = t_anchor(t_child(t_next(t_next(t_root_0, true)))) as HTMLElement;
+	const t_for_parent_1 = t_skip(t_root_0, 2, 1) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_child(t_skip(t_root_0, 2, 1))) as HTMLElement;
 
 	/* @for */
 	let t_for_region_1 = t_region();
@@ -68,7 +69,7 @@ export default function NestedReactive(
 		true
 	);
 
-	const t_p_1 = t_next(t_next(t_next(t_next(t_root_0, true)), true)) as HTMLElement;
+	const t_p_1 = t_skip(t_root_0, 4, 5) as HTMLElement;
 	const t_text_3 = t_child(t_p_1);
 	$run(() => {
 		t_text_1.textContent = `Name: ${t_fmt($props.user.name)}`;
