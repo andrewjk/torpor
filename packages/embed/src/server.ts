@@ -17,12 +17,15 @@ export type {
 } from "./server/service/createServiceRenderer";
 
 // Re-exported for hosts that only import from @torpor/embed/server
+export { default as createBridge } from "./bridge/createBridge";
 export { default as EmbedCompileError } from "./types/EmbedCompileError";
 export { default as checkVersion } from "./checkVersion";
 
 export type {
 	EmbedArtifact,
 	EmbedBridge,
+	EmbedBridgeController,
+	EmbedBridgeHandlers,
 	EmbedOptions,
 	EmbedRenderResult,
 	EmbedStyle,

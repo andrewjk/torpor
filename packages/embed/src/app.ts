@@ -27,5 +27,5 @@
  * });
  * ```
  */
-export { default as defineApp, manifestExpr, manifestRequirements } from "./app/manifest";
+export { default as defineApp, manifestRequirements } from "./app/manifest";
 export type { AppManifest, ManifestRequirement, ManifestValue } from "./app/manifest";

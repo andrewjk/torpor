@@ -10,6 +10,9 @@ export { default as createHttpSource } from "./restricted/http/createHttpSource"
 export { default as httpRequirementKind } from "./restricted/http/httpRequirementKind";
 export { default as deriveRequirementKind } from "./restricted/derive/deriveRequirementKind";
 export type { DeriveLimits } from "./restricted/derive/resolveDerive";
+// Hosts writing their own requirement kinds need the validator's shape,
+// just like the built-in kinds below
+export type { RestrictedRequirementKindValidator, RestrictedSpecEntry } from "@torpor/view/compile";
 export type {
 	HttpCredential,
 	HttpOriginPolicy,

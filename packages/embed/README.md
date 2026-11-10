@@ -199,6 +199,11 @@ Data declarations in the template are inert specs, implemented by the host:
 data tickets from tickets { queue: $props.queue, sort: "recency" };
 ```
 
+(The in-torp `data … from …` block is the default style. The same
+requirements can instead live in an app manifest -- plain JSON outside the
+template, via `compileRestricted`'s `data` option; see **App manifests**
+below. Pick one style per artifact: declaring both is a compile error.)
+
 - `sources` is the trusted boundary: authorization, tenant scoping and network
   access live there, never in the artifact. Data resolves per render under the
   _viewer's_ authority, so a shared embed only ever shows what its viewer
@@ -439,6 +444,50 @@ const { body } = await renderRestricted(artifact, {
 - Host functions are not available to template expressions; a missing
   formatter fails loudly, naming it.
 
+### App manifests: data outside the template
+
+`@torpor/embed/app` is the author-facing manifest entry (edge-safe, no Node
+builtins). `defineApp` types an app declaration and returns it unchanged --
+plain JSON, so a host can store it and compile against it without executing
+anything. Data lives in the manifest instead of a `data … from http` block
+inside the .torp, keeping restricted templates plain torpor:
+
+```ts
+// word-lookup.app.ts -- authored by the client, submitted as JSON
+import { defineApp } from "@torpor/embed/app";
+
+export default defineApp({
+	id: "word-lookup",
+	props: { word: "serendipity" },
+	data: {
+		entry: {
+			kind: "http",
+			url: "https://dictionaryapi.com/api/v3/references/collegiate/json",
+			params: { word: "$props.word" }, // "$props.<path>" resolves per render
+			auth: "mw", // credential *name*; secrets stay host-side
+			pick: "0",
+			limit: 5,
+		},
+	},
+});
+```
+
+Compile against it with `compileRestricted`'s `data` option -- use one
+style or the other, not both:
+
+```ts
+const artifact = compileRestricted("word-lookup", templateSource, {
+	requirementKinds: { http: httpRequirementKind },
+	data: manifest.data, // validated like in-torp requirements, at save time
+});
+```
+
+Manifests are validated by the same requirement kinds, so unknown kinds and
+malformed specs fail at save time. Requirements resolve in declaration
+order, so `derive` entries can reference earlier ones. For validation-only
+workflows (checking a submitted manifest before storing it),
+`manifestRequirements` returns the same error list a compile would.
+
 ### Audit trail
 
 `renderRestricted` takes `onAudit`, called once per resolved data
@@ -552,7 +601,9 @@ host's. Frame embeds subscribe through the same `on`; the host listener
 relays pushes across the postMessage boundary (see the frame protocol
 below). Pushing requires passing a bridge: embeds mounted without one get
 a private default bridge you can't reach. With no subscriber for a type,
-a push is a silent no-op.
+a push is a silent no-op. (The scoping itself is `scopeBridge` -- the
+helper the loaders apply per mount, exported for hosts building their own
+loading paths.)
 
 If a host mounts an embed without a bridge, a default bridge is injected
 that warns on first use -- unwired embeds fail loudly in the console
