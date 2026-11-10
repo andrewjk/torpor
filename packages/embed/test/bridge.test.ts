@@ -1,6 +1,7 @@
 import { expect, test } from "vite-plus/test";
 import createBridge from "../src/bridge/createBridge";
 import scopeBridge from "../src/bridge/scopeBridge";
+import compileRestricted from "../src/restricted/compileRestricted";
 import compileEmbed from "../src/server/compileEmbed";
 import mountEmbed from "../src/loader/mountEmbed";
 import type EmbedArtifact from "../src/types/EmbedArtifact";
@@ -203,4 +204,48 @@ test("push updates a mounted embed reactively", async () => {
 	bridge.push("count", 9, "live-counter");
 	await tick();
 	expect(target.querySelector("p")?.textContent).toBe("9");
+});
+
+const SURFACE_SOURCE = `
+export default function Guarded($props: { $embed: any }) {
+	async function submit() {
+		await $props.$embed.invoke("declared-method", {});
+		// Dynamically composed names are invisible to the compile-time
+		// scan — this is what the runtime warning is for
+		const method = "rogue-method";
+		await $props.$embed.invoke(method, {});
+	}
+	@render { <button onclick={submit}>Go</button> }
+}
+`;
+
+test("calls outside a declared surface warn at runtime, once per call", async () => {
+	const artifact = compileRestricted("guarded", SURFACE_SOURCE, {
+		api: { "declared-method": {} },
+	});
+	const warn = console.warn;
+	const warnings: string[] = [];
+	console.warn = (message: string) => warnings.push(message);
+	try {
+		const bridge = createBridge({ invoke: async () => "ok" });
+		const target = document.createElement("div");
+		document.body.appendChild(target);
+		mountEmbed(target, artifact, {}, { bridge });
+
+		getButton(target).click();
+		await tick();
+
+		// The declared call is silent; the rogue one warns, naming the section
+		const rogue = warnings.filter((w) => w.includes("rogue-method"));
+		expect(rogue.length).toBe(1);
+		expect(rogue[0]).toMatch(/invoked "rogue-method", which is not declared in its app manifest/);
+		expect(warnings.some((w) => w.includes("declared-method"))).toBe(false);
+
+		// A second run warns again only for new names — declared stays quiet
+		getButton(target).click();
+		await tick();
+		expect(warnings.filter((w) => w.includes("rogue-method")).length).toBe(1);
+	} finally {
+		console.warn = warn;
+	}
 });

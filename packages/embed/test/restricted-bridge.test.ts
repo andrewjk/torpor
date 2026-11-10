@@ -22,7 +22,7 @@ export default function Sign($props: { $embed?: any }) {
 `;
 
 test("restricted handlers can invoke the host bridge", async () => {
-	const artifact = compileRestricted("sign", SOURCE);
+	const artifact = compileRestricted("sign", SOURCE, { api: { submit: {} } });
 
 	// Paint server-side first (empty form), then hydrate with a bridge
 	const rendered = await renderRestricted(artifact, {});

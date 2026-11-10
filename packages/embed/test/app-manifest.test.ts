@@ -6,7 +6,9 @@ import {
 	deriveRequirementKind,
 	httpRequirementKind,
 	renderRestricted,
+	recompileRestricted,
 } from "../src/restricted";
+import EmbedCompileError from "../src/types/EmbedCompileError";
 
 const KINDS = { http: httpRequirementKind, derive: deriveRequirementKind };
 
@@ -37,6 +39,19 @@ test("defineApp types a manifest and returns plain JSON", () => {
 		},
 	});
 	expect(JSON.parse(JSON.stringify(manifest))).toEqual(manifest);
+});
+
+test("defineApp carries the declared bridge surface as plain JSON", () => {
+	const manifest = defineApp({
+		id: "poll",
+		api: { vote: { payload: { choice: "yes" }, result: "ok" } },
+		emits: ["voted"],
+		pushes: ["votes-changed"],
+	});
+	expect(JSON.parse(JSON.stringify(manifest))).toEqual(manifest);
+	// The api block doubles as a typed contract for EmbedApiBridge
+	const contract: Record<string, { payload?: unknown; result?: unknown }> = manifest.api ?? {};
+	expect(Object.keys(contract)).toEqual(["vote"]);
 });
 
 test("a manifest data block compiles a plain template and renders through sources", async () => {
@@ -155,4 +170,77 @@ test("manifestRequirements validates names and shapes without compiling", () => 
 	expect(errors.length).toBe(2);
 	expect(errors[0]!.message).toMatch(/Invalid data requirement name/);
 	expect(errors[1]!.message).toMatch(/missing a "kind"/);
+});
+
+const SURFACE_SOURCE = `
+export default function Poll($props: { $embed: any }) {
+	async function submit() {
+		await $props.$embed.invoke("vote", { choice: "yes" });
+		$props.$embed.emit("voted");
+	}
+	$props.$embed.on("votes-changed", () => {});
+	@render { <button onclick={submit}>Vote</button> }
+}
+`;
+
+const SURFACE_OPTIONS = {
+	requirementKinds: KINDS,
+	api: { vote: { payload: { choice: "yes" }, result: "ok" } },
+	emits: ["voted"],
+	pushes: ["votes-changed"],
+};
+
+test("a declared surface compiles onto the artifact", () => {
+	const embed = compileRestricted("poll", SURFACE_SOURCE, SURFACE_OPTIONS);
+	expect(embed.surface).toEqual({
+		api: ["vote"],
+		emits: ["voted"],
+		pushes: ["votes-changed"],
+	});
+});
+
+test("calls outside a declared surface are compile errors", () => {
+	const cases: [Record<string, unknown>, RegExp][] = [
+		[
+			{ api: { different: {} } },
+			/invoke\("vote"\), which is not declared in the app manifest's api/,
+		],
+		[{ emits: ["something-else"] }, /emits "voted", which is not declared/],
+		[
+			{ pushes: ["other-push"] },
+			/subscribes to "votes-changed".*not declared in the app manifest's pushes/s,
+		],
+	];
+	for (const [surface, pattern] of cases) {
+		let thrown: unknown;
+		try {
+			compileRestricted("poll", SURFACE_SOURCE, { ...SURFACE_OPTIONS, ...surface });
+		} catch (error) {
+			thrown = error;
+		}
+		expect(thrown).toBeInstanceOf(EmbedCompileError);
+		const messages = (thrown as EmbedCompileError).errors.map((error) => error.message).join("\n");
+		expect(messages).toMatch(pattern);
+	}
+});
+
+test("recompileRestricted keeps the declared surface", () => {
+	const embed = compileRestricted("poll", SURFACE_SOURCE, SURFACE_OPTIONS);
+	const fresh = recompileRestricted(embed, SURFACE_OPTIONS);
+	expect(fresh.surface).toEqual(embed.surface);
+});
+
+test("using the bridge without a declared surface is a compile error", () => {
+	let thrown: unknown;
+	try {
+		compileRestricted("poll-ungated", SURFACE_SOURCE, { requirementKinds: KINDS });
+	} catch (error) {
+		thrown = error;
+	}
+	expect(thrown).toBeInstanceOf(EmbedCompileError);
+	const messages = (thrown as EmbedCompileError).errors.map((error) => error.message).join("\n");
+	// Default deny: one error per undeclared section, naming the first call
+	expect(messages).toMatch(/declares no api surface/);
+	expect(messages).toMatch(/declares no emits surface/);
+	expect(messages).toMatch(/declares no pushes surface/);
 });

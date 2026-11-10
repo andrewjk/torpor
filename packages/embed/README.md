@@ -445,13 +445,14 @@ const { body } = await renderRestricted(artifact, {
 - Host functions are not available to template expressions; a missing
   formatter fails loudly, naming it.
 
-### App manifests: where data requirements live
+### App manifests: what an app may do
 
 `@torpor/embed/app` is the author-facing manifest entry (edge-safe, no Node
 builtins). `defineApp` types an app declaration and returns it unchanged --
 plain JSON, so a host can store it and compile against it without executing
-anything. All data requirements live here, keeping restricted templates
-plain torpor:
+anything. The manifest declares what the app is allowed to do: its data
+requirements, and its bridge surface. Data requirements live here rather
+than in the template, keeping restricted templates plain torpor:
 
 ```ts
 // word-lookup.app.ts -- authored by the client, submitted as JSON
@@ -470,15 +471,23 @@ export default defineApp({
 			limit: 5,
 		},
 	},
+	// The declared bridge surface (all optional):
+	api: { define: { payload: { word: "string" }, result: "entry" } }, // $embed.invoke
+	emits: ["looked-up"], // $embed.emit
+	pushes: ["dictionary-updated"], // $embed.on
 });
 ```
 
-Compile against it with `compileRestricted`'s `data` option:
+Compile against it with `compileRestricted`'s `data`/`api`/`emits`/`pushes`
+options:
 
 ```ts
 const artifact = compileRestricted("word-lookup", templateSource, {
 	requirementKinds: { http: httpRequirementKind },
 	data: manifest.data, // validated like in-torp requirements, at save time
+	api: manifest.api,
+	emits: manifest.emits,
+	pushes: manifest.pushes,
 });
 ```
 
@@ -487,6 +496,18 @@ malformed specs fail at save time. Requirements resolve in declaration
 order, so `derive` entries can reference earlier ones. For validation-only
 workflows (checking a submitted manifest before storing it),
 `manifestRequirements` returns the same error list a compile would.
+
+**The declared bridge surface is enforced, with default deny.** An embed
+that uses the bridge must declare its surface: calling
+`$embed.invoke`/`emit`/`on` without the matching block -- or with names
+outside it -- is a compile error naming the declaration. Embeds that never
+touch the bridge need no surface. At mount time the loaders also warn when
+a call steps outside the declaration (catching dynamically composed names,
+which the compile-time scan can't see). The audit trail and approval flow
+remain the boundary for what declared calls actually _do_. The `api` block
+doubles as an `EmbedApi` contract: `$props.$embed as
+EmbedApiBridge<typeof manifest.api>` types every call site from the
+manifest itself.
 
 ### Audit trail
 

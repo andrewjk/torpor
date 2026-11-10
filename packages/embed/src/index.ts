@@ -41,6 +41,7 @@ export type {
 	EmbedOptions,
 	EmbedRenderResult,
 	EmbedStyle,
+	EmbedSurface,
 } from "./types";
 export type { EmbedScope } from "./loader/scope";
 export type { ModuleEmbedOptions } from "./loader/prepareModule";

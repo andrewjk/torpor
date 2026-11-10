@@ -229,7 +229,9 @@ export default function Section($props: { $embed: any; title: string }) {
 	}
 }
 `;
-	const artifact: EmbedArtifact = compileRestricted("hydrate-parity", source);
+	const artifact: EmbedArtifact = compileRestricted("hydrate-parity", source, {
+		emits: ["pinged"],
+	});
 	const { body } = await renderRestricted(artifact, {
 		props: { title: "Hello" },
 		data: {},

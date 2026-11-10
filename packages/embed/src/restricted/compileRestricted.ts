@@ -1,10 +1,12 @@
 import { bindDataTemplate, build, buildRestricted, parse } from "@torpor/view/compile";
 import type { CompileError, RestrictedRequirementKindValidator } from "@torpor/view/compile";
-import { type ManifestRequirement, manifestRequirements } from "../app";
+import { type ManifestApiMethod, type ManifestRequirement, manifestRequirements } from "../app";
+import { checkBridgeSurface, scanBridgeUsage } from "../app/bridgeSurface";
 import { checkMaxSourceBytes, scanImports, toClientCode } from "../compile/compileEmbed";
 import { RUNTIME_VERSION } from "../generated/version";
 import EmbedCompileError from "../types/EmbedCompileError";
 import type EmbedArtifact from "../types/EmbedArtifact";
+import type EmbedSurface from "../types/EmbedSurface";
 
 export interface CompileRestrictedOptions {
 	/**
@@ -34,6 +36,21 @@ export interface CompileRestrictedOptions {
 	 * and derive expressions are strings parsed at save time.
 	 */
 	data?: Record<string, ManifestRequirement>;
+
+	/**
+	 * The app manifest's declared bridge surface (`defineApp().api`) — the
+	 * methods the embed may `invoke`. **Default deny**: an embed that
+	 * invokes without this block, or calls a method outside it, is a
+	 * compile error. The declared names are compiled onto the artifact as
+	 * its `surface`, so the loaders can also warn at mount time.
+	 */
+	api?: Record<string, ManifestApiMethod>;
+
+	/** The event types the embed may `emit` — enforced like `api`. */
+	emits?: string[];
+
+	/** The push types the embed may subscribe to — enforced like `api`. */
+	pushes?: string[];
 
 	/** Host metadata carried through recompiles. */
 	meta?: Record<string, unknown>;
@@ -106,6 +123,18 @@ export default function compileRestricted(
 
 	const imports = scanImports(client.code);
 
+	// Declared bridge surface, with default deny: an embed that uses the
+	// bridge must declare its surface, and calls outside the declaration
+	// are compile errors (dynamic names warn at runtime instead).
+	const surfaceErrors = checkBridgeSurface(scanBridgeUsage(client.code), {
+		api: options?.api,
+		emits: options?.emits,
+		pushes: options?.pushes,
+	});
+	if (surfaceErrors.length > 0) {
+		throw new EmbedCompileError(surfaceErrors);
+	}
+
 	return {
 		id,
 		name: component.name,
@@ -117,5 +146,20 @@ export default function compileRestricted(
 		server: { template: { ...restricted.program, requirements: manifest.requirements } },
 		styles: restricted.styles,
 		meta: options?.meta,
+		surface: bridgeSurface(options),
+	};
+}
+
+/**
+ * Compiles the declared bridge surface onto the artifact, so the loaders
+ * can warn at mount time when a call steps outside it.
+ */
+function bridgeSurface(options?: CompileRestrictedOptions): EmbedSurface | undefined {
+	const { api, emits, pushes } = options ?? {};
+	if (api === undefined && emits === undefined && pushes === undefined) return undefined;
+	return {
+		api: api === undefined ? undefined : Object.keys(api),
+		emits,
+		pushes,
 	};
 }

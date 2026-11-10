@@ -1,5 +1,6 @@
 import type { RestrictedProgram } from "@torpor/view/compile";
 import type EmbedArtifactImport from "./EmbedArtifactImport";
+import type EmbedSurface from "./EmbedSurface";
 
 /**
  * A component authored at runtime (by a REPL user, a feed post author, an
@@ -94,6 +95,14 @@ export default interface EmbedArtifact {
 	 * Arbitrary host-specific metadata (author id, publish date, etc).
 	 */
 	meta?: Record<string, unknown>;
+
+	/**
+	 * The bridge surface declared in the app manifest (`api`/`emits`/
+	 * `pushes`), if any. Compile time enforces the embed's calls against
+	 * it; at mount time the loaders warn when a call steps outside a
+	 * declared section. Absent when the manifest declares no surface.
+	 */
+	surface?: EmbedSurface;
 }
 
 export interface EmbedStyle {

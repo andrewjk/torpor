@@ -2,10 +2,11 @@
  * The author-facing app manifest entry — edge-safe, no Node builtins.
  *
  * `defineApp` types an app declaration and returns it unchanged: the result
- * is plain JSON (id, default props, data requirements), so a host can store
- * it and compile against it without executing anything. This is what lets
- * data live in a typed config file instead of a `data … from http` block
- * inside the .torp, keeping restricted templates plain torpor.
+ * is plain JSON (id, default props, data requirements, declared bridge
+ * surface), so a host can store it and compile against it without executing
+ * anything. Data lives in a typed config file, keeping restricted templates
+ * plain torpor, and the declared surface turns "what this app may do" into
+ * something a host can review and the compiler can enforce.
  *
  * ```ts
  * // word-lookup.app.ts — authored by the client, submitted as JSON
@@ -28,4 +29,9 @@
  * ```
  */
 export { default as defineApp, manifestRequirements } from "./app/manifest";
-export type { AppManifest, ManifestRequirement, ManifestValue } from "./app/manifest";
+export type {
+	AppManifest,
+	ManifestApiMethod,
+	ManifestRequirement,
+	ManifestValue,
+} from "./app/manifest";

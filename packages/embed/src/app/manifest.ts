@@ -32,9 +32,20 @@ export interface ManifestRequirement {
 }
 
 /**
+ * One declared bridge method in an app manifest's `api` block. The
+ * payload/result values are inert documentation of the shapes — the
+ * declaration's job is the method *name*, which is enforced at compile
+ * time and doubles as an `EmbedApi` contract for typed call sites.
+ */
+export interface ManifestApiMethod {
+	payload?: ManifestValue;
+	result?: ManifestValue;
+}
+
+/**
  * The author-facing app declaration. This is inert data (JSON after
- * evaluation) describing the app: its id, default props, and the data
- * requirements that feed `$data`.
+ * evaluation) describing the app: its id, default props, the data
+ * requirements that feed `$data`, and the bridge surface it uses.
  *
  * For restricted embeds, data lives here — the template stays plain
  * torpor, and the manifest is typed at author time via `defineApp`.
@@ -46,6 +57,25 @@ export interface AppManifest {
 	props?: Record<string, ManifestValue>;
 	/** Data requirements, keyed by the `$data.<name>` they bind. */
 	data?: Record<string, ManifestRequirement>;
+	/**
+	 * The bridge methods the embed may `invoke`, keyed by method name.
+	 * **Using the bridge requires declaring its surface**: an embed that
+	 * invokes without this block (or calls a method outside it) is a
+	 * compile error, and calls outside the declaration warn at runtime.
+	 * The `api` block doubles as an `EmbedApi` contract for typed call
+	 * sites.
+	 */
+	api?: Record<string, ManifestApiMethod>;
+	/**
+	 * The event types the embed may `emit` — enforced like `api` (using
+	 * `$embed.emit` without declaring this block is a compile error).
+	 */
+	emits?: string[];
+	/**
+	 * The push types the embed may subscribe to with `$embed.on` —
+	 * enforced like `api`.
+	 */
+	pushes?: string[];
 }
 
 /**
