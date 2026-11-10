@@ -352,21 +352,6 @@ cost of touching the path-building code in buildFragment.ts (which also does
 the `t_next(t_next(x))` → `t_skip(x, n)` shortening). Purely cosmetic; skipped
 to avoid churning every golden file for no behavior change.
 
-### Artifact client builds strip imports with a line-anchored regex
-
-`compileArtifact`'s client post-processing (`src/artifact/client.ts`,
-`toClientCode`) strips imports from the client build with
-`/^import\s.+\n/gm` (the same regex the site REPL has always used) before
-the sucrase pass, so it only works while the compiler emits single-line
-imports at the start of lines. Sucrase hoists its helpers _above_ import
-statements in other transforms — proving the emitted shape can change out
-from under a line-anchored regex (the loader test strips with a
-brace-matching regex for this reason). If the compiler ever emits
-multi-line imports for the client build, artifacts would silently ship
-`import` statements in global-scope code. A small parser-based strip (or
-having the compiler emit a no-import mode directly) would remove the
-fragility.
-
 ### Slot fills whose root is auto-closed by the HTML parser break hydration
 
 When a component wraps each row in an element and the consumer's fill root

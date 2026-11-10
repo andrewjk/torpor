@@ -184,6 +184,57 @@ test("rejects artifacts without a server build", async () => {
 	await expect(renderArtifact(notAnArtifact)).rejects.toThrow(/missing its server build/);
 });
 
+const MULTILINE_SOURCE = `
+import {
+	FieldRow,
+} from "@host/ui";
+
+// import FakeRow from "@host/fake"
+const sample = 'import x from "y";';
+
+export default function Section() {
+	function lazy() {
+		// dynamic imports are untouched by the client transform
+		return import("@host/lazy");
+	}
+	@render {
+		<FieldRow>
+			<p>records ready</p>
+		</FieldRow>
+		<button onclick={lazy}>Lazy</button>
+	}
+}
+`;
+
+test("strips multi-line imports and leaves import-like text alone", async () => {
+	const embed = compileArtifact("multiline", MULTILINE_SOURCE, { scope: ["@host/ui"] });
+
+	// The declaration is stripped from the client build...
+	expect(embed.client.code).not.toMatch(/^[ \t]*import[\s{]/m);
+	// ...while import-like text in strings, comments, and dynamic import()
+	// survive untouched
+	expect(embed.client.code).toContain('import x from "y"');
+	expect(embed.client.code).toContain('import("@host/lazy")');
+
+	// And the mounted embed runs: the scoped binding is provided, the
+	// string renders as text
+	const hostClient = {
+		FieldRow: ($parent: any, $anchor: any, _props: any, _context: any, $slots: any) => {
+			const div = document.createElement("div");
+			div.className = "field-row";
+			if ($anchor && $anchor.parentNode === $parent) $parent.insertBefore(div, $anchor);
+			else $parent.appendChild(div);
+			$slots?._?.(div, null);
+		},
+	};
+	const target = document.createElement("div");
+	document.body.appendChild(target);
+	const handle = mountEmbed(target, embed, {}, { scope: { "@host/ui": hostClient } });
+	expect(target.querySelector(".field-row")).not.toBeNull();
+	expect(target.querySelector("button")?.textContent).toBe("Lazy");
+	handle.unmount();
+});
+
 test("enforces runtime versions with the edge-safe constant", async () => {
 	const stale = artifact();
 	stale.version = "0.0.0-stale";
