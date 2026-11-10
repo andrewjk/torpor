@@ -6,8 +6,6 @@ import { expect, test } from "vite-plus/test";
 // that pulls a Node builtin in fails here instead of in the host's deploy.
 // Needs the node environment: esbuild refuses to run under jsdom.
 const ENTRIES: { entry: string; budget: number }[] = [
-	// The compile entry (compiler + sucrase)
-	{ entry: "../src/compile.ts", budget: 400_000 },
 	// The restricted entry (compiler + serializer + interpreter)
 	{ entry: "../src/restricted.ts", budget: 600_000 },
 ];

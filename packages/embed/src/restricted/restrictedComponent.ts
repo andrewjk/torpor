@@ -62,9 +62,9 @@ export default function restrictedComponent(
 	artifact: EmbedArtifact,
 	options?: RestrictedComponentOptions,
 ): ServerComponent {
-	if (artifact.format !== "restricted") {
+	if (artifact.server?.template === undefined) {
 		throw new Error(
-			`Embed "${artifact.id}" is not a restricted artifact. restrictedComponent wraps format: "restricted" artifacts.`,
+			`Embed "${artifact.id}" is missing its restricted server template -- recompile it from its source.`,
 		);
 	}
 	return async (props, _context, slots) => {

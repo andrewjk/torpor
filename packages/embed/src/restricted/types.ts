@@ -118,8 +118,7 @@ export interface RenderRestrictedOptions {
 
 	/**
 	 * The expected runtime version. Defaults to `RUNTIME_VERSION` (the
-	 * @torpor/view version this package was built against) — the edge-safe
-	 * equivalent of `getRuntimeVersion()`.
+	 * @torpor/view version this package was built against).
 	 */
 	runtimeVersion?: string;
 

@@ -1,5 +1,5 @@
-import type EmbedArtifact from "../types/EmbedArtifact";
-import checkVersion from "../checkVersion";
+import type EmbedArtifact from "./types/EmbedArtifact";
+import checkVersion from "./checkVersion";
 
 /**
  * Serve-time compatibility check: verifies that a stored artifact can run

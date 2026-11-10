@@ -9,7 +9,6 @@ import type EmbedFrameHandle from "./EmbedFrameHandle";
 import type EmbedFrameOptions from "./EmbedFrameOptions";
 import type EmbedHandle from "./EmbedHandle";
 import type EmbedOptions from "./EmbedOptions";
-import type EmbedRenderResult from "./EmbedRenderResult";
 import type EmbedStyle from "./EmbedStyle";
 import type EmbedSurface from "./EmbedSurface";
 import type EmbedVersionError from "./EmbedVersionError";
@@ -26,7 +25,6 @@ export type {
 	EmbedFrameOptions,
 	EmbedHandle,
 	EmbedOptions,
-	EmbedRenderResult,
 	EmbedStyle,
 	EmbedSurface,
 	EmbedVersionError,

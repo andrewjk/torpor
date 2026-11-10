@@ -1,6 +1,5 @@
-import * as ssr from "@torpor/view/ssr";
 import { expect, test } from "vite-plus/test";
-import compileEmbed from "../src/server/compileEmbed";
+import { compileRestricted, renderRestricted } from "../src/restricted";
 import hydrateEmbed from "../src/loader/hydrateEmbed";
 import mountEmbed from "../src/loader/mountEmbed";
 import EmbedVersionError from "../src/types/EmbedVersionError";
@@ -24,7 +23,7 @@ export default function Counter($props: { start?: number }) {
 `;
 
 function artifact(): EmbedArtifact {
-	return compileEmbed("counter-test", SOURCE);
+	return compileRestricted("counter-test", SOURCE);
 }
 
 function getButton(): HTMLButtonElement {
@@ -101,20 +100,8 @@ test("throws EmbedVersionError on a version mismatch", () => {
 test("hydrates server-rendered markup", async () => {
 	const art = artifact();
 
-	// Render the server build to HTML, the way a host app would: evaluate the
-	// server module with the SSR runtime exports injected. The server code
-	// keeps its imports (it's an ES module), so strip them here and inject the
-	// exports as function parameters instead.
-	const names = Object.keys(ssr);
-	const values = Object.values(ssr);
-	const serverCode = art.server.code
-		.replace("export default ", "")
-		// Sucrase hoists its helpers above the import statements, so don't
-		// rely on line anchors here
-		.replace(/import\s*\{[^}]+\}\s*from\s*"[^"]*";/g, "");
-	const make = new Function(...names, `${serverCode}\nreturn Counter;`); // eslint-disable-line no-implied-eval
-	const serverComponent = make(...values);
-	const { body } = await serverComponent({ start: 3 });
+	// Render the restricted server build to HTML, the way a host app would
+	const { body } = await renderRestricted(art, { props: { start: 3 } });
 
 	const target = document.createElement("div");
 	target.innerHTML = body;

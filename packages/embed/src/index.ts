@@ -3,9 +3,8 @@ export { default as mountEmbed } from "./loader/mountEmbed";
 export { default as hydrateEmbed } from "./loader/hydrateEmbed";
 export { default as loadComponent } from "./loader/loadComponent";
 
-// Module-format embeds (real ES modules)
-export { default as mountModuleEmbed } from "./loader/mountModuleEmbed";
-export { default as hydrateModuleEmbed } from "./loader/hydrateModuleEmbed";
+// Serve-time compatibility check
+export { default as assertRunnable } from "./assertRunnable";
 
 // Host ↔ embed bridge
 export { default as createBridge } from "./bridge/createBridge";
@@ -39,9 +38,7 @@ export type {
 	EmbedFrameOptions,
 	EmbedHandle,
 	EmbedOptions,
-	EmbedRenderResult,
 	EmbedStyle,
 	EmbedSurface,
 } from "./types";
 export type { EmbedScope } from "./loader/scope";
-export type { ModuleEmbedOptions } from "./loader/prepareModule";

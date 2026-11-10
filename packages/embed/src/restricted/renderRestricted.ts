@@ -64,17 +64,12 @@ export default async function renderRestricted(
 	artifact: EmbedArtifact,
 	options?: RenderRestrictedOptions,
 ): Promise<RestrictedRenderResult> {
-	if (artifact.format !== "restricted") {
+	if (artifact.server?.template === undefined) {
 		throw new Error(
-			`Embed "${artifact.id}" is not a restricted artifact. Compile it with compileRestricted from "@torpor/embed/restricted".`,
+			`Embed "${artifact.id}" is missing its restricted server template -- recompile it from its source.`,
 		);
 	}
-	const program = artifact.server?.template;
-	if (program === undefined) {
-		throw new Error(
-			`Embed "${artifact.id}" is missing its restricted template -- recompile it from its source.`,
-		);
-	}
+	const program = artifact.server.template;
 
 	checkVersion(artifact.version, options?.runtimeVersion ?? RUNTIME_VERSION, {
 		allowMismatch: options?.allowVersionMismatch,

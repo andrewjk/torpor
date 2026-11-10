@@ -73,7 +73,7 @@ export function checkBridgeSurface(
 		);
 	} else if (options.api !== undefined) {
 		const declared = Object.keys(options.api).join(", ") || "(none)";
-		for (const method of [...new Set(usage.invokes)]) {
+		for (const method of new Set(usage.invokes)) {
 			if (!Object.hasOwn(options.api, method)) {
 				fail(
 					`Embed calls $embed.invoke("${method}"), which is not declared in the app manifest's api. Declared methods: ${declared}.`,
@@ -88,7 +88,7 @@ export function checkBridgeSurface(
 			`Embed emits "${usage.emits[0]}", but its app manifest declares no emits surface. Declare the events it may emit: emits: [${names}].`,
 		);
 	} else if (options.emits !== undefined) {
-		for (const type of [...new Set(usage.emits)]) {
+		for (const type of new Set(usage.emits)) {
 			if (!options.emits.includes(type)) {
 				fail(
 					`Embed emits "${type}", which is not declared in the app manifest's emits. Declared events: ${options.emits.join(", ") || "(none)"}.`,
@@ -103,7 +103,7 @@ export function checkBridgeSurface(
 			`Embed subscribes to "${usage.listens[0]}" ($embed.on), but its app manifest declares no pushes surface. Declare the pushes it may listen to: pushes: [${names}].`,
 		);
 	} else if (options.pushes !== undefined) {
-		for (const type of [...new Set(usage.listens)]) {
+		for (const type of new Set(usage.listens)) {
 			if (!options.pushes.includes(type)) {
 				fail(
 					`Embed subscribes to "${type}" ($embed.on), which is not declared in the app manifest's pushes. Declared pushes: ${options.pushes.join(", ") || "(none)"}.`,

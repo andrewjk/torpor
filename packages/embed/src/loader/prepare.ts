@@ -20,11 +20,6 @@ const componentCache = new WeakMap<EmbedArtifact, unknown>();
  * code, ready to be mounted or hydrated. Shared by mountEmbed/hydrateEmbed.
  */
 export function prepare(artifact: EmbedArtifact, options?: EmbedOptions): unknown {
-	if (artifact.format === "module") {
-		throw new Error(
-			'Embed is in module format -- use mountModuleEmbed/hydrateModuleEmbed (from "@torpor/embed") instead.',
-		);
-	}
 	if (options?.runtimeVersion !== undefined) {
 		checkVersion(artifact.version, options.runtimeVersion, {
 			allowMismatch: options?.allowVersionMismatch,

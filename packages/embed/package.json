@@ -10,18 +10,6 @@
 			"import": "./dist/index.mjs",
 			"require": "./dist/index.cjs"
 		},
-		"./compile": {
-			"torpor:source": "./src/compile.ts",
-			"types": "./dist/compile.d.mts",
-			"import": "./dist/compile.mjs",
-			"require": "./dist/compile.cjs"
-		},
-		"./server": {
-			"torpor:source": "./src/server.ts",
-			"types": "./dist/server.d.mts",
-			"import": "./dist/server.mjs",
-			"require": "./dist/server.cjs"
-		},
 		"./restricted": {
 			"torpor:source": "./src/restricted.ts",
 			"types": "./dist/restricted.d.mts",

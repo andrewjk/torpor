@@ -48,7 +48,7 @@ export function validateImports(
 					.map((name: string) => `"${name}"`)
 					.join(
 						", ",
-					)} from "${imported.source}", which the host did not provide. Pass scope: { "${imported.source}": ... } to mountEmbed/hydrateEmbed/renderEmbed. Scope values cannot cross the iframe boundary.`,
+					)} from "${imported.source}", which the host did not provide. Pass scope: { "${imported.source}": ... } to mountEmbed/hydrateEmbed. Scope values cannot cross the iframe boundary.`,
 			);
 		}
 	}

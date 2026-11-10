@@ -110,7 +110,7 @@ test("restrictedComponent rejects non-restricted artifacts", () => {
 			format: "globals",
 			client: { code: "" },
 		} as never),
-	).toThrow(/is not a restricted artifact/);
+	).toThrow(/missing its restricted server template/);
 });
 
 test("hydration: the inner artifact's client build renders via scope", async () => {

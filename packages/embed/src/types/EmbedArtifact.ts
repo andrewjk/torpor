@@ -38,20 +38,10 @@ export default interface EmbedArtifact {
 	source: string;
 
 	/**
-	 * How the client build must be run:
-	 *
-	 * - "globals" (default): imports are stripped and TypeScript is removed;
-	 * the code runs against the runtime functions injected by the loader.
-	 * - "module": TypeScript is removed but imports and the default export
-	 * are kept as a real ES module; import specifiers may have been
-	 * rewritten by the compiler's `resolveImport` option. Run it with
-	 * mountModuleEmbed/hydrateModuleEmbed.
-	 * - "restricted": the server build is a serialized instruction tree
-	 * (no JS, no eval) interpreted by `renderRestricted` from
-	 * `@torpor/embed/restricted`; the client build is ordinary globals-format
-	 * code. Compile with `compileRestricted`.
+	 * How the client build must be run. Restricted artifacts carry a
+	 * serialized server build; compile with `compileRestricted`.
 	 */
-	format?: "globals" | "module" | "restricted";
+	format?: "restricted";
 
 	/**
 	 * The modules the embed imports from (besides the runtime, which is
@@ -71,19 +61,11 @@ export default interface EmbedArtifact {
 	};
 
 	/**
-	 * The server build.
-	 *
-	 * - For JS formats (globals/module): `code` is an ES module (TypeScript
-	 *   removed, imports kept) that a host can save to disk and import with
-	 *   its own node_modules resolution. Running untrusted code on the server
-	 *   is a remote code execution risk: sandbox it before rendering embeds
-	 *   from authors you don't fully trust.
-	 * - For the restricted format: `template` is the serialized instruction
-	 *   tree interpreted by `renderRestricted` (no code execution).
+	 * The serialized server build: the instruction tree interpreted by
+	 * `renderRestricted` (no code execution).
 	 */
 	server?: {
-		code?: string;
-		template?: RestrictedProgram;
+		template: RestrictedProgram;
 	};
 
 	/**

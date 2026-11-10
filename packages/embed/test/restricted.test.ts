@@ -1,5 +1,4 @@
 import { expect, test } from "vite-plus/test";
-import { compileEmbed } from "../src/compile";
 import { compileRestricted, recompileRestricted, renderRestricted } from "../src/restricted";
 import type { RestrictedAuditEntry } from "../src/restricted";
 import { deriveRequirementKind } from "../src/restricted";
@@ -46,15 +45,12 @@ function artifact(): EmbedArtifact {
 test("compiles a restricted artifact with a serialized server build", () => {
 	const embed = artifact();
 
-	expect(embed.format).toBe("restricted");
 	expect(embed.name).toBe("Inbox");
 	expect(embed.server?.template).toBeDefined();
-	expect(embed.server?.code).toBeUndefined();
 	expect(embed.client.code).not.toMatch(/^import\s/m);
 	expect(embed.styles.length).toBe(1);
 	// Data names are bound from props in the client build
 	expect(embed.client.code).toMatch(/let \$data = /);
-	expect(embed.client.code).not.toContain("data tickets from");
 });
 
 test("renders with a first-party source, resolving props in the spec", async () => {
@@ -183,16 +179,11 @@ export default function Stats() {
 	expect(entries[1].ok).toBe(true);
 });
 
-test("rejects non-restricted artifacts", async () => {
-	const globalsArtifact = compileEmbed(
-		"plain",
-		`
-export default function Plain() {
-	@render { <p>hi</p> }
-}
-`,
+test("rejects artifacts without a restricted server build", async () => {
+	const notRestricted: EmbedArtifact = { ...artifact(), server: undefined };
+	await expect(renderRestricted(notRestricted)).rejects.toThrow(
+		/missing its restricted server template/,
 	);
-	await expect(renderRestricted(globalsArtifact)).rejects.toThrow(/not a restricted artifact/);
 });
 
 test("enforces runtime versions with the edge-safe constant", async () => {
@@ -217,11 +208,6 @@ test("enforces runtime versions with the edge-safe constant", async () => {
 	} finally {
 		console.warn = warn;
 	}
-});
-
-test("renderEmbed refuses restricted artifacts with a pointer", async () => {
-	const renderEmbed = (await import("../src/server/renderEmbed")).default;
-	await expect(renderEmbed(artifact())).rejects.toThrow(/renderRestricted/);
 });
 
 test("compileRestricted surfaces restricted-build errors with positions", () => {

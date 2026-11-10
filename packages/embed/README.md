@@ -10,16 +10,20 @@ An embed is a component compiled **at publish time** and stored as plain,
 JSON-serializable data:
 
 ```
-.torp source ──compileEmbed()──▶ EmbedArtifact ──store/serve──▶ mountEmbed()
- (admin saves)     (server)        (in your DB)                   (client)
+.torp source + app manifest ──compileRestricted()──▶ EmbedArtifact ──store/serve──▶ mountEmbed() / hydrateEmbed()
+ (author saves)                (anywhere)              (in your DB)                    (client)
 ```
 
-- `compileEmbed` (from `@torpor/embed/server`) runs once when the author
-  saves. It produces both builds of the component plus its styles, and
-  stamps them with the `@torpor/view` version they were built against.
+- `compileRestricted` (from `@torpor/embed/restricted`) runs once when the
+  author saves — in Node, Cloudflare Workers, or the browser. The server
+  build is a serialized instruction tree that **never runs author code on
+  your server** (no `eval`, no `new Function`); the client build is ordinary
+  globals-format code. Both are stamped with the `@torpor/view` version they
+  were built against.
 - `mountEmbed` / `hydrateEmbed` (from `@torpor/embed`) run on the client:
-  they evaluate the artifact's client code against the runtime the host app
-  already has, inject the scoped styles, and give you a handle to unmount.
+  they evaluate the artifact's client build against the runtime the host
+  app already has, inject the scoped styles, and give you a handle to
+  unmount. `renderRestricted` renders the server build to HTML.
 
 Because the artifact is data, the usual torpor flow still applies: render
 the server build to HTML on the server, hydrate it on the client with the
@@ -27,7 +31,7 @@ same props.
 
 ## Scope: host components inside embeds
 
-Embeds can import from host modules -- your UI kit, your helpers -- and the
+Embeds can import from host modules — your UI kit, your helpers — and the
 host provides the actual values at mount/render time:
 
 ```ts
@@ -43,48 +47,35 @@ export default function Section() {
 
 ```ts
 // compile time: optionally whitelist which modules the embed may import
-const artifact = compileEmbed("section-42", source, { scope: ["@example/ui"] });
+const artifact = compileRestricted("section-42", source, { scope: ["@example/ui"] });
 // artifact.imports records what was imported: [{ source: "@example/ui", names: ["Form"] }]
 
-// mount/render time: provide the values
-mountEmbed(target, artifact, props, { scope: { "@example/ui": uiExports } });
-renderEmbed(artifact, { props, scope: { "@example/ui": serverExports } });
+// render time: server builds of the host's components
+renderRestricted(artifact, { components: { Form: formServerComponent } });
+
+// mount/hydrate time: client builds via scope
+mountEmbed(target, artifact, props, { scope: { "@example/ui": { Form: formClientComponent } } });
+hydrateEmbed(target, artifact, props, { scope: { "@example/ui": { Form: formClientComponent } } });
 ```
 
-Provide **client builds** of your components to `mountEmbed`/`hydrateEmbed`
-and **server builds** to `renderEmbed`, exactly like your own app does. The
-loaders validate `artifact.imports` against the flattened scope and fail
+The loaders validate `artifact.imports` against the flattened scope and fail
 loudly naming the missing bindings, so a forgotten module is an actionable
 error instead of a ReferenceError inside compiled code.
 
 Scope values are host-side objects and cannot be serialized, so they cannot
-cross the iframe boundary or the worker/service boundary -- sandboxed frames
-use slots and the bridge; `renderEmbed({ isolate: true })` rejects scoped
-artifacts.
+cross the iframe boundary — sandboxed frames use slots and the bridge.
 
-## The compile entry
+## Compiling
 
-`@torpor/embed/compile` is the compiler with **no Node builtins**: it runs
-in Node, Cloudflare Workers, and browsers alike (compile-on-save in a web
-admin, or in the admin's browser). It exports `compileEmbed`,
-`recompileEmbed`, and `RUNTIME_VERSION` (the @torpor/view version this
-package was built against -- used to stamp artifacts, no runtime package
-reads needed):
+`compileRestricted` (from `@torpor/embed/restricted`) is **edge-safe**: no
+Node builtins, so it runs in Node, Cloudflare Workers, and browsers alike
+(compile-on-save in a web admin, or in the admin's browser). `RUNTIME_VERSION`
+—the `@torpor/view` version the package was built against — is exported for
+stamping and serve-time checks.
 
-```ts
-import { compileEmbed, RUNTIME_VERSION } from "@torpor/embed/compile";
-const artifact = compileEmbed(id, source); // version defaults to RUNTIME_VERSION
-```
-
-`@torpor/embed/server` re-exports all of it plus the Node-only renderers
-(`renderEmbed`, worker isolation, render service). Server-side rendering of
-**JS-format** artifacts requires Node (workerd bans `new Function`); on
-Workers, compile to a **restricted** artifact and render it with
-`renderRestricted` from `@torpor/embed/restricted` — that entry is edge-safe.
-
-The compiler also takes `maxSourceBytes` as a backstop against runaway
-author input (rejected with a compile error, so the editor can show it
-inline).
+The compiler takes `maxSourceBytes` as a backstop against runaway author
+input (rejected with a compile error, so the editor can show it inline) and
+`scope` as a compile-time whitelist of the modules the embed may import.
 
 ## Upgrades and recovery
 
@@ -92,30 +83,55 @@ On a @torpor/view upgrade, stale artifacts fail loudly at serve time. The
 recovery path is built in:
 
 ```ts
-import { assertRunnable, getRuntimeVersion, recompileEmbed } from "@torpor/embed/server";
+import { assertRunnable } from "@torpor/embed";
+import { recompileRestricted, RUNTIME_VERSION } from "@torpor/embed/restricted";
 
 // in the request path: render a placeholder while a job recompiles
-assertRunnable(artifact, getRuntimeVersion());
+assertRunnable(artifact, RUNTIME_VERSION);
 // bulk job: recompile from source (the source of truth); meta is preserved
-const fresh = recompileEmbed(artifact);
+const fresh = recompileRestricted(artifact);
 ```
 
 ## Usage
 
-Publish (server side, or anywhere -- see the compile entry above):
+Publish (anywhere — the compiler is edge-safe):
 
 ```ts
-import { compileEmbed, assertRunnable, getRuntimeVersion } from "@torpor/embed/server";
+import {
+	compileRestricted,
+	renderRestricted,
+	recompileRestricted,
+	assertRunnable,
+	RUNTIME_VERSION,
+} from "@torpor/embed/restricted";
 
 // When the author saves
-const artifact = compileEmbed("section-42", source);
+const artifact = compileRestricted("section-42", source, {
+	data: manifest.data,
+	api: manifest.api,
+	emits: manifest.emits,
+	pushes: manifest.pushes,
+});
 await db.embeds.save(artifact); // includes artifact.source -- keep it!
 
 // When serving, e.g. after a runtime upgrade
-assertRunnable(artifact, getRuntimeVersion()); // throws if it needs a recompile
+assertRunnable(artifact, RUNTIME_VERSION); // throws if it needs a recompile
 ```
 
-Render (client side):
+Render (server side, from `@torpor/embed/restricted`):
+
+```ts
+import { renderRestricted } from "@torpor/embed/restricted";
+
+// Renders to HTML; hydrateEmbed the result with the same props + data
+const { body, head, styles, data } = await renderRestricted(artifact, {
+	props: { sectionId: 42 },
+	components, // server builds of the host components the template uses
+	sources, // first-party implementations of the manifest's data requirements
+});
+```
+
+Mount/hydrate (client side, from `@torpor/embed`):
 
 ```ts
 import { createBridge, mountEmbed, hydrateEmbed } from "@torpor/embed";
@@ -130,43 +146,20 @@ const bridge = createBridge({
 	},
 });
 
-// Client-rendered
-const handle = mountEmbed(target, artifact, { sectionId: 42 }, { bridge });
+// Client-rendered: pass the resolved data bag (from renderRestricted, or
+// fetched by the host) through props — paint-then-mount
+const handle = mountEmbed(target, artifact, { sectionId: 42, $data }, { bridge, scope });
 handle.unmount();
 
-// Or hydrate markup that the server rendered from the same artifact + props
-hydrateEmbed(target, artifact, { sectionId: 42 }, { bridge });
+// Or hydrate markup that the server rendered from the same artifact + data
+hydrateEmbed(target, artifact, { sectionId: 42, $data }, { bridge, scope });
 ```
 
-Server-render (from `@torpor/embed/server`):
-
-```ts
-import { createBridge, renderEmbed } from "@torpor/embed/server";
-
-// Renders to HTML; hydrateEmbed the result with the same props + bridge
-const { body, head, styles } = await renderEmbed(artifact, {
-	props: { sectionId: 42 },
-	bridge, // available to the embed during render (e.g. @await data fetches)
-	scope, // host components for the embed's server build
-	isolate: true, // render in a worker thread with a hard timeout
-	timeout: 5000,
-});
-```
-
-Place `head` in the page `<head>` -- for artifacts with `@style` it carries
-the embed's scoped styles alongside its `@head` output, so server-rendered
-content is styled from the first paint. `styles` exposes the same CSS
-separately, for hosts that place styles themselves -- pick one (using both
-double-injects), and pass `styles: false` to `hydrateEmbed` when the
-server side already handled it.
-
-`isolate: true` runs the render in a worker thread and terminates it at the
-timeout, so a runaway embed can't take your server down. It's fault
-isolation, not a security boundary (workers share the process): for
-untrusted authors, skip server rendering entirely and render client-side in
-a sandboxed iframe. Isolated renders also can't bridge host APIs during
-render -- pass data as props instead; the worker fails loudly if an embed
-tries.
+Place `head` in the page `<head>` — for artifacts with `@style` it carries
+the embed's scoped styles, so server-rendered content is styled from the
+first paint. `styles` exposes the same CSS separately, for hosts that place
+styles themselves — pick one (using both double-injects), and pass
+`styles: false` to `hydrateEmbed` when the server side already handled it.
 
 ## Restricted mode (no-eval SSR)
 
@@ -316,7 +309,7 @@ builds. Unknown components fail at render time with their name — the host
 decides whether that's a build failure or a graceful fallback.
 
 - `recompileRestricted(artifact)` is the upgrade path for these artifacts
-  (`recompileEmbed` covers the JS formats).
+  `recompileRestricted(artifact)` is the upgrade path for these artifacts.
 
 ### The `http` source kind
 
@@ -530,39 +523,6 @@ the url, the credential _name_, the pick path — never fetched data or
 secrets. Wrapping an inner artifact with `restrictedComponent` passes your
 `onAudit` through, so reads behind the component boundary are audited too.
 
-## Module-format artifacts
-
-By default artifacts compile to _globals format_: imports stripped, run by
-the loader against injected runtime exports (works everywhere, including
-sandboxed iframe frames). For in-process embeds you can instead compile to
-_module format_ -- a real ES module with imports and its default export
-intact:
-
-```ts
-const artifact = compileEmbed("section-42", source, {
-	module: true,
-	// Optional: point imports at a runtime URL your server hosts, so stored
-	// artifacts keep importing the exact runtime they were built against
-	resolveImport: (spec) =>
-		spec === "@torpor/view" ? `/modules/@torpor/view@${getRuntimeVersion()}/index.mjs` : undefined,
-});
-```
-
-Then load it asynchronously:
-
-```ts
-import { mountModuleEmbed, hydrateModuleEmbed } from "@torpor/embed";
-
-const handle = await mountModuleEmbed(target, artifact, props, { bridge });
-```
-
-Module loading defaults to a blob-URL `import()`; an import map on the host
-page resolves bare specifiers, rewritten URLs resolve directly, and hosts
-with their own module pipeline can pass an `import` hook. Version checking
-is stricter here: it runs against the installed runtime before loading.
-The sync `mountEmbed` rejects module artifacts with a pointer to
-`mountModuleEmbed`.
-
 ## Caching
 
 Every loader takes `cache: true`, which stores the evaluated component
@@ -773,14 +733,11 @@ Validation rules (the part hosts re-implementing it most often get wrong):
 
 ## CSP
 
-Content-Security-Policy interactions, per tier and format:
+Content-Security-Policy interactions, per tier:
 
-- **Globals-format embeds** (`mountEmbed`) evaluate compiled code with
-  `new Function`, which requires `script-src 'unsafe-eval'`. That's the
-  price of running stored code; module format doesn't need it.
-- **Module-format embeds** (`mountModuleEmbed`) load via blob-URL
-  `import()`: allow `script-src blob:` (plus whatever your import map
-  points at).
+- **In-process embeds** (`mountEmbed`/`hydrateEmbed`) evaluate compiled
+  client code with `new Function`, which requires `script-src
+  'unsafe-eval'`. That's the price of running stored code.
 - **`srcdoc` frames** inherit the _parent page's_ CSP, so a strict
   `script-src` on your app also applies inside the frame -- inline scripts
   there need `'unsafe-inline'` or nonces, or serve the frame from a URL
@@ -819,9 +776,10 @@ strictest model and loosen deliberately:
 - **Semi-trusted authors** (paying admins): mounting in the host page is
   reasonable, but pass only vetted data through props, and gate what the
   embed can reach on the server.
-- **Server-side rendering of embeds executes author code on your
-  infrastructure.** Contain it before rendering embeds from authors you
-  don't fully trust (see the render service below).
+- **Server-side rendering never executes author code.** The restricted
+  server build is an instruction tree interpreted by `renderRestricted` —
+  author code only ever runs in the _browser_, client-side. Untrusted
+  authors get the iframe tier; trusted authors can mount in-process.
 - **Private when shared**: rendered output must only ever be visible to
   viewers who already have access to the data behind it. Data resolves
   per render under the _viewer's_ authority -- per-user/tenant props,
@@ -857,50 +815,10 @@ viewer's; until then the embed sees only the pending receipt. No API
 changes are needed for this -- it is a discipline for `invoke` handlers.
 
 When the author is an AI (an agent building sections from a prompt), treat
-it as untrusted by default: restricted mode (`compileRestricted` +
-`renderRestricted`) keeps the author's code off your servers entirely, and
-its compile-time validation catches hallucinated syntax and spec shapes at
-save time, where the editing UI can show them.
-
-## Render service
-
-`isolate: true` renders in a worker thread, which is **fault isolation,
-not a security boundary** -- workers share the process's memory and Node
-builtins. The real boundary is a separate container, and
-`@torpor/embed/server` ships the protocol for exactly that:
-
-```ts
-// render-service.mjs -- runs in the container, nothing else
-import { startRenderServer } from "@torpor/embed/server";
-
-await startRenderServer({ port: 8080, token: process.env.RENDER_TOKEN });
-```
-
-```ts
-// your app -- a drop-in replacement for renderEmbed
-import { createServiceRenderer } from "@torpor/embed/server";
-
-const render = createServiceRenderer({
-	url: "http://render-pool.internal:8080",
-	token: process.env.RENDER_TOKEN,
-});
-const { body, head } = await render(artifact, { props, timeout: 5000 });
-```
-
-The container is the security boundary -- lock it down accordingly:
-non-root user, read-only root filesystem, **no network egress** (your app
-calls it; it never calls out), memory and CPU limits, and a minimal image.
-The service binds loopback by default and requires a bearer token when one
-is configured.
-
-Notes:
-
-- Slots and the host bridge are functions and cannot cross the service
-  boundary -- pass data as props; requests carrying slots are rejected.
-- The service runs its own runtime version and rejects artifacts it can't
-  run with 409 -- recompile them from `artifact.source` (or query
-  `GET /version` from your deploy script to detect drift).
-- Run a pool of these behind your orchestrator; renders are stateless.
+it as untrusted by default: the restricted server build keeps the author's
+code off your servers entirely, and compile-time validation catches
+hallucinated syntax, spec shapes, and undeclared bridge calls at save
+time, where the editing UI can show them.
 
 ## `@torpor/view/runtime`
 
@@ -916,10 +834,3 @@ bundle with all exports attached to the `TorporView` global:
 
 This is what sandboxed iframes and REPLs (including torpor's own site REPL)
 run compiled code against.
-
-## Roadmap
-
-- Single-process isolation research: a WASM engine (e.g. QuickJS) running
-  the SSR runtime with no Node builtins, as an alternative to the
-  container-based render service. Unverified whether torpor's async SSR
-  drains correctly there; the render service is the supported path today.

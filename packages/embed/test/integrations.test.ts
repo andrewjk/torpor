@@ -2,10 +2,10 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
 import createBridge from "../src/bridge/createBridge";
-import { compileEmbed, recompileEmbed, RUNTIME_VERSION } from "../src/compile";
-import getRuntimeVersion from "../src/server/getRuntimeVersion";
-import renderEmbed from "../src/server/renderEmbed";
-import assertRunnable from "../src/server/assertRunnable";
+import assertRunnable from "../src/assertRunnable";
+import { RUNTIME_VERSION } from "../src/restricted";
+import { compileRestricted, recompileRestricted, renderRestricted } from "../src/restricted";
+import { defineApp } from "../src/app";
 import mountEmbed from "../src/loader/mountEmbed";
 import hydrateEmbed from "../src/loader/hydrateEmbed";
 import EmbedCompileError from "../src/types/EmbedCompileError";
@@ -22,7 +22,6 @@ const hostClient = {
 		else $parent.appendChild(div);
 		$slots?._?.(div, null);
 	},
-	shout: (text: string) => `${text.toUpperCase()}!`,
 };
 
 const hostServer = {
@@ -30,30 +29,40 @@ const hostServer = {
 		const inner = $slots?._ ? await $slots._() : "";
 		return { body: `<div class="field-row">${inner}</div>`, head: "" };
 	},
-	shout: (text: string) => `${text.toUpperCase()}!`,
 };
 
-// A Mallet-shaped section: scoped host component, bridge fetch during
-// render (server) / events (client), and scoped styles.
+const manifest = defineApp({
+	id: "example-section",
+	// Data requirements live in the manifest; the host's source resolves
+	// them with tenant scoping and authorization
+	data: {
+		records: { kind: "records" },
+	},
+	// The declared bridge surface: default deny for everything else
+	api: { save: { payload: { name: "string" }, result: "ok" } },
+	emits: ["saved"],
+});
+
+// A Mallet-shaped section: host component, manifest data, bridge save.
+// State is an object ($watch wraps objects; the serialized initializer is
+// what the server paint reads).
 const SECTION_SOURCE = `
-import { FieldRow, shout } from "@host/ui";
+import { FieldRow } from "@host/ui";
 
 export default function Section($props: { $embed: any }) {
-	let $state = $watch({
-		get saved() {
-			return $async(() => $props.$embed.invoke("fetch-data"), { source: "server" });
-		},
-	});
-	function save() {
+	let saved = $watch({ value: false });
+	async function save() {
+		await $props.$embed.invoke("save", { name: "new record" });
+		saved.value = true;
 		$props.$embed.emit("saved", { ok: true });
 	}
 	@render {
-		@await {
-			<FieldRow>{shout($state.saved)}</FieldRow>
-		} with {
-			<p>loading</p>
-		}
-		<button onclick={save}>Save</button>
+		<FieldRow>
+			@for (r of $data.records) {
+				<p>{r.name}</p>
+			}
+		</FieldRow>
+		<button onclick={save}>{saved.value ? "Saved" : "Save"}</button>
 	}
 	@style {
 		button { padding: 4px; }
@@ -61,33 +70,61 @@ export default function Section($props: { $embed: any }) {
 }
 `;
 
+const ROWS = [{ name: "Alpha" }, { name: "Beta" }];
+
 function sectionArtifact(): EmbedArtifact {
-	return compileEmbed("example-section", SECTION_SOURCE);
+	return compileRestricted("example-section", SECTION_SOURCE, {
+		requirementKinds: { records: () => {} },
+		data: manifest.data,
+		api: manifest.api,
+		emits: manifest.emits,
+	});
 }
 
-test("compile entry stays free of Node builtins", () => {
-	const dir = join(import.meta.dirname, "../src/compile");
-	for (const file of readdirSync(dir)) {
-		const content = readFileSync(join(dir, file), "utf8");
-		expect(content, `${file} must not import node builtins`).not.toMatch(/from\s+"node:/);
+const sources = { records: () => ROWS };
+const renderOptions = {
+	components: { FieldRow: hostServer.FieldRow },
+	sources,
+};
+
+// The full compile options: manifest data + declared bridge surface
+const compileOptions = {
+	requirementKinds: { records: () => {} },
+	data: manifest.data,
+	api: manifest.api,
+	emits: manifest.emits,
+};
+
+test("edge-safe sources stay free of Node builtins", () => {
+	const dirs = ["../src/restricted", "../src/app"];
+	for (const dir of dirs) {
+		const entries = readdirSync(join(import.meta.dirname, dir), { withFileTypes: true });
+		for (const entry of entries) {
+			if (!entry.isFile()) continue;
+			const content = readFileSync(join(import.meta.dirname, dir, entry.name), "utf8");
+			expect(content, `${dir}/${entry.name} must not import node builtins`).not.toMatch(
+				/from\s+"node:/,
+			);
+		}
 	}
-	const barrel = readFileSync(join(import.meta.dirname, "../src/compile.ts"), "utf8");
-	expect(barrel).not.toMatch(/from\s+"node:/);
+	for (const barrel of ["../src/restricted.ts", "../src/app.ts"]) {
+		const content = readFileSync(join(import.meta.dirname, barrel), "utf8");
+		expect(content).not.toMatch(/from\s+"node:/);
+	}
 });
 
 test("RUNTIME_VERSION matches the built-against @torpor/view version", () => {
 	expect(RUNTIME_VERSION).toBe(viewPkg.version);
-	expect(compileEmbed("v", SECTION_SOURCE).version).toBe(RUNTIME_VERSION);
-	expect(getRuntimeVersion()).toBe(RUNTIME_VERSION);
+	expect(sectionArtifact().version).toBe(RUNTIME_VERSION);
 });
 
 test("records the modules an embed imports, with local bindings", () => {
 	const artifact = sectionArtifact();
-	expect(artifact.imports).toEqual([{ source: "@host/ui", names: ["FieldRow", "shout"] }]);
+	expect(artifact.imports).toEqual([{ source: "@host/ui", names: ["FieldRow"] }]);
 
 	// The runtime is auto-provided and not recorded; type-only imports are
 	// erased by the transform
-	const plain = compileEmbed(
+	const plain = compileRestricted(
 		"plain",
 		`
 import { type SlotRender } from "@torpor/view";
@@ -102,9 +139,11 @@ export default function Plain() {
 });
 
 test("compile scope whitelist rejects imports outside it", () => {
-	expect(() => compileEmbed("scoped-ok", SECTION_SOURCE, { scope: ["@host/ui"] })).not.toThrow();
+	expect(() =>
+		compileRestricted("scoped-ok", SECTION_SOURCE, { ...compileOptions, scope: ["@host/ui"] }),
+	).not.toThrow();
 	try {
-		compileEmbed("scoped-bad", SECTION_SOURCE, { scope: ["@other/ui"] });
+		compileRestricted("scoped-bad", SECTION_SOURCE, { ...compileOptions, scope: ["@other/ui"] });
 		expect.unreachable();
 	} catch (error) {
 		expect(error).toBeInstanceOf(EmbedCompileError);
@@ -113,9 +152,11 @@ test("compile scope whitelist rejects imports outside it", () => {
 });
 
 test("enforces maxSourceBytes", () => {
-	expect(() => compileEmbed("fits", SECTION_SOURCE, { maxSourceBytes: 100_000 })).not.toThrow();
+	expect(() =>
+		compileRestricted("fits", SECTION_SOURCE, { ...compileOptions, maxSourceBytes: 100_000 }),
+	).not.toThrow();
 	try {
-		compileEmbed("too-big", SECTION_SOURCE, { maxSourceBytes: 10 });
+		compileRestricted("too-big", SECTION_SOURCE, { ...compileOptions, maxSourceBytes: 10 });
 		expect.unreachable();
 	} catch (error) {
 		expect(error).toBeInstanceOf(EmbedCompileError);
@@ -130,12 +171,13 @@ test("mountEmbed injects host modules via scope", async () => {
 
 	const bridge = createBridge({
 		onEvent: () => {},
-		invoke: async (method) => (method === "fetch-data" ? "section data" : undefined),
+		invoke: async () => "ok",
 	});
 	const handle = mountEmbed(
 		target,
 		artifact,
-		{},
+		// Paint-then-mount: the data bag the sources resolved ships as props
+		{ $data: { records: ROWS } },
 		{
 			scope: { "@host/ui": hostClient },
 			bridge,
@@ -144,7 +186,7 @@ test("mountEmbed injects host modules via scope", async () => {
 	await new Promise((resolve) => setTimeout(resolve, 10));
 
 	expect(target.querySelector(".field-row")).not.toBeNull();
-	expect(target.textContent).toContain("SECTION DATA!");
+	expect(target.textContent).toContain("Alpha");
 	handle.unmount();
 });
 
@@ -154,34 +196,28 @@ test("a missing scope entry fails loudly, naming the binding and module", () => 
 	document.body.appendChild(target);
 
 	expect(() => mountEmbed(target, artifact)).toThrow(/"FieldRow"[\s\S]*"@host\/ui"[\s\S]*scope/);
-	// And names every missing binding
-	expect(() => mountEmbed(target, artifact)).toThrow(/"shout"/);
+	// And there is only one binding to name here
 });
 
-test("renderEmbed with scope produces the same host-component markup", async () => {
+test("renderRestricted with host components produces the same markup", async () => {
 	const artifact = sectionArtifact();
-	const { body } = await renderEmbed(artifact, {
-		scope: { "@host/ui": hostServer },
-		bridge: {
-			emit: () => {},
-			invoke: async (method) => (method === "fetch-data" ? "section data" : undefined),
-		},
-	});
+	const { body } = await renderRestricted(artifact, renderOptions);
 
 	expect(body).toContain('class="field-row"');
-	expect(body).toContain("SECTION DATA!");
+	expect(body).toContain("Alpha");
+	expect(body).toContain("Beta");
 });
 
-test("recompileEmbed recovers stale artifacts and preserves meta", () => {
+test("recompileRestricted recovers stale artifacts and preserves meta", () => {
 	const artifact = sectionArtifact();
 	const stale: EmbedArtifact = { ...artifact, version: "0.0.0-stale", meta: { author: "ada" } };
 
-	expect(() => assertRunnable(stale, getRuntimeVersion())).toThrow();
-	const fresh = recompileEmbed(stale);
-	expect(fresh.version).toBe(getRuntimeVersion());
+	expect(() => assertRunnable(stale, RUNTIME_VERSION)).toThrow();
+	const fresh = recompileRestricted(stale, compileOptions);
+	expect(fresh.version).toBe(RUNTIME_VERSION);
 	expect(fresh.meta).toEqual({ author: "ada" });
 	expect(fresh.client.code).toBe(artifact.client.code);
-	expect(() => assertRunnable(fresh, getRuntimeVersion())).not.toThrow();
+	expect(() => assertRunnable(fresh, RUNTIME_VERSION)).not.toThrow();
 });
 
 test("Mallet fixture end-to-end: scoped SSR + styles + hydrate + bridge event", async () => {
@@ -189,17 +225,15 @@ test("Mallet fixture end-to-end: scoped SSR + styles + hydrate + bridge event", 
 	const events: { type: string; artifactId: string }[] = [];
 	const bridge = createBridge({
 		onEvent: (type, _detail, source) => events.push({ type, artifactId: source.artifactId }),
-		invoke: async (method) => (method === "fetch-data" ? "section data" : undefined),
+		invoke: async () => "ok",
 	});
 
-	// Server render with scope + bridge: host component markup, resolved
-	// fetch, and inlinable styles
-	const { body, styles } = await renderEmbed(artifact, {
-		scope: { "@host/ui": hostServer },
-		bridge,
-	});
+	// Server render with host components and manifest sources: host
+	// component markup, resolved records, and inlinable styles. The
+	// resolved bag comes back for hydration (paint-then-mount).
+	const { body, styles, data } = await renderRestricted(artifact, renderOptions);
 	expect(body).toContain('class="field-row"');
-	expect(body).toContain("section data");
+	expect(body).toContain("Alpha");
 	expect(styles.some((s) => s.style.includes("padding: 4px"))).toBe(true);
 
 	// Hydrate with the same scope + bridge: scoped client component renders,
@@ -207,11 +241,10 @@ test("Mallet fixture end-to-end: scoped SSR + styles + hydrate + bridge event", 
 	const target = document.createElement("div");
 	target.innerHTML = body;
 	document.body.appendChild(target);
-	// hydrateEmbed is synchronous (globals format)
 	hydrateEmbed(
 		target,
 		artifact,
-		{},
+		{ $data: data },
 		{
 			scope: { "@host/ui": hostClient },
 			bridge,

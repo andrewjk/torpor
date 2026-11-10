@@ -2,7 +2,6 @@ import { expect, test } from "vite-plus/test";
 import createBridge from "../src/bridge/createBridge";
 import scopeBridge from "../src/bridge/scopeBridge";
 import compileRestricted from "../src/restricted/compileRestricted";
-import compileEmbed from "../src/server/compileEmbed";
 import mountEmbed from "../src/loader/mountEmbed";
 import type EmbedArtifact from "../src/types/EmbedArtifact";
 
@@ -22,7 +21,10 @@ export default function FormSection($props: { $embed: any }) {
 `;
 
 function artifact(): EmbedArtifact {
-	return compileEmbed("form-section", SOURCE);
+	return compileRestricted("form-section", SOURCE, {
+		api: { "save-section": {} },
+		emits: ["submitted"],
+	});
 }
 
 function tick(): Promise<void> {
@@ -179,7 +181,7 @@ export default function LiveCounter($props: { $embed: any }) {
 `;
 
 function liveArtifact(): EmbedArtifact {
-	return compileEmbed("live-counter", LIVE_SOURCE);
+	return compileRestricted("live-counter", LIVE_SOURCE, { pushes: ["count"] });
 }
 
 test("push updates a mounted embed reactively", async () => {

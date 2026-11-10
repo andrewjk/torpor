@@ -2,7 +2,7 @@ import { bindDataTemplate, build, buildRestricted, parse } from "@torpor/view/co
 import type { CompileError, RestrictedRequirementKindValidator } from "@torpor/view/compile";
 import { type ManifestApiMethod, type ManifestRequirement, manifestRequirements } from "../app";
 import { checkBridgeSurface, scanBridgeUsage } from "../app/bridgeSurface";
-import { checkMaxSourceBytes, scanImports, toClientCode } from "../compile/compileEmbed";
+import { checkMaxSourceBytes, scanImports, toClientCode } from "./client";
 import { RUNTIME_VERSION } from "../generated/version";
 import EmbedCompileError from "../types/EmbedCompileError";
 import type EmbedArtifact from "../types/EmbedArtifact";
@@ -52,6 +52,16 @@ export interface CompileRestrictedOptions {
 	/** The push types the embed may subscribe to — enforced like `api`. */
 	pushes?: string[];
 
+	/**
+	 * The module specifiers the embed is allowed to import from, besides
+	 * "@torpor/view" (always allowed). When set, an import from any other
+	 * module is a compile error — useful in editors, so an author importing
+	 * something the host never provides finds out on save. Recorded imports
+	 * (artifact.imports) are validated again at mount time against the
+	 * host-provided `scope`.
+	 */
+	scope?: string[];
+
 	/** Host metadata carried through recompiles. */
 	meta?: Record<string, unknown>;
 }
@@ -65,7 +75,7 @@ export interface CompileRestrictedOptions {
  * `requirementKinds` at compile time; `$props` references in specs stay
  * symbolic until the host resolves them.
  *
- * Edge-safe (no Node builtins), like `compileEmbed`.
+ * Edge-safe (no Node builtins): runs in Node, workers, and browsers alike.
  */
 export default function compileRestricted(
 	id: string,
@@ -122,6 +132,24 @@ export default function compileRestricted(
 	}
 
 	const imports = scanImports(client.code);
+	if (options?.scope) {
+		const allowed = new Set(["@torpor/view", ...options.scope]);
+		const outside = imports.filter((imp) => !allowed.has(imp.source));
+		if (outside.length > 0) {
+			const first = outside[0];
+			throw new EmbedCompileError([
+				{
+					message: `Import "${first.source}" is not in the compile scope. Add it: compileRestricted(..., { scope: ["${first.source}"] }) -- and provide it at mount time via the scope option.`,
+					startIndex: 0,
+					startLine: 0,
+					startChar: 0,
+					endIndex: 0,
+					endLine: 0,
+					endChar: 0,
+				},
+			]);
+		}
+	}
 
 	// Declared bridge surface, with default deny: an embed that uses the
 	// bridge must declare its surface, and calls outside the declaration
@@ -140,7 +168,6 @@ export default function compileRestricted(
 		name: component.name,
 		version: options?.version ?? RUNTIME_VERSION,
 		source,
-		format: "restricted",
 		imports: imports.length > 0 ? imports : undefined,
 		client: { code: toClientCode(client.code) },
 		server: { template: { ...restricted.program, requirements: manifest.requirements } },
