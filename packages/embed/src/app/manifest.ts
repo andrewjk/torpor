@@ -5,6 +5,8 @@ import type {
 	RestrictedRequirementKindValidator,
 	RestrictedSpecEntry,
 } from "@torpor/view/compile";
+import { parseExpressionPrefix, RestrictedSyntaxError } from "@torpor/view/compile";
+import { DERIVE_EXPRESSION_KEYS } from "../restricted/derive/deriveRequirementKind";
 
 /**
  * A value in an app manifest. Strings may be `$props.<path>` references
@@ -34,9 +36,8 @@ export interface ManifestRequirement {
  * evaluation) describing the app: its id, default props, and the data
  * requirements that feed `$data`.
  *
- * For restricted embeds, data lives here instead of in a `data … from http`
- * block in the .torp — the template stays plain torpor, and the manifest is
- * typed at author time via `defineApp`.
+ * For restricted embeds, data lives here — the template stays plain
+ * torpor, and the manifest is typed at author time via `defineApp`.
  */
 export interface AppManifest {
 	/** Stable app id: lowercase letters, digits and dashes. */
@@ -57,7 +58,6 @@ export interface AppManifest {
 export default function defineApp(manifest: AppManifest): AppManifest {
 	return manifest;
 }
-
 /** Converts a manifest value to the inert expression tree the renderer uses. */
 export function manifestExpr(value: ManifestValue): RestrictedExpr {
 	if (typeof value === "string" && /^\$props(\.|$)/.test(value)) {
@@ -75,6 +75,43 @@ export function manifestExpr(value: ManifestValue): RestrictedExpr {
 		const entries: Record<string, RestrictedExpr> = {};
 		for (const [key, child] of Object.entries(value)) {
 			entries[key] = manifestExpr(child);
+		}
+		return { op: "object", entries };
+	}
+	return { op: "lit", value: value as string | number | boolean | null };
+}
+
+/**
+ * Manifest values for a derive's expression keys (`where`, `map`,
+ * `sortBy`, the aggregates) are expression **source**: parsed at save time
+ * with the restricted expression grammar — calls to host formatters
+ * allowed, row scope (`$item`/`$index`) and `$props` referencable — so the
+ * manifest stays inert JSON. Parse failures become compile errors naming
+ * the requirement.
+ */
+function deriveManifestExpr(
+	value: ManifestValue,
+	name: string,
+	report: (message: string) => void,
+): RestrictedExpr {
+	if (typeof value === "string") {
+		try {
+			return parseExpressionPrefix(value, 0, { allowCalls: true }).expression;
+		} catch (error) {
+			if (error instanceof RestrictedSyntaxError) {
+				report(`data "${name}": ${error.message}`);
+				return { op: "lit", value: "" };
+			}
+			throw error;
+		}
+	}
+	if (Array.isArray(value)) {
+		return { op: "array", items: value.map((item) => deriveManifestExpr(item, name, report)) };
+	}
+	if (value !== null && typeof value === "object") {
+		const entries: Record<string, RestrictedExpr> = {};
+		for (const [key, child] of Object.entries(value)) {
+			entries[key] = deriveManifestExpr(child as ManifestValue, name, report);
 		}
 		return { op: "object", entries };
 	}
@@ -129,7 +166,10 @@ export function manifestRequirements(
 			continue;
 		}
 		const entries: RestrictedSpecEntry[] = Object.entries(specValues).map(([key, value]) => {
-			const expr = manifestExpr(value as ManifestValue);
+			const expr =
+				kind === "derive" && DERIVE_EXPRESSION_KEYS.has(key)
+					? deriveManifestExpr(value as ManifestValue, name, report)
+					: manifestExpr(value as ManifestValue);
 			return { key, expr, keyStart: 0, valueStart: 0, valueEnd: 0 };
 		});
 		const validator = requirementKinds?.[kind];

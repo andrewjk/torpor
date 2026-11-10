@@ -5,31 +5,30 @@ import type {
 } from "@torpor/view/compile";
 
 /**
- * The compile-time shape of `data <name> from derive { … }` declarations.
+ * The compile-time shape of a `derive` requirement in an app manifest.
  *
- * ```torp
- * data view from derive {
- * 	of: "tickets",                                    // earlier requirement (array)
- * 	where: $item.priority >= 2,                       // optional per-row filter
- * 	map: { due: formatDue($item.due) },               // optional per-row shaping
- * 	sortBy: $item.priority,                           // optional sort key
- * 	order: "desc",                                    // "asc" (default) | "desc"
- * 	limit: 20,
- * };
+ * ```json
+ * {
+ * 	"view": {
+ * 		"kind": "derive",
+ * 		"of": "tickets",                                // earlier requirement (array)
+ * 		"where": "$item.priority >= 2",                 // optional per-row filter
+ * 		"map": { "due": "formatDue($item.due)" },       // optional per-row shaping
+ * 		"sortBy": "$item.priority",                     // optional sort key
+ * 		"order": "desc",                                // "asc" (default) | "desc"
+ * 		"limit": 20
+ * 	}
+ * }
  * ```
  *
- * Aggregate form — returns a single object instead of rows:
+ * Expression values are strings parsed at save time with the restricted
+ * expression grammar (calls to host formatters allowed), so the manifest
+ * stays inert JSON. Aggregate form — returns a single object instead of
+ * rows:
  *
- * ```torp
- * data stats from derive {
- * 	of: "tickets",
- * 	where: $item.open,                                // optional filter
- * 	count: true,                                      // rows passing the filter
- * 	sum: $item.estimate,                              // numeric aggregates
- * 	average: $item.estimate,
- * 	min: $item.due,
- * 	max: $item.priority,
- * };
+ * ```json
+ * { "kind": "derive", "of": "tickets", "where": "$item.open", "count": true,
+ *   "sum": "$item.estimate", "average": "$item.estimate", "max": "$item.priority" }
  * ```
  *
  * This is the one data-layer construct whose expressions are evaluated per
@@ -45,6 +44,23 @@ const DERIVE_SPEC_KEYS = new Set([
 	"limit",
 	// Aggregates — produce a single object; can't combine with the row pipeline
 	"count",
+	"sum",
+	"min",
+	"max",
+	"average",
+]);
+
+/**
+ * The derive spec keys whose manifest values are expression **source**:
+ * parsed at save time with the restricted expression grammar. (`of`,
+ * `order`, `limit` and `count` are plain literals; `map` is an object of
+ * expression strings.) Used by the app-manifest layer to build the same
+ * expression trees the old in-template syntax produced.
+ */
+export const DERIVE_EXPRESSION_KEYS: ReadonlySet<string> = new Set([
+	"where",
+	"map",
+	"sortBy",
 	"sum",
 	"min",
 	"max",

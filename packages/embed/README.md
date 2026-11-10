@@ -179,9 +179,11 @@ build is ordinary globals-format code.
 ```ts
 import { compileRestricted, renderRestricted } from "@torpor/embed/restricted";
 
-// Publish (edge-safe: runs on Node, workers, browsers)
+// Publish (edge-safe: runs on Node, workers, browsers). Data requirements
+// come from the app manifest (see "App manifests" below)
 const artifact = compileRestricted(id, source, {
 	requirementKinds: { tickets: validateTicketSpec }, // spec shape validation
+	data: manifest.data, // the app's declared data requirements
 });
 
 // Render (edge-safe; resolves data, then interprets the template)
@@ -193,16 +195,9 @@ const { body, head, styles } = await renderRestricted(artifact, {
 });
 ```
 
-Data declarations in the template are inert specs, implemented by the host:
-
-```torp
-data tickets from tickets { queue: $props.queue, sort: "recency" };
-```
-
-(The in-torp `data … from …` block is the default style. The same
-requirements can instead live in an app manifest -- plain JSON outside the
-template, via `compileRestricted`'s `data` option; see **App manifests**
-below. Pick one style per artifact: declaring both is a compile error.)
+Data requirements are declared in the **app manifest** — inert JSON outside
+the template (see **App manifests** below), so the .torp stays plain
+torpor. Specs are inert data, implemented by the host.
 
 - `sources` is the trusted boundary: authorization, tenant scoping and network
   access live there, never in the artifact. Data resolves per render under the
@@ -334,6 +329,16 @@ import { createHttpSource, httpRequirementKind } from "@torpor/embed/restricted"
 
 const artifact = compileRestricted(id, source, {
 	requirementKinds: { http: httpRequirementKind }, // authoring-time shape errors
+	data: {
+		tickets: {
+			kind: "http",
+			url: "https://api.corp.example/tickets", // string literal; props never reach the origin
+			auth: "corp-key", // credential *name* (secret stays host-side)
+			params: { queue: "$props.queue" }, // query params; values may be $props refs
+			pick: "items", // dot path into the JSON response
+			limit: 50,
+		},
+	},
 });
 
 const { body } = await renderRestricted(artifact, {
@@ -351,16 +356,6 @@ const { body } = await renderRestricted(artifact, {
 		}),
 	},
 });
-```
-
-```torp
-data tickets from http {
-	url: "https://api.corp.example/tickets",  // string literal; props never reach the origin
-	auth: "corp-key",                          // credential *name* (secret stays host-side)
-	params: { queue: $props.queue },           // query params; values may be props
-	pick: "items",                             // dot path into the JSON response
-	limit: 50,
-};
 ```
 
 Security posture, all enforced by `createHttpSource`:
@@ -389,17 +384,22 @@ Security posture, all enforced by `createHttpSource`:
 
 Formatting and shaping belong in data, not templates — `derive` filters,
 maps, sorts and limits an earlier requirement's rows, with host functions
-callable here (and only here):
+callable here (and only here). In manifests, the expression values
+(`where`, `map`, `sortBy`, the aggregates) are expression **strings**,
+parsed at save time with the restricted expression grammar:
 
-```torp
-data view from derive {
-	of: "tickets",                               // an earlier requirement (array)
-	where: $item.priority >= 2,                  // optional per-row filter
-	map: { due: formatDue($item.due), isLate: $item.due < now() },  // optional shape
-	sortBy: $item.priority,
-	order: "desc",                               // "asc" (default) | "desc"
-	limit: 20,
-};
+```ts
+data: {
+	view: {
+		kind: "derive",
+		of: "tickets",                        // an earlier requirement (array)
+		where: "$item.priority >= 2",         // optional per-row filter
+		map: { due: "formatDue($item.due)", isLate: "$item.due < now()" },
+		sortBy: "$item.priority",
+		order: "desc",                        // "asc" (default) | "desc"
+		limit: 20,
+	},
+},
 ```
 
 ```ts
@@ -420,15 +420,16 @@ const { body } = await renderRestricted(artifact, {
 - **Aggregates** — `count`, `sum`, `min`, `max`, `average` — produce a single
   object instead of rows, over the rows passing `where`:
 
-  ```torp
-  data stats from derive {
+  ```ts
+  stats: {
+  	kind: "derive",
   	of: "tickets",
-  	where: $item.open,
+  	where: "$item.open",
   	count: true,
-  	sum: $item.estimate,
-  	average: $item.estimate,
-  	max: $item.priority,
-  };
+  	sum: "$item.estimate",
+  	average: "$item.estimate",
+  	max: "$item.priority",
+  },
   ```
 
   The template reads `$data.stats.count`, `$data.stats.sum`, … Nulls are
@@ -444,13 +445,13 @@ const { body } = await renderRestricted(artifact, {
 - Host functions are not available to template expressions; a missing
   formatter fails loudly, naming it.
 
-### App manifests: data outside the template
+### App manifests: where data requirements live
 
 `@torpor/embed/app` is the author-facing manifest entry (edge-safe, no Node
 builtins). `defineApp` types an app declaration and returns it unchanged --
 plain JSON, so a host can store it and compile against it without executing
-anything. Data lives in the manifest instead of a `data … from http` block
-inside the .torp, keeping restricted templates plain torpor:
+anything. All data requirements live here, keeping restricted templates
+plain torpor:
 
 ```ts
 // word-lookup.app.ts -- authored by the client, submitted as JSON
@@ -472,8 +473,7 @@ export default defineApp({
 });
 ```
 
-Compile against it with `compileRestricted`'s `data` option -- use one
-style or the other, not both:
+Compile against it with `compileRestricted`'s `data` option:
 
 ```ts
 const artifact = compileRestricted("word-lookup", templateSource, {

@@ -27,9 +27,11 @@ export interface CompileRestrictedOptions {
 	requirementKinds?: Record<string, RestrictedRequirementKindValidator>;
 
 	/**
-	 * Data requirements as an app manifest (`defineApp().data`) instead of
-	 * in-torp `data … from …` declarations, so the template stays plain
-	 * torpor. Use one style or the other, not both.
+	 * The app manifest's data requirements (`defineApp().data`), keyed by
+	 * the `$data.<name>` they bind — the only place data requirements are
+	 * declared. Specs are validated against `requirementKinds` at compile
+	 * time; `$props` references stay symbolic until the host resolves them,
+	 * and derive expressions are strings parsed at save time.
 	 */
 	data?: Record<string, ManifestRequirement>;
 
@@ -80,38 +82,20 @@ export default function compileRestricted(
 	// nodes in place (invalidating those spans).
 	const restricted = buildRestricted(template, {
 		source,
-		requirementKinds: options?.requirementKinds,
 		preserveWhitespace: options?.preserveWhitespace,
 	});
 	if (restricted.errors.length > 0) {
 		throw new EmbedCompileError(restricted.errors);
 	}
 
-	// Data requirements come from the manifest (plain-torpor templates) or
-	// the in-torp `data … from …` declarations, never both
-	let requirements = restricted.program.requirements;
-	if (options?.data !== undefined) {
-		if (requirements.length > 0) {
-			const error: CompileError = {
-				message:
-					"Declare data requirements in the app manifest or as `data … from …` in the source, not both.",
-				startIndex: 0,
-				startLine: 0,
-				startChar: 0,
-				endIndex: 0,
-				endLine: 0,
-				endChar: 0,
-			};
-			throw new EmbedCompileError([error]);
-		}
-		const manifest = manifestRequirements(options.data, options.requirementKinds);
-		if (manifest.errors.length > 0) {
-			throw new EmbedCompileError(manifest.errors);
-		}
-		requirements = manifest.requirements;
-		// The in-source path binds `$data` at parse time; a manifest has no
-		// declarations to scan, so install the same binding for the client
-		// build (`$props.$data` is where the host passes the resolved bag)
+	// Data requirements come from the app manifest only. When there are
+	// any, bind `$data` (the client build reads the host-resolved bag
+	// through `$props.$data`); templates without requirements skip it.
+	const manifest = manifestRequirements(options?.data ?? {}, options?.requirementKinds);
+	if (manifest.errors.length > 0) {
+		throw new EmbedCompileError(manifest.errors);
+	}
+	if (manifest.requirements.length > 0) {
 		bindDataTemplate(template);
 	}
 
@@ -130,7 +114,7 @@ export default function compileRestricted(
 		format: "restricted",
 		imports: imports.length > 0 ? imports : undefined,
 		client: { code: toClientCode(client.code) },
-		server: { template: { ...restricted.program, requirements } },
+		server: { template: { ...restricted.program, requirements: manifest.requirements } },
 		styles: restricted.styles,
 		meta: options?.meta,
 	};

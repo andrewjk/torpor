@@ -17,7 +17,6 @@ import trimQuotes from "../../utils/trimQuotes";
 import voidTags from "../../utils/voidTags";
 import scanStateInitializers from "./scanState";
 import parseExpression, { RestrictedSyntaxError } from "./parseExpression";
-import parseRequirementSpec from "./parseRequirementSpec";
 import type {
 	RestrictedAttribute,
 	RestrictedFill,
@@ -26,18 +25,9 @@ import type {
 	RestrictedComponent,
 	RestrictedExpr,
 	RestrictedNode,
-	RestrictedRequirement,
-	RestrictedRequirementKindValidator,
 } from "./types";
 
-export interface RestrictedBuildOptions extends BuildOptions {
-	/**
-	 * The data requirement kinds available to this build, keyed by kind
-	 * name. Unknown kinds are a compile error, so an admin importing an
-	 * unsupported data source finds out at save time.
-	 */
-	requirementKinds?: Record<string, RestrictedRequirementKindValidator>;
-}
+export interface RestrictedBuildOptions extends BuildOptions {}
 
 interface Context {
 	source: string;
@@ -157,47 +147,11 @@ export default function buildRestricted(
 		});
 	}
 
-	const requirements: RestrictedRequirement[] = [];
-	const names = new Set<string>();
-	for (const declaration of template.requirements ?? []) {
-		if (names.has(declaration.name)) {
-			report(
-				`Duplicate data requirement name "${declaration.name}".`,
-				declaration.span.start,
-				declaration.span.end,
-			);
-			continue;
-		}
-		names.add(declaration.name);
-		try {
-			const entries = parseRequirementSpec(declaration.spec, declaration.specStart);
-			const validator = options?.requirementKinds?.[declaration.kind];
-			if (!validator) {
-				report(
-					`Unknown data requirement kind "${declaration.kind}". Enable it in the compiler's requirementKinds (or have the host provide it as a first-party kind).`,
-					declaration.span.start,
-					declaration.span.end,
-				);
-				continue;
-			}
-			validator(entries, report, {
-				name: declaration.name,
-				names: [...names].filter((n) => n !== declaration.name),
-			});
-			const spec: Record<string, RestrictedExpr> = {};
-			for (const entry of entries) spec[entry.key] = entry.expr;
-			requirements.push({ name: declaration.name, kind: declaration.kind, spec });
-		} catch (error) {
-			if (error instanceof RestrictedSyntaxError) {
-				report(error.message, error.start, error.end);
-			} else {
-				throw error;
-			}
-		}
-	}
-
 	errors.sort((a, b) => a.startIndex - b.startIndex);
-	return { program: { requirements, components }, styles, errors };
+	// Requirements are not parsed from the template: they come from an app
+	// manifest, which the host (e.g. compileRestricted) installs on the
+	// program after the build.
+	return { program: { requirements: [], components }, styles, errors };
 }
 
 function compileError(message: string, start: number, end: number, source: string): CompileError {

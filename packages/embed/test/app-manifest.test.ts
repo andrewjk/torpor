@@ -105,24 +105,6 @@ test("paint-then-mount: a manifest app hydrates from the data bag", async () => 
 	expect(target.innerHTML).toBe("");
 });
 
-test("manifest data and in-source declarations are mutually exclusive", () => {
-	expect(() =>
-		compileRestricted(
-			"mixed",
-			`
-data tickets from tickets { queue: "x" };
-export default function Mixed() {
-	@render { <p>{$data.tickets}</p> }
-}
-`,
-			{
-				requirementKinds: { tickets: () => {} },
-				data: { extra: { kind: "http", url: "https://api.example.com/x" } },
-			},
-		),
-	).toThrow(/not both/i);
-});
-
 test("unknown manifest kinds are compile errors", () => {
 	expect(() =>
 		compileRestricted("bad-kind", PLAIN, {

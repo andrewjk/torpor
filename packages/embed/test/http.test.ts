@@ -6,17 +6,10 @@ import {
 	renderRestricted,
 } from "../src/restricted";
 import type { HttpOriginPolicy } from "../src/restricted";
+import type { ManifestRequirement } from "../src/app";
 import EmbedCompileError from "../src/types/EmbedCompileError";
 
 const SOURCE = `
-data tickets from http {
-	url: "https://api.example.test/tickets",
-	auth: "corp-key",
-	params: { queue: $props.queue },
-	pick: "items",
-	limit: 2,
-};
-
 export default function Inbox($props: { queue: string }) {
 	@render {
 		<div>
@@ -28,11 +21,34 @@ export default function Inbox($props: { queue: string }) {
 }
 `;
 
-function artifact(source = SOURCE) {
+const DATA: Record<string, ManifestRequirement> = {
+	tickets: {
+		kind: "http",
+		url: "https://api.example.test/tickets",
+		auth: "corp-key",
+		params: { queue: "$props.queue" },
+		pick: "items",
+		limit: 2,
+	},
+};
+
+function artifact(
+	source = SOURCE,
+	data: Record<string, ManifestRequirement> = DATA,
+): ReturnType<typeof compileRestricted> {
 	return compileRestricted("inbox", source, {
 		requirementKinds: { http: httpRequirementKind },
+		data,
 	});
 }
+
+const TEMPLATE = `
+export default function A() {
+	@render {
+		<p>x</p>
+	}
+}
+`;
 
 interface Captured {
 	url: URL;
@@ -54,9 +70,12 @@ function mockFetch(handler: (url: URL) => Response, captured: Captured[] = []): 
 	}) as typeof fetch;
 }
 
-function compileErrorOf(source: string): EmbedCompileError {
+function compileErrorOf(
+	source = SOURCE,
+	data: Record<string, ManifestRequirement> = DATA,
+): EmbedCompileError {
 	try {
-		artifact(source);
+		artifact(source, data);
 	} catch (error) {
 		expect(error).toBeInstanceOf(EmbedCompileError);
 		return error as EmbedCompileError;
@@ -87,50 +106,21 @@ test("compile-time shape validation accepts the documented spec", () => {
 });
 
 test("compile-time validation rejects bad shapes", () => {
-	const cases: [string, RegExp][] = [
-		[
-			`data t from http { params: {} };
-export default function A() { @render { <p>x</p> } }`,
-			/http requirements need a "url"/,
-		],
-		[
-			`data t from http { url: $props.url };
-export default function A() { @render { <p>x</p> } }`,
-			/http "url" must be a string literal/,
-		],
-		[
-			`data t from http { url: "https://x.test", auth: $props.key };
-export default function A() { @render { <p>x</p> } }`,
-			/http "auth" must be a credential name/,
-		],
-		[
-			`data t from http { url: "https://x.test", bogus: 1 };
-export default function A() { @render { <p>x</p> } }`,
-			/Unknown http spec key "bogus"/,
-		],
-		[
-			`data t from http { url: "https://x.test", pick: "a..b" };
-export default function A() { @render { <p>x</p> } }`,
-			/empty segment/,
-		],
-		[
-			`data t from http { url: "https://x.test", limit: 0 };
-export default function A() { @render { <p>x</p> } }`,
-			/positive integer/,
-		],
-		[
-			`data t from http { url: "ftp://x.test" };
-export default function A() { @render { <p>x</p> } }`,
-			/must use http: or https:/,
-		],
-		[
-			`data t from http { url: "https://user:pass@x.test" };
-export default function A() { @render { <p>x</p> } }`,
-			/must not embed credentials/,
-		],
+	const cases: [Record<string, unknown>, RegExp][] = [
+		[{ params: {} }, /http requirements need a "url"/],
+		[{ url: "$props.url" }, /http "url" must be a string literal/],
+		[{ url: "https://x.test", auth: "$props.key" }, /http "auth" must be a credential name/],
+		[{ url: "https://x.test", bogus: 1 }, /Unknown http spec key "bogus"/],
+		[{ url: "https://x.test", pick: "a..b" }, /empty segment/],
+		[{ url: "https://x.test", limit: 0 }, /positive integer/],
+		[{ url: "ftp://x.test" }, /must use http: or https:/],
+		[{ url: "https://user:pass@x.test" }, /must not embed credentials/],
 	];
-	for (const [source, pattern] of cases) {
-		expect(compileErrorOf(source).errors[0].message).toMatch(pattern);
+	for (const [spec, pattern] of cases) {
+		const error = compileErrorOf(TEMPLATE, {
+			t: { kind: "http", ...spec } as ManifestRequirement,
+		});
+		expect(error.errors[0].message).toMatch(pattern);
 	}
 });
 
@@ -294,14 +284,10 @@ test("maxRows clamps the spec limit", async () => {
 
 test("private and local hosts are blocked even when allowlisted", async () => {
 	for (const url of ["http://localhost:8080/x", "http://127.0.0.1/x", "http://10.0.0.5/x"]) {
-		const source = compileRestricted(
-			"private",
-			`
-data t from http { url: "${url}" };
-export default function A() { @render { <p>x</p> } }
-`,
-			{ requirementKinds: { http: httpRequirementKind } },
-		);
+		const source = compileRestricted("private", TEMPLATE, {
+			requirementKinds: { http: httpRequirementKind },
+			data: { t: { kind: "http", url } },
+		});
 
 		await expect(
 			renderRestricted(source, {
@@ -334,10 +320,6 @@ test("response data is inert: markup in rows is escaped", async () => {
 });
 
 const ROOT_SOURCE = `
-data payload from http {
-	url: "https://api.example.test/tickets",
-};
-
 export default function Inbox() {
 	@render {
 		@for (t of $data.payload.items) {
@@ -346,6 +328,10 @@ export default function Inbox() {
 	}
 }
 `;
+
+const ROOT_DATA: Record<string, ManifestRequirement> = {
+	payload: { kind: "http", url: "https://api.example.test/tickets" },
+};
 
 test("allowFields strips disallowed fields from rows, at every level", async () => {
 	const { data } = await renderRestricted(artifact(), {
@@ -379,7 +365,7 @@ test("allowFields strips disallowed fields from rows, at every level", async () 
 });
 
 test("allowFields narrows the response root when there is no pick", async () => {
-	const { data } = await renderRestricted(artifact(ROOT_SOURCE), {
+	const { data } = await renderRestricted(artifact(ROOT_SOURCE, ROOT_DATA), {
 		sources: {
 			http: createHttpSource({
 				allowOrigins: [{ origin: "https://api.example.test", allowFields: ["items", "title"] }],
@@ -391,14 +377,12 @@ test("allowFields narrows the response root when there is no pick", async () => 
 });
 
 test("a pick into a stripped field fails loudly", async () => {
-	const source = compileRestricted(
-		"stripped-pick",
-		`
-data t from http { url: "https://api.example.test/tickets", pick: "items.0.internal" };
-export default function A() { @render { <p>x</p> } }
-`,
-		{ requirementKinds: { http: httpRequirementKind } },
-	);
+	const source = compileRestricted("stripped-pick", TEMPLATE, {
+		requirementKinds: { http: httpRequirementKind },
+		data: {
+			t: { kind: "http", url: "https://api.example.test/tickets", pick: "items.0.internal" },
+		},
+	});
 	await expect(
 		renderRestricted(source, {
 			sources: {
@@ -438,7 +422,7 @@ test("deeply nested responses hit the narrowing depth cap", async () => {
 	let deep: unknown = { title: "leaf" };
 	for (let i = 0; i < 150; i++) deep = { inner: deep };
 	await expect(
-		renderRestricted(artifact(ROOT_SOURCE), {
+		renderRestricted(artifact(ROOT_SOURCE, ROOT_DATA), {
 			sources: {
 				http: createHttpSource({
 					allowOrigins: [{ origin: "https://api.example.test", allowFields: ["inner"] }],

@@ -9,11 +9,6 @@ import EmbedVersionError from "../src/types/EmbedVersionError";
 import type EmbedArtifact from "../src/types/EmbedArtifact";
 
 const SOURCE = `
-data tickets from tickets {
-	queue: $props.queue,
-	sort: "recency",
-};
-
 export default function Inbox($props: { queue: string }) {
 	@render {
 		<ul class="inbox">
@@ -40,8 +35,12 @@ const ROWS = [
 	{ id: "2", title: '<script>alert("x")</script>', priority: 1 },
 ];
 
+const DATA = {
+	tickets: { kind: "tickets", queue: "$props.queue", sort: "recency" },
+};
+
 function artifact(): EmbedArtifact {
-	return compileRestricted("inbox", SOURCE, { requirementKinds });
+	return compileRestricted("inbox", SOURCE, { requirementKinds, data: DATA });
 }
 
 test("compiles a restricted artifact with a serialized server build", () => {
@@ -158,14 +157,17 @@ test("onAudit covers derive requirements with their static spec", async () => {
 	const statsArtifact = compileRestricted(
 		"stats",
 		`
-data tickets from tickets { queue: "open" };
-data stats from derive { of: "tickets", count: true };
-
 export default function Stats() {
 	@render { <p>{$data.stats.count}</p> }
 }
 `,
-		{ requirementKinds: { tickets: () => {}, derive: deriveRequirementKind } },
+		{
+			requirementKinds: { tickets: () => {}, derive: deriveRequirementKind },
+			data: {
+				tickets: { kind: "tickets", queue: "open" },
+				stats: { kind: "derive", of: "tickets", count: true },
+			},
+		},
 	);
 	const entries: RestrictedAuditEntry[] = [];
 	await renderRestricted(statsArtifact, {
@@ -244,9 +246,12 @@ export default function Bad() {
 });
 
 test("unknown requirement kinds fail at compile time", () => {
-	expect(() => compileRestricted("unknown-kind", SOURCE, { requirementKinds: {} })).toThrow(
-		/Unknown data requirement kind "tickets"/,
-	);
+	expect(() =>
+		compileRestricted("unknown-kind", SOURCE, {
+			requirementKinds: {},
+			data: { tickets: { kind: "tickets", queue: "open" } },
+		}),
+	).toThrow(/Unknown data requirement kind "tickets"/);
 });
 
 test("paint-then-mount: the client build renders from the same data bag", async () => {
@@ -282,7 +287,7 @@ test("recompileRestricted refreshes the version and keeps meta", () => {
 		version: "0.0.0-stale",
 		meta: { author: "ada" },
 	};
-	const fresh = recompileRestricted(stale, { requirementKinds });
+	const fresh = recompileRestricted(stale, { requirementKinds, data: DATA });
 	expect(fresh.version).not.toBe("0.0.0-stale");
 	expect(fresh.meta).toEqual({ author: "ada" });
 	expect(fresh.server?.template).toEqual(stale.server?.template);

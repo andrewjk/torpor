@@ -1,25 +1,11 @@
 import { expect, test } from "vite-plus/test";
-import { build, buildRestricted, parse } from "../../src/compile";
+import { bindDataTemplate, build, buildRestricted, parse } from "../../src/compile";
 import type { RestrictedNode } from "../../src/compile";
-
-const requirementKinds = {
-	http: (
-		spec: { key: string }[],
-		report: (message: string, start: number, end: number) => void,
-	) => {
-		const keys = spec.map((entry) => entry.key);
-		for (const allowed of keys) {
-			if (!["url", "auth", "params", "pick", "sort", "limit"].includes(allowed)) {
-				report(`Unknown http spec key "${allowed}"`, 0, 0);
-			}
-		}
-	},
-};
 
 function compile(source: string, options?: Parameters<typeof buildRestricted>[1]) {
 	const parsed = parse(source);
 	expect(parsed.errors).toEqual([]);
-	return buildRestricted(parsed.template!, { source, requirementKinds, ...options });
+	return buildRestricted(parsed.template!, { source, ...options });
 }
 
 function errorsOf(result: ReturnType<typeof buildRestricted>): string[] {
@@ -162,72 +148,8 @@ export default function Rows() {
 	});
 });
 
-test("parses data requirements and validates their kind shape", () => {
-	const { program, errors } = compile(`
-data tickets from http {
-	url: "https://api.example.test/tickets",
-	params: { queue: $props.queue },
-	sort: "recency",
-};
-
-export default function List($props: { queue: string }) {
-	@render {
-		<p>{$data.tickets.length}</p>
-	}
-}
-`);
-	expect(errors).toEqual([]);
-	expect(program.requirements).toEqual([
-		{
-			name: "tickets",
-			kind: "http",
-			spec: {
-				url: { op: "lit", value: "https://api.example.test/tickets" },
-				params: {
-					op: "object",
-					entries: {
-						queue: {
-							op: "get",
-							object: { op: "ref", name: "$props" },
-							key: "queue",
-						},
-					},
-				},
-				sort: { op: "lit", value: "recency" },
-			},
-		},
-	]);
-});
-
-test("unknown requirement kinds are a compile error", () => {
-	const result = compile(
-		`
-data tickets from sql { table: "tickets" };
-
-export default function List() {
-	@render { <p>hi</p> }
-}
-`,
-		{ requirementKinds: {} },
-	);
-	expect(errorsOf(result).join("\n")).toContain('Unknown data requirement kind "sql"');
-});
-
-test("requirement kind validators can reject spec keys", () => {
-	const result = compile(`
-data tickets from http { url: "https://x", bogus: 1 };
-
-export default function List() {
-	@render { <p>hi</p> }
-}
-`);
-	expect(errorsOf(result).join("\n")).toContain('Unknown http spec key "bogus"');
-});
-
-test("requirement declarations are stripped from the JS builds and bind $data", () => {
+test("bindDataTemplate binds $data for manifest-driven templates", () => {
 	const source = `
-data tickets from http { url: "https://api.example.test/tickets" };
-
 export default function List() {
 	@render {
 		<p>{$data.tickets.length}</p>
@@ -237,18 +159,18 @@ export default function List() {
 	const parsed = parse(source);
 	expect(parsed.errors).toEqual([]);
 
+	bindDataTemplate(parsed.template!);
+
 	// Restricted first: build() trims whitespace in place, which invalidates
 	// the parse-time spans restricted mode relies on
-	const restricted = buildRestricted(parsed.template!, { source, requirementKinds });
+	const restricted = buildRestricted(parsed.template!, { source });
 	expect(restricted.errors).toEqual([]);
 
 	const client = build(parsed.template!);
 	expect(client.code).toContain("let $data = $props?.$data ?? {};");
-	expect(client.code).not.toContain("data tickets from");
 
 	const server = build(parsed.template!, { server: true });
 	expect(server.code).toContain("let $data = $props?.$data ?? {};");
-	expect(server.code).not.toContain("data tickets from");
 });
 
 test("serializes component usage as component nodes with fills", () => {

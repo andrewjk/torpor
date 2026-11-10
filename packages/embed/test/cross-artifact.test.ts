@@ -1,4 +1,4 @@
-import { build, parse } from "@torpor/view/compile";
+import { bindDataTemplate, build, parse } from "@torpor/view/compile";
 import * as ssr from "@torpor/view/ssr";
 import { transform } from "sucrase";
 import { expect, test } from "vite-plus/test";
@@ -18,8 +18,6 @@ const ROWS = [
 ];
 
 const INNER = `
-data tickets from rows { };
-
 export default function TicketList() {
 	@render {
 		@for (t of $data.tickets) {
@@ -50,7 +48,10 @@ export default function Board() {
 const KINDS = { rows: () => {}, derive: deriveRequirementKind };
 
 function innerArtifact(): EmbedArtifact {
-	return compileRestricted("ticket-list", INNER, { requirementKinds: KINDS });
+	return compileRestricted("ticket-list", INNER, {
+		requirementKinds: KINDS,
+		data: { tickets: { kind: "rows" } },
+	});
 }
 
 function outerArtifact(): EmbedArtifact {
@@ -156,8 +157,6 @@ test("hydration: the inner artifact's client build renders via scope", async () 
 });
 
 const INNER_STYLED_SOURCE = `
-data tickets from rows { };
-
 export default function TicketList() {
 	@style {
 		.row { padding: 4px; }
@@ -176,6 +175,9 @@ export default function TicketList() {
  * exports in scope (same harness as restricted-components.test.ts). */
 function compileServerComponent(source: string): unknown {
 	const parsed = parse(source);
+	// The source reads `$data` from the injected bag; the JS build needs the
+	// same binding the manifest path installs
+	bindDataTemplate(parsed.template!);
 	const built = build(parsed.template!, { server: true, source });
 	// Strip imports before the TS transform (sucrase hoists helpers above them)
 	const code = built.code.replace("export default ", "").replace(/^import\s.+\n/gm, "");
@@ -188,6 +190,7 @@ function compileServerComponent(source: string): unknown {
 test("inner artifact styles flow through the boundary like the JS build", async () => {
 	const inner = compileRestricted("ticket-list-styled", INNER_STYLED_SOURCE, {
 		requirementKinds: KINDS,
+		data: { tickets: { kind: "rows" } },
 	});
 	const outer = compileRestricted("board-styled", OUTER_SOURCE);
 
@@ -225,8 +228,6 @@ test("inner artifact styles flow through the boundary like the JS build", async 
 });
 
 const INNER_LI_SOURCE = `
-data tickets from rows { };
-
 export default function TicketListLi() {
 	@render {
 		@for (t of $data.tickets) {
@@ -249,6 +250,7 @@ export default function BoardLi() {
 test("slot fills that auto-close the wrapper throw at render time", async () => {
 	const inner = compileRestricted("ticket-list-li", INNER_LI_SOURCE, {
 		requirementKinds: KINDS,
+		data: { tickets: { kind: "rows" } },
 	});
 	const outer = compileRestricted("board-li", OUTER_LI_SOURCE);
 	await expect(

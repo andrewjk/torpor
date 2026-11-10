@@ -1,7 +1,6 @@
 import type TemplateComponent from "../../types/TemplateComponent";
 import type CompileError from "../types/CompileError";
 import type Import from "../types/Import";
-import type RequirementDeclaration from "../types/RequirementDeclaration";
 import type ScriptChunk from "../types/ScriptChunk";
 import ElementNode from "../types/nodes/ElementNode";
 
@@ -25,9 +24,6 @@ export default interface ParseStatus {
 
 	components: TemplateComponent[];
 	stack: ElementNode[];
-
-	/** File-level `data` declarations (restricted-mode requirements). */
-	requirements: RequirementDeclaration[];
 
 	errors: CompileError[];
 }

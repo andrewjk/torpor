@@ -1,4 +1,4 @@
-import { build, parse } from "@torpor/view/compile";
+import { bindDataTemplate, build, parse } from "@torpor/view/compile";
 import * as ssr from "@torpor/view/ssr";
 import { transform } from "sucrase";
 import { expect, test } from "vite-plus/test";
@@ -22,6 +22,9 @@ async function renderJsServer(
 ): Promise<{ body: string; styles: unknown[] }> {
 	const parsed = parse(source);
 	expect(parsed.errors).toEqual([]);
+	// The source reads `$data` from the injected bag; the JS build needs the
+	// same binding the manifest path installs
+	bindDataTemplate(parsed.template!);
 	const built = build(parsed.template!, { server: true, source });
 	// Strip imports before the TS transform (sucrase hoists helpers above them)
 	const code = built.code.replace("export default ", "").replace(/^import\s.+\n/gm, "");
@@ -138,8 +141,6 @@ export default function Branches($props: { n: number }) {
 
 test("parity: @for with @key, nested control and data", async () => {
 	const source = `
-data tickets from http { url: "https://api.example.test/x" };
-
 export default function Rows($props: { show: boolean }) {
 	@render {
 		<ul>

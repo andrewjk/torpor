@@ -182,8 +182,17 @@ export interface RestrictedRequirementKindContext {
 	names: string[];
 }
 
+export interface RestrictedSpecEntry {
+	key: string;
+	expr: RestrictedExpr;
+	/** Absolute source indices, for kind validators to report against. */
+	keyStart: number;
+	valueStart: number;
+	valueEnd: number;
+}
+
 export type RestrictedRequirementKindValidator = (
-	spec: import("./parseRequirementSpec").RestrictedSpecEntry[],
+	spec: RestrictedSpecEntry[],
 	report: (message: string, start: number, end: number) => void,
 	context?: RestrictedRequirementKindContext,
 ) => void;

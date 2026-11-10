@@ -6,21 +6,12 @@ import {
 	httpRequirementKind,
 	renderRestricted,
 } from "../src/restricted";
+import type { ManifestRequirement } from "../src/app";
 import EmbedCompileError from "../src/types/EmbedCompileError";
 
 const REQUIREMENT_KINDS = { rows: () => {}, derive: deriveRequirementKind };
 
 const SOURCE = `
-data tickets from rows { };
-data view from derive {
-	of: "tickets",
-	where: $item.priority >= 2,
-	map: { label: upper($item.title), due: formatDue($item.due) },
-	sortBy: $item.priority,
-	order: "desc",
-	limit: 2,
-};
-
 export default function Inbox() {
 	@render {
 		<ul>
@@ -31,6 +22,19 @@ export default function Inbox() {
 	}
 }
 `;
+
+const DATA: Record<string, ManifestRequirement> = {
+	tickets: { kind: "rows" },
+	view: {
+		kind: "derive",
+		of: "tickets",
+		where: "$item.priority >= 2",
+		map: { label: "upper($item.title)", due: "formatDue($item.due)" },
+		sortBy: "$item.priority",
+		order: "desc",
+		limit: 2,
+	},
+};
 
 const ROWS = [
 	{ title: "a", priority: 1, due: 1 },
@@ -44,13 +48,19 @@ const formatters = {
 	formatDue: (value: unknown) => `#${String(value)}`,
 };
 
-function artifact(source = SOURCE, kinds = REQUIREMENT_KINDS) {
-	return compileRestricted("derive-test", source, { requirementKinds: kinds });
+function artifact(
+	source = SOURCE,
+	data: Record<string, ManifestRequirement> = DATA,
+): ReturnType<typeof compileRestricted> {
+	return compileRestricted("derive-test", source, { requirementKinds: REQUIREMENT_KINDS, data });
 }
 
-function compileErrorOf(source: string): EmbedCompileError {
+function compileErrorOf(
+	source = SOURCE,
+	data: Record<string, ManifestRequirement> = DATA,
+): EmbedCompileError {
 	try {
-		artifact(source);
+		artifact(source, data);
 	} catch (error) {
 		expect(error).toBeInstanceOf(EmbedCompileError);
 		return error as EmbedCompileError;
@@ -72,19 +82,24 @@ test("derive filters, maps with host formatters, sorts and limits", async () => 
 });
 
 test("derive supports ascending order and $index", async () => {
+	const data: Record<string, ManifestRequirement> = {
+		tickets: { kind: "rows" },
+		view: {
+			kind: "derive",
+			of: "tickets",
+			map: { label: "upper($item.title)", position: "$index" },
+			sortBy: "$item.priority",
+			order: "asc",
+		},
+	};
 	const source = `
-data rowsIn from rows { };
-data view from derive {
-	of: "rowsIn",
-	map: { label: upper($item.title), position: $index },
-	sortBy: $item.priority,
-	order: "asc",
-};
 export default function Inbox() {
-	@render { <ul>@for (v of $data.view) { <li>{v.position}:{v.label}</li> }</ul> }
+	@render {
+		<ul>@for (v of $data.view) { <li>{v.position}:{v.label}</li> }</ul>
+	}
 }
 `;
-	const { body } = await renderRestricted(artifact(source), {
+	const { body } = await renderRestricted(artifact(source, data), {
 		formatters,
 		sources: { rows: () => ROWS },
 	});
@@ -96,15 +111,17 @@ export default function Inbox() {
 });
 
 test("derive chains over earlier derives", async () => {
+	const data: Record<string, ManifestRequirement> = {
+		tickets: { kind: "rows" },
+		high: { kind: "derive", of: "tickets", where: "$item.priority >= 2" },
+		labels: { kind: "derive", of: "high", map: { label: "upper($item.title)" } },
+	};
 	const source = `
-data rowsIn from rows { };
-data high from derive { of: "rowsIn", where: $item.priority >= 2 };
-data labels from derive { of: "high", map: { label: upper($item.title) } };
 export default function Inbox() {
 	@render { <ul>@for (v of $data.labels) { <li>{v.label}</li> }</ul> }
 }
 `;
-	const { body } = await renderRestricted(artifact(source), {
+	const { body } = await renderRestricted(artifact(source, data), {
 		formatters,
 		sources: { rows: () => ROWS },
 	});
@@ -115,21 +132,26 @@ export default function Inbox() {
 });
 
 test("derive composes with the http source kind", async () => {
+	const data: Record<string, ManifestRequirement> = {
+		tickets: {
+			kind: "http",
+			url: "https://api.example.test/tickets",
+			pick: "items",
+		},
+		view: {
+			kind: "derive",
+			of: "tickets",
+			map: { upperTitle: "upper($item.title)" },
+		},
+	};
 	const source = `
-data tickets from http {
-	url: "https://api.example.test/tickets",
-	pick: "items",
-};
-data view from derive {
-	of: "tickets",
-	map: { upperTitle: upper($item.title) },
-};
 export default function Inbox() {
 	@render { <ul>@for (v of $data.view) { <li>{v.upperTitle}</li> }</ul> }
 }
 `;
 	const embed = compileRestricted("http-derive", source, {
 		requirementKinds: { http: httpRequirementKind, derive: deriveRequirementKind },
+		data,
 	});
 	const { body } = await renderRestricted(embed, {
 		formatters,
@@ -148,92 +170,79 @@ export default function Inbox() {
 });
 
 test("unknown formatters fail loudly, naming the function", async () => {
-	const source = `
-data rowsIn from rows { };
-data view from derive { of: "rowsIn", map: { x: nope($item.title) } };
-export default function Inbox() {
-	@render { <ul>@for (v of $data.view) { <li>{v.x}</li> }</ul> }
-}
-`;
+	const data: Record<string, ManifestRequirement> = {
+		tickets: { kind: "rows" },
+		view: { kind: "derive", of: "tickets", map: { x: "nope($item.title)" } },
+	};
 	await expect(
-		renderRestricted(artifact(source), { sources: { rows: () => ROWS } }),
+		renderRestricted(artifact(SOURCE, data), { sources: { rows: () => ROWS } }),
 	).rejects.toThrow(/Unknown host function "nope"/);
 });
 
-test("method calls are rejected at compile time in derive specs", () => {
-	const source = `
-data rowsIn from rows { };
-data view from derive { of: "rowsIn", map: { x: $item.title.toUpperCase() } };
-export default function Inbox() {
-	@render { <ul>@for (v of $data.view) { <li>{v.x}</li> }</ul> }
-}
-`;
-	const error = compileErrorOf(source);
+test("method calls are rejected at compile time in derive specs", async () => {
+	const data: Record<string, ManifestRequirement> = {
+		tickets: { kind: "rows" },
+		view: { kind: "derive", of: "tickets", map: { x: "$item.title.toUpperCase()" } },
+	};
+	const error = compileErrorOf(SOURCE, data);
 	expect(error.errors[0].message).toMatch(/Only named host functions/);
 });
 
 test("derive shape validation", () => {
-	const cases: [string, RegExp][] = [
+	const cases: [Record<string, ManifestRequirement>, RegExp][] = [
+		[{ view: { kind: "derive", where: "$item.x" } }, /need an "of" data name/],
+		[{ view: { kind: "derive", of: 42 } }, /"of" must be a string literal/],
 		[
-			`data rowsIn from rows { };
-data view from derive { where: $item.x };
-export default function A() { @render { <p>x</p> } }`,
-			/need an "of" data name/,
-		],
-		[
-			`data rowsIn from rows { };
-data view from derive { of: rowsIn };
-export default function A() { @render { <p>x</p> } }`,
-			/"of" must be a string literal/,
-		],
-		[
-			`data view from derive { of: "later" };
-data later from rows { };
-export default function A() { @render { <p>x</p> } }`,
+			{ view: { kind: "derive", of: "later" }, later: { kind: "rows" } },
 			/not an earlier requirement/,
 		],
 		[
-			`data rowsIn from rows { };
-data view from derive { of: "rowsIn", order: "sideways" };
-export default function A() { @render { <p>x</p> } }`,
+			{
+				tickets: { kind: "rows" },
+				view: { kind: "derive", of: "tickets", order: "sideways" },
+			},
 			/"order" must be "asc" or "desc"/,
 		],
 		[
-			`data rowsIn from rows { };
-data view from derive { of: "rowsIn", limit: -1 };
-export default function A() { @render { <p>x</p> } }`,
+			{
+				tickets: { kind: "rows" },
+				view: { kind: "derive", of: "tickets", limit: -1 },
+			},
 			/positive integer/,
 		],
 		[
-			`data rowsIn from rows { };
-data view from derive { of: "rowsIn", bogus: 1 };
-export default function A() { @render { <p>x</p> } }`,
+			{
+				tickets: { kind: "rows" },
+				view: { kind: "derive", of: "tickets", bogus: 1 },
+			},
 			/Unknown derive spec key "bogus"/,
 		],
 	];
-	for (const [source, pattern] of cases) {
-		expect(compileErrorOf(source).errors[0].message).toMatch(pattern);
+	for (const [data, pattern] of cases) {
+		expect(compileErrorOf(SOURCE, data).errors[0].message).toMatch(pattern);
 	}
 });
 
 test("budgets: input rows, output rows and wall clock", async () => {
 	const many = Array.from({ length: 50 }, (_, index) => ({ n: index }));
 
-	const inputSource = `
-data rowsIn from rows { };
-data view from derive { of: "rowsIn" };
+	const data: Record<string, ManifestRequirement> = {
+		tickets: { kind: "rows" },
+		view: { kind: "derive", of: "tickets" },
+	};
+	const source = `
 export default function A() {
 	@render { <ul>@for (v of $data.view) { <li>{v.n}</li> }</ul> }
 }
 `;
 	await expect(
-		renderRestricted(artifact(inputSource), {
+		renderRestricted(artifact(source, data), {
 			sources: { rows: () => many },
 			deriveLimits: { maxInputRows: 10 },
 		}),
 	).rejects.toThrow(/over the 10 row budget/);
 
-	const { body } = await renderRestricted(artifact(inputSource), {
+	const { body } = await renderRestricted(artifact(source, data), {
 		sources: { rows: () => many },
 		deriveLimits: { maxOutputRows: 1 },
 	});
@@ -242,7 +251,7 @@ export default function A() {
 
 	const huge = Array.from({ length: 200_000 }, (_, index) => ({ n: index }));
 	await expect(
-		renderRestricted(artifact(inputSource), {
+		renderRestricted(artifact(source, data), {
 			sources: { rows: () => huge },
 			deriveLimits: { maxInputRows: 1_000_000, maxOutputRows: 1, timeoutMs: 1 },
 		}),
@@ -266,18 +275,20 @@ test("derive input must be an array", async () => {
 });
 
 test("aggregate values over filtered rows", async () => {
+	const data: Record<string, ManifestRequirement> = {
+		tickets: { kind: "rows" },
+		stats: {
+			kind: "derive",
+			of: "tickets",
+			where: "$item.priority >= 2",
+			count: true,
+			sum: "$item.points",
+			average: "$item.points",
+			min: "$item.points",
+			max: "$item.points",
+		},
+	};
 	const source = `
-data tickets from rows { };
-data stats from derive {
-	of: "tickets",
-	where: $item.priority >= 2,
-	count: true,
-	sum: $item.points,
-	average: $item.points,
-	min: $item.points,
-	max: $item.points,
-};
-
 export default function Stats() {
 	@render {
 		<p data-count>{ $data.stats.count }</p>
@@ -294,7 +305,7 @@ export default function Stats() {
 		{ priority: 2, points: 5 },
 		{ priority: 2, points: null },
 	];
-	const { body } = await renderRestricted(artifact(source), {
+	const { body } = await renderRestricted(artifact(source, data), {
 		sources: { rows: () => rows },
 	});
 	// Rows passing where: 3, 5 (null row counts toward count, skips numeric aggregates)
@@ -307,17 +318,19 @@ export default function Stats() {
 });
 
 test("aggregates over an empty set", async () => {
+	const data: Record<string, ManifestRequirement> = {
+		tickets: { kind: "rows" },
+		stats: {
+			kind: "derive",
+			of: "tickets",
+			count: true,
+			sum: "$item.points",
+			min: "$item.points",
+			max: "$item.points",
+			average: "$item.points",
+		},
+	};
 	const source = `
-data tickets from rows { };
-data stats from derive {
-	of: "tickets",
-	count: true,
-	sum: $item.points,
-	min: $item.points,
-	max: $item.points,
-	average: $item.points,
-};
-
 export default function Stats() {
 	@render {
 		<p data-count>{ $data.stats.count }</p>
@@ -328,7 +341,7 @@ export default function Stats() {
 	}
 }
 `;
-	const { body } = await renderRestricted(artifact(source), {
+	const { body } = await renderRestricted(artifact(source, data), {
 		sources: { rows: () => [] },
 	});
 	const doc = new DOMParser().parseFromString(body, "text/html");
@@ -340,54 +353,37 @@ export default function Stats() {
 });
 
 test("aggregates can't combine with the row pipeline", () => {
-	const error = compileErrorOf(`
-data tickets from rows { };
-data stats from derive {
-	of: "tickets",
-	count: true,
-	limit: 5,
-};
-
-export default function S() {
-	@render { <p>{ $data.stats.count }</p> }
-}
-`);
+	const error = compileErrorOf(SOURCE, {
+		tickets: { kind: "rows" },
+		stats: { kind: "derive", of: "tickets", count: true, limit: 5 },
+	});
 	expect(error.errors.map((e) => e.message).join("\n")).toContain(
 		'Aggregates (count) produce a single value, so "limit" doesn\'t apply',
 	);
 });
 
 test('aggregate "count" must be literal true', () => {
-	const error = compileErrorOf(`
-data tickets from rows { };
-data stats from derive {
-	of: "tickets",
-	count: 1,
-};
-
-export default function S() {
-	@render { <p>{ $data.stats.count }</p> }
-}
-`);
+	const error = compileErrorOf(SOURCE, {
+		tickets: { kind: "rows" },
+		stats: { kind: "derive", of: "tickets", count: 1 },
+	});
 	expect(error.errors.map((e) => e.message).join("\n")).toContain(
 		'derive "count" must be literal true',
 	);
 });
 
 test("sum over non-numbers fails at resolve time", async () => {
+	const data: Record<string, ManifestRequirement> = {
+		tickets: { kind: "rows" },
+		stats: { kind: "derive", of: "tickets", sum: "$item.title" },
+	};
 	const source = `
-data tickets from rows { };
-data stats from derive {
-	of: "tickets",
-	sum: $item.title,
-};
-
 export default function Stats() {
 	@render { <p>{ $data.stats.sum }</p> }
 }
 `;
 	await expect(
-		renderRestricted(artifact(source), {
+		renderRestricted(artifact(source, data), {
 			sources: { rows: () => ROWS },
 		}),
 	).rejects.toThrow(/sum must evaluate to a number/);
