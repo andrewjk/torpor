@@ -1,11 +1,11 @@
 import { expect, test } from "vite-plus/test";
 import {
-	compileRestricted,
+	compileArtifact,
 	createHttpSource,
 	deriveRequirementKind,
 	httpRequirementKind,
-	renderRestricted,
-} from "../src/restricted";
+	renderArtifact,
+} from "../src/artifact";
 import type { ManifestRequirement } from "../src/app";
 import EmbedCompileError from "../src/types/EmbedCompileError";
 
@@ -51,8 +51,8 @@ const formatters = {
 function artifact(
 	source = SOURCE,
 	data: Record<string, ManifestRequirement> = DATA,
-): ReturnType<typeof compileRestricted> {
-	return compileRestricted("derive-test", source, { requirementKinds: REQUIREMENT_KINDS, data });
+): ReturnType<typeof compileArtifact> {
+	return compileArtifact("derive-test", source, { requirementKinds: REQUIREMENT_KINDS, data });
 }
 
 function compileErrorOf(
@@ -69,7 +69,7 @@ function compileErrorOf(
 }
 
 test("derive filters, maps with host formatters, sorts and limits", async () => {
-	const { body } = await renderRestricted(artifact(), {
+	const { body } = await renderArtifact(artifact(), {
 		formatters,
 		sources: { rows: () => ROWS },
 	});
@@ -99,7 +99,7 @@ export default function Inbox() {
 	}
 }
 `;
-	const { body } = await renderRestricted(artifact(source, data), {
+	const { body } = await renderArtifact(artifact(source, data), {
 		formatters,
 		sources: { rows: () => ROWS },
 	});
@@ -121,7 +121,7 @@ export default function Inbox() {
 	@render { <ul>@for (v of $data.labels) { <li>{v.label}</li> }</ul> }
 }
 `;
-	const { body } = await renderRestricted(artifact(source, data), {
+	const { body } = await renderArtifact(artifact(source, data), {
 		formatters,
 		sources: { rows: () => ROWS },
 	});
@@ -149,11 +149,11 @@ export default function Inbox() {
 	@render { <ul>@for (v of $data.view) { <li>{v.upperTitle}</li> }</ul> }
 }
 `;
-	const embed = compileRestricted("http-derive", source, {
+	const embed = compileArtifact("http-derive", source, {
 		requirementKinds: { http: httpRequirementKind, derive: deriveRequirementKind },
 		data,
 	});
-	const { body } = await renderRestricted(embed, {
+	const { body } = await renderArtifact(embed, {
 		formatters,
 		sources: {
 			http: createHttpSource({
@@ -175,7 +175,7 @@ test("unknown formatters fail loudly, naming the function", async () => {
 		view: { kind: "derive", of: "tickets", map: { x: "nope($item.title)" } },
 	};
 	await expect(
-		renderRestricted(artifact(SOURCE, data), { sources: { rows: () => ROWS } }),
+		renderArtifact(artifact(SOURCE, data), { sources: { rows: () => ROWS } }),
 	).rejects.toThrow(/Unknown host function "nope"/);
 });
 
@@ -236,13 +236,13 @@ export default function A() {
 }
 `;
 	await expect(
-		renderRestricted(artifact(source, data), {
+		renderArtifact(artifact(source, data), {
 			sources: { rows: () => many },
 			deriveLimits: { maxInputRows: 10 },
 		}),
 	).rejects.toThrow(/over the 10 row budget/);
 
-	const { body } = await renderRestricted(artifact(source, data), {
+	const { body } = await renderArtifact(artifact(source, data), {
 		sources: { rows: () => many },
 		deriveLimits: { maxOutputRows: 1 },
 	});
@@ -251,7 +251,7 @@ export default function A() {
 
 	const huge = Array.from({ length: 200_000 }, (_, index) => ({ n: index }));
 	await expect(
-		renderRestricted(artifact(source, data), {
+		renderArtifact(artifact(source, data), {
 			sources: { rows: () => huge },
 			deriveLimits: { maxInputRows: 1_000_000, maxOutputRows: 1, timeoutMs: 1 },
 		}),
@@ -259,7 +259,7 @@ export default function A() {
 });
 
 test("a pre-resolved data bag skips requirement resolution entirely", async () => {
-	const { body } = await renderRestricted(artifact(), {
+	const { body } = await renderArtifact(artifact(), {
 		data: { view: [{ label: "PRE", due: "#0" }] },
 	});
 	expect(body).toContain("PRE — #0");
@@ -267,7 +267,7 @@ test("a pre-resolved data bag skips requirement resolution entirely", async () =
 
 test("derive input must be an array", async () => {
 	await expect(
-		renderRestricted(artifact(), {
+		renderArtifact(artifact(), {
 			formatters,
 			sources: { rows: () => ({ not: "an array" }) },
 		}),
@@ -305,7 +305,7 @@ export default function Stats() {
 		{ priority: 2, points: 5 },
 		{ priority: 2, points: null },
 	];
-	const { body } = await renderRestricted(artifact(source, data), {
+	const { body } = await renderArtifact(artifact(source, data), {
 		sources: { rows: () => rows },
 	});
 	// Rows passing where: 3, 5 (null row counts toward count, skips numeric aggregates)
@@ -341,7 +341,7 @@ export default function Stats() {
 	}
 }
 `;
-	const { body } = await renderRestricted(artifact(source, data), {
+	const { body } = await renderArtifact(artifact(source, data), {
 		sources: { rows: () => [] },
 	});
 	const doc = new DOMParser().parseFromString(body, "text/html");
@@ -383,7 +383,7 @@ export default function Stats() {
 }
 `;
 	await expect(
-		renderRestricted(artifact(source, data), {
+		renderArtifact(artifact(source, data), {
 			sources: { rows: () => ROWS },
 		}),
 	).rejects.toThrow(/sum must evaluate to a number/);

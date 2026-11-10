@@ -2,7 +2,7 @@
  * The bridge surface an app manifest declares: the methods the embed may
  * `invoke`, the event types it may `emit`, and the push types it may
  * subscribe to with `$embed.on`. Compiled onto the artifact by
- * `compileRestricted` (from the manifest's `api`/`emits`/`pushes`), so the
+ * `compileArtifact` (from the manifest's `api`/`emits`/`pushes`), so the
  * loaders can warn when a mounted embed steps outside its declaration.
  */
 export default interface EmbedSurface {

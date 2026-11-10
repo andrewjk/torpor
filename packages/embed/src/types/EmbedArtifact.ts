@@ -38,12 +38,6 @@ export default interface EmbedArtifact {
 	source: string;
 
 	/**
-	 * How the client build must be run. Restricted artifacts carry a
-	 * serialized server build; compile with `compileRestricted`.
-	 */
-	format?: "restricted";
-
-	/**
 	 * The modules the embed imports from (besides the runtime, which is
 	 * provided automatically), with the local binding names its code
 	 * references. The loaders validate these against the host's `scope`
@@ -62,7 +56,7 @@ export default interface EmbedArtifact {
 
 	/**
 	 * The serialized server build: the instruction tree interpreted by
-	 * `renderRestricted` (no code execution).
+	 * `renderArtifact` (no code execution).
 	 */
 	server?: {
 		template: RestrictedProgram;

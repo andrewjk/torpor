@@ -1,4 +1,4 @@
-import type { RestrictedSource } from "../types";
+import type { ArtifactSource } from "../types";
 
 /**
  * A host-side credential binding for the `http` source kind. Secrets live
@@ -101,7 +101,7 @@ const MAX_NARROW_DEPTH = 100;
  * - Redirects are not followed, responses must be JSON, and both body size
  *   and row count are capped.
  */
-export default function createHttpSource(options?: HttpSourceOptions): RestrictedSource {
+export default function createHttpSource(options?: HttpSourceOptions): ArtifactSource {
 	const originPolicies = buildOriginPolicies(options?.allowOrigins ?? []);
 	const credentials = options?.credentials ?? {};
 	const timeout = options?.timeout ?? DEFAULT_TIMEOUT;

@@ -1,11 +1,11 @@
 import { expect, test } from "vite-plus/test";
 import {
-	compileRestricted,
+	compileArtifact,
 	createHttpSource,
 	httpRequirementKind,
-	renderRestricted,
-} from "../src/restricted";
-import type { HttpOriginPolicy } from "../src/restricted";
+	renderArtifact,
+} from "../src/artifact";
+import type { HttpOriginPolicy } from "../src/artifact";
 import type { ManifestRequirement } from "../src/app";
 import EmbedCompileError from "../src/types/EmbedCompileError";
 
@@ -35,8 +35,8 @@ const DATA: Record<string, ManifestRequirement> = {
 function artifact(
 	source = SOURCE,
 	data: Record<string, ManifestRequirement> = DATA,
-): ReturnType<typeof compileRestricted> {
-	return compileRestricted("inbox", source, {
+): ReturnType<typeof compileArtifact> {
+	return compileArtifact("inbox", source, {
 		requirementKinds: { http: httpRequirementKind },
 		data,
 	});
@@ -128,7 +128,7 @@ test("fetches, authenticates by credential name, interpolates props, picks and l
 	const captured: Captured[] = [];
 	const rows = [{ title: "One" }, { title: "Two" }, { title: "Three" }];
 
-	const { body } = await renderRestricted(artifact(), {
+	const { body } = await renderArtifact(artifact(), {
 		props: { queue: "open" },
 		sources: {
 			http: createHttpSource({
@@ -163,7 +163,7 @@ test("secrets never enter the artifact", () => {
 
 test("default deny: no allowed origins rejects every request", async () => {
 	await expect(
-		renderRestricted(artifact(), {
+		renderArtifact(artifact(), {
 			props: { queue: "open" },
 			sources: { http: createHttpSource({ fetch: mockFetch(() => jsonResponse({ items: [] })) }) },
 		}),
@@ -172,7 +172,7 @@ test("default deny: no allowed origins rejects every request", async () => {
 
 test("unconfigured credentials are named without leaking values", async () => {
 	await expect(
-		renderRestricted(artifact(), {
+		renderArtifact(artifact(), {
 			props: { queue: "open" },
 			sources: {
 				http: createHttpSource({
@@ -187,7 +187,7 @@ test("unconfigured credentials are named without leaking values", async () => {
 
 test("rejects non-JSON responses", async () => {
 	await expect(
-		renderRestricted(artifact(), {
+		renderArtifact(artifact(), {
 			props: { queue: "open" },
 			sources: {
 				http: createHttpSource({
@@ -204,7 +204,7 @@ test("rejects non-JSON responses", async () => {
 
 test("HTTP errors include the path but not the query string", async () => {
 	await expect(
-		renderRestricted(artifact(), {
+		renderArtifact(artifact(), {
 			props: { queue: "sensitive-tenant" },
 			sources: {
 				http: createHttpSource({
@@ -220,7 +220,7 @@ test("HTTP errors include the path but not the query string", async () => {
 test("oversized responses are rejected", async () => {
 	const big = { items: [{ title: "x".repeat(5000) }] };
 	await expect(
-		renderRestricted(artifact(), {
+		renderArtifact(artifact(), {
 			props: { queue: "open" },
 			sources: {
 				http: createHttpSource({
@@ -243,7 +243,7 @@ test("invalid JSON and missing pick paths are rejected", async () => {
 		});
 
 	await expect(
-		renderRestricted(artifact(), {
+		renderArtifact(artifact(), {
 			props: { queue: "open" },
 			sources: {
 				http: createHttpSource({
@@ -258,7 +258,7 @@ test("invalid JSON and missing pick paths are rejected", async () => {
 	).rejects.toThrow(/invalid JSON/);
 
 	await expect(
-		renderRestricted(artifact(), {
+		renderArtifact(artifact(), {
 			props: { queue: "open" },
 			sources: { http: make({ data: [] }) },
 		}),
@@ -267,7 +267,7 @@ test("invalid JSON and missing pick paths are rejected", async () => {
 
 test("maxRows clamps the spec limit", async () => {
 	const rows = [1, 2, 3, 4, 5].map((n) => ({ title: `T${n}` }));
-	const { body } = await renderRestricted(artifact(), {
+	const { body } = await renderArtifact(artifact(), {
 		props: { queue: "open" },
 		sources: {
 			http: createHttpSource({
@@ -284,13 +284,13 @@ test("maxRows clamps the spec limit", async () => {
 
 test("private and local hosts are blocked even when allowlisted", async () => {
 	for (const url of ["http://localhost:8080/x", "http://127.0.0.1/x", "http://10.0.0.5/x"]) {
-		const source = compileRestricted("private", TEMPLATE, {
+		const source = compileArtifact("private", TEMPLATE, {
 			requirementKinds: { http: httpRequirementKind },
 			data: { t: { kind: "http", url } },
 		});
 
 		await expect(
-			renderRestricted(source, {
+			renderArtifact(source, {
 				sources: {
 					http: createHttpSource({
 						allowOrigins: [new URL(url).origin],
@@ -303,7 +303,7 @@ test("private and local hosts are blocked even when allowlisted", async () => {
 });
 
 test("response data is inert: markup in rows is escaped", async () => {
-	const { body } = await renderRestricted(artifact(), {
+	const { body } = await renderArtifact(artifact(), {
 		props: { queue: "open" },
 		sources: {
 			http: createHttpSource({
@@ -334,7 +334,7 @@ const ROOT_DATA: Record<string, ManifestRequirement> = {
 };
 
 test("allowFields strips disallowed fields from rows, at every level", async () => {
-	const { data } = await renderRestricted(artifact(), {
+	const { data } = await renderArtifact(artifact(), {
 		props: { queue: "open" },
 		sources: {
 			http: createHttpSource({
@@ -365,7 +365,7 @@ test("allowFields strips disallowed fields from rows, at every level", async () 
 });
 
 test("allowFields narrows the response root when there is no pick", async () => {
-	const { data } = await renderRestricted(artifact(ROOT_SOURCE, ROOT_DATA), {
+	const { data } = await renderArtifact(artifact(ROOT_SOURCE, ROOT_DATA), {
 		sources: {
 			http: createHttpSource({
 				allowOrigins: [{ origin: "https://api.example.test", allowFields: ["items", "title"] }],
@@ -377,14 +377,14 @@ test("allowFields narrows the response root when there is no pick", async () => 
 });
 
 test("a pick into a stripped field fails loudly", async () => {
-	const source = compileRestricted("stripped-pick", TEMPLATE, {
+	const source = compileArtifact("stripped-pick", TEMPLATE, {
 		requirementKinds: { http: httpRequirementKind },
 		data: {
 			t: { kind: "http", url: "https://api.example.test/tickets", pick: "items.0.internal" },
 		},
 	});
 	await expect(
-		renderRestricted(source, {
+		renderArtifact(source, {
 			sources: {
 				http: createHttpSource({
 					allowOrigins: [{ origin: "https://api.example.test", allowFields: ["items", "id"] }],
@@ -422,7 +422,7 @@ test("deeply nested responses hit the narrowing depth cap", async () => {
 	let deep: unknown = { title: "leaf" };
 	for (let i = 0; i < 150; i++) deep = { inner: deep };
 	await expect(
-		renderRestricted(artifact(ROOT_SOURCE, ROOT_DATA), {
+		renderArtifact(artifact(ROOT_SOURCE, ROOT_DATA), {
 			sources: {
 				http: createHttpSource({
 					allowOrigins: [{ origin: "https://api.example.test", allowFields: ["inner"] }],
@@ -434,7 +434,7 @@ test("deeply nested responses hit the narrowing depth cap", async () => {
 });
 
 test("string and policy origin entries can be mixed", async () => {
-	const { body } = await renderRestricted(artifact(), {
+	const { body } = await renderArtifact(artifact(), {
 		props: { queue: "open" },
 		sources: {
 			http: createHttpSource({

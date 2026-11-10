@@ -1,7 +1,7 @@
 import { createContext, Script } from "node:vm";
 import { expect, test } from "vite-plus/test";
 import createBridge from "../src/bridge/createBridge";
-import compileRestricted from "../src/restricted/compileRestricted";
+import compileArtifact from "../src/artifact/compileArtifact";
 import frameDocument, { safeJson } from "../src/frame/frameDocument";
 import frameScript from "../src/frame/frameScript";
 import mountEmbedFrame from "../src/frame/mountEmbedFrame";
@@ -21,7 +21,7 @@ export default function Counter($props: { start?: number }) {
 `;
 
 function artifact(source = SOURCE, id = "frame-counter"): EmbedArtifact {
-	return compileRestricted(id, source);
+	return compileArtifact(id, source);
 }
 
 const RUNTIME = "/* runtime bundle */ globalThis.TorporView = { mount() {} };";

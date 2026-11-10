@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
 import createBridge from "../src/bridge/createBridge";
 import scopeBridge from "../src/bridge/scopeBridge";
-import compileRestricted from "../src/restricted/compileRestricted";
+import compileArtifact from "../src/artifact/compileArtifact";
 import mountEmbed from "../src/loader/mountEmbed";
 import type EmbedArtifact from "../src/types/EmbedArtifact";
 
@@ -21,7 +21,7 @@ export default function FormSection($props: { $embed: any }) {
 `;
 
 function artifact(): EmbedArtifact {
-	return compileRestricted("form-section", SOURCE, {
+	return compileArtifact("form-section", SOURCE, {
 		api: { "save-section": {} },
 		emits: ["submitted"],
 	});
@@ -181,7 +181,7 @@ export default function LiveCounter($props: { $embed: any }) {
 `;
 
 function liveArtifact(): EmbedArtifact {
-	return compileRestricted("live-counter", LIVE_SOURCE, { pushes: ["count"] });
+	return compileArtifact("live-counter", LIVE_SOURCE, { pushes: ["count"] });
 }
 
 test("push updates a mounted embed reactively", async () => {
@@ -222,7 +222,7 @@ export default function Guarded($props: { $embed: any }) {
 `;
 
 test("calls outside a declared surface warn at runtime, once per call", async () => {
-	const artifact = compileRestricted("guarded", SURFACE_SOURCE, {
+	const artifact = compileArtifact("guarded", SURFACE_SOURCE, {
 		api: { "declared-method": {} },
 	});
 	const warn = console.warn;

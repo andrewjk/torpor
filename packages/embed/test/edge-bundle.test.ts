@@ -6,8 +6,8 @@ import { expect, test } from "vite-plus/test";
 // that pulls a Node builtin in fails here instead of in the host's deploy.
 // Needs the node environment: esbuild refuses to run under jsdom.
 const ENTRIES: { entry: string; budget: number }[] = [
-	// The restricted entry (compiler + serializer + interpreter)
-	{ entry: "../src/restricted.ts", budget: 600_000 },
+	// The artifact entry (compiler + serializer + interpreter)
+	{ entry: "../src/artifact.ts", budget: 600_000 },
 ];
 
 test("edge-safe entries bundle for the browser with no node: specifiers", async () => {

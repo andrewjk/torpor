@@ -3,7 +3,7 @@ import type { RestrictedExpr } from "@torpor/view/compile";
 const DANGEROUS_KEYS = new Set(["__proto__", "prototype", "constructor"]);
 
 /**
- * Evaluates a serialized restricted expression against a scope.
+ * Evaluates a serialized artifact expression against a scope.
  *
  * This is the whole "interpreter" for expressions: switch on the op set and
  * apply JS semantics. It never compiles or evals code — the ops are the
@@ -23,7 +23,7 @@ export default function evaluateExpr(
 		case "ref": {
 			if (!Object.prototype.hasOwnProperty.call(scope, expr.name)) {
 				throw new Error(
-					`Unknown identifier "${expr.name}" in restricted expression. Available: ${Object.keys(scope).join(", ")}.`,
+					`Unknown identifier "${expr.name}" in artifact expression. Available: ${Object.keys(scope).join(", ")}.`,
 				);
 			}
 			return scope[expr.name];
@@ -31,13 +31,13 @@ export default function evaluateExpr(
 
 		case "get": {
 			if (DANGEROUS_KEYS.has(expr.key)) {
-				throw new Error(`Dangerous property name "${expr.key}" in restricted expression.`);
+				throw new Error(`Dangerous property name "${expr.key}" in artifact expression.`);
 			}
 			const object = evaluateExpr(expr.object, scope, functions);
 			if (object === null || object === undefined) {
 				if (expr.optional) return undefined;
 				throw new TypeError(
-					`Cannot read properties of ${object} (reading "${expr.key}") in restricted expression.`,
+					`Cannot read properties of ${object} (reading "${expr.key}") in artifact expression.`,
 				);
 			}
 			return (object as Record<string, unknown>)[expr.key];
@@ -49,11 +49,11 @@ export default function evaluateExpr(
 			if (object === null || object === undefined) {
 				if (expr.optional) return undefined;
 				throw new TypeError(
-					`Cannot read properties of ${object} (reading "${String(index)}") in restricted expression.`,
+					`Cannot read properties of ${object} (reading "${String(index)}") in artifact expression.`,
 				);
 			}
 			if (typeof index === "string" && DANGEROUS_KEYS.has(index)) {
-				throw new Error(`Dangerous property name "${index}" in restricted expression.`);
+				throw new Error(`Dangerous property name "${index}" in artifact expression.`);
 			}
 			return (object as Record<string | number, unknown>)[index as string | number];
 		}
@@ -61,7 +61,7 @@ export default function evaluateExpr(
 		case "call": {
 			if (functions === undefined || !Object.prototype.hasOwnProperty.call(functions, expr.name)) {
 				throw new Error(
-					`Unknown host function "${expr.name}" in restricted expression. Available: ${Object.keys(functions ?? {}).join(", ") || "(none)"}.`,
+					`Unknown host function "${expr.name}" in artifact expression. Available: ${Object.keys(functions ?? {}).join(", ") || "(none)"}.`,
 				);
 			}
 			const fn = functions[expr.name];
@@ -141,7 +141,7 @@ export default function evaluateExpr(
 			const result: Record<string, unknown> = {};
 			for (const [key, value] of Object.entries(expr.entries)) {
 				if (DANGEROUS_KEYS.has(key)) {
-					throw new Error(`Dangerous property name "${key}" in restricted expression.`);
+					throw new Error(`Dangerous property name "${key}" in artifact expression.`);
 				}
 				result[key] = evaluateExpr(value, scope, functions);
 			}

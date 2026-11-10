@@ -3,8 +3,8 @@ import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
 import createBridge from "../src/bridge/createBridge";
 import assertRunnable from "../src/assertRunnable";
-import { RUNTIME_VERSION } from "../src/restricted";
-import { compileRestricted, recompileRestricted, renderRestricted } from "../src/restricted";
+import { RUNTIME_VERSION } from "../src/artifact";
+import { compileArtifact, recompileArtifact, renderArtifact } from "../src/artifact";
 import { defineApp } from "../src/app";
 import mountEmbed from "../src/loader/mountEmbed";
 import hydrateEmbed from "../src/loader/hydrateEmbed";
@@ -73,7 +73,7 @@ export default function Section($props: { $embed: any }) {
 const ROWS = [{ name: "Alpha" }, { name: "Beta" }];
 
 function sectionArtifact(): EmbedArtifact {
-	return compileRestricted("example-section", SECTION_SOURCE, {
+	return compileArtifact("example-section", SECTION_SOURCE, {
 		requirementKinds: { records: () => {} },
 		data: manifest.data,
 		api: manifest.api,
@@ -96,7 +96,7 @@ const compileOptions = {
 };
 
 test("edge-safe sources stay free of Node builtins", () => {
-	const dirs = ["../src/restricted", "../src/app"];
+	const dirs = ["../src/artifact", "../src/app"];
 	for (const dir of dirs) {
 		const entries = readdirSync(join(import.meta.dirname, dir), { withFileTypes: true });
 		for (const entry of entries) {
@@ -107,7 +107,7 @@ test("edge-safe sources stay free of Node builtins", () => {
 			);
 		}
 	}
-	for (const barrel of ["../src/restricted.ts", "../src/app.ts"]) {
+	for (const barrel of ["../src/artifact.ts", "../src/app.ts"]) {
 		const content = readFileSync(join(import.meta.dirname, barrel), "utf8");
 		expect(content).not.toMatch(/from\s+"node:/);
 	}
@@ -124,7 +124,7 @@ test("records the modules an embed imports, with local bindings", () => {
 
 	// The runtime is auto-provided and not recorded; type-only imports are
 	// erased by the transform
-	const plain = compileRestricted(
+	const plain = compileArtifact(
 		"plain",
 		`
 import { type SlotRender } from "@torpor/view";
@@ -140,10 +140,10 @@ export default function Plain() {
 
 test("compile scope whitelist rejects imports outside it", () => {
 	expect(() =>
-		compileRestricted("scoped-ok", SECTION_SOURCE, { ...compileOptions, scope: ["@host/ui"] }),
+		compileArtifact("scoped-ok", SECTION_SOURCE, { ...compileOptions, scope: ["@host/ui"] }),
 	).not.toThrow();
 	try {
-		compileRestricted("scoped-bad", SECTION_SOURCE, { ...compileOptions, scope: ["@other/ui"] });
+		compileArtifact("scoped-bad", SECTION_SOURCE, { ...compileOptions, scope: ["@other/ui"] });
 		expect.unreachable();
 	} catch (error) {
 		expect(error).toBeInstanceOf(EmbedCompileError);
@@ -153,10 +153,10 @@ test("compile scope whitelist rejects imports outside it", () => {
 
 test("enforces maxSourceBytes", () => {
 	expect(() =>
-		compileRestricted("fits", SECTION_SOURCE, { ...compileOptions, maxSourceBytes: 100_000 }),
+		compileArtifact("fits", SECTION_SOURCE, { ...compileOptions, maxSourceBytes: 100_000 }),
 	).not.toThrow();
 	try {
-		compileRestricted("too-big", SECTION_SOURCE, { ...compileOptions, maxSourceBytes: 10 });
+		compileArtifact("too-big", SECTION_SOURCE, { ...compileOptions, maxSourceBytes: 10 });
 		expect.unreachable();
 	} catch (error) {
 		expect(error).toBeInstanceOf(EmbedCompileError);
@@ -199,21 +199,21 @@ test("a missing scope entry fails loudly, naming the binding and module", () => 
 	// And there is only one binding to name here
 });
 
-test("renderRestricted with host components produces the same markup", async () => {
+test("renderArtifact with host components produces the same markup", async () => {
 	const artifact = sectionArtifact();
-	const { body } = await renderRestricted(artifact, renderOptions);
+	const { body } = await renderArtifact(artifact, renderOptions);
 
 	expect(body).toContain('class="field-row"');
 	expect(body).toContain("Alpha");
 	expect(body).toContain("Beta");
 });
 
-test("recompileRestricted recovers stale artifacts and preserves meta", () => {
+test("recompileArtifact recovers stale artifacts and preserves meta", () => {
 	const artifact = sectionArtifact();
 	const stale: EmbedArtifact = { ...artifact, version: "0.0.0-stale", meta: { author: "ada" } };
 
 	expect(() => assertRunnable(stale, RUNTIME_VERSION)).toThrow();
-	const fresh = recompileRestricted(stale, compileOptions);
+	const fresh = recompileArtifact(stale, compileOptions);
 	expect(fresh.version).toBe(RUNTIME_VERSION);
 	expect(fresh.meta).toEqual({ author: "ada" });
 	expect(fresh.client.code).toBe(artifact.client.code);
@@ -231,7 +231,7 @@ test("Mallet fixture end-to-end: scoped SSR + styles + hydrate + bridge event", 
 	// Server render with host components and manifest sources: host
 	// component markup, resolved records, and inlinable styles. The
 	// resolved bag comes back for hydration (paint-then-mount).
-	const { body, styles, data } = await renderRestricted(artifact, renderOptions);
+	const { body, styles, data } = await renderArtifact(artifact, renderOptions);
 	expect(body).toContain('class="field-row"');
 	expect(body).toContain("Alpha");
 	expect(styles.some((s) => s.style.includes("padding: 4px"))).toBe(true);

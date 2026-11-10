@@ -10,8 +10,8 @@
 			"import": "./dist/index.mjs",
 			"require": "./dist/index.cjs"
 		},
-		"./restricted": {
-			"torpor:source": "./src/restricted.ts",
+		"./artifact": {
+			"torpor:source": "./src/artifact.ts",
 			"types": "./dist/restricted.d.mts",
 			"import": "./dist/restricted.mjs",
 			"require": "./dist/restricted.cjs"

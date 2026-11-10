@@ -3,11 +3,11 @@ import * as ssr from "@torpor/view/ssr";
 import { transform } from "sucrase";
 import { expect, test } from "vite-plus/test";
 import {
-	compileRestricted,
+	compileArtifact,
 	deriveRequirementKind,
-	renderRestricted,
-	restrictedComponent,
-} from "../src/restricted";
+	renderArtifact,
+	artifactComponent,
+} from "../src/artifact";
 import { hydrateEmbed, loadComponent } from "../src";
 import EmbedCompileError from "../src/types/EmbedCompileError";
 import type EmbedArtifact from "../src/types/EmbedArtifact";
@@ -48,20 +48,20 @@ export default function Board() {
 const KINDS = { rows: () => {}, derive: deriveRequirementKind };
 
 function innerArtifact(): EmbedArtifact {
-	return compileRestricted("ticket-list", INNER, {
+	return compileArtifact("ticket-list", INNER, {
 		requirementKinds: KINDS,
 		data: { tickets: { kind: "rows" } },
 	});
 }
 
 function outerArtifact(): EmbedArtifact {
-	return compileRestricted("board", OUTER_SOURCE);
+	return compileArtifact("board", OUTER_SOURCE);
 }
 
-test("a restricted artifact renders another restricted artifact", async () => {
-	const { body, head } = await renderRestricted(outerArtifact(), {
+test("an artifact renders another artifact", async () => {
+	const { body, head } = await renderArtifact(outerArtifact(), {
 		components: {
-			TicketList: restrictedComponent(innerArtifact(), {
+			TicketList: artifactComponent(innerArtifact(), {
 				sources: { rows: () => ROWS },
 			}),
 		},
@@ -77,7 +77,7 @@ test("a restricted artifact renders another restricted artifact", async () => {
 	expect(head).toBe("");
 });
 
-test("a restricted component slot renders its fallback without incoming fills", async () => {
+test("an artifact component slot renders its fallback without incoming fills", async () => {
 	// An outer template that renders the inner component bare: the inner
 	// default slot falls back to <span>{t.title}</span>.
 	const source = `
@@ -87,10 +87,10 @@ export default function Plain() {
 	}
 }
 `;
-	const plain = compileRestricted("plain", source);
-	const { body } = await renderRestricted(plain, {
+	const plain = compileArtifact("plain", source);
+	const { body } = await renderArtifact(plain, {
 		components: {
-			TicketList: restrictedComponent(innerArtifact(), {
+			TicketList: artifactComponent(innerArtifact(), {
 				sources: { rows: () => ROWS },
 			}),
 		},
@@ -100,9 +100,9 @@ export default function Plain() {
 	expect(body).toContain("<p>default footer</p>");
 });
 
-test("restrictedComponent rejects non-restricted artifacts", () => {
+test("artifactComponent rejects artifacts without a server build", () => {
 	expect(() =>
-		restrictedComponent({
+		artifactComponent({
 			id: "js-embed",
 			name: "X",
 			version: "1",
@@ -110,15 +110,15 @@ test("restrictedComponent rejects non-restricted artifacts", () => {
 			format: "globals",
 			client: { code: "" },
 		} as never),
-	).toThrow(/missing its restricted server template/);
+	).toThrow(/missing its server build/);
 });
 
 test("hydration: the inner artifact's client build renders via scope", async () => {
 	const inner = innerArtifact();
 	const outer = outerArtifact();
-	const { body } = await renderRestricted(outer, {
+	const { body } = await renderArtifact(outer, {
 		components: {
-			TicketList: restrictedComponent(inner, { sources: { rows: () => ROWS } }),
+			TicketList: artifactComponent(inner, { sources: { rows: () => ROWS } }),
 		},
 	});
 
@@ -172,7 +172,7 @@ export default function TicketList() {
 `;
 
 /** Compiles a torp source into a server component, with the SSR runtime
- * exports in scope (same harness as restricted-components.test.ts). */
+ * exports in scope (same harness as artifact-components.test.ts). */
 function compileServerComponent(source: string): unknown {
 	const parsed = parse(source);
 	// The source reads `$data` from the injected bag; the JS build needs the
@@ -188,15 +188,15 @@ function compileServerComponent(source: string): unknown {
 }
 
 test("inner artifact styles flow through the boundary like the JS build", async () => {
-	const inner = compileRestricted("ticket-list-styled", INNER_STYLED_SOURCE, {
+	const inner = compileArtifact("ticket-list-styled", INNER_STYLED_SOURCE, {
 		requirementKinds: KINDS,
 		data: { tickets: { kind: "rows" } },
 	});
-	const outer = compileRestricted("board-styled", OUTER_SOURCE);
+	const outer = compileArtifact("board-styled", OUTER_SOURCE);
 
-	const { body, head } = await renderRestricted(outer, {
+	const { body, head } = await renderArtifact(outer, {
 		components: {
-			TicketList: restrictedComponent(inner, { sources: { rows: () => ROWS } }),
+			TicketList: artifactComponent(inner, { sources: { rows: () => ROWS } }),
 		},
 	});
 
@@ -213,7 +213,7 @@ test("inner artifact styles flow through the boundary like the JS build", async 
 		"TicketList",
 		`${jsPage}\nreturn ${namePage};`,
 	); // eslint-disable-line no-implied-eval
-	// The JS inner reads $data through props, exactly like the restricted
+	// The JS inner reads $data through props, exactly like the artifact
 	// client build — adapt it the same way the host adapts at hydration.
 	const innerJs = compileServerComponent(INNER_STYLED_SOURCE) as any;
 	const adaptedInner = async (props: any, context: any, slots: any) =>
@@ -248,22 +248,22 @@ export default function BoardLi() {
 `;
 
 test("slot fills that auto-close the wrapper throw at render time", async () => {
-	const inner = compileRestricted("ticket-list-li", INNER_LI_SOURCE, {
+	const inner = compileArtifact("ticket-list-li", INNER_LI_SOURCE, {
 		requirementKinds: KINDS,
 		data: { tickets: { kind: "rows" } },
 	});
-	const outer = compileRestricted("board-li", OUTER_LI_SOURCE);
+	const outer = compileArtifact("board-li", OUTER_LI_SOURCE);
 	await expect(
-		renderRestricted(outer, {
+		renderArtifact(outer, {
 			components: {
-				TicketListLi: restrictedComponent(inner, { sources: { rows: () => ROWS } }),
+				TicketListLi: artifactComponent(inner, { sources: { rows: () => ROWS } }),
 			},
 		}),
 	).rejects.toThrow(/re-nested by the HTML parser/);
 	await expect(
-		renderRestricted(outer, {
+		renderArtifact(outer, {
 			components: {
-				TicketListLi: restrictedComponent(inner, { sources: { rows: () => ROWS } }),
+				TicketListLi: artifactComponent(inner, { sources: { rows: () => ROWS } }),
 			},
 		}),
 	).rejects.toThrow(/auto-closes the enclosing <li>/);
@@ -279,7 +279,7 @@ export default function Bad() {
 `;
 	let thrown: unknown;
 	try {
-		compileRestricted("bad-fallback", source);
+		compileArtifact("bad-fallback", source);
 	} catch (error) {
 		thrown = error;
 	}

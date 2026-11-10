@@ -21,7 +21,7 @@ import type {
  * }
  * ```
  *
- * Expression values are strings parsed at save time with the restricted
+ * Expression values are strings parsed at save time with the artifact
  * expression grammar (calls to host formatters allowed), so the manifest
  * stays inert JSON. Aggregate form — returns a single object instead of
  * rows:
@@ -52,7 +52,7 @@ const DERIVE_SPEC_KEYS = new Set([
 
 /**
  * The derive spec keys whose manifest values are expression **source**:
- * parsed at save time with the restricted expression grammar. (`of`,
+ * parsed at save time with the artifact expression grammar. (`of`,
  * `order`, `limit` and `count` are plain literals; `map` is an object of
  * expression strings.) Used by the app-manifest layer to build the same
  * expression trees the old in-template syntax produced.

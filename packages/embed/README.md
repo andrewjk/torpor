@@ -10,11 +10,11 @@ An embed is a component compiled **at publish time** and stored as plain,
 JSON-serializable data:
 
 ```
-.torp source + app manifest ──compileRestricted()──▶ EmbedArtifact ──store/serve──▶ mountEmbed() / hydrateEmbed()
+.torp source + app manifest ──compileArtifact()──▶ EmbedArtifact ──store/serve──▶ mountEmbed() / hydrateEmbed()
  (author saves)                (anywhere)              (in your DB)                    (client)
 ```
 
-- `compileRestricted` (from `@torpor/embed/restricted`) runs once when the
+- `compileArtifact` (from `@torpor/embed/artifact`) runs once when the
   author saves — in Node, Cloudflare Workers, or the browser. The server
   build is a serialized instruction tree that **never runs author code on
   your server** (no `eval`, no `new Function`); the client build is ordinary
@@ -23,7 +23,7 @@ JSON-serializable data:
 - `mountEmbed` / `hydrateEmbed` (from `@torpor/embed`) run on the client:
   they evaluate the artifact's client build against the runtime the host
   app already has, inject the scoped styles, and give you a handle to
-  unmount. `renderRestricted` renders the server build to HTML.
+  unmount. `renderArtifact` renders the server build to HTML.
 
 Because the artifact is data, the usual torpor flow still applies: render
 the server build to HTML on the server, hydrate it on the client with the
@@ -47,11 +47,11 @@ export default function Section() {
 
 ```ts
 // compile time: optionally whitelist which modules the embed may import
-const artifact = compileRestricted("section-42", source, { scope: ["@example/ui"] });
+const artifact = compileArtifact("section-42", source, { scope: ["@example/ui"] });
 // artifact.imports records what was imported: [{ source: "@example/ui", names: ["Form"] }]
 
 // render time: server builds of the host's components
-renderRestricted(artifact, { components: { Form: formServerComponent } });
+renderArtifact(artifact, { components: { Form: formServerComponent } });
 
 // mount/hydrate time: client builds via scope
 mountEmbed(target, artifact, props, { scope: { "@example/ui": { Form: formClientComponent } } });
@@ -67,7 +67,7 @@ cross the iframe boundary — sandboxed frames use slots and the bridge.
 
 ## Compiling
 
-`compileRestricted` (from `@torpor/embed/restricted`) is **edge-safe**: no
+`compileArtifact` (from `@torpor/embed/artifact`) is **edge-safe**: no
 Node builtins, so it runs in Node, Cloudflare Workers, and browsers alike
 (compile-on-save in a web admin, or in the admin's browser). `RUNTIME_VERSION`
 —the `@torpor/view` version the package was built against — is exported for
@@ -84,12 +84,12 @@ recovery path is built in:
 
 ```ts
 import { assertRunnable } from "@torpor/embed";
-import { recompileRestricted, RUNTIME_VERSION } from "@torpor/embed/restricted";
+import { recompileArtifact, RUNTIME_VERSION } from "@torpor/embed/artifact";
 
 // in the request path: render a placeholder while a job recompiles
 assertRunnable(artifact, RUNTIME_VERSION);
 // bulk job: recompile from source (the source of truth); meta is preserved
-const fresh = recompileRestricted(artifact);
+const fresh = recompileArtifact(artifact);
 ```
 
 ## Usage
@@ -98,15 +98,15 @@ Publish (anywhere — the compiler is edge-safe):
 
 ```ts
 import {
-	compileRestricted,
-	renderRestricted,
-	recompileRestricted,
+	compileArtifact,
+	renderArtifact,
+	recompileArtifact,
 	assertRunnable,
 	RUNTIME_VERSION,
-} from "@torpor/embed/restricted";
+} from "@torpor/embed/artifact";
 
 // When the author saves
-const artifact = compileRestricted("section-42", source, {
+const artifact = compileArtifact("section-42", source, {
 	data: manifest.data,
 	api: manifest.api,
 	emits: manifest.emits,
@@ -118,13 +118,13 @@ await db.embeds.save(artifact); // includes artifact.source -- keep it!
 assertRunnable(artifact, RUNTIME_VERSION); // throws if it needs a recompile
 ```
 
-Render (server side, from `@torpor/embed/restricted`):
+Render (server side, from `@torpor/embed/artifact`):
 
 ```ts
-import { renderRestricted } from "@torpor/embed/restricted";
+import { renderArtifact } from "@torpor/embed/artifact";
 
 // Renders to HTML; hydrateEmbed the result with the same props + data
-const { body, head, styles, data } = await renderRestricted(artifact, {
+const { body, head, styles, data } = await renderArtifact(artifact, {
 	props: { sectionId: 42 },
 	components, // server builds of the host components the template uses
 	sources, // first-party implementations of the manifest's data requirements
@@ -146,7 +146,7 @@ const bridge = createBridge({
 	},
 });
 
-// Client-rendered: pass the resolved data bag (from renderRestricted, or
+// Client-rendered: pass the resolved data bag (from renderArtifact, or
 // fetched by the host) through props — paint-then-mount
 const handle = mountEmbed(target, artifact, { sectionId: 42, $data }, { bridge, scope });
 handle.unmount();
@@ -161,26 +161,25 @@ first paint. `styles` exposes the same CSS separately, for hosts that place
 styles themselves — pick one (using both double-injects), and pass
 `styles: false` to `hydrateEmbed` when the server side already handled it.
 
-## Restricted mode (no-eval SSR)
+## Artifacts: no-eval server rendering
 
-For server rendering where code generation from strings is unavailable
-(Cloudflare Workers) or where author code must not run on your servers, compile
-to a **restricted** artifact: the server build is a serialized instruction
-tree, interpreted by trusted code — no `new Function`, no `eval`. The client
-build is ordinary globals-format code.
+An artifact's server build is a serialized instruction tree, interpreted by
+trusted code — no `new Function`, no `eval` — so it renders anywhere JS
+runs, including Cloudflare Workers, and author code never executes on your
+server. The client build is ordinary globals-format code.
 
 ```ts
-import { compileRestricted, renderRestricted } from "@torpor/embed/restricted";
+import { compileArtifact, renderArtifact } from "@torpor/embed/artifact";
 
 // Publish (edge-safe: runs on Node, workers, browsers). Data requirements
 // come from the app manifest (see "App manifests" below)
-const artifact = compileRestricted(id, source, {
+const artifact = compileArtifact(id, source, {
 	requirementKinds: { tickets: validateTicketSpec }, // spec shape validation
 	data: manifest.data, // the app's declared data requirements
 });
 
 // Render (edge-safe; resolves data, then interprets the template)
-const { body, head, styles } = await renderRestricted(artifact, {
+const { body, head, styles } = await renderArtifact(artifact, {
 	props: { queue: "open" },
 	sources: {
 		tickets: async (spec, { props }) => db.tickets.forTenant(tenant).list(spec),
@@ -198,7 +197,7 @@ torpor. Specs are inert data, implemented by the host.
   could already see (see "Private when shared" under Trust model). Unknown
   kinds fail at compile time (`requirementKinds`). Pass `data` instead of
   `sources` when the host already fetched the data.
-- Template expressions are a restricted op set — reads, literals, operators,
+- Template expressions use a deliberately small op set — reads, literals, operators,
   optional chaining, array/object literals — **no calls**. Compute formatted
   values in a requirement spec or a `derive` (see below); the client build is
   full JS, so formatting helpers are fine there via `scope`.
@@ -210,14 +209,14 @@ torpor. Specs are inert data, implemented by the host.
   breaks hydration — this fails at SSR with an error naming both tags and
   the fix. Wrap rows in a `<div>` (or start fills with a nesting-safe tag).
   Slot **fallbacks** with the same problem are rejected at compile time.
-- **Hydration**: `renderRestricted` emits the same hydration markers as the
+- **Hydration**: `renderArtifact` emits the same hydration markers as the
   Node server build, so `hydrateEmbed(target, artifact, { $data: data }, {
   styles: false })` adopts the painted HTML (byte-parity with the full server
   build is enforced by the parity suite). `mountEmbed(...)` still works for
   client-only rendering; the data bag is passed in props in both cases.
 - **Client state works**: script bodies are stripped on the server but run on
   the client. `let $state = $watch({ count: $props.start ?? 0 })` initializers
-  are serialized as restricted expressions over props — the server renders
+  are serialized as artifact expressions over props — the server renders
   the initial paint from them, and the client build binds the real reactive
   `$watch` state, so counters, toggles and list mutations work after
   hydration. Initializers may reference only `$props` (plus literals and
@@ -234,18 +233,18 @@ torpor. Specs are inert data, implemented by the host.
 
 ### Cross-artifact components
 
-A restricted artifact can render **another restricted artifact** as a
-component. Wrap the inner artifact with `restrictedComponent` — it becomes a
+An artifact can render **another artifact** as a
+component. Wrap the inner artifact with `artifactComponent` — it becomes a
 server component for the outer template's `components` map, with its own
 data layer:
 
 ```ts
-import { restrictedComponent } from "@torpor/embed/restricted";
+import { artifactComponent } from "@torpor/embed/artifact";
 
-const { body } = await renderRestricted(outerArtifact, {
+const { body } = await renderArtifact(outerArtifact, {
 	props,
 	components: {
-		TicketList: restrictedComponent(innerArtifact, {
+		TicketList: artifactComponent(innerArtifact, {
 			sources, // the inner artifact's own requirement sources
 			formatters,
 			deriveLimits,
@@ -257,8 +256,8 @@ const { body } = await renderRestricted(outerArtifact, {
 The outer template's fills become the inner artifact's incoming slots: the
 inner `<slot item={row}>` evaluates its slot props in its own scope, calls
 the outer fill's render, and falls back to its fallback children when the
-outer passes no fill for that name. `renderRestricted` also takes `slots`
-directly, so a host can supply fills for a top-level restricted template.
+outer passes no fill for that name. `renderArtifact` also takes `slots`
+directly, so a host can supply fills for a top-level template.
 The inner artifact's styles are inlined into `head` as
 `<style id='…'>…</style>` — the same emission as the JS server build — so
 scoped-styled inner components render styled through the boundary.
@@ -284,14 +283,14 @@ hydrateEmbed(target, outerArtifact, props, {
 Wrapper cycles (`A` renders `B` renders `A`) recurse until the stack
 overflows — construct component maps acyclically.
 
-### Host components in restricted mode
+### Host components
 
 Components resolve like everything else — host-side. At render time, pass
 **server components** (their server builds); at mount time, pass the client
 builds via `scope`:
 
 ```ts
-const { body } = await renderRestricted(artifact, {
+const { body } = await renderArtifact(artifact, {
 	components: { Card: cardServerComponent }, // server build: (props, ctx, slots) => {body, head}
 });
 
@@ -308,19 +307,18 @@ style-hash class merged through to the host component, exactly like the JS
 builds. Unknown components fail at render time with their name — the host
 decides whether that's a build failure or a graceful fallback.
 
-- `recompileRestricted(artifact)` is the upgrade path for these artifacts
-  `recompileRestricted(artifact)` is the upgrade path for these artifacts.
+- `recompileArtifact(artifact)` is the upgrade path for these artifacts.
 
 ### The `http` source kind
 
-`@torpor/embed/restricted` ships one generic mechanism so admins can point
+`@torpor/embed/artifact` ships one generic mechanism so admins can point
 requirements at JSON APIs the host was never told about — under operator
 policy:
 
 ```ts
-import { createHttpSource, httpRequirementKind } from "@torpor/embed/restricted";
+import { createHttpSource, httpRequirementKind } from "@torpor/embed/artifact";
 
-const artifact = compileRestricted(id, source, {
+const artifact = compileArtifact(id, source, {
 	requirementKinds: { http: httpRequirementKind }, // authoring-time shape errors
 	data: {
 		tickets: {
@@ -334,7 +332,7 @@ const artifact = compileRestricted(id, source, {
 	},
 });
 
-const { body } = await renderRestricted(artifact, {
+const { body } = await renderArtifact(artifact, {
 	sources: {
 		http: createHttpSource({
 			allowOrigins: [
@@ -370,7 +368,7 @@ Security posture, all enforced by `createHttpSource`:
   rebinding and outbound network control remain the deployment's job (route
   through an egress proxy via the `fetch` option, or `globalOutbound` on
   Workers).
-- Response data is inert: `renderRestricted` escapes it like any other
+- Response data is inert: `renderArtifact` escapes it like any other
   string, so a row containing markup renders as text.
 
 ### `derive`: the computation layer
@@ -379,7 +377,7 @@ Formatting and shaping belong in data, not templates — `derive` filters,
 maps, sorts and limits an earlier requirement's rows, with host functions
 callable here (and only here). In manifests, the expression values
 (`where`, `map`, `sortBy`, the aggregates) are expression **strings**,
-parsed at save time with the restricted expression grammar:
+parsed at save time with the artifact expression grammar:
 
 ```ts
 data: {
@@ -396,7 +394,7 @@ data: {
 ```
 
 ```ts
-const { body } = await renderRestricted(artifact, {
+const { body } = await renderArtifact(artifact, {
 	formatters: { formatDue: (d) => dateFmt.format(d as number), now: () => Date.now() },
 	sources: { http: createHttpSource(…), rows: … },
 	deriveLimits: { maxInputRows: 5000, maxOutputRows: 1000, timeoutMs: 50 },
@@ -445,7 +443,7 @@ builtins). `defineApp` types an app declaration and returns it unchanged --
 plain JSON, so a host can store it and compile against it without executing
 anything. The manifest declares what the app is allowed to do: its data
 requirements, and its bridge surface. Data requirements live here rather
-than in the template, keeping restricted templates plain torpor:
+rather than in the template, keeping templates plain torpor:
 
 ```ts
 // word-lookup.app.ts -- authored by the client, submitted as JSON
@@ -471,11 +469,11 @@ export default defineApp({
 });
 ```
 
-Compile against it with `compileRestricted`'s `data`/`api`/`emits`/`pushes`
+Compile against it with `compileArtifact`'s `data`/`api`/`emits`/`pushes`
 options:
 
 ```ts
-const artifact = compileRestricted("word-lookup", templateSource, {
+const artifact = compileArtifact("word-lookup", templateSource, {
 	requirementKinds: { http: httpRequirementKind },
 	data: manifest.data, // validated like in-torp requirements, at save time
 	api: manifest.api,
@@ -504,12 +502,12 @@ manifest itself.
 
 ### Audit trail
 
-`renderRestricted` takes `onAudit`, called once per resolved data
+`renderArtifact` takes `onAudit`, called once per resolved data
 requirement with what was read — the "record what was read" half of the
 trusted boundary:
 
 ```ts
-const { body } = await renderRestricted(artifact, {
+const { body } = await renderArtifact(artifact, {
 	sources,
 	onAudit: (entry) => log.info("embed-read", entry), // artifactId, name, kind, spec, durationMs, ok, error?
 });
@@ -520,7 +518,7 @@ success and failure (failures are reported, then rethrown — auditing never
 swallows an error). No entries when the host passes pre-resolved `data`,
 because nothing was read. The `spec` in an entry is the inert declaration —
 the url, the credential _name_, the pick path — never fetched data or
-secrets. Wrapping an inner artifact with `restrictedComponent` passes your
+secrets. Wrapping an inner artifact with `artifactComponent` passes your
 `onAudit` through, so reads behind the component boundary are audited too.
 
 ## Caching
@@ -776,8 +774,8 @@ strictest model and loosen deliberately:
 - **Semi-trusted authors** (paying admins): mounting in the host page is
   reasonable, but pass only vetted data through props, and gate what the
   embed can reach on the server.
-- **Server-side rendering never executes author code.** The restricted
-  server build is an instruction tree interpreted by `renderRestricted` —
+- **Server-side rendering never executes author code.** The server build
+  is an instruction tree interpreted by `renderArtifact` —
   author code only ever runs in the _browser_, client-side. Untrusted
   authors get the iframe tier; trusted authors can mount in-process.
 - **Private when shared**: rendered output must only ever be visible to
@@ -815,7 +813,7 @@ viewer's; until then the embed sees only the pending receipt. No API
 changes are needed for this -- it is a discipline for `invoke` handlers.
 
 When the author is an AI (an agent building sections from a prompt), treat
-it as untrusted by default: the restricted server build keeps the author's
+it as untrusted by default: the server build keeps the author's
 code off your servers entirely, and compile-time validation catches
 hallucinated syntax, spec shapes, and undeclared bridge calls at save
 time, where the editing UI can show them.

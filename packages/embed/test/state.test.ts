@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { compileRestricted, renderRestricted } from "../src/restricted";
+import { compileArtifact, renderArtifact } from "../src/artifact";
 import { hydrateEmbed, mountEmbed } from "../src";
 import type EmbedArtifact from "../src/types/EmbedArtifact";
 
@@ -16,17 +16,17 @@ export default function Counter($props: { start?: number }) {
 `;
 
 function counterArtifact(): EmbedArtifact {
-	return compileRestricted("counter", COUNTER_SOURCE);
+	return compileArtifact("counter", COUNTER_SOURCE);
 }
 
-test("restricted templates render client state as the initial paint", async () => {
-	const { body } = await renderRestricted(counterArtifact(), { props: { start: 5 } });
+test("templates render client state as the initial paint", async () => {
+	const { body } = await renderArtifact(counterArtifact(), { props: { start: 5 } });
 	expect(body).toContain("Count: 5");
 });
 
 test("state initializers must reference only $props", () => {
 	expect(() =>
-		compileRestricted(
+		compileArtifact(
 			"bad-init",
 			`
 export default function Bad($props: {}) {
@@ -38,7 +38,7 @@ export default function Bad($props: {}) {
 	).toThrow(/Function calls aren't supported/);
 
 	expect(() =>
-		compileRestricted(
+		compileArtifact(
 			"bad-init-2",
 			`
 export default function Bad($props: {}) {
@@ -59,7 +59,7 @@ export default function Typo($props: {}) {
 }
 `;
 	// $data is a known root; the property typo is a render-time value
-	expect(() => compileRestricted("typo-ok", typo)).not.toThrow();
+	expect(() => compileArtifact("typo-ok", typo)).not.toThrow();
 
 	const unknownRoot = `
 export default function UnknownRoot($props: {}) {
@@ -68,14 +68,12 @@ export default function UnknownRoot($props: {}) {
 	}
 }
 `;
-	expect(() => compileRestricted("unknown-root", unknownRoot)).toThrow(
-		/Unknown identifier "\$stat"/,
-	);
+	expect(() => compileArtifact("unknown-root", unknownRoot)).toThrow(/Unknown identifier "\$stat"/);
 });
 
 test("hydration: client state takes over from the SSR paint", async () => {
 	const artifact = counterArtifact();
-	const { body } = await renderRestricted(artifact, { props: { start: 3 } });
+	const { body } = await renderArtifact(artifact, { props: { start: 3 } });
 
 	const target = document.createElement("div");
 	target.innerHTML = body;
@@ -93,7 +91,7 @@ test("hydration: client state takes over from the SSR paint", async () => {
 	handle.unmount();
 });
 
-test("client handlers mutate restricted state (reactive list)", async () => {
+test("client handlers mutate artifact state (reactive list)", async () => {
 	const source = `
 export default function Notes() {
 	let $state = $watch({ items: ["first"] });
@@ -110,10 +108,10 @@ export default function Notes() {
 	}
 }
 `;
-	const artifact = compileRestricted("notes", source);
+	const artifact = compileArtifact("notes", source);
 
 	// SSR: initial items only
-	const { body } = await renderRestricted(artifact, {});
+	const { body } = await renderArtifact(artifact, {});
 	expect(body).toContain("first");
 	expect(body).not.toContain("another");
 
@@ -140,8 +138,8 @@ export default function Labels($props: { prefix: string }) {
 	}
 }
 `;
-	const artifact = compileRestricted("labels", source);
-	const { body } = await renderRestricted(artifact, { props: { prefix: "hi" } });
+	const artifact = compileArtifact("labels", source);
+	const { body } = await renderArtifact(artifact, { props: { prefix: "hi" } });
 	expect(body).toContain("<span>hi-a!</span>");
 	expect(body).toContain("<span>hi-b!</span>");
 });

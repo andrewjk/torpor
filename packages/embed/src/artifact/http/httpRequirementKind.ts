@@ -3,11 +3,11 @@ import type { RestrictedRequirementKindValidator, RestrictedSpecEntry } from "@t
 /**
  * The compile-time shape of `data <name> from http { … }` declarations.
  *
- * Pass it to `compileRestricted` (and `recompileRestricted`) under
+ * Pass it to `compileArtifact` (and `recompileArtifact`) under
  * `requirementKinds.http` so admins get authoring-time errors:
  *
  * ```ts
- * compileRestricted(id, source, { requirementKinds: { http: httpRequirementKind } });
+ * compileArtifact(id, source, { requirementKinds: { http: httpRequirementKind } });
  * ```
  *
  * Shape (v1, GET only):

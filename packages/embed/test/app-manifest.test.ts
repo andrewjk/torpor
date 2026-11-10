@@ -2,12 +2,12 @@ import { expect, test } from "vite-plus/test";
 import { defineApp, manifestRequirements } from "../src/app";
 import { hydrateEmbed } from "../src";
 import {
-	compileRestricted,
+	compileArtifact,
 	deriveRequirementKind,
 	httpRequirementKind,
-	renderRestricted,
-	recompileRestricted,
-} from "../src/restricted";
+	renderArtifact,
+	recompileArtifact,
+} from "../src/artifact";
 import EmbedCompileError from "../src/types/EmbedCompileError";
 
 const KINDS = { http: httpRequirementKind, derive: deriveRequirementKind };
@@ -55,7 +55,7 @@ test("defineApp carries the declared bridge surface as plain JSON", () => {
 });
 
 test("a manifest data block compiles a plain template and renders through sources", async () => {
-	const artifact = compileRestricted("tickets", PLAIN, {
+	const artifact = compileArtifact("tickets", PLAIN, {
 		requirementKinds: KINDS,
 		data: {
 			tickets: {
@@ -73,7 +73,7 @@ test("a manifest data block compiles a plain template and renders through source
 	expect(artifact.client.code).toMatch(/let \$data = /);
 
 	const specs: Record<string, unknown>[] = [];
-	const { body, data } = await renderRestricted(artifact, {
+	const { body, data } = await renderArtifact(artifact, {
 		props: { queue: "late" },
 		sources: {
 			http: (spec) => {
@@ -95,14 +95,14 @@ test("a manifest data block compiles a plain template and renders through source
 });
 
 test("paint-then-mount: a manifest app hydrates from the data bag", async () => {
-	const artifact = compileRestricted("tickets", PLAIN, {
+	const artifact = compileArtifact("tickets", PLAIN, {
 		requirementKinds: KINDS,
 		data: {
 			tickets: { kind: "http", url: "https://api.example.com/tickets", pick: "items" },
 		},
 	});
 	const data = { tickets: [{ title: "from the paint" }] };
-	const { body } = await renderRestricted(artifact, {
+	const { body } = await renderArtifact(artifact, {
 		props: { queue: "open" },
 		data,
 	});
@@ -122,7 +122,7 @@ test("paint-then-mount: a manifest app hydrates from the data bag", async () => 
 
 test("unknown manifest kinds are compile errors", () => {
 	expect(() =>
-		compileRestricted("bad-kind", PLAIN, {
+		compileArtifact("bad-kind", PLAIN, {
 			requirementKinds: KINDS,
 			data: { x: { kind: "sql", query: "select 1" } },
 		}),
@@ -131,7 +131,7 @@ test("unknown manifest kinds are compile errors", () => {
 
 test("malformed manifest specs name their requirement", () => {
 	expect(() =>
-		compileRestricted("bad-spec", PLAIN, {
+		compileArtifact("bad-spec", PLAIN, {
 			requirementKinds: KINDS,
 			data: { x: { kind: "http", url: "not a url" } },
 		}),
@@ -139,7 +139,7 @@ test("malformed manifest specs name their requirement", () => {
 });
 
 test("derive resolves in manifest key order and sees earlier requirements", async () => {
-	const artifact = compileRestricted("derived", PLAIN, {
+	const artifact = compileArtifact("derived", PLAIN, {
 		requirementKinds: KINDS,
 		data: {
 			tickets: {
@@ -151,7 +151,7 @@ test("derive resolves in manifest key order and sees earlier requirements", asyn
 		},
 	});
 
-	const { data } = await renderRestricted(artifact, {
+	const { data } = await renderArtifact(artifact, {
 		sources: { http: () => [{ title: "a" }, { title: "b" }] },
 	});
 	expect(data.count).toEqual({ count: 2 });
@@ -191,7 +191,7 @@ const SURFACE_OPTIONS = {
 };
 
 test("a declared surface compiles onto the artifact", () => {
-	const embed = compileRestricted("poll", SURFACE_SOURCE, SURFACE_OPTIONS);
+	const embed = compileArtifact("poll", SURFACE_SOURCE, SURFACE_OPTIONS);
 	expect(embed.surface).toEqual({
 		api: ["vote"],
 		emits: ["voted"],
@@ -214,7 +214,7 @@ test("calls outside a declared surface are compile errors", () => {
 	for (const [surface, pattern] of cases) {
 		let thrown: unknown;
 		try {
-			compileRestricted("poll", SURFACE_SOURCE, { ...SURFACE_OPTIONS, ...surface });
+			compileArtifact("poll", SURFACE_SOURCE, { ...SURFACE_OPTIONS, ...surface });
 		} catch (error) {
 			thrown = error;
 		}
@@ -224,16 +224,16 @@ test("calls outside a declared surface are compile errors", () => {
 	}
 });
 
-test("recompileRestricted keeps the declared surface", () => {
-	const embed = compileRestricted("poll", SURFACE_SOURCE, SURFACE_OPTIONS);
-	const fresh = recompileRestricted(embed, SURFACE_OPTIONS);
+test("recompileArtifact keeps the declared surface", () => {
+	const embed = compileArtifact("poll", SURFACE_SOURCE, SURFACE_OPTIONS);
+	const fresh = recompileArtifact(embed, SURFACE_OPTIONS);
 	expect(fresh.surface).toEqual(embed.surface);
 });
 
 test("using the bridge without a declared surface is a compile error", () => {
 	let thrown: unknown;
 	try {
-		compileRestricted("poll-ungated", SURFACE_SOURCE, { requirementKinds: KINDS });
+		compileArtifact("poll-ungated", SURFACE_SOURCE, { requirementKinds: KINDS });
 	} catch (error) {
 		thrown = error;
 	}

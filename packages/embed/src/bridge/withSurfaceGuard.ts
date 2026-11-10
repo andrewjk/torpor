@@ -17,7 +17,7 @@ const SECTIONS: Record<keyof EmbedSurface, string> = {
  * Wraps a scoped bridge so calls outside the artifact's declared surface
  * (its app manifest's `api`/`emits`/`pushes`) warn once per call — the
  * runtime half of the declared-surface check (the compile half runs in
- * `compileRestricted`, and it can only see string literals). Sections the
+ * `compileArtifact`, and it can only see string literals). Sections the
  * manifest doesn't declare gate nothing.
  */
 export default function withSurfaceGuard(

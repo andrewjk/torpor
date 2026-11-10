@@ -1,29 +1,26 @@
 import type { ServerComponent } from "@torpor/view/ssr";
 import type EmbedArtifact from "../types/EmbedArtifact";
-import type { RestrictedSlotRender, RenderRestrictedOptions } from "./types";
-import renderRestricted from "./renderRestricted";
+import type { ArtifactSlotRender, RenderArtifactOptions } from "./types";
+import renderArtifact from "./renderArtifact";
 
 /**
- * The per-render options a restricted artifact used as a component may
+ * The per-render options an artifact used as a component may
  * need. Props and slots come from the component call; everything else is
  * fixed at wrapper-creation time.
  */
-export type RestrictedComponentOptions = Omit<
-	RenderRestrictedOptions,
-	"props" | "slots" | "bridge"
->;
+export type ArtifactComponentOptions = Omit<RenderArtifactOptions, "props" | "slots" | "bridge">;
 
 /**
- * Wraps a restricted artifact as a **server component**, so another
- * restricted artifact can render it: `<TicketList>…</TicketList>` in the
+ * Wraps an artifact as a **server component**, so another
+ * artifact can render it: `<TicketList>…</TicketList>` in the
  * outer template calls this component, the interpreter renders the inner
  * artifact recursively, and its HTML is inlined.
  *
  * ```ts
- * const { body } = await renderRestricted(outerArtifact, {
+ * const { body } = await renderArtifact(outerArtifact, {
  * 	props,
  * 	components: {
- * 		TicketList: restrictedComponent(innerArtifact, {
+ * 		TicketList: artifactComponent(innerArtifact, {
  * 			sources,        // the inner artifact's own data layer
  * 			formatters,
  * 			deriveLimits,
@@ -58,20 +55,20 @@ export type RestrictedComponentOptions = Omit<
  * Note the wrapper boundary: cycles (`A` renders `B` renders `A`) recurse
  * until the stack overflows — construct component maps acyclically.
  */
-export default function restrictedComponent(
+export default function artifactComponent(
 	artifact: EmbedArtifact,
-	options?: RestrictedComponentOptions,
+	options?: ArtifactComponentOptions,
 ): ServerComponent {
 	if (artifact.server?.template === undefined) {
 		throw new Error(
-			`Embed "${artifact.id}" is missing its restricted server template -- recompile it from its source.`,
+			`Embed "${artifact.id}" is missing its server build -- recompile it from its source.`,
 		);
 	}
 	return async (props, _context, slots) => {
-		const result = await renderRestricted(artifact, {
+		const result = await renderArtifact(artifact, {
 			...options,
 			props: (props ?? undefined) as Record<string, any> | undefined,
-			slots: slots as Record<string, RestrictedSlotRender> | undefined,
+			slots: slots as Record<string, ArtifactSlotRender> | undefined,
 		});
 		// Inline the artifact's styles into head, matching the JS server
 		// build's component emission (`t_head += "<style id='…'>…</style>"`,

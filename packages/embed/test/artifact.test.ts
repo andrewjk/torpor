@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
-import { compileRestricted, recompileRestricted, renderRestricted } from "../src/restricted";
-import type { RestrictedAuditEntry } from "../src/restricted";
-import { deriveRequirementKind } from "../src/restricted";
+import { compileArtifact, recompileArtifact, renderArtifact } from "../src/artifact";
+import type { ArtifactAuditEntry } from "../src/artifact";
+import { deriveRequirementKind } from "../src/artifact";
 import { mountEmbed } from "../src/index";
 import EmbedCompileError from "../src/types/EmbedCompileError";
 import EmbedVersionError from "../src/types/EmbedVersionError";
@@ -39,10 +39,10 @@ const DATA = {
 };
 
 function artifact(): EmbedArtifact {
-	return compileRestricted("inbox", SOURCE, { requirementKinds, data: DATA });
+	return compileArtifact("inbox", SOURCE, { requirementKinds, data: DATA });
 }
 
-test("compiles a restricted artifact with a serialized server build", () => {
+test("compiles an artifact with a serialized server build", () => {
 	const embed = artifact();
 
 	expect(embed.name).toBe("Inbox");
@@ -55,7 +55,7 @@ test("compiles a restricted artifact with a serialized server build", () => {
 
 test("renders with a first-party source, resolving props in the spec", async () => {
 	const specs: Record<string, unknown>[] = [];
-	const { body, head, styles, data } = await renderRestricted(artifact(), {
+	const { body, head, styles, data } = await renderArtifact(artifact(), {
 		props: { queue: "open" },
 		sources: {
 			tickets: (spec) => {
@@ -79,7 +79,7 @@ test("renders with a first-party source, resolving props in the spec", async () 
 });
 
 test("accepts pre-resolved data and skips sources", async () => {
-	const { body } = await renderRestricted(artifact(), {
+	const { body } = await renderArtifact(artifact(), {
 		props: { queue: "open" },
 		data: { tickets: ROWS },
 	});
@@ -87,13 +87,13 @@ test("accepts pre-resolved data and skips sources", async () => {
 });
 
 test("missing source implementations fail with an actionable error", async () => {
-	await expect(renderRestricted(artifact(), { props: { queue: "open" } })).rejects.toThrow(
+	await expect(renderArtifact(artifact(), { props: { queue: "open" } })).rejects.toThrow(
 		/No source implementation for data requirement kind "tickets"/,
 	);
 });
 
 test("async sources are awaited", async () => {
-	const { body } = await renderRestricted(artifact(), {
+	const { body } = await renderArtifact(artifact(), {
 		props: { queue: "open" },
 		sources: { tickets: async () => Promise.resolve(ROWS) },
 	});
@@ -101,8 +101,8 @@ test("async sources are awaited", async () => {
 });
 
 test("onAudit reports each requirement resolution", async () => {
-	const entries: RestrictedAuditEntry[] = [];
-	const { body } = await renderRestricted(artifact(), {
+	const entries: ArtifactAuditEntry[] = [];
+	const { body } = await renderArtifact(artifact(), {
 		props: { queue: "open" },
 		sources: { tickets: () => ROWS },
 		onAudit: (entry) => entries.push(entry),
@@ -120,9 +120,9 @@ test("onAudit reports each requirement resolution", async () => {
 });
 
 test("onAudit reports failures, then the error still throws", async () => {
-	const entries: RestrictedAuditEntry[] = [];
+	const entries: ArtifactAuditEntry[] = [];
 	await expect(
-		renderRestricted(artifact(), {
+		renderArtifact(artifact(), {
 			props: { queue: "open" },
 			sources: {
 				tickets: () => {
@@ -140,7 +140,7 @@ test("onAudit reports failures, then the error still throws", async () => {
 
 test("onAudit is not called when data is pre-resolved", async () => {
 	let calls = 0;
-	const { body } = await renderRestricted(artifact(), {
+	const { body } = await renderArtifact(artifact(), {
 		props: { queue: "open" },
 		data: { tickets: ROWS },
 		onAudit: () => calls++,
@@ -150,7 +150,7 @@ test("onAudit is not called when data is pre-resolved", async () => {
 });
 
 test("onAudit covers derive requirements with their static spec", async () => {
-	const statsArtifact = compileRestricted(
+	const statsArtifact = compileArtifact(
 		"stats",
 		`
 export default function Stats() {
@@ -165,8 +165,8 @@ export default function Stats() {
 			},
 		},
 	);
-	const entries: RestrictedAuditEntry[] = [];
-	await renderRestricted(statsArtifact, {
+	const entries: ArtifactAuditEntry[] = [];
+	await renderArtifact(statsArtifact, {
 		sources: { tickets: () => ROWS },
 		onAudit: (entry) => entries.push(entry),
 	});
@@ -179,18 +179,16 @@ export default function Stats() {
 	expect(entries[1].ok).toBe(true);
 });
 
-test("rejects artifacts without a restricted server build", async () => {
-	const notRestricted: EmbedArtifact = { ...artifact(), server: undefined };
-	await expect(renderRestricted(notRestricted)).rejects.toThrow(
-		/missing its restricted server template/,
-	);
+test("rejects artifacts without a server build", async () => {
+	const notAnArtifact: EmbedArtifact = { ...artifact(), server: undefined };
+	await expect(renderArtifact(notAnArtifact)).rejects.toThrow(/missing its server build/);
 });
 
 test("enforces runtime versions with the edge-safe constant", async () => {
 	const stale = artifact();
 	stale.version = "0.0.0-stale";
 	await expect(
-		renderRestricted(stale, { props: { queue: "open" }, data: { tickets: [] } }),
+		renderArtifact(stale, { props: { queue: "open" }, data: { tickets: [] } }),
 	).rejects.toThrow(EmbedVersionError);
 
 	// allowMismatch warns and renders
@@ -198,7 +196,7 @@ test("enforces runtime versions with the edge-safe constant", async () => {
 	const warnings: string[] = [];
 	console.warn = (message: string) => warnings.push(message);
 	try {
-		const { body } = await renderRestricted(stale, {
+		const { body } = await renderArtifact(stale, {
 			props: { queue: "open" },
 			data: { tickets: [] },
 			allowVersionMismatch: true,
@@ -210,9 +208,9 @@ test("enforces runtime versions with the edge-safe constant", async () => {
 	}
 });
 
-test("compileRestricted surfaces restricted-build errors with positions", () => {
+test("compileArtifact surfaces build errors with positions", () => {
 	try {
-		compileRestricted(
+		compileArtifact(
 			"bad",
 			`
 export default function Bad() {
@@ -233,7 +231,7 @@ export default function Bad() {
 
 test("unknown requirement kinds fail at compile time", () => {
 	expect(() =>
-		compileRestricted("unknown-kind", SOURCE, {
+		compileArtifact("unknown-kind", SOURCE, {
 			requirementKinds: {},
 			data: { tickets: { kind: "tickets", queue: "open" } },
 		}),
@@ -244,7 +242,7 @@ test("paint-then-mount: the client build renders from the same data bag", async 
 	const embed = artifact();
 	const data = { tickets: ROWS };
 
-	const { body } = await renderRestricted(embed, {
+	const { body } = await renderArtifact(embed, {
 		props: { queue: "open" },
 		data,
 	});
@@ -267,20 +265,20 @@ test("paint-then-mount: the client build renders from the same data bag", async 
 	expect(target.innerHTML).toBe("");
 });
 
-test("recompileRestricted refreshes the version and keeps meta", () => {
+test("recompileArtifact refreshes the version and keeps meta", () => {
 	const stale: EmbedArtifact = {
 		...artifact(),
 		version: "0.0.0-stale",
 		meta: { author: "ada" },
 	};
-	const fresh = recompileRestricted(stale, { requirementKinds, data: DATA });
+	const fresh = recompileArtifact(stale, { requirementKinds, data: DATA });
 	expect(fresh.version).not.toBe("0.0.0-stale");
 	expect(fresh.meta).toEqual({ author: "ada" });
 	expect(fresh.server?.template).toEqual(stale.server?.template);
 });
 
 test("escapes attribute values", async () => {
-	const embed = compileRestricted(
+	const embed = compileArtifact(
 		"attrs",
 		`
 export default function Attrs($props: { label: string }) {
@@ -290,6 +288,6 @@ export default function Attrs($props: { label: string }) {
 }
 `,
 	);
-	const { body } = await renderRestricted(embed, { props: { label: 'a "b" <c>' } });
+	const { body } = await renderArtifact(embed, { props: { label: 'a "b" <c>' } });
 	expect(body).toContain('title="a &quot;b&quot; <c>"');
 });

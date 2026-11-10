@@ -3,11 +3,11 @@ import * as ssr from "@torpor/view/ssr";
 import { transform } from "sucrase";
 import { expect, test } from "vite-plus/test";
 import {
-	compileRestricted,
+	compileArtifact,
 	deriveRequirementKind,
 	httpRequirementKind,
-	renderRestricted,
-} from "../src/restricted";
+	renderArtifact,
+} from "../src/artifact";
 import { hydrateEmbed } from "../src/index";
 import { createBridge } from "../src/index";
 import type EmbedArtifact from "../src/types/EmbedArtifact";
@@ -36,18 +36,18 @@ async function renderJsServer(
 	return { body: result.body, styles: built.styles };
 }
 
-/** Compiles restricted, then byte-compares the interpreter output with the
+/** Compiles an artifact, then byte-compares the interpreter output with the
  * real server build. */
 async function assertParity(
 	source: string,
 	options?: { props?: Record<string, any>; data?: Record<string, unknown> },
 ): Promise<void> {
-	const artifact = compileRestricted("parity", source, {
+	const artifact = compileArtifact("parity", source, {
 		requirementKinds: { derive: deriveRequirementKind, http: httpRequirementKind },
 	});
 	expect(artifact.server?.template).toBeDefined();
 
-	const restricted = await renderRestricted(artifact, {
+	const rendered = await renderArtifact(artifact, {
 		props: options?.props ?? {},
 		data: options?.data ?? {},
 	});
@@ -57,9 +57,9 @@ async function assertParity(
 		$data: options?.data ?? {},
 	});
 
-	expect(restricted.body).toBe(reference.body);
+	expect(rendered.body).toBe(reference.body);
 	// Styles come from the same helper
-	expect(restricted.styles).toEqual(reference.styles);
+	expect(rendered.styles).toEqual(reference.styles);
 }
 
 test("parity: elements, attributes and interpolated text", async () => {
@@ -213,7 +213,7 @@ export default function Void($props: { raw: string }) {
 	);
 });
 
-test("restricted SSR output hydrates with the same client build", async () => {
+test("artifact SSR output hydrates with the same client build", async () => {
 	const source = `
 export default function Section($props: { $embed: any; title: string }) {
 	function ping() {
@@ -229,10 +229,10 @@ export default function Section($props: { $embed: any; title: string }) {
 	}
 }
 `;
-	const artifact: EmbedArtifact = compileRestricted("hydrate-parity", source, {
+	const artifact: EmbedArtifact = compileArtifact("hydrate-parity", source, {
 		emits: ["pinged"],
 	});
-	const { body } = await renderRestricted(artifact, {
+	const { body } = await renderArtifact(artifact, {
 		props: { title: "Hello" },
 		data: {},
 	});

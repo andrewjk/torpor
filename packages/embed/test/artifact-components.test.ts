@@ -3,7 +3,7 @@ import { build, parse } from "@torpor/view/compile";
 import * as view from "@torpor/view";
 import * as ssr from "@torpor/view/ssr";
 import { transform } from "sucrase";
-import { compileRestricted, renderRestricted } from "../src/restricted";
+import { compileArtifact, renderArtifact } from "../src/artifact";
 import { hydrateEmbed } from "../src";
 import type EmbedArtifact from "../src/types/EmbedArtifact";
 
@@ -69,8 +69,8 @@ function compileServerComponent(source: string): unknown {
 
 test("slot props flow from host server components through fills", async () => {
 	const listServer = compileServerComponent(LIST_SOURCE);
-	const artifact = compileRestricted("page", PAGE_SOURCE);
-	const { body, head } = await renderRestricted(artifact, {
+	const artifact = compileArtifact("page", PAGE_SOURCE);
+	const { body, head } = await renderArtifact(artifact, {
 		components: { List: listServer as never },
 		props: { items: ROWS },
 	});
@@ -113,7 +113,7 @@ export default function EchoPage() {
 	}
 }
 `;
-	const { body } = await renderRestricted(compileRestricted("echo", source), {
+	const { body } = await renderArtifact(compileArtifact("echo", source), {
 		components: { Echo: echoServer as never },
 	});
 	expect(body).toContain("<p>Echo</p>");
@@ -128,12 +128,12 @@ export default function Outside() {
 	}
 }
 `;
-	expect(() => compileRestricted("outside", source)).toThrow(/Unknown identifier "\$slot"/);
+	expect(() => compileArtifact("outside", source)).toThrow(/Unknown identifier "\$slot"/);
 });
 
-test("hydration: the client host component renders the restricted fills", async () => {
-	const artifact: EmbedArtifact = compileRestricted("page-text", PAGE_TEXT_SOURCE);
-	const { body } = await renderRestricted(artifact, {
+test("hydration: the client host component renders the artifact fills", async () => {
+	const artifact: EmbedArtifact = compileArtifact("page-text", PAGE_TEXT_SOURCE);
+	const { body } = await renderArtifact(artifact, {
 		props: { items: ROWS },
 		components: { List: compileServerComponent(LIST_SOURCE) as never },
 	});
@@ -189,8 +189,8 @@ export default function ScopedPage($props: { wide: boolean }) {
 }
 `;
 	const cardServer = compileServerComponent(CARD_SOURCE);
-	const artifact = compileRestricted("scoped", PAGE_SOURCE);
-	const { body, styles } = await renderRestricted(artifact, {
+	const artifact = compileArtifact("scoped", PAGE_SOURCE);
+	const { body, styles } = await renderArtifact(artifact, {
 		components: { Card: cardServer as never },
 		props: { wide: true },
 	});

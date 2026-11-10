@@ -18,7 +18,7 @@ type Formatters = Record<string, (...args: unknown[]) => unknown>;
 
 /**
  * Resolves a `data <name> from derive { … }` requirement: filters, maps,
- * sorts and limits an earlier requirement's rows, using the restricted
+ * sorts and limits an earlier requirement's rows, using the artifact
  * expression language (with host function calls available for formatting).
  * With an aggregate (`count`/`sum`/`min`/`max`/`average`), returns a single
  * object keyed by the aggregates instead of rows.

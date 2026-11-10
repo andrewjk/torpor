@@ -3,7 +3,7 @@ import { defineConfig, UserConfig } from "vite-plus";
 export default defineConfig({
 	pack: [
 		{
-			entry: ["src/index.ts", "src/restricted.ts", "src/app.ts"],
+			entry: ["src/index.ts", "src/artifact.ts", "src/app.ts"],
 			format: ["esm", "cjs"],
 		},
 	],

@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { compileRestricted, renderRestricted } from "../src/restricted";
+import { compileArtifact, renderArtifact } from "../src/artifact";
 import hydrateEmbed from "../src/loader/hydrateEmbed";
 import mountEmbed from "../src/loader/mountEmbed";
 import EmbedVersionError from "../src/types/EmbedVersionError";
@@ -23,7 +23,7 @@ export default function Counter($props: { start?: number }) {
 `;
 
 function artifact(): EmbedArtifact {
-	return compileRestricted("counter-test", SOURCE);
+	return compileArtifact("counter-test", SOURCE);
 }
 
 function getButton(): HTMLButtonElement {
@@ -100,8 +100,8 @@ test("throws EmbedVersionError on a version mismatch", () => {
 test("hydrates server-rendered markup", async () => {
 	const art = artifact();
 
-	// Render the restricted server build to HTML, the way a host app would
-	const { body } = await renderRestricted(art, { props: { start: 3 } });
+	// Render the server build to HTML, the way a host app would
+	const { body } = await renderArtifact(art, { props: { start: 3 } });
 
 	const target = document.createElement("div");
 	target.innerHTML = body;

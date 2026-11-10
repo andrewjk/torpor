@@ -4,7 +4,7 @@
  * `defineApp` types an app declaration and returns it unchanged: the result
  * is plain JSON (id, default props, data requirements, declared bridge
  * surface), so a host can store it and compile against it without executing
- * anything. Data lives in a typed config file, keeping restricted templates
+ * anything. Data lives in a typed config file, keeping templates
  * plain torpor, and the declared surface turns "what this app may do" into
  * something a host can review and the compiler can enforce.
  *

@@ -8,7 +8,7 @@ import EmbedCompileError from "../types/EmbedCompileError";
 import type EmbedArtifact from "../types/EmbedArtifact";
 import type EmbedSurface from "../types/EmbedSurface";
 
-export interface CompileRestrictedOptions {
+export interface CompileArtifactOptions {
 	/**
 	 * The version to stamp the artifact with. Defaults to RUNTIME_VERSION,
 	 * the @torpor/view version this package was built against.
@@ -67,7 +67,7 @@ export interface CompileRestrictedOptions {
 }
 
 /**
- * Compiles .torp source into a **restricted** embed artifact: the server
+ * Compiles .torp source into an embed artifact: the server
  * build is a serialized instruction tree (no JS, no eval), while the client
  * build is ordinary globals-format torpor code (mounted with `mountEmbed`).
  *
@@ -77,10 +77,10 @@ export interface CompileRestrictedOptions {
  *
  * Edge-safe (no Node builtins): runs in Node, workers, and browsers alike.
  */
-export default function compileRestricted(
+export default function compileArtifact(
 	id: string,
 	source: string,
-	options?: CompileRestrictedOptions,
+	options?: CompileArtifactOptions,
 ): EmbedArtifact {
 	checkMaxSourceBytes(source, options?.maxSourceBytes);
 
@@ -104,7 +104,7 @@ export default function compileRestricted(
 		throw new EmbedCompileError([error]);
 	}
 
-	// The restricted build must run before build(): it maps text
+	// The restricted build (view's buildRestricted) must run before build(): it maps text
 	// interpolations through parse-time spans, and build() trims whitespace
 	// nodes in place (invalidating those spans).
 	const restricted = buildRestricted(template, {
@@ -139,7 +139,7 @@ export default function compileRestricted(
 			const first = outside[0];
 			throw new EmbedCompileError([
 				{
-					message: `Import "${first.source}" is not in the compile scope. Add it: compileRestricted(..., { scope: ["${first.source}"] }) -- and provide it at mount time via the scope option.`,
+					message: `Import "${first.source}" is not in the compile scope. Add it: compileArtifact(..., { scope: ["${first.source}"] }) -- and provide it at mount time via the scope option.`,
 					startIndex: 0,
 					startLine: 0,
 					startChar: 0,
@@ -181,7 +181,7 @@ export default function compileRestricted(
  * Compiles the declared bridge surface onto the artifact, so the loaders
  * can warn at mount time when a call steps outside it.
  */
-function bridgeSurface(options?: CompileRestrictedOptions): EmbedSurface | undefined {
+function bridgeSurface(options?: CompileArtifactOptions): EmbedSurface | undefined {
 	const { api, emits, pushes } = options ?? {};
 	if (api === undefined && emits === undefined && pushes === undefined) return undefined;
 	return {

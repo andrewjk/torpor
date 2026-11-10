@@ -7,7 +7,7 @@ import type { DeriveLimits } from "./derive/resolveDerive";
  * What a first-party requirement implementation receives alongside the
  * evaluated spec.
  */
-export interface RestrictedSourceContext {
+export interface ArtifactSourceContext {
 	artifactId: string;
 	props: Record<string, any>;
 }
@@ -21,18 +21,18 @@ export interface RestrictedSourceContext {
  * This is the trusted boundary: authorization, tenant scoping and network
  * access live here, in host code — never in the artifact.
  */
-export type RestrictedSource = (
+export type ArtifactSource = (
 	spec: Record<string, unknown>,
-	context: RestrictedSourceContext,
+	context: ArtifactSourceContext,
 ) => unknown; // may be a promise; awaited by the renderer
 
 /**
- * One resolved data requirement, reported to `renderRestricted`'s
+ * One resolved data requirement, reported to `renderArtifact`'s
  * `onAudit` hook — the "record what was read" half of the trusted
  * boundary. One entry per requirement per render, for host sources and
  * `derive` alike, on success and failure.
  */
-export interface RestrictedAuditEntry {
+export interface ArtifactAuditEntry {
 	/** The artifact whose requirement was resolved. */
 	artifactId: string;
 	/** The requirement name, as it appears in `$data`. */
@@ -55,7 +55,7 @@ export interface RestrictedAuditEntry {
 	error?: string;
 }
 
-export interface RenderRestrictedOptions {
+export interface RenderArtifactOptions {
 	/** Props for the component (`$props` in the template). */
 	props?: Record<string, any>;
 
@@ -69,16 +69,16 @@ export interface RenderRestrictedOptions {
 	 * First-party implementations, keyed by requirement kind. Required for
 	 * every kind used by the artifact (unless `data` is provided).
 	 */
-	sources?: Record<string, RestrictedSource>;
+	sources?: Record<string, ArtifactSource>;
 
 	/**
 	 * Audit hook: called once per resolved data requirement with what was
-	 * read (see {@link RestrictedAuditEntry}). Fires for host sources and
+	 * read (see {@link ArtifactAuditEntry}). Fires for host sources and
 	 * `derive` alike, on success and failure — failures are reported, then
 	 * rethrown, so auditing never swallows an error. Not called when the
 	 * host passes pre-resolved `data`, because nothing was read.
 	 */
-	onAudit?: (entry: RestrictedAuditEntry) => void;
+	onAudit?: (entry: ArtifactAuditEntry) => void;
 
 	/**
 	 * Host **server components** available to the template, keyed by usage
@@ -92,12 +92,12 @@ export interface RenderRestrictedOptions {
 	/**
 	 * Incoming slot renders, keyed by slot name: the fills a **parent**
 	 * provides when this artifact is itself used as a component
-	 * (cross-artifact, via `restrictedComponent`). A `<slot name="x">` region
+	 * (cross-artifact, via `artifactComponent`). A `<slot name="x">` region
 	 * calls the incoming render with the slot props evaluated in this
 	 * artifact's scope, falling back to its fallback children when absent —
 	 * the same contract as the JS server build.
 	 */
-	slots?: Record<string, RestrictedSlotRender>;
+	slots?: Record<string, ArtifactSlotRender>;
 
 	/**
 	 * Host functions available to **data-layer** expressions only
@@ -112,7 +112,7 @@ export interface RenderRestrictedOptions {
 
 	/**
 	 * The bridge, injected as the `$embed` prop (for any client-side code in
-	 * the client build; restricted templates themselves cannot call it).
+	 * the client build; templates themselves cannot call it).
 	 */
 	bridge?: EmbedBridge;
 
@@ -126,7 +126,7 @@ export interface RenderRestrictedOptions {
 	allowVersionMismatch?: boolean;
 }
 
-export interface RestrictedRenderResult {
+export interface ArtifactRenderResult {
 	body: string;
 	head: string;
 	styles: EmbedStyle[];
@@ -149,7 +149,7 @@ export interface RestrictedRenderResult {
  * contract: called with the slot props the `<slot>` element evaluates
  * (e.g. per-row data), returning the fill's HTML.
  */
-export type RestrictedSlotRender = (
+export type ArtifactSlotRender = (
 	$slot?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 ) => string | Promise<string>;

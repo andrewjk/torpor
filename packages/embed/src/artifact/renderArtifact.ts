@@ -8,16 +8,16 @@ import type EmbedArtifact from "../types/EmbedArtifact";
 import evaluateExpr from "./evaluateExpr";
 import resolveDerive from "./derive/resolveDerive";
 import type {
-	RenderRestrictedOptions,
-	RestrictedAuditEntry,
-	RestrictedRenderResult,
-	RestrictedSlotRender,
-	RestrictedSource,
+	RenderArtifactOptions,
+	ArtifactAuditEntry,
+	ArtifactRenderResult,
+	ArtifactSlotRender,
+	ArtifactSource,
 } from "./types";
 
 /**
  * Hydration markers. The JS server build emits these as HTML "bogus comments"
- * (`<![]>`, `<!^0>`, ...), which the client's hydrate() walks; restricted
+ * (`<![]>`, `<!^0>`, ...), which the client's hydrate() walks; artifact
  * output emits the identical markers so hydration works unchanged.
  */
 const ANCHOR_COMMENT = "<!>";
@@ -45,7 +45,7 @@ const VOID_TAGS = new Set([
 type Scope = Record<string, unknown>;
 
 /**
- * Renders a restricted artifact to HTML — **without evaluating
+ * Renders an artifact to HTML — **without evaluating
  * author-authored code**. The server build is an instruction tree; this
  * interpreter walks it against props and the resolved data bag, so it runs
  * anywhere JS runs, including workerd (where code generation from strings
@@ -60,13 +60,13 @@ type Scope = Record<string, unknown>;
  * can only read the resulting `$data` bag and `$props` — it cannot call,
  * construct, or assign anything.
  */
-export default async function renderRestricted(
+export default async function renderArtifact(
 	artifact: EmbedArtifact,
-	options?: RenderRestrictedOptions,
-): Promise<RestrictedRenderResult> {
+	options?: RenderArtifactOptions,
+): Promise<ArtifactRenderResult> {
 	if (artifact.server?.template === undefined) {
 		throw new Error(
-			`Embed "${artifact.id}" is missing its restricted server template -- recompile it from its source.`,
+			`Embed "${artifact.id}" is missing its server build -- recompile it from its source.`,
 		);
 	}
 	const program = artifact.server.template;
@@ -98,7 +98,7 @@ export default async function renderRestricted(
 		throw new Error(`Embed "${artifact.id}" has no components to render.`);
 	}
 
-	// Client state: initializers are restricted expressions over $props, so
+	// Client state: initializers are artifact expressions over $props, so
 	// the initial paint is computed without running author code. The client
 	// build binds the real `$watch` state from the same props.
 	const state: Record<string, unknown> = {};
@@ -127,11 +127,11 @@ export default async function renderRestricted(
 async function resolveData(
 	artifact: EmbedArtifact,
 	program: RestrictedProgram,
-	sources: Record<string, RestrictedSource> | undefined,
+	sources: Record<string, ArtifactSource> | undefined,
 	formatters: Record<string, (...args: unknown[]) => unknown> | undefined,
 	props: Record<string, any>,
 	deriveLimits: import("./derive/resolveDerive").DeriveLimits | undefined,
-	onAudit: ((entry: RestrictedAuditEntry) => void) | undefined,
+	onAudit: ((entry: ArtifactAuditEntry) => void) | undefined,
 ): Promise<Record<string, unknown>> {
 	const data: Record<string, unknown> = {};
 	for (const requirement of program.requirements) {
@@ -169,7 +169,7 @@ async function resolveData(
 		const source = sources?.[requirement.kind];
 		if (source === undefined) {
 			throw new Error(
-				`No source implementation for data requirement kind "${requirement.kind}" (needed by "${requirement.name}"). Pass sources: { "${requirement.kind}": … } to renderRestricted.`,
+				`No source implementation for data requirement kind "${requirement.kind}" (needed by "${requirement.name}"). Pass sources: { "${requirement.kind}": … } to renderArtifact.`,
 			);
 		}
 		const spec: Record<string, unknown> = {};
@@ -234,7 +234,7 @@ function auditEntry(
 	started: number,
 	ok: boolean,
 	error?: unknown,
-): RestrictedAuditEntry {
+): ArtifactAuditEntry {
 	return {
 		artifactId,
 		name: requirement.name,
@@ -263,7 +263,7 @@ function errorMessage(error: unknown): string {
 interface RenderContext {
 	scope: Scope;
 	components: Record<string, ServerComponent> | undefined;
-	slots: Record<string, RestrictedSlotRender> | undefined;
+	slots: Record<string, ArtifactSlotRender> | undefined;
 	head: string;
 }
 
@@ -294,7 +294,7 @@ async function renderNode(node: RestrictedNode, context: RenderContext): Promise
 			const component = context.components?.[node.name];
 			if (component === undefined) {
 				throw new Error(
-					`No server component "${node.name}" was provided to renderRestricted (pass components: { "${node.name}": … }).`,
+					`No server component "${node.name}" was provided to renderArtifact (pass components: { "${node.name}": … }).`,
 				);
 			}
 			const props: Record<string, unknown> = {};

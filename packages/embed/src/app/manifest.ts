@@ -6,13 +6,13 @@ import type {
 	RestrictedSpecEntry,
 } from "@torpor/view/compile";
 import { parseExpressionPrefix, RestrictedSyntaxError } from "@torpor/view/compile";
-import { DERIVE_EXPRESSION_KEYS } from "../restricted/derive/deriveRequirementKind";
+import { DERIVE_EXPRESSION_KEYS } from "../artifact/derive/deriveRequirementKind";
 
 /**
  * A value in an app manifest. Strings may be `$props.<path>` references
  * (`"$props.word"`, `"$props.query.id"`), resolved against the render props;
  * everything else is an inert literal. Manifests are JSON — nothing in them
- * executes, which is what keeps the restricted tier safe.
+ * executes, which is what keeps this tier safe.
  */
 export type ManifestValue =
 	| string
@@ -47,7 +47,7 @@ export interface ManifestApiMethod {
  * evaluation) describing the app: its id, default props, the data
  * requirements that feed `$data`, and the bridge surface it uses.
  *
- * For restricted embeds, data lives here — the template stays plain
+ * For embeds, data lives here — the template stays plain
  * torpor, and the manifest is typed at author time via `defineApp`.
  */
 export interface AppManifest {
@@ -114,7 +114,7 @@ export function manifestExpr(value: ManifestValue): RestrictedExpr {
 /**
  * Manifest values for a derive's expression keys (`where`, `map`,
  * `sortBy`, the aggregates) are expression **source**: parsed at save time
- * with the restricted expression grammar — calls to host formatters
+ * with the artifact expression grammar — calls to host formatters
  * allowed, row scope (`$item`/`$index`) and `$props` referencable — so the
  * manifest stays inert JSON. Parse failures become compile errors naming
  * the requirement.
