@@ -15,9 +15,9 @@ export interface BridgeUsage {
 	listens: string[];
 }
 
-const INVOKE = /\.invoke\(\s*(?:"([^"]*)"|'([^']*)')/g;
-const EMIT = /\.emit\(\s*(?:"([^"]*)"|'([^']*)')/g;
-const ON = /\.on\(\s*(?:"([^"]*)"|'([^']*)')/g;
+const INVOKE = /\.invoke(?:\?\.)?\(\s*(?:"([^"]*)"|'([^']*)')/g;
+const EMIT = /\.emit(?:\?\.)?\(\s*(?:"([^"]*)"|'([^']*)')/g;
+const ON = /\.on(?:\?\.)?\(\s*(?:"([^"]*)"|'([^']*)')/g;
 
 export function scanBridgeUsage(code: string): BridgeUsage {
 	const collect = (pattern: RegExp): string[] => {

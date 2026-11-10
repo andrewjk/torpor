@@ -1,4 +1,8 @@
 {
 	"id": "guest-book",
-	"props": {}
+	"props": {},
+	"api": {
+		"signatures": {},
+		"submit": { "payload": { "app": "string", "text": "string" } }
+	}
 }

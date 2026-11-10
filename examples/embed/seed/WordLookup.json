@@ -1,6 +1,7 @@
 {
 	"id": "word-lookup",
 	"props": { "word": "serendipity" },
+	"api": { "lookup": { "payload": { "word": "string" } } },
 	"data": {
 		"entry": {
 			"kind": "http",

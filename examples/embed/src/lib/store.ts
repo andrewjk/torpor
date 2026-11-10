@@ -8,14 +8,14 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import path from "node:path";
 import type { AppManifest } from "@torpor/embed/app";
 import {
-	compileRestricted,
+	compileArtifact,
 	createHttpSource,
 	deriveRequirementKind,
 	httpRequirementKind,
-	renderRestricted,
+	renderArtifact,
 	type EmbedArtifact,
-	type RestrictedRenderResult,
-} from "@torpor/embed/restricted";
+	type ArtifactRenderResult,
+} from "@torpor/embed/artifact";
 
 const ROOT = process.cwd();
 const APPS_DIR = path.join(ROOT, "apps");
@@ -68,9 +68,12 @@ function saveApp(app: StoredApp): void {
 
 /** Compiles a submission at "publish" time and stores it */
 export function deploy(manifest: AppManifest, source: string): StoredApp {
-	const artifact = compileRestricted(manifest.id, source, {
+	const artifact = compileArtifact(manifest.id, source, {
 		requirementKinds,
 		data: manifest.data,
+		api: manifest.api,
+		emits: manifest.emits,
+		pushes: manifest.pushes,
 		maxSourceBytes: 256 * 1024,
 	});
 	const app: StoredApp = { id: manifest.id, name: artifact.name, manifest, artifact };
@@ -109,8 +112,8 @@ export function getApp(id: string): StoredApp | undefined {
 export function renderApp(
 	app: StoredApp,
 	props: Record<string, unknown> = app.manifest.props ?? {},
-): Promise<RestrictedRenderResult> {
-	return renderRestricted(app.artifact, { props, sources: policy });
+): Promise<ArtifactRenderResult> {
+	return renderArtifact(app.artifact, { props, sources: policy });
 }
 
 loadApps();

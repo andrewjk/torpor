@@ -12,9 +12,9 @@
 		},
 		"./artifact": {
 			"torpor:source": "./src/artifact.ts",
-			"types": "./dist/restricted.d.mts",
-			"import": "./dist/restricted.mjs",
-			"require": "./dist/restricted.cjs"
+			"types": "./dist/artifact.d.mts",
+			"import": "./dist/artifact.mjs",
+			"require": "./dist/artifact.cjs"
 		},
 		"./app": {
 			"torpor:source": "./src/app.ts",
