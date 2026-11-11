@@ -5,34 +5,10 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
-### Loop-var resolution in @for bodies: read-only bindings (view compiler)
+### Loop-var resolution in @for bodies: open points
 
-Loop vars are read-only. The compiler emits a per-scope shadow binding
-(`const <var> = <dataPath>;`) at the top of every reactive scope it generates
-inside the `@for` body — each `$run`/`t_run` effect (`forVarBindings` /
-`appendForVarBindings`), control-node callbacks (`@if`, `@switch`, `@replace`,
-`@html`, `@try`, `@await`), the row-create and `createNewItems` callbacks,
-`@function` bodies, and event/transition handlers (the bindings are injected
-into the handler's own body — or, for a handler that isn't a plain
-arrow/function, into a passthrough wrapper — so they are created per
-invocation, not captured from the row scope). Because resolution is lexical,
-**shadowing** (`arr.filter(child => child.ok)`) and **no-space operator
-styles** (`a&&b`, `x===child`) work. The binding is re-read on every scope
-invocation, so reads stay live; `forVarMask` is computed from the bare var
-names (`compile/utils/forVarsReadIn.ts`).
-
-A `@for` extracts a **copy** of each element, so writing the binding cannot
-update the source. `buildForNode` reports a bare write (`x = …`, `x++`,
-`x += …`, destructuring, or an `&`-binding on the var — `compile/utils/
-forVarsWrittenIn.ts`'s `forVarsReassignedIn`) as a compile **error**, collected
-on `BuildStatus.errors` and surfaced on `BuildResult.errors`. There is no
-textual substitution left: `replaceForVarNames` is gone. A **property/index
-write** (`row.name = …`, `row[i] = …`, e.g. `&checked={task.done}`) still
-mutates the row object through the shadowed reference and is fine;
-`forVarsWrittenIn` (the conservative any-write-target scan) remains the gate for
-`isForBodyNoProxySafe`.
-
-Open points:
+The read-only loop-var bindings shipped (`appendForVarBindings` shadows, writes
+are compile errors) — what's left, deliberately parked:
 
 - **The error hint is container-agnostic on purpose** ("assign to a property of
   the item, or mutate the source collection directly"): there is no single
@@ -133,7 +109,7 @@ deliberately:
 
 ### Loader adoption in ComboBox/SelectBox: known gaps
 
-ComboBox and SelectBox now accept the shared `load` prop (utils/loader.ts
+ComboBox and SelectBox accept the shared `load` prop (utils/loader.ts
 `createItemLoader`) and auto-render a ListBox of loaded options when no
 content is slotted in. Left out deliberately:
 
@@ -142,10 +118,6 @@ content is slotted in. Left out deliberately:
   rejections swallowed), so well-behaved loaders can cancel the wire request.
 - SelectBox loads once per mount (content stays mounted but hidden), not once
   per open; a refresh-on-reopen option may be wanted.
-- ~~Tree lazy child loading doesn't fit this shape~~ -- it did after all: Tree
-  loads each `hasChildren` item's children on first expansion via
-  `createItemLoader`, gated behind an `@if` so the fetch starts when the item
-  expands (see src/ui/Tree/TreeLoadedChildren.torp).
 
 ### Language server duplicates @torpor/check's compile-and-check pipeline
 
@@ -183,16 +155,16 @@ exists, the extension can only provide partial support. The language-server
 README documents setups for editors that work today (Neovim, Helix,
 OpenCode).
 
-### Prebundling .torp libraries in dep optimization
+### Prebundling .torp libraries: compile into the dep optimizer
 
-Handled now: `@torpor/build` detects installed packages that ship `.torp`
+Done already: `@torpor/build` detects installed packages that ship `.torp`
 files (a `torpor` field or `.torp` export targets in their package.json) and
 automatically adds them to `optimizeDeps.exclude` and `ssr.noExternal`
-(packages/build/src/utils/torporPackages.ts). What's left is the optional
-performance follow-up, like Svelte's `prebundleSvelteLibraries`: registering
-an optimizer plugin so `.torp` files can actually be _compiled into_ the dep
-optimizer's bundle, instead of being excluded and transformed per-request in
-dev (fine for icon packages, but it's an extra transform per module load).
+(packages/build/src/utils/torporPackages.ts). The remaining performance
+follow-up, like Svelte's `prebundleSvelteLibraries`: registering an optimizer
+plugin so `.torp` files can actually be _compiled into_ the dep optimizer's
+bundle, instead of being excluded and transformed per-request in dev (fine
+for icon packages, but it's an extra transform per module load).
 
 ### `$stream` follow-ups
 
@@ -222,10 +194,10 @@ rules + renderers) could add a `:::carousel` style fence rule whose renderer
 emits a placeholder like `<div data-torpor="Carousel"
 data-props='{...}'></div>`, and `PostPage.torp` would use `$onmount` to find
 placeholders and swap in real components client-side (`$watch`-wrapped props
-from the parsed JSON). Interacts with any future sanitization of the
-rendered html (see the sanitization entry) -- the `data-torpor`/`data-props`
-attributes would need allowlisting, or (better) placeholders are injected
-_after_ sanitization so component props never run through the tag filter.
+from the parsed JSON). Interacts with the pipeline's sanitization (now wired
+in via allmark's `sanitize`): the `data-torpor`/`data-props` attributes would
+need allowlisting, or (better) placeholders are injected _after_ sanitization
+so component props never run through the tag filter.
 
 ### Custom renderers for docs pages
 
@@ -313,32 +285,3 @@ the expression contains nothing reactive and the effect can never re-run
 wants real static analysis (the "TODO: Need to be more fancy" in isReactive:
 matching braces, skipping strings/comments) to avoid silently changing
 reactivity. Same heuristic gap drives `as const` on static string props.
-
-### Slot fills whose root is auto-closed by the HTML parser break hydration
-
-When a component wraps each row in an element and the consumer's fill root
-is a tag the HTML parser auto-closes inside that wrapper (`<li>` fill inside
-`<li><slot/></li>`, likewise `p`, `tr`, `td`, `option`), the SSR markup is
-re-nested by the HTML parser: `<li><![><li>…</li><!]><!></li>` parses as
-`<li><!--[--></li><li>…</li><!--]--><!---->` — the slot region's markers end
-up as siblings of the row instead of children, and hydration throws
-"End hydration comment not found" (or swallows it in an effect and leaves
-mis-adopted DOM). This is plain HTML parsing, not a torpor bug, and it hits
-every rendering path identically (module imports and the embed eval harness
-behave the same).
-
-**Resolution (detected and rejected loudly):** the JS server build and the
-restricted interpreter now guard slot regions whose wrapper the parser can
-auto-close. `buildServerSlotNode` tracks the enclosing element stack and
-emits a `t_slot_guard([...], content, name)` call around `$slots[...]` for
-slots inside auto-closeable wrappers (`li`, `p`, table parts, …); the
-restricted serializer records the same context on the slot node
-(`autoClose`) and the interpreter applies the same guard to incoming fills
-and fallbacks. A violating shape now fails SSR with an actionable message
-naming both tags and the fix, instead of shipping markup hydration can't
-adopt (`test/slots/auto-close.test.ts`, restricted-components and
-cross-artifact embed tests). Restricted slot fallbacks are rejected at
-**compile** time (positioned error), since their content is static. Valid
-shapes are unaffected — the guard is a no-op for parse-stable fills. A
-hypothetical "make li-in-li work" (replace-mode slots) remains a language
-feature, not a bug fix.
