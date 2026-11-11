@@ -1,5 +1,11 @@
 # @torpor/ui
 
+## 1.3.6
+
+<sub>2026-11-11</sub>
+
+- _(patch)_ Fix: abort superseded loader requests
+
 ## 1.3.5
 
 <sub>2026-11-11</sub>

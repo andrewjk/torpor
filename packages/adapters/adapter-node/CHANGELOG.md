@@ -1,5 +1,11 @@
 # @torpor/adapter-node
 
+## 1.1.13
+
+<sub>2026-11-11</sub>
+
+- _(patch)_ Updated dependency `@torpor/build` v1.8.7
+
 ## 1.1.12
 
 <sub>2026-11-11</sub>

@@ -2,4 +2,4 @@
 // The version of @torpor/view this package was built against. Safe to use
 // in any runtime (no Node builtins); the Node-only server entry also
 // exposes getRuntimeVersion(), which reads the installed package instead.
-export const RUNTIME_VERSION = "1.3.0";
+export const RUNTIME_VERSION = "1.3.1";

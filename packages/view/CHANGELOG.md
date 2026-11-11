@@ -1,5 +1,13 @@
 # @torpor/view
 
+## 1.3.1
+
+<sub>2026-11-11</sub>
+
+- _(patch)_ Fix: nested embeds keep the host context
+- _(patch)_ Fix: escaping hint for unescaped @ in text
+- _(patch)_ Fix: fold branch region bookkeeping into t_run_branch
+
 ## 1.3.0
 
 <sub>2026-11-11</sub>
