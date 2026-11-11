@@ -1,8 +1,15 @@
 export default function Main() {
-	var $state = $watch({
-		data: [],
-		selected: null,
-	});
+	// Shallow state: the row data is replaced wholesale by every op (never
+	// mutated in place), so the items don't need to be reactive — only the
+	// `data` array reference and `selected` do. This is the same data model
+	// the other keyed fixtures use (svelte's `$state.raw`).
+	var $state = $watch(
+		{
+			data: [],
+			selected: null,
+		},
+		{ shallow: true },
+	);
 
 	var nextId = 1;
 
