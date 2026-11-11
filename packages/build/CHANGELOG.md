@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 1.8.6
+
+<sub>2026-11-11</sub>
+
+- _(patch)_ Fix: unify the eight middleware/hook enter-exit loops
+
 ## 1.8.5
 
 <sub>2026-11-05</sub>

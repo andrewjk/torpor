@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.15
+
+<sub>2026-11-11</sub>
+
+- _(patch)_ Feat: warn when torp-check compiles a stale view dist
+
 ## 1.0.14
 
 <sub>2026-11-05</sub>

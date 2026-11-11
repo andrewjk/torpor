@@ -1,5 +1,31 @@
 # @torpor/view
 
+## 1.3.0
+
+<sub>2026-11-11</sub>
+
+- _(minor)_
+  Feat: @torpor/view/runtime, a self-contained minified browser build of the runtime (replaces the hand-flattened REPL view.txt)
+- _(minor)_ Feat: restricted-mode build target (buildRestricted) serializing server templates to a no-eval instruction format
+- _(minor)_
+  Feat: restricted build serializes $watch client state (scanStateInitializers) and validates template identifier refs at compile time
+- _(minor)_ Feat: restricted build serializes component usage, slot elements, and $slot.<prop> reads in fills
+- _(minor)_ Feat: restricted build serializes scoped class props on component usages (static and reactive)
+- _(minor)_ Feat: restricted build serializes slot props; requirements keep the $props param named for the injected $data binding
+- _(minor)_
+  Fix: slot fills that auto-close their wrapper (li-in-li, p shapes) throw at SSR with an actionable error instead of shipping unhydratable markup
+- _(minor)_ Feat: key add/delete re-runs Object.keys/spread readers
+- _(minor)_ Feat: warn on plain lets initialized from $props
+- _(minor)_ Feat: manifest-only data requirements
+- _(minor)_ Fix: flatten generated element walks
+- _(patch)_
+  Fix: restricted-mode parity with the server build (text anchors for merged whitespace nodes, separate $data binding chunk, whitespace trimming)
+- _(patch)_ Fix: collapse $async settle flags into one union
+- _(patch)_ Feat: devAssert invariants for the runtime state machines
+- _(patch)_ Fix: attribute for-var write errors to the shadowing loop
+- _(patch)_ Fix: slot fills only declare used $context
+- _(patch)_ Fix: skip no-op list item updates
+
 ## 1.2.6
 
 <sub>2026-11-05</sub>

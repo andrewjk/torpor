@@ -1,5 +1,13 @@
 # @torpor/ui
 
+## 1.3.5
+
+<sub>2026-11-11</sub>
+
+- _(patch)_ Fix: ColorPicker hex input commits typed values
+- _(patch)_ Fix: batch chart claim writes into one flush
+- _(patch)_ Fix: touch taps on controls skip hover popups
+
 ## 1.3.4
 
 <sub>2026-11-05</sub>
