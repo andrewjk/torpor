@@ -11,7 +11,7 @@
 		"bump:add": "bumpy add",
 		"bump:version": "pnpm -r build && bumpy version && pnpm sync:template",
 		"bump:publish": "bumpy publish",
-		"sync:template": "node packages/build/scripts/sync-template.ts",
+		"sync:template": "node packages/build/scripts/sync-template.ts && pnpm --filter @torpor/embed run build",
 		"test": "vp test run",
 		"test:watch": "vp test --fsModuleCache",
 		"format": "vp fmt .",
