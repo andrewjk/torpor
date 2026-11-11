@@ -341,3 +341,65 @@ export default function Test() {
 		output.errors.some((e) => e.message === "`@try` cannot have more than one `@catch` block"),
 	).toBe(true);
 });
+
+test("unescaped literal @ in text suggests escaping", () => {
+	// `<code>@for</code>` in text: the `@` scans as an operation and swallows
+	// the closing tag with it. The error must point at the escaping (and not
+	// just complain about the element the markup got eaten from).
+	const input = `
+export default function Test() {
+	@render {
+		<p>
+			from a keyed <code>@for</code> stays alive
+		</p>
+	}
+}
+  `;
+	const output = trimParsed(parse(input));
+	expect(output.ok).toBe(false);
+	expect(output.errors.some((e) => e.message.startsWith("Unknown operation: @for</code>"))).toBe(
+		true,
+	);
+	expect(
+		output.errors.some((e) =>
+			e.message.includes("A literal '@' in text must be escaped as '&#64;'"),
+		),
+	).toBe(true);
+});
+
+test("unknown operation without markup keeps the plain error", () => {
+	const input = `
+export default function Test() {
+	@render {
+		@bogus (x) {
+			<p>x</p>
+		}
+	}
+}
+  `;
+	const output = trimParsed(parse(input));
+	expect(output.ok).toBe(false);
+	const errors = output.errors.filter((e) => e.message.startsWith("Unknown operation:"));
+	expect(errors.length).toBe(1);
+	expect(errors[0].message).toBe("Unknown operation: @bogus");
+});
+
+test("unspaced comparison does not get the escaping hint", () => {
+	// `@if(a<b)` is a mistyped operation, not swallowed markup: the `<` sits
+	// mid-expression rather than glued right after the operation word
+	const input = `
+export default function Test() {
+	@render {
+		@if(a<b) {
+			<p>x</p>
+		}
+	}
+}
+  `;
+	const output = trimParsed(parse(input));
+	expect(output.ok).toBe(false);
+	const errors = output.errors.filter((e) => e.message.startsWith("Unknown operation:"));
+	expect(errors.length).toBe(1);
+	expect(errors[0].message).toBe("Unknown operation: @if(a<b)");
+	expect(errors[0].message).not.toContain("&#64;");
+});

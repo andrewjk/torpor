@@ -5,17 +5,6 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
-### Unescaped `@` in .torp text produces a confusing parse error (torpor parser)
-
-A literal `@for` in template text (e.g. `<code>@for</code>` in
-`site/src/views/docs/ReactivityPage.torp`, fixed by escaping to `&#64;for`)
-parses as an operation, and the closing tag gets swallowed into it — reporting
-`Unclosed non-void element: code` plus `Unknown operation: @for</code>` at
-positions past the real problem. The parser could detect this shape (an
-unknown operation whose source text ends in `</tag>`) and hint: "a literal @
-in text must be escaped as &#64;". Cheap UX win for a mistake every docs
-author eventually makes.
-
 ### Loop-var resolution in @for bodies: read-only bindings (view compiler)
 
 Loop vars are read-only. The compiler emits a per-scope shadow binding

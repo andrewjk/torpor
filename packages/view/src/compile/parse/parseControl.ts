@@ -155,6 +155,21 @@ function parseControlOpen(status: ParseStatus): ControlNode | null {
 			);
 		}
 	} else {
+		// An unescaped literal `@` in element text (e.g. `<code>@for</code>`)
+		// scans as an operation and swallows the markup that follows — which
+		// usually also eats the enclosing element's closing tag, producing a
+		// confusing "Unclosed non-void element" error further on. When the
+		// "operation" is a `@word` glued straight onto a tag, point at the
+		// escaping instead.
+		if (/^@[a-zA-Z]+</.test(operation)) {
+			addError(
+				status,
+				`Unknown operation: ${operation}. A literal '@' in text must be escaped as '&#64;'`,
+				start,
+				status.i,
+			);
+			return null;
+		}
 		// TODO: Should probably advance until a closing brace or a newline
 		addError(status, `Unknown operation: ${operation}`, status.i, status.i + operation.length);
 		return null;
