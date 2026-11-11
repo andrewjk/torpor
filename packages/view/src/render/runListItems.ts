@@ -166,16 +166,25 @@ export default function runListItems(
 	//    `update` to sync the spec's data references.
 	while (oldStart <= oldEnd && newStart <= newEnd) {
 		if (oldItems[oldStart]!.key === newSpecs[newStart]!.key) {
-			// common head — reuse the survivor in place
+			// common head — reuse the survivor in place. `update` re-syncs the
+			// item's data from the spec; when the spec's data is the SAME
+			// reference the compiler-emitted update is a no-op (its first act
+			// is the reference check), so skip the call entirely. In watch
+			// mode `item.data` is a `$watch` proxy, which never equals the
+			// raw spec data, so this guard is inert there.
 			const item = oldItems[oldStart]!;
-			update(item, newSpecs[newStart]!);
+			if (item.data !== newSpecs[newStart]!.data) {
+				update(item, newSpecs[newStart]!);
+			}
 			newItems[newStart] = item;
 			oldStart++;
 			newStart++;
 		} else if (oldItems[oldEnd]!.key === newSpecs[newEnd]!.key) {
 			// common tail — reuse the survivor in place
 			const item = oldItems[oldEnd]!;
-			update(item, newSpecs[newEnd]!);
+			if (item.data !== newSpecs[newEnd]!.data) {
+				update(item, newSpecs[newEnd]!);
+			}
 			newItems[newEnd] = item;
 			oldEnd--;
 			newEnd--;
@@ -184,7 +193,9 @@ export default function runListItems(
 			const item = oldItems[oldStart]!;
 			moveRegion(parent, item, oldItems[oldEnd]!.endNode?.nextSibling ?? anchor);
 			chainNeedsRelink = true;
-			update(item, newSpecs[newEnd]!);
+			if (item.data !== newSpecs[newEnd]!.data) {
+				update(item, newSpecs[newEnd]!);
+			}
 			newItems[newEnd] = item;
 			oldStart++;
 			newEnd--;
@@ -193,7 +204,9 @@ export default function runListItems(
 			const item = oldItems[oldEnd]!;
 			moveRegion(parent, item, oldItems[oldStart]!.startNode);
 			chainNeedsRelink = true;
-			update(item, newSpecs[newStart]!);
+			if (item.data !== newSpecs[newStart]!.data) {
+				update(item, newSpecs[newStart]!);
+			}
 			newItems[newStart] = item;
 			oldEnd--;
 			newStart++;
@@ -257,7 +270,8 @@ export default function runListItems(
 			// 4c. Walk the old middle: reuse matches into their new positions
 			//     (via update) and clear the rest. `newIndexToOld[i] = oldIndex
 			//     + 1` (0 marks a new slot that has no matching old item and
-			//     must be mounted).
+			//     must be mounted). As in the fast paths above, survivors with
+			//     a reference-equal data bag skip the update call.
 			const newMidLen = newEnd - newStart + 1;
 			const newIndexToOld = Array.from({ length: newMidLen }).fill(0) as number[];
 			for (let i = oldStart; i <= oldEnd; i++) {
@@ -265,7 +279,9 @@ export default function runListItems(
 				const newIdx = newKeyToIndex.get(oldItem.key);
 				if (newIdx !== undefined) {
 					newIndexToOld[newIdx - newStart] = i + 1;
-					update(oldItem, newSpecs[newIdx]!);
+					if (oldItem.data !== newSpecs[newIdx]!.data) {
+						update(oldItem, newSpecs[newIdx]!);
+					}
 					newItems[newIdx] = oldItem;
 				} else {
 					clearRegion(oldItem);
