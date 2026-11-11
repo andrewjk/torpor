@@ -20,7 +20,6 @@ export default function buildReplaceNode(node: ControlNode, status: BuildStatus,
 	status.imports.add("t_region");
 	status.imports.add("t_run_control");
 	status.imports.add("t_run_branch");
-	status.imports.add("t_push_region");
 	status.imports.add("t_pop_region");
 
 	b.append("");
@@ -43,15 +42,17 @@ function buildReplaceBranch(
 	parentName: string,
 	regionName: string,
 ) {
-	status.imports.add("t_run_branch");
-
 	b.append(`${node.statement};`);
-	b.append(`if (!t_run_branch(${regionName}, 0, -1)) return;`);
 
-	b.append(`
-		const t_new_region = t_region(${status.options.dev === true ? `"replace_branch"` : ""});
-		const t_old_region = t_push_region(t_new_region, true);
-	`);
+	// The branch call creates and pushes the branch region itself, returning
+	// the region to pop. The sentinel old index (0 → -1) forces a clear and
+	// re-render on every run, so it never returns null.
+	b.append(
+		`const t_old_region = t_run_branch(${regionName}, 0, -1${
+			status.options.dev === true ? `, "replace_branch"` : ""
+		});`,
+	);
+	b.append("if (t_old_region === null) return;");
 
 	buildFragment(node, status, b, parentName, "t_before");
 

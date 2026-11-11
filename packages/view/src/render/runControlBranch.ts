@@ -1,8 +1,33 @@
+import devContext from "../dev/devContext";
 import type Region from "../types/Region";
 import clearRegion from "./clearRegion";
 import context from "./context";
+import newRegion from "./newRegion";
+import pushRegion from "./pushRegion";
 
-export default function runControlBranch(region: Region, oldIndex: number, index: number): boolean {
+/**
+ * Runs one branch of a control block (`@if`/`@switch`/`@replace`, and the
+ * runtime-driven `@await`/`@try` groups). Returns the region to pop after
+ * the branch's content has rendered, or `null` when the branch should be
+ * skipped (same index as the previous render and not forced to recreate).
+ *
+ * The branch region is created and pushed here — the single point of branch
+ * bookkeeping, so emitters (and the runtime-driven groups) don't repeat the
+ * region/push/pop dance and can't get it wrong (e.g. forgetting that the
+ * clear above can release the region `context.previousRegion` points at).
+ *
+ * @param region The control's own region
+ * @param oldIndex The branch index of the previous render (callers pass a
+ *   sentinel like `0` → `-1` to force a clear-and-rerender)
+ * @param index The branch index of this render
+ * @param name Dev-only name for the pushed branch region
+ */
+export default function runControlBranch(
+	region: Region,
+	oldIndex: number,
+	index: number,
+	name?: string,
+): Region | null {
 	// Clear the recreate flag if it was set — it only needs to trigger once
 	const recreate = (region as any).recreate;
 	if (recreate) {
@@ -52,15 +77,28 @@ export default function runControlBranch(region: Region, oldIndex: number, index
 			if (region.nextRegion !== null && region.nextRegion.depth > region.depth) {
 				clearRegion(region.nextRegion);
 			}
-			return true;
+			return pushBranchRegion(region, name);
 		}
-		return false;
+		return null;
 	}
 	if (!firstRender && region.nextRegion !== null && region.nextRegion.depth > region.depth) {
 		clearRegion(region.nextRegion);
 	}
 
-	return true;
+	return pushBranchRegion(region, name);
+}
+
+/**
+ * Creates and pushes the region the branch's content renders into.
+ *
+ * The clear above can release the region `context.previousRegion` points at
+ * (the previous branch subtree's last region), so re-anchor it to the control
+ * region before linking — otherwise the fresh branch would chain off a
+ * released region instead of the control's.
+ */
+function pushBranchRegion(region: Region, name?: string): Region {
+	context.previousRegion = region;
+	return pushRegion(newRegion(devContext.enabled ? name : undefined), true);
 }
 
 /**

@@ -58,9 +58,8 @@ export default function CleanupIfInsideFor(
 			t_run_control(t_if_region_1, t_if_anchor_1, (t_before) => {
 				const item = t_item_1.data.item;
 				if ($props.show) {
-					if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
-					const t_new_region = t_region();
-					const t_old_region = t_push_region(t_new_region, true);
+					const t_old_region = t_run_branch(t_if_region_1, t_if_index_1, 0);
+					if (t_old_region === null) return;
 					const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<!>`);
 					const t_root_2 = t_root(t_fragment_2);
 					let t_comp_anchor_1 = t_anchor(t_root_2) as HTMLElement;
@@ -73,7 +72,9 @@ export default function CleanupIfInsideFor(
 					t_if_index_1 = 0;
 				}
 				else {
-					if (!t_run_branch(t_if_region_1, t_if_index_1, 1)) return;
+					const t_old_region = t_run_branch(t_if_region_1, t_if_index_1, 1);
+					if (t_old_region === null) return;
+					t_pop_region(t_old_region);
 					t_if_index_1 = 1;
 				}
 			});

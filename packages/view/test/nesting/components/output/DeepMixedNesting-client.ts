@@ -5,7 +5,6 @@ import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
-import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
@@ -35,9 +34,8 @@ export default function DeepMixed(
 	let t_if_index_1 = -1;
 	t_run_control(t_if_region_1, t_if_anchor_1, (t_before) => {
 		if ($props.a) {
-			if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
-			const t_new_region = t_region();
-			const t_old_region = t_push_region(t_new_region, true);
+			const t_old_region = t_run_branch(t_if_region_1, t_if_index_1, 0);
+			if (t_old_region === null) return;
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<p>Level 1</p> <!>`);
 			const t_root_1 = t_root(t_fragment_1);
 			let t_if_anchor_2 = t_anchor(t_skip(t_root_1, 2, 1)) as HTMLElement;
@@ -47,9 +45,8 @@ export default function DeepMixed(
 			let t_if_index_2 = -1;
 			t_run_control(t_if_region_2, t_if_anchor_2, (t_before) => {
 				if ($props.b) {
-					if (!t_run_branch(t_if_region_2, t_if_index_2, 0)) return;
-					const t_new_region = t_region();
-					const t_old_region = t_push_region(t_new_region, true);
+					const t_old_region = t_run_branch(t_if_region_2, t_if_index_2, 0);
+					if (t_old_region === null) return;
 					const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<p>Level 2</p> <!>`);
 					const t_root_2 = t_root(t_fragment_2);
 					let t_if_anchor_3 = t_anchor(t_skip(t_root_2, 2, 1)) as HTMLElement;
@@ -59,9 +56,8 @@ export default function DeepMixed(
 					let t_if_index_3 = -1;
 					t_run_control(t_if_region_3, t_if_anchor_3, (t_before) => {
 						if ($props.c) {
-							if (!t_run_branch(t_if_region_3, t_if_index_3, 0)) return;
-							const t_new_region = t_region();
-							const t_old_region = t_push_region(t_new_region, true);
+							const t_old_region = t_run_branch(t_if_region_3, t_if_index_3, 0);
+							if (t_old_region === null) return;
 							const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, `<p>Level 3</p> <!>`);
 							const t_root_3 = t_root(t_fragment_3);
 							let t_if_anchor_4 = t_anchor(t_skip(t_root_3, 2, 1)) as HTMLElement;
@@ -71,9 +67,8 @@ export default function DeepMixed(
 							let t_if_index_4 = -1;
 							t_run_control(t_if_region_4, t_if_anchor_4, (t_before) => {
 								if ($props.d) {
-									if (!t_run_branch(t_if_region_4, t_if_index_4, 0)) return;
-									const t_new_region = t_region();
-									const t_old_region = t_push_region(t_new_region, true);
+									const t_old_region = t_run_branch(t_if_region_4, t_if_index_4, 0);
+									if (t_old_region === null) return;
 									const t_fragment_4 = t_fragment($parent.ownerDocument!, t_fragments, 4, `<p>Level 4</p> <!>`);
 									const t_root_4 = t_root(t_fragment_4);
 									let t_if_anchor_5 = t_anchor(t_skip(t_root_4, 2, 1)) as HTMLElement;
@@ -83,9 +78,8 @@ export default function DeepMixed(
 									let t_if_index_5 = -1;
 									t_run_control(t_if_region_5, t_if_anchor_5, (t_before) => {
 										if ($props.e) {
-											if (!t_run_branch(t_if_region_5, t_if_index_5, 0)) return;
-											const t_new_region = t_region();
-											const t_old_region = t_push_region(t_new_region, true);
+											const t_old_region = t_run_branch(t_if_region_5, t_if_index_5, 0);
+											if (t_old_region === null) return;
 											const t_fragment_5 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 5, `<p>Level 5</p>`);
 											const t_root_5 = t_root_el(t_fragment_5);
 											const t_p_1 = t_root_5 as HTMLElement;
@@ -94,7 +88,9 @@ export default function DeepMixed(
 											t_if_index_5 = 0;
 										}
 										else {
-											if (!t_run_branch(t_if_region_5, t_if_index_5, 1)) return;
+											const t_old_region = t_run_branch(t_if_region_5, t_if_index_5, 1);
+											if (t_old_region === null) return;
+											t_pop_region(t_old_region);
 											t_if_index_5 = 1;
 										}
 									});
@@ -104,7 +100,9 @@ export default function DeepMixed(
 									t_if_index_4 = 0;
 								}
 								else {
-									if (!t_run_branch(t_if_region_4, t_if_index_4, 1)) return;
+									const t_old_region = t_run_branch(t_if_region_4, t_if_index_4, 1);
+									if (t_old_region === null) return;
+									t_pop_region(t_old_region);
 									t_if_index_4 = 1;
 								}
 							});
@@ -114,7 +112,9 @@ export default function DeepMixed(
 							t_if_index_3 = 0;
 						}
 						else {
-							if (!t_run_branch(t_if_region_3, t_if_index_3, 1)) return;
+							const t_old_region = t_run_branch(t_if_region_3, t_if_index_3, 1);
+							if (t_old_region === null) return;
+							t_pop_region(t_old_region);
 							t_if_index_3 = 1;
 						}
 					});
@@ -124,7 +124,9 @@ export default function DeepMixed(
 					t_if_index_2 = 0;
 				}
 				else {
-					if (!t_run_branch(t_if_region_2, t_if_index_2, 1)) return;
+					const t_old_region = t_run_branch(t_if_region_2, t_if_index_2, 1);
+					if (t_old_region === null) return;
+					t_pop_region(t_old_region);
 					t_if_index_2 = 1;
 				}
 			});
@@ -134,7 +136,9 @@ export default function DeepMixed(
 			t_if_index_1 = 0;
 		}
 		else {
-			if (!t_run_branch(t_if_region_1, t_if_index_1, 1)) return;
+			const t_old_region = t_run_branch(t_if_region_1, t_if_index_1, 1);
+			if (t_old_region === null) return;
+			t_pop_region(t_old_region);
 			t_if_index_1 = 1;
 		}
 	});
@@ -146,9 +150,8 @@ export default function DeepMixed(
 	let t_if_index_6 = -1;
 	t_run_control(t_if_region_6, t_if_anchor_6, (t_before) => {
 		if ($props.a && $props.e) {
-			if (!t_run_branch(t_if_region_6, t_if_index_6, 0)) return;
-			const t_new_region = t_region();
-			const t_old_region = t_push_region(t_new_region, true);
+			const t_old_region = t_run_branch(t_if_region_6, t_if_index_6, 0);
+			if (t_old_region === null) return;
 			const t_fragment_6 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 6, `<p>A+E</p>`);
 			const t_root_6 = t_root_el(t_fragment_6);
 			const t_p_2 = t_root_6 as HTMLElement;
@@ -157,7 +160,9 @@ export default function DeepMixed(
 			t_if_index_6 = 0;
 		}
 		else {
-			if (!t_run_branch(t_if_region_6, t_if_index_6, 1)) return;
+			const t_old_region = t_run_branch(t_if_region_6, t_if_index_6, 1);
+			if (t_old_region === null) return;
+			t_pop_region(t_old_region);
 			t_if_index_6 = 1;
 		}
 	});

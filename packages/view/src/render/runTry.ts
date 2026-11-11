@@ -4,7 +4,6 @@ import type Region from "../types/Region";
 import $run from "../watch/$run";
 import trackSignal from "../watch/trackSignal";
 import context from "./context";
-import newRegion from "./newRegion";
 import popRegion from "./popRegion";
 import pushRegion from "./pushRegion";
 import restoreHydration from "./restoreHydration";
@@ -91,15 +90,17 @@ export default function runTry(
 		const oldRegion = pushRegion(region, first);
 		first = false;
 
-		// Render a branch into a fresh child region, clearing the old branch
+		// Render a branch into a fresh child region, clearing the old branch.
+		// `runControlBranch` creates and pushes the branch region itself (and
+		// returns the region to pop), or null when the branch is skipped.
 		const renderBranch = (targetIndex: number, fn: (anchor: Node | null) => void) => {
-			runControlBranch(region, index, targetIndex);
-			// runControlBranch may have cleared the previous branch, leaving
-			// context.previousRegion pointing at a released region. Reset it
-			// to the boundary region so the new branch links correctly.
-			context.previousRegion = region;
-			const branchRegion = newRegion(targetIndex === 0 ? "try" : "catch");
-			const oldR = pushRegion(branchRegion, true);
+			const oldR = runControlBranch(
+				region,
+				index,
+				targetIndex,
+				targetIndex === 0 ? "try" : "catch",
+			);
+			if (oldR === null) return;
 			fn(anchor);
 			popRegion(oldR);
 			index = targetIndex;

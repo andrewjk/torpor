@@ -4,7 +4,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_pop_region from "../../../../src/render/popRegion";
-import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
@@ -34,9 +33,8 @@ export default function SwitchComponent(
 	t_run_control(t_switch_region_1, t_switch_anchor_1, (t_before) => {
 		switch ($props.mode) {
 			case "a": {
-				if (!t_run_branch(t_switch_region_1, t_switch_index_1, 0)) return;
-				const t_new_region = t_region();
-				const t_old_region = t_push_region(t_new_region, true);
+				const t_old_region = t_run_branch(t_switch_region_1, t_switch_index_1, 0);
+				if (t_old_region === null) return;
 				const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<div id="a">Mode A</div>`);
 				const t_root_1 = t_root_el(t_fragment_1);
 				const t_div_1 = t_root_1 as HTMLDivElement;
@@ -46,9 +44,8 @@ export default function SwitchComponent(
 				break;
 			}
 			case "b": {
-				if (!t_run_branch(t_switch_region_1, t_switch_index_1, 1)) return;
-				const t_new_region = t_region();
-				const t_old_region = t_push_region(t_new_region, true);
+				const t_old_region = t_run_branch(t_switch_region_1, t_switch_index_1, 1);
+				if (t_old_region === null) return;
 				const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<div id="b">Mode B</div>`);
 				const t_root_2 = t_root_el(t_fragment_2);
 				const t_div_2 = t_root_2 as HTMLDivElement;
@@ -58,9 +55,8 @@ export default function SwitchComponent(
 				break;
 			}
 			default: {
-				if (!t_run_branch(t_switch_region_1, t_switch_index_1, 2)) return;
-				const t_new_region = t_region();
-				const t_old_region = t_push_region(t_new_region, true);
+				const t_old_region = t_run_branch(t_switch_region_1, t_switch_index_1, 2);
+				if (t_old_region === null) return;
 				const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<div id="default">Default</div>`);
 				const t_root_3 = t_root_el(t_fragment_3);
 				const t_div_3 = t_root_3 as HTMLDivElement;

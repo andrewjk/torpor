@@ -4,7 +4,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_pop_region from "../../../../src/render/popRegion";
-import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
@@ -33,9 +32,8 @@ export default function IfNested(
 	let t_if_index_1 = -1;
 	t_run_control(t_if_region_1, t_if_anchor_1, (t_before) => {
 		if ($props.counter > 5) {
-			if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
-			const t_new_region = t_region();
-			const t_old_region = t_push_region(t_new_region, true);
+			const t_old_region = t_run_branch(t_if_region_1, t_if_index_1, 0);
+			if (t_old_region === null) return;
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<!>`);
 			const t_root_1 = t_root(t_fragment_1);
 			let t_if_anchor_2 = t_anchor(t_root_1) as HTMLElement;
@@ -45,9 +43,8 @@ export default function IfNested(
 			let t_if_index_2 = -1;
 			t_run_control(t_if_region_2, t_if_anchor_2, (t_before) => {
 				if ($props.counter > 10) {
-					if (!t_run_branch(t_if_region_2, t_if_index_2, 0)) return;
-					const t_new_region = t_region();
-					const t_old_region = t_push_region(t_new_region, true);
+					const t_old_region = t_run_branch(t_if_region_2, t_if_index_2, 0);
+					if (t_old_region === null) return;
 					const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p> It's both true! </p>`);
 					const t_root_2 = t_root_el(t_fragment_2);
 					const t_p_1 = t_root_2 as HTMLElement;
@@ -56,9 +53,8 @@ export default function IfNested(
 					t_if_index_2 = 0;
 				}
 				else {
-					if (!t_run_branch(t_if_region_2, t_if_index_2, 1)) return;
-					const t_new_region = t_region();
-					const t_old_region = t_push_region(t_new_region, true);
+					const t_old_region = t_run_branch(t_if_region_2, t_if_index_2, 1);
+					if (t_old_region === null) return;
 					const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<p> The second is not true! </p>`);
 					const t_root_3 = t_root_el(t_fragment_3);
 					const t_p_2 = t_root_3 as HTMLElement;
@@ -73,9 +69,8 @@ export default function IfNested(
 			t_if_index_1 = 0;
 		}
 		else {
-			if (!t_run_branch(t_if_region_1, t_if_index_1, 1)) return;
-			const t_new_region = t_region();
-			const t_old_region = t_push_region(t_new_region, true);
+			const t_old_region = t_run_branch(t_if_region_1, t_if_index_1, 1);
+			if (t_old_region === null) return;
 			const t_fragment_4 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 4, `<p> The first is not true! </p>`);
 			const t_root_4 = t_root_el(t_fragment_4);
 			const t_p_3 = t_root_4 as HTMLElement;

@@ -7,7 +7,6 @@ import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_pop_region from "../../../../src/render/popRegion";
-import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
@@ -44,9 +43,8 @@ export default function ErrorBlock(
 		let t_if_index_1 = -1;
 		t_run_control(t_if_region_1, t_if_anchor_1, (t_before) => {
 			if (maybeThrow()) {
-				if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
-				const t_new_region = t_region();
-				const t_old_region = t_push_region(t_new_region, true);
+				const t_old_region = t_run_branch(t_if_region_1, t_if_index_1, 0);
+				if (t_old_region === null) return;
 				const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<p>All good</p>`);
 				const t_root_1 = t_root_el(t_fragment_1);
 				const t_p_1 = t_root_1 as HTMLElement;
@@ -55,7 +53,9 @@ export default function ErrorBlock(
 				t_if_index_1 = 0;
 			}
 			else {
-				if (!t_run_branch(t_if_region_1, t_if_index_1, 1)) return;
+				const t_old_region = t_run_branch(t_if_region_1, t_if_index_1, 1);
+				if (t_old_region === null) return;
+				t_pop_region(t_old_region);
 				t_if_index_1 = 1;
 			}
 		});

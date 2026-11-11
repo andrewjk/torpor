@@ -62,9 +62,8 @@ export default function ForIfLeadingContent(
 			t_run_control(t_if_region_1, t_if_anchor_1, (t_before) => {
 				const t = t_item_1.data.t;
 				if (t.done) {
-					if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
-					const t_new_region = t_region();
-					const t_old_region = t_push_region(t_new_region, true);
+					const t_old_region = t_run_branch(t_if_region_1, t_if_index_1, 0);
+					if (t_old_region === null) return;
 					const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<b class="mark">#</b>`);
 					const t_root_2 = t_root_el(t_fragment_2);
 					const t_b_1 = t_root_2 as HTMLElement;
@@ -78,7 +77,9 @@ export default function ForIfLeadingContent(
 					t_if_index_1 = 0;
 				}
 				else {
-					if (!t_run_branch(t_if_region_1, t_if_index_1, 1)) return;
+					const t_old_region = t_run_branch(t_if_region_1, t_if_index_1, 1);
+					if (t_old_region === null) return;
+					t_pop_region(t_old_region);
 					t_if_index_1 = 1;
 				}
 			});

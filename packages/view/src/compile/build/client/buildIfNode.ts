@@ -37,7 +37,6 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 	status.imports.add("t_region");
 	status.imports.add("t_run_control");
 	status.imports.add("t_run_branch");
-	status.imports.add("t_push_region");
 	status.imports.add("t_pop_region");
 
 	b.append("");
@@ -75,14 +74,16 @@ function buildIfBranch(
 	index: number,
 ) {
 	addMappedText("", `${node.statement}`, " {", node.span, status, b);
-	b.append(`if (!t_run_branch(${regionName}, ${indexName}, ${index})) return;`);
+	// The branch call creates and pushes the branch region itself, returning
+	// the region to pop (or null when the branch is skipped)
+	b.append(
+		`const t_old_region = t_run_branch(${regionName}, ${indexName}, ${index}${
+			status.options.dev === true ? `, "if_branch"` : ""
+		});`,
+	);
+	b.append("if (t_old_region === null) return;");
 
 	if (node.children.length > 0) {
-		b.append(`
-			const t_new_region = t_region(${status.options.dev === true ? `"if_branch"` : ""});
-			const t_old_region = t_push_region(t_new_region, true);
-		`);
-
 		buildFragment(node, status, b, parentName, "t_before");
 
 		status.fragmentStack.push({
@@ -95,10 +96,9 @@ function buildIfBranch(
 		status.fragmentStack.pop();
 
 		buildAddFragment(node, status, b, parentName, "t_before");
-
-		b.append("t_pop_region(t_old_region);");
 	}
 
+	b.append("t_pop_region(t_old_region);");
 	b.append(`${indexName} = ${index};`);
 	b.append("}");
 }

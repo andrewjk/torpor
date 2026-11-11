@@ -61,9 +61,8 @@ export default function ForSwitchFor(
 				const row = t_item_1.data.row;
 				switch ($props.operation) {
 					case "sum": {
-						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 0)) return;
-						const t_new_region = t_region();
-						const t_old_region = t_push_region(t_new_region, true);
+						const t_old_region = t_run_branch(t_switch_region_1, t_switch_index_1, 0);
+						if (t_old_region === null) return;
 						const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p>#</p>`);
 						const t_root_2 = t_root_el(t_fragment_2);
 						const t_p_1 = t_root_2 as HTMLElement;
@@ -78,9 +77,8 @@ export default function ForSwitchFor(
 						break;
 					}
 					case "max": {
-						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 1)) return;
-						const t_new_region = t_region();
-						const t_old_region = t_push_region(t_new_region, true);
+						const t_old_region = t_run_branch(t_switch_region_1, t_switch_index_1, 1);
+						if (t_old_region === null) return;
 						const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<p>#</p>`);
 						const t_root_3 = t_root_el(t_fragment_3);
 						const t_p_2 = t_root_3 as HTMLElement;
@@ -95,9 +93,8 @@ export default function ForSwitchFor(
 						break;
 					}
 					case "items": {
-						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 2)) return;
-						const t_new_region = t_region();
-						const t_old_region = t_push_region(t_new_region, true);
+						const t_old_region = t_run_branch(t_switch_region_1, t_switch_index_1, 2);
+						if (t_old_region === null) return;
 						const t_fragment_4 = t_fragment($parent.ownerDocument!, t_fragments, 4, `<!>`);
 						const t_root_4 = t_root(t_fragment_4);
 						let t_for_anchor_2 = t_anchor(t_root_4) as HTMLElement;
@@ -144,9 +141,8 @@ export default function ForSwitchFor(
 						break;
 					}
 					default: {
-						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 3)) return;
-						const t_new_region = t_region();
-						const t_old_region = t_push_region(t_new_region, true);
+						const t_old_region = t_run_branch(t_switch_region_1, t_switch_index_1, 3);
+						if (t_old_region === null) return;
 						const t_fragment_6 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 6, `<p>Unknown op</p>`);
 						const t_root_6 = t_root_el(t_fragment_6);
 						const t_p_3 = t_root_6 as HTMLElement;

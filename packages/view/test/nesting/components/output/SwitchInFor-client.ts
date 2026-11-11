@@ -57,9 +57,8 @@ export default function SwitchInFor(
 				const item = t_item_1.data.item;
 				switch (item.type) {
 					case "admin": {
-						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 0)) return;
-						const t_new_region = t_region();
-						const t_old_region = t_push_region(t_new_region, true);
+						const t_old_region = t_run_branch(t_switch_region_1, t_switch_index_1, 0);
+						if (t_old_region === null) return;
 						const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<strong>#</strong>`);
 						const t_root_2 = t_root_el(t_fragment_2);
 						const t_strong_1 = t_root_2 as HTMLElement;
@@ -74,9 +73,8 @@ export default function SwitchInFor(
 						break;
 					}
 					case "user": {
-						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 1)) return;
-						const t_new_region = t_region();
-						const t_old_region = t_push_region(t_new_region, true);
+						const t_old_region = t_run_branch(t_switch_region_1, t_switch_index_1, 1);
+						if (t_old_region === null) return;
 						const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<span>#</span>`);
 						const t_root_3 = t_root_el(t_fragment_3);
 						const t_span_1 = t_root_3 as HTMLSpanElement;
@@ -91,9 +89,8 @@ export default function SwitchInFor(
 						break;
 					}
 					default: {
-						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 2)) return;
-						const t_new_region = t_region();
-						const t_old_region = t_push_region(t_new_region, true);
+						const t_old_region = t_run_branch(t_switch_region_1, t_switch_index_1, 2);
+						if (t_old_region === null) return;
 						const t_fragment_4 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 4, `<em>#</em>`);
 						const t_root_4 = t_root_el(t_fragment_4);
 						const t_em_1 = t_root_4 as HTMLElement;

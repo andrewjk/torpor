@@ -301,19 +301,6 @@ by URL alone can expose values the markup never showed. A dev-only reminder
 prompts for an explicit `Cache-Control` (and any value silences it), but that's
 a nudge, not enforcement — the requirement is on the site's cache config.
 
-### Control-flow branches repeat the region push/pop boilerplate (view compiler)
-
-Every emitted `@if`/`@switch`/`@await` branch carries a six-line
-preamble/outro: `t_run_branch(...)` guard, `t_region()`,
-`t_push_region(new, true)`, then `t_pop_region(old)` and the branch-index
-assignment. `test/nesting/components/output/IfForSwitchCombo-client.ts` is
-mostly this. `t_run_branch` (src/render/runControlBranch.ts) could create +
-push the region and return it (or take a completion callback) so the emitter
-folds the bookkeeping into one call, cutting nesting output ~30-40% and
-removing a class of emitter mistakes. Not done inline: it changes a core
-runtime API that hydration branch-mismatch handling depends on, and wanted
-its own careful pass.
-
 ### Component props get a redundant re-apply `$run` for statically-constant expressions
 
 `buildComponentNode` (client) emits `$watch({...})` plus a

@@ -6,7 +6,6 @@ import trackSignal from "../watch/trackSignal";
 import { AwaitSuspend } from "./AwaitSuspend";
 import context from "./context";
 import isCommentNode from "./isCommentNode";
-import newRegion from "./newRegion";
 import popRegion from "./popRegion";
 import pushRegion from "./pushRegion";
 import runControlBranch from "./runControlBranch";
@@ -102,15 +101,17 @@ export default function runAwait(
 		const oldRegion = pushRegion(region, first);
 		first = false;
 
-		// Render a branch into a fresh child region, clearing the old branch
+		// Render a branch into a fresh child region, clearing the old branch.
+		// `runControlBranch` creates and pushes the branch region itself (and
+		// returns the region to pop), or null when the branch is skipped.
 		const renderBranch = (targetIndex: number, fn: (anchor: Node | null) => void) => {
-			runControlBranch(region, index, targetIndex);
-			// runControlBranch may have cleared the previous branch, leaving
-			// context.previousRegion pointing at a released region. Reset it
-			// to the await region so the new branch links correctly.
-			context.previousRegion = region;
-			const branchRegion = newRegion(targetIndex === 0 ? "await_content" : "await_with");
-			const oldR = pushRegion(branchRegion, true);
+			const oldR = runControlBranch(
+				region,
+				index,
+				targetIndex,
+				targetIndex === 0 ? "await_content" : "await_with",
+			);
+			if (oldR === null) return;
 			try {
 				fn(anchor);
 			} finally {
@@ -169,8 +170,10 @@ export default function runAwait(
 			if (boundary.suspended && renderWith !== null) {
 				renderBranch(1, renderWith);
 			} else if (boundary.suspended && aborted) {
-				// No with-branch: clear the aborted partial content
-				runControlBranch(region, index, 1);
+				// No with-branch: clear the aborted partial content. The empty
+				// branch region is popped right away — nothing renders into it.
+				const oldR = runControlBranch(region, index, 1, "await_with");
+				if (oldR !== null) popRegion(oldR);
 				index = 1;
 			} else if (!boundary.suspended) {
 				// Content rendered without suspending — mark it so a later
@@ -216,7 +219,9 @@ export default function runAwait(
 					if (renderWith !== null) {
 						renderBranch(1, renderWith);
 					} else {
-						runControlBranch(region, index, 1);
+						// Empty branch: pop the region right away
+						const oldR = runControlBranch(region, index, 1, "await_with");
+						if (oldR !== null) popRegion(oldR);
 						index = 1;
 					}
 				}
