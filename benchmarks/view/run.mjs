@@ -815,7 +815,10 @@ function buildViewHtml(payload, { prevRun, nextRun } = {}) {
 	return buildHtmlReport({
 		suite: 'view',
 		title: 'view benchmarks — keyed 1,000-row table',
-		note: `score = steady-window mean, ${payload.iterations} samples per op · green = best in row · ${versionNote}`,
+		note: [
+			`score = steady-window mean, ${payload.iterations} samples per op · green = best in row`,
+			versionNote,
+		],
 		columns: names,
 		baseline,
 		generatedAt: payload.generatedAt,

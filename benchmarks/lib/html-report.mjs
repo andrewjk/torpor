@@ -170,6 +170,8 @@ export function writeRunResults({ suite, payload, resultsDir, renderHtml }) {
 export function buildHtmlReport({
 	suite,
 	title,
+	// Methodology notes rendered under the title — a string, or an array of
+	// strings for multiple lines (e.g. scoring info, then versions).
 	note,
 	columns,
 	baseline,
@@ -180,6 +182,7 @@ export function buildHtmlReport({
 }) {
 	if (!columns?.length || !sections?.length) return null;
 	const generated = generatedAt ?? new Date();
+	const noteLines = Array.isArray(note) ? note : note ? [note] : [];
 	const headerCells = columns
 		.map(
 			(n) =>
@@ -256,7 +259,7 @@ ${navHtml(suiteLabel, prevRun, nextRun)}
 	run at ${escapeHtml(formatTimestamp(compactTimestamp(generated)))}
 	<span class="legend"><i style="background:hsl(120,60%,88%)"></i><i style="background:hsl(60,60%,88%)"></i><i style="background:hsl(0,60%,88%)"></i></span>
 	${baseline ? `· ratio baseline: <strong>${escapeHtml(baseline)}</strong>` : ''}
-	${note ? `<br>${escapeHtml(note)}` : ''}
+	${noteLines.map((l) => `<br>${escapeHtml(l)}`).join('')}
 </p>
 ${tables}
 ${navHtml(suiteLabel, prevRun, nextRun)}
