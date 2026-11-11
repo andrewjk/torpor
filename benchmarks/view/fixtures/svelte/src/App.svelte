@@ -225,46 +225,6 @@
 								Displace first 3 to end
 							</button>
 						</div>
-						<div class="col-sm-6 smallpad">
-							<button
-								type="button"
-								class="btn btn-primary btn-block"
-								id="displace4"
-								onclick={() => displace(4)}
-							>
-								Displace first 4 to end
-							</button>
-						</div>
-						<div class="col-sm-6 smallpad">
-							<button
-								type="button"
-								class="btn btn-primary btn-block"
-								id="displace5"
-								onclick={() => displace(5)}
-							>
-								Displace first 5 to end
-							</button>
-						</div>
-						<div class="col-sm-6 smallpad">
-							<button
-								type="button"
-								class="btn btn-primary btn-block"
-								id="displace6"
-								onclick={() => displace(6)}
-							>
-								Displace first 6 to end
-							</button>
-						</div>
-						<div class="col-sm-6 smallpad">
-							<button
-								type="button"
-								class="btn btn-primary btn-block"
-								id="displace8"
-								onclick={() => displace(8)}
-							>
-								Displace first 8 to end
-							</button>
-						</div>
 					</div>
 				</div>
 			</div>

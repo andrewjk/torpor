@@ -216,26 +216,6 @@
 								Displace first 3 to end
 							</button>
 						</div>
-						<div class="col-sm-6 smallpad">
-							<button type="button" class="btn btn-primary btn-block" id="displace4" @click="displace(4)">
-								Displace first 4 to end
-							</button>
-						</div>
-						<div class="col-sm-6 smallpad">
-							<button type="button" class="btn btn-primary btn-block" id="displace5" @click="displace(5)">
-								Displace first 5 to end
-							</button>
-						</div>
-						<div class="col-sm-6 smallpad">
-							<button type="button" class="btn btn-primary btn-block" id="displace6" @click="displace(6)">
-								Displace first 6 to end
-							</button>
-						</div>
-						<div class="col-sm-6 smallpad">
-							<button type="button" class="btn btn-primary btn-block" id="displace8" @click="displace(8)">
-								Displace first 8 to end
-							</button>
-						</div>
 					</div>
 				</div>
 			</div>

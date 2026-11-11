@@ -11,14 +11,14 @@ and `clear` (of the 10,000-row table).
 
 Plus a 14-op keyed-reorder matrix (from `torpor-bench`'s run-reorder harness):
 `reverse`, `shuffle` (seeded), `rotatef`/`rotateb`, `prepend100`, `append100`,
-`insertmid100`, `removefirst`, `removeevery10`, and `displace3…8` (move the
-first k rows, as a group, to the end).
+`insertmid100`, `removefirst`, `removeevery10`, and `displace3` (move the
+first 3 rows, as a group, to the end).
 
 Each framework implements the same keyed 1,000-row table with the same DOM
 shape, driven through the same buttons (`#run`, `#runlots`, `#add`, `#update`,
 `#clear`, `#swaprows`, plus the reorder row `#reverse`, `#shuffle`,
 `#rotatef`, `#rotateb`, `#prepend100`, `#append100`, `#insertmid100`,
-`#removefirst`, `#removeevery10`, `#displace3…8`) and per-row select/remove
+`#removefirst`, `#removeevery10`, `#displace3`) and per-row select/remove
 anchors.
 
 ## Reorder ops

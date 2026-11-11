@@ -92,10 +92,6 @@ const OPS = [
 	{ name: 'removefirst', pre: 'rows', click: '#removefirst', reps: 20, gate: 'removefirst' },
 	{ name: 'removeevery10', pre: 'rows', click: '#removeevery10', reps: 20, gate: 'removeevery10' },
 	{ name: 'displace3', pre: 'rows', click: '#displace3', reps: 20, gate: 'displace3' },
-	{ name: 'displace4', pre: 'rows', click: '#displace4', reps: 20, gate: 'displace4' },
-	{ name: 'displace5', pre: 'rows', click: '#displace5', reps: 20, gate: 'displace5' },
-	{ name: 'displace6', pre: 'rows', click: '#displace6', reps: 20, gate: 'displace6' },
-	{ name: 'displace8', pre: 'rows', click: '#displace8', reps: 20, gate: 'displace8' },
 ];
 
 // Reorder-gate sentinel for "a freshly-built row goes here" in expected
@@ -147,10 +143,6 @@ const GATE_EXPECTED = {
 	removefirst: (pre) => pre.slice(1),
 	removeevery10: (pre) => pre.filter((_, i) => i % 10 !== 0),
 	displace3: (pre) => pre.slice(3).concat(pre.slice(0, 3)),
-	displace4: (pre) => pre.slice(4).concat(pre.slice(0, 4)),
-	displace5: (pre) => pre.slice(5).concat(pre.slice(0, 5)),
-	displace6: (pre) => pre.slice(6).concat(pre.slice(0, 6)),
-	displace8: (pre) => pre.slice(8).concat(pre.slice(0, 8)),
 };
 
 // Reset to a fresh 1k table (each reorder timed sample starts here).

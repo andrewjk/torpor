@@ -227,26 +227,6 @@ const Jumbotron = memo(
 							title="Displace first 3 to end"
 							cb={() => dispatch({ type: 'DISPLACE', k: 3 })}
 						/>
-						<Button
-							id="displace4"
-							title="Displace first 4 to end"
-							cb={() => dispatch({ type: 'DISPLACE', k: 4 })}
-						/>
-						<Button
-							id="displace5"
-							title="Displace first 5 to end"
-							cb={() => dispatch({ type: 'DISPLACE', k: 5 })}
-						/>
-						<Button
-							id="displace6"
-							title="Displace first 6 to end"
-							cb={() => dispatch({ type: 'DISPLACE', k: 6 })}
-						/>
-						<Button
-							id="displace8"
-							title="Displace first 8 to end"
-							cb={() => dispatch({ type: 'DISPLACE', k: 8 })}
-						/>
 					</div>
 				</div>
 			</div>
