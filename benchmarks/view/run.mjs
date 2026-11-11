@@ -74,6 +74,165 @@ const OPS = [
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// ── Framework versions ──────────────────────────────────────────────────────
+
+// The packages whose versions define each fixture, resolved from the
+// benchmarks workspace's node_modules (hoisted deps) or the workspace
+// package sources for torpor itself.
+const VERSION_PACKAGES = {
+	torpor: ['@torpor/view'],
+	react: ['react', 'react-dom'],
+	solid: ['solid-js'],
+	vue: ['vue'],
+	svelte: ['svelte'],
+};
+
+function resolveVersions(targetNames) {
+	const versions = {};
+	for (const name of targetNames) {
+		versions[name] = {};
+		for (const pkg of VERSION_PACKAGES[name] ?? []) {
+			let v;
+			try {
+				v = JSON.parse(
+					fs.readFileSync(path.join(HERE, 'node_modules', pkg, 'package.json'), 'utf8'),
+				).version;
+			} catch {
+				try {
+					v = JSON.parse(
+						fs.readFileSync(
+							path.join(REPO_ROOT, 'packages', pkg.replace('@torpor/', ''), 'package.json'),
+							'utf8',
+						),
+					).version;
+				} catch {
+					// not installed — leave undefined
+				}
+			}
+			versions[name][pkg] = v ?? 'unknown';
+		}
+	}
+	return versions;
+}
+
+function versionLine(versions, targetNames) {
+	return targetNames
+		.map((n) =>
+			Object.entries(versions[n] ?? {})
+				.map(([p, v]) => `${p}@${v}`)
+				.join(' + '),
+		)
+		.join(' · ');
+}
+
+// ── README results section ──────────────────────────────────────────────────
+
+// Rewrites the marker-bounded "Latest results" section of
+// benchmarks/README.md after every run, so the checked-in README always
+// shows the most recent comparison.
+const README_START = '<!-- results:auto -->';
+const README_END = '<!-- /results:auto -->';
+
+function updateReadmeResults(payload, readmePath) {
+	const names = payload.targets.map((t) => t.name);
+	const baseline = names.includes('torpor') ? 'torpor' : names[0];
+	const baselineOps = payload.targets.find((t) => t.name === baseline).ops;
+	const opNames = Object.keys(baselineOps).filter((k) => baselineOps[k].score !== undefined);
+
+	// Reference-weighted geometric mean vs the baseline (same weighting as
+	// the HTML report's total row; 1.00 = baseline).
+	const totals = Object.fromEntries(
+		payload.targets.map((t) => {
+			let weightedLogSum = 0;
+			let weightSum = 0;
+			for (const opName of opNames) {
+				const s = t.ops[opName]?.score;
+				const base = baselineOps[opName]?.score;
+				if (typeof s === 'number' && s > 0 && base > 0) {
+					weightedLogSum += base * Math.log(s / base);
+					weightSum += base;
+				}
+			}
+			return [t.name, weightSum > 0 ? Math.exp(weightedLogSum / weightSum) : NaN];
+		}),
+	);
+
+	const best = (opName) => {
+		let bestName = null;
+		let bestV = Infinity;
+		for (const t of payload.targets) {
+			const v = t.ops[opName]?.score;
+			if (typeof v === 'number' && v < bestV) {
+				bestV = v;
+				bestName = t.name;
+			}
+		}
+		return bestName;
+	};
+
+	const fmt = (v) => (v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v >= 1 ? v.toFixed(2) : v.toFixed(3));
+	const cell = (tName, opName) => {
+		const v = payload.targets.find((t) => t.name === tName).ops[opName]?.score;
+		if (typeof v !== 'number') return '—';
+		const text = fmt(v);
+		return best(opName) === tName ? `**${text}**` : text;
+	};
+	const totalCell = (tName) => {
+		const v = totals[tName];
+		const text = `${fmt(v)}×`;
+		return bestTotal() === tName ? `**${text}**` : text;
+	};
+	const bestTotal = () => {
+		let bestName = null;
+		let bestV = Infinity;
+		for (const t of payload.targets) {
+			const v = totals[t.name];
+			if (typeof v === 'number' && v < bestV) {
+				bestV = v;
+				bestName = t.name;
+			}
+		}
+		return bestName;
+	};
+
+	const table = [
+		`| op (ms · lower is better) | ${names.map((n) => n.padEnd(7)).join(' | ')} |`,
+		`|---|${names.map(() => '---:').join('|')}|`,
+		...opNames.map((opName) =>
+			`| ${opName.padEnd(9)} | ${names.map((n) => cell(n, opName).padEnd(7)).join(' | ')} |`,
+		),
+		`| **total (geo vs ${baseline})** | ${names.map((n) => totalCell(n).padEnd(7)).join(' | ')} |`,
+	].join('\n');
+
+	const generated = new Date(payload.generatedAt);
+	const section = [
+		README_START,
+		'',
+		'## Latest results',
+		'',
+		`${generated.toISOString().replace('T', ' ').slice(0, 16)} UTC · interactive report: [view.html](./results/view.html) · archive: [view-${payload.generatedAt ? '' : ''}…]`,
+		'',
+		`Versions: ${versionLine(payload.versions, names)}`,
+		'',
+		table,
+		'',
+		`Totals are reference-weighted geometric means vs ${baseline} (1.00 = baseline). Best per row in bold.`,
+		'',
+		README_END,
+	].join('\n');
+
+	let readme = fs.readFileSync(readmePath, 'utf8');
+	const startIdx = readme.indexOf(README_START);
+	const endIdx = readme.indexOf(README_END);
+	if (startIdx !== -1 && endIdx !== -1) {
+		readme = readme.slice(0, startIdx) + section + '\n' + readme.slice(endIdx + README_END.length);
+	} else {
+		readme = readme.trimEnd() + '\n\n' + section + '\n';
+	}
+	fs.writeFileSync(readmePath, readme);
+	console.error(`README results section updated in ${path.relative(REPO_ROOT, readmePath)}`);
+}
+
 // ── Dev server management ───────────────────────────────────────────────────
 
 function vpBin() {
@@ -281,9 +440,13 @@ function printReport(all, targetNames) {
 
 (async () => {
 	const targetNames = TARGETS.map((t) => t.name);
+	const versions = resolveVersions(targetNames);
 	const children = await startServers();
 
 	try {
+		console.log();
+		console.log(`Versions: ${versionLine(versions, targetNames)}`);
+
 		const browser = await chromium.launch({
 			headless: true,
 			args: ['--disable-extensions', '--js-flags=--expose-gc'],
@@ -301,8 +464,10 @@ function printReport(all, targetNames) {
 		const payload = {
 			suite: 'view',
 			iterations: ITER,
+			versions,
 			targets: targetNames.map((name) => ({
 				name,
+				versions: versions[name],
 				ops: Object.fromEntries(
 					Object.entries(all[name])
 						.filter(([key]) => key !== '__dom')
@@ -324,6 +489,7 @@ function printReport(all, targetNames) {
 		console.error(
 			`results written to ${path.relative(REPO_ROOT, RESULTS_DIR)}/view.html (archive view-${result.timestamp}.html)`,
 		);
+		updateReadmeResults(payload, path.join(REPO_ROOT, 'benchmarks', 'README.md'));
 
 		if (process.env.BENCH_JSON) {
 			fs.writeFileSync(
@@ -347,6 +513,14 @@ function buildViewHtml(payload, { prevRun, nextRun } = {}) {
 	const names = targets.map((t) => t.name);
 	const baseline = names.includes('torpor') ? 'torpor' : names[0];
 	const baselineOps = targets.find((t) => t.name === baseline).ops;
+	const versionNote = names
+		.map(
+			(n) =>
+				`${n}: ${Object.entries(payload.versions?.[n] ?? {})
+					.map(([p, v]) => `${p} ${v}`)
+					.join(', ')}`,
+		)
+		.join(' · ');
 
 	// Total row: reference-time-weighted geometric mean of per-op scores vs the
 	// baseline (baseline reads exactly 1; <1 faster overall, >1 slower).
@@ -370,7 +544,7 @@ function buildViewHtml(payload, { prevRun, nextRun } = {}) {
 	return buildHtmlReport({
 		suite: 'view',
 		title: 'view benchmarks — keyed 1,000-row table',
-		note: `score = steady-window mean, ${payload.iterations} samples per op · green = best in row`,
+		note: `score = steady-window mean, ${payload.iterations} samples per op · green = best in row · ${versionNote}`,
 		columns: names,
 		baseline,
 		generatedAt: payload.generatedAt,

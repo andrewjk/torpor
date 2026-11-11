@@ -12,6 +12,7 @@
 - Scoped styles, two-way binding, child components and more -- see [torpor/view](./packages/view)
 - An accessible, unstyled component library -- see [torpor/ui](./packages/ui)
 - A site and app framework -- see [torpor/build](./packages/build)
+- Benchmarks against React, Solid, Vue and Svelte -- see [benchmarks](./benchmarks)
 
 ## Language Tools
 
