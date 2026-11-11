@@ -213,20 +213,6 @@ resubscribe, SSR-safe). Deliberately left out:
   (documented in JSDoc): errors are values; sources own their reconnection.
   Revisit if wrapper sources (retry/backoff wrappers) become common.
 
-### Sanitizing rendered markdown
-
-The markdown pipeline (`site/src/lib/markdown`) renders allmark output
-straight into `@html(...)` without sanitizing it (see `createDoc` in
-`site/src/lib/markdown/index.ts`, the natural boundary). Fine today: content
-is authored in-repo and code-reviewed. Becomes mandatory before any
-user-submitted markdown exists (e.g. the CRM scenario, where item
-descriptions written by users get re-used across search, product pages,
-etc). allmark's README explicitly warns to sanitize its HTML output.
-Note: `sanitize-html` has been archived, so pick a maintained,
-worker-compatible alternative -- `rehype-sanitize` (unified ecosystem,
-allowlist schema, pure JS so it bundles for the Cloudflare adapter) or
-equivalent; DOMPurify needs a DOM/jsdom, which doesn't work in workers.
-
 ### Interactive components in markdown (MDX-lite)
 
 The site's markdown pipeline (`site/src/lib/markdown`) renders content to

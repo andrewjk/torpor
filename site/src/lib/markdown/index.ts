@@ -1,4 +1,4 @@
-import { extended, htmlRenderers, parse, render } from "allmark";
+import { extended, htmlRenderers, parse, render, sanitize } from "allmark";
 import parseFrontmatter from "./frontmatter.ts";
 import type MarkdownDoc from "./MarkdownDoc.ts";
 import type PostFrontmatter from "./PostFrontmatter.ts";
@@ -36,7 +36,10 @@ export function listPosts(): PostSummary[] {
 
 function createDoc(slug: string, src: string): MarkdownDoc {
 	const doc = parse(src, extended);
-	const html = render(doc, htmlRenderers);
+	// Sanitize at this boundary (allmark's GitHub-style allowlist): the
+	// pipeline must stay safe for user-submitted markdown even though the
+	// content today is authored in-repo
+	const html = sanitize(render(doc, htmlRenderers));
 	const content = doc.info ? src.slice(src.indexOf(doc.info) + doc.info.length).trim() : src;
 	return {
 		slug,
