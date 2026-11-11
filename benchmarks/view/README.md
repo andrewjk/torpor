@@ -66,10 +66,25 @@ total vs torpor), archived as `view-<timestamp>.{json,html}`. Each page shows
 when it was run and links to the previous/next run of the suite and to the
 `build` suite's latest page.
 
-The runner starts each fixture's vite dev server (production mode — the
-configs set `mode: 'production'` and pin `NODE_ENV` so framework runtimes are
-measured without dev guards) and kills them on exit. Requires the Playwright
-chromium browser (`npx playwright install chromium` if missing).
+The runner starts each fixture's vite dev server and kills them on exit.
+Although it is a dev server, every framework runs its **production** variant
+(audited by fetching each page's served module graph):
+
+- the runner spawns each server with `NODE_ENV=production` — this is what
+  plugin-level choices key off (e.g. React's prod `jsx-runtime` instead of
+  the validating `jsx-dev-runtime`);
+- each config defines `process.env.NODE_ENV=production`, compiling dev
+  branches out of the prebundled deps (vue's `__DEV__` blocks, react-dom
+  warnings);
+- the solid fixture passes `dev: false` — `vite-plugin-solid` otherwise
+  injects the `development` export condition during `vp dev`, silently
+  resolving solid-js to its `dist/dev.js` runtime (verified: the served
+  runtime is `dist/solid.js`, with no `devComponent` wrappers);
+- svelte compiles without dev validators (`validate_each_keys` et al absent
+  from the served component output).
+
+Requires the Playwright chromium browser (`npx playwright install chromium`
+if missing).
 
 ## Fixtures
 

@@ -158,13 +158,15 @@ async function resetRows(page) {
 }
 
 // Identity gate (uibench-style), run ONCE per gate op OUTSIDE the timed
-// loop: before the op every <tr> is stamped with an expando
-// (`tr.__benchId = <row id>`); after one click the harness asserts that
-// (a) every surviving row id is rendered by the SAME <tr> node (the expando
-// still matches — the framework moved the node, it didn't rebuild it), and
-// (b) DOM order equals data order (the op replayed on the pre-click id
-// list — including the fixtures' shared seeded shuffle stream). Throws on
-// any mismatch; the caller records the fail and skips the op's timing.
+// loop: before the op the harness stamps every <tr> AND every element
+// inside it with an expando (`__benchId = <row id>`); after one click it
+// asserts that (a) every surviving row id appears at the position the
+// replayed op predicts, (b) each surviving <tr> is the SAME node as before
+// (its stamp still matches), (c) every cell inside a surviving <tr> is also
+// the same node (no stampless, rebuilt children — moving the <tr> while
+// re-creating its contents fails), and (d) freshly-built rows use brand-new
+// ids on all-new nodes. Throws on any mismatch; the caller records the fail
+// and skips the op's timing.
 async function identityGate(page, op, ctx, targetName) {
 	await resetRows(page);
 	const preIds = await page.evaluate(() => {
@@ -172,6 +174,7 @@ async function identityGate(page, op, ctx, targetName) {
 		for (const tr of document.querySelectorAll('tbody tr')) {
 			const id = tr.firstElementChild.textContent;
 			tr.__benchId = id;
+			for (const el of tr.querySelectorAll('*')) el.__benchId = id;
 			out.push(id);
 		}
 		return out;
@@ -183,10 +186,17 @@ async function identityGate(page, op, ctx, targetName) {
 	const post = await page.evaluate(async (sel) => {
 		document.querySelector(sel).click();
 		if (window.__benchFlush) await window.__benchFlush();
-		return Array.from(document.querySelectorAll('tbody tr'), (tr) => ({
-			id: tr.firstElementChild.textContent,
-			stamp: typeof tr.__benchId === 'string' ? tr.__benchId : null,
-		}));
+		return Array.from(document.querySelectorAll('tbody tr'), (tr) => {
+			const stamp = typeof tr.__benchId === 'string' ? tr.__benchId : null;
+			let mismatched = 0;
+			let unstamped = 0;
+			for (const el of tr.querySelectorAll('*')) {
+				const s = el.__benchId;
+				if (s === undefined) unstamped++;
+				else if (s !== stamp) mismatched++;
+			}
+			return { id: tr.firstElementChild.textContent, stamp, mismatched, unstamped };
+		});
 	}, op.click);
 
 	const fail = (msg) => {
@@ -201,21 +211,31 @@ async function identityGate(page, op, ctx, targetName) {
 		const want = expected[i];
 		const got = post[i];
 		if (want === GATE_NEW) {
-			// Freshly-built row: must be a brand-new id on an unstamped <tr>.
+			// Freshly-built row: brand-new id on an all-new node subtree.
 			if (preSet.has(got.id)) fail(`position ${i}: expected a new row, got surviving id ${got.id}`);
 			if (seenNew.has(got.id)) fail(`position ${i}: duplicate new id ${got.id}`);
 			seenNew.add(got.id);
 			if (got.stamp !== null) {
 				fail(`position ${i}: new row ${got.id} reused a pre-existing <tr> (stamp ${got.stamp})`);
 			}
+			if (got.mismatched !== 0) {
+				fail(`position ${i}: new row ${got.id} contains ${got.mismatched} foreign stamped node(s)`);
+			}
 		} else {
-			// Survivor: right id in the right place, on the SAME node as before.
+			// Survivor: right id in the right place, on the SAME node as
+			// before — the <tr> itself and every element inside it.
 			if (got.id !== want) fail(`position ${i}: id ${got.id}, expected ${want} (order mismatch)`);
 			if (got.stamp !== want) {
 				fail(
 					`position ${i}: id ${want} is on a ${got.stamp === null ? 'REBUILT' : 'foreign'} <tr>` +
 						` (stamp ${got.stamp}) — survivor node identity lost`,
 				);
+			}
+			if (got.unstamped !== 0) {
+				fail(`position ${i}: row ${want} has ${got.unstamped} rebuilt node(s) — cells were re-created, not moved`);
+			}
+			if (got.mismatched !== 0) {
+				fail(`position ${i}: row ${want} contains ${got.mismatched} node(s) from other rows`);
 			}
 		}
 	}
@@ -427,6 +447,13 @@ async function startServers() {
 		const fixtureDir = path.join(HERE, 'fixtures', f.fixture);
 		const child = spawn(vpBin(), ['dev', '--port', String(f.port), '--strictPort'], {
 			cwd: fixtureDir,
+			// The vite `mode: 'production'` in each fixture's config controls
+			// `define` replacement, but NOT how the framework plugins pick
+			// their variants: plugin-react chooses jsx-dev-runtime and solid
+			// resolves dist/dev.js from the actual NODE_ENV. Without this,
+			// react/solid silently run dev-mode runtimes (audited via the
+			// served module graph — see the README's methodology note).
+			env: { ...process.env, NODE_ENV: 'production' },
 			stdio: 'ignore',
 		});
 		children.push(child);
