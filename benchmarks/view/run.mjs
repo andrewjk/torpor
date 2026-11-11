@@ -70,7 +70,164 @@ const OPS = [
 	// Canonical `clear` measures clearing the 10K-row table that `runlots`
 	// populated. `rows-large` ensures the 10K state first.
 	{ name: 'clear', pre: 'rows-large', click: '#clear' },
+	// ── Keyed-reorder matrix (adapted from torpor-bench's run-reorder.mjs).
+	// Most reorder ops sit far below performance.now()'s resolution (a rotate
+	// is ~1 DOM move), so each timed sample loops REPS clicks inside the
+	// window and divides: REPS=100 for the guarded rotate pair, REPS=20 for
+	// displace_k / remove*, REPS=4 for reverse + shuffle (reverse is
+	// self-inverse and shuffle reseeds per click, so repeated clicks are
+	// valid, comparable work). The 100-row insert ops time with one click.
+	// Each sample starts from a fresh 1k `#run` (outside the timed window).
+	//
+	// The shuffle op advances a seeded stream ONCE per click, replayed by the
+	// identity gate to verify DOM order — a fast reorder that recreates rows
+	// or misorders them fails the gate and is reported as `null`.
+	{ name: 'reverse', pre: 'rows', click: '#reverse', reps: 4, gate: 'reverse' },
+	{ name: 'shuffle', pre: 'rows', click: '#shuffle', reps: 4, gate: 'shuffle' },
+	{ name: 'rotatef', pre: 'rows', click: '#rotatef', reps: 100, gate: 'rotatef' },
+	{ name: 'rotateb', pre: 'rows', click: '#rotateb', reps: 100, gate: 'rotateb' },
+	{ name: 'prepend100', pre: 'rows', click: '#prepend100', reps: 1, gate: 'prepend100' },
+	{ name: 'append100', pre: 'rows', click: '#append100', reps: 1, gate: 'append100' },
+	{ name: 'insertmid100', pre: 'rows', click: '#insertmid100', reps: 1, gate: 'insertmid100' },
+	{ name: 'removefirst', pre: 'rows', click: '#removefirst', reps: 20, gate: 'removefirst' },
+	{ name: 'removeevery10', pre: 'rows', click: '#removeevery10', reps: 20, gate: 'removeevery10' },
+	{ name: 'displace3', pre: 'rows', click: '#displace3', reps: 20, gate: 'displace3' },
+	{ name: 'displace4', pre: 'rows', click: '#displace4', reps: 20, gate: 'displace4' },
+	{ name: 'displace5', pre: 'rows', click: '#displace5', reps: 20, gate: 'displace5' },
+	{ name: 'displace6', pre: 'rows', click: '#displace6', reps: 20, gate: 'displace6' },
+	{ name: 'displace8', pre: 'rows', click: '#displace8', reps: 20, gate: 'displace8' },
 ];
+
+// Reorder-gate sentinel for "a freshly-built row goes here" in expected
+// permutations. Row ids are numeric strings, so this can never collide.
+const GATE_NEW = '<new>';
+const gateFill100 = () => new Array(100).fill(GATE_NEW);
+
+// Fixture-shared shuffle machinery, replayed for the identity gate:
+// byte-for-byte the algorithm in each fixture — a module-level mulberry32
+// stream (fixed seed 42) yields one 32-bit seed per #shuffle click, and
+// Fisher–Yates runs on a PRNG seeded by it. Each target gets a fresh page
+// load (fresh module state), so a fresh stream here stays in lockstep as
+// long as the harness counts every #shuffle click it fires.
+function mulberry32(seed) {
+	return () => {
+		seed |= 0;
+		seed = (seed + 0x6d2b79f5) | 0;
+		let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+		t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+	};
+}
+const SHUFFLE_SEED = 42;
+function shuffleWithSeed(d, seed) {
+	const rand = mulberry32(seed);
+	const out = d.slice();
+	for (let i = out.length - 1; i > 0; i--) {
+		const j = (rand() * (i + 1)) | 0;
+		const tmp = out[i];
+		out[i] = out[j];
+		out[j] = tmp;
+	}
+	return out;
+}
+
+// Expected permutation for each gate op — replays the op on the pre-click
+// id list. `NEW` marks "a freshly-built row goes here".
+const GATE_EXPECTED = {
+	reverse: (pre) => pre.slice().reverse(),
+	shuffle: (pre, ctx) => shuffleWithSeed(pre, ctx.nextSeed()),
+	rotatef: (pre) => [pre[pre.length - 1], ...pre.slice(0, -1)],
+	rotateb: (pre) => [...pre.slice(1), pre[0]],
+	prepend100: (pre) => gateFill100().concat(pre),
+	append100: (pre) => pre.concat(gateFill100()),
+	insertmid100: (pre) => {
+		const mid = pre.length >> 1;
+		return pre.slice(0, mid).concat(gateFill100(), pre.slice(mid));
+	},
+	removefirst: (pre) => pre.slice(1),
+	removeevery10: (pre) => pre.filter((_, i) => i % 10 !== 0),
+	displace3: (pre) => pre.slice(3).concat(pre.slice(0, 3)),
+	displace4: (pre) => pre.slice(4).concat(pre.slice(0, 4)),
+	displace5: (pre) => pre.slice(5).concat(pre.slice(0, 5)),
+	displace6: (pre) => pre.slice(6).concat(pre.slice(0, 6)),
+	displace8: (pre) => pre.slice(8).concat(pre.slice(0, 8)),
+};
+
+// Reset to a fresh 1k table (each reorder timed sample starts here).
+async function resetRows(page) {
+	const cnt = await page.evaluate(async () => {
+		document.getElementById('run').click();
+		if (window.__benchFlush) await window.__benchFlush();
+		return document.querySelectorAll('tbody tr').length;
+	});
+	if (cnt !== ROW_COUNT) {
+		throw new Error(`reset: expected ${ROW_COUNT} rows after #run, got ${cnt}`);
+	}
+}
+
+// Identity gate (uibench-style), run ONCE per gate op OUTSIDE the timed
+// loop: before the op every <tr> is stamped with an expando
+// (`tr.__benchId = <row id>`); after one click the harness asserts that
+// (a) every surviving row id is rendered by the SAME <tr> node (the expando
+// still matches — the framework moved the node, it didn't rebuild it), and
+// (b) DOM order equals data order (the op replayed on the pre-click id
+// list — including the fixtures' shared seeded shuffle stream). Throws on
+// any mismatch; the caller records the fail and skips the op's timing.
+async function identityGate(page, op, ctx, targetName) {
+	await resetRows(page);
+	const preIds = await page.evaluate(() => {
+		const out = [];
+		for (const tr of document.querySelectorAll('tbody tr')) {
+			const id = tr.firstElementChild.textContent;
+			tr.__benchId = id;
+			out.push(id);
+		}
+		return out;
+	});
+	if (preIds.length !== ROW_COUNT) {
+		throw new Error(`[${targetName}/${op.name}] identity gate: bad pre state (${preIds.length})`);
+	}
+	const expected = GATE_EXPECTED[op.gate](preIds, ctx);
+	const post = await page.evaluate(async (sel) => {
+		document.querySelector(sel).click();
+		if (window.__benchFlush) await window.__benchFlush();
+		return Array.from(document.querySelectorAll('tbody tr'), (tr) => ({
+			id: tr.firstElementChild.textContent,
+			stamp: typeof tr.__benchId === 'string' ? tr.__benchId : null,
+		}));
+	}, op.click);
+
+	const fail = (msg) => {
+		throw new Error(`[${targetName}/${op.name}] identity gate FAILED: ${msg}`);
+	};
+	if (post.length !== expected.length) {
+		fail(`row count ${post.length}, expected ${expected.length}`);
+	}
+	const preSet = new Set(preIds);
+	const seenNew = new Set();
+	for (let i = 0; i < expected.length; i++) {
+		const want = expected[i];
+		const got = post[i];
+		if (want === GATE_NEW) {
+			// Freshly-built row: must be a brand-new id on an unstamped <tr>.
+			if (preSet.has(got.id)) fail(`position ${i}: expected a new row, got surviving id ${got.id}`);
+			if (seenNew.has(got.id)) fail(`position ${i}: duplicate new id ${got.id}`);
+			seenNew.add(got.id);
+			if (got.stamp !== null) {
+				fail(`position ${i}: new row ${got.id} reused a pre-existing <tr> (stamp ${got.stamp})`);
+			}
+		} else {
+			// Survivor: right id in the right place, on the SAME node as before.
+			if (got.id !== want) fail(`position ${i}: id ${got.id}, expected ${want} (order mismatch)`);
+			if (got.stamp !== want) {
+				fail(
+					`position ${i}: id ${want} is on a ${got.stamp === null ? 'REBUILT' : 'foreign'} <tr>` +
+						` (stamp ${got.stamp}) — survivor node identity lost`,
+				);
+			}
+		}
+	}
+}
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -125,6 +282,13 @@ function versionLine(versions, targetNames) {
 		.join(' · ');
 }
 
+// Per-target identity-gate summary: "pass" when every reorder op held, else
+// "fail: <op>[, <op>…]" listing exactly which ops broke node identity.
+function gateSummary(gateFails) {
+	const failed = Object.keys(gateFails ?? {});
+	return failed.length ? `fail: ${failed.join(', ')}` : 'pass';
+}
+
 // ── README results section ──────────────────────────────────────────────────
 
 // Rewrites the marker-bounded "Latest results" section of
@@ -137,7 +301,15 @@ function updateReadmeResults(payload, readmePath) {
 	const names = payload.targets.map((t) => t.name);
 	const baseline = names.includes('torpor') ? 'torpor' : names[0];
 	const baselineOps = payload.targets.find((t) => t.name === baseline).ops;
-	const opNames = Object.keys(baselineOps).filter((k) => baselineOps[k].score !== undefined);
+	// Reference-weighted geometric mean vs the baseline (same weighting as
+	// the HTML report's total row; 1.00 = baseline). Gate-failed ops carry
+	// null scores and are excluded from the weighting — as are ops missing
+	// from any target.
+	const opNames = Object.keys(baselineOps).filter(
+		(opName) =>
+			baselineOps[opName]?.score !== undefined &&
+			payload.targets.every((t) => typeof t.ops[opName]?.score === 'number' && t.ops[opName].score > 0),
+	);
 
 	// Reference-weighted geometric mean vs the baseline (same weighting as
 	// the HTML report's total row; 1.00 = baseline).
@@ -348,13 +520,49 @@ async function timeClick(page, sel) {
 	}, sel);
 }
 
+// Timed sample for the reorder ops: REPS clicks inside one
+// performance.now() window, divided — most reorder ops sit far below
+// performance.now()'s resolution, so a single click quantizes to the timer
+// floor. gc() immediately before keeps a surprise collection out of the
+// window. Async-commit targets (window.__benchFlush) await the scheduler
+// flush BETWEEN clicks: without it the REPS state changes would coalesce
+// into one commit and the sample would time a single net permutation
+// instead of REPS full commits.
+async function timeSample(page, sel, reps) {
+	return await page.evaluate(
+		async ({ sel, reps }) => {
+			const el = document.querySelector(sel);
+			if (!el) throw new Error('selector not found: ' + sel);
+			const flush = window.__benchFlush;
+			(window.gc || (() => {}))();
+			const t0 = performance.now();
+			if (flush) {
+				for (let k = 0; k < reps; k++) {
+					el.click();
+					await flush();
+				}
+			} else {
+				for (let k = 0; k < reps; k++) el.click();
+			}
+			return (performance.now() - t0) / reps;
+		},
+		{ sel, reps },
+	);
+}
+
 async function runTarget(t, browser) {
 	const context = await browser.newContext();
 	const page = await context.newPage();
 	page.on('pageerror', (e) => console.error(`  [${t.name}] page error:`, e.message));
 	await page.goto(t.url, { waitUntil: 'load' });
 	await page.waitForSelector(t.ready, { timeout: 15000 });
+	await page.waitForSelector('#reverse', { timeout: 15000 }).catch(() => {});
 	await seedRandom(page);
+
+	// Fresh page load ⇒ the fixture's module-level shuffle stream is at its
+	// start. Mirror it, advancing once per #shuffle click the harness fires.
+	const stream = mulberry32(SHUFFLE_SEED);
+	const gateCtx = { nextSeed: () => (stream() * 4294967296) >>> 0 };
 
 	// Warmup — let JIT settle.
 	for (let i = 0; i < 3; i++) {
@@ -365,16 +573,50 @@ async function runTarget(t, browser) {
 	}
 
 	const results = {};
+	const gateFails = {};
 	for (const op of OPS) {
-		const samples = [];
-		for (let i = 0; i < ITER; i++) {
-			await ensureState(page, op.pre);
-			const dt = await timeClick(page, op.click);
-			samples.push(dt);
-			await sleep(50);
+		if (op.gate) {
+			// Reorder op: correctness first, once, outside any timed window.
+			// A gate failure is a per-(target, op) fact — record it, skip the
+			// timing (its DOM is wrong, so any number would be garbage), and
+			// keep going so the other targets/ops still produce a full
+			// matrix. Timing each sample starts from a fresh 1k `#run`; REPS
+			// clicks inside one performance.now() window, divided. The
+			// shuffle op advances the seeded stream once per click — the
+			// harness advances its replayed stream to stay in lockstep.
+			try {
+				await identityGate(page, op, gateCtx, t.name);
+			} catch (e) {
+				const msg = String(e && e.message ? e.message : e);
+				gateFails[op.name] = msg;
+				results[op.name] = null;
+				console.error(`  ⚠ GATE FAIL ${t.name}/${op.name}: ${msg}`);
+				continue;
+			}
+			const samples = [];
+			const reps = op.reps ?? 1;
+			for (let i = 0; i < ITER; i++) {
+				await resetRows(page);
+				const dt = await timeSample(page, op.click, reps);
+				if (op.gate === 'shuffle') {
+					for (let k = 0; k < reps; k++) stream();
+				}
+				samples.push(dt);
+				await sleep(20);
+			}
+			results[op.name] = summarizeSamples(samples);
+		} else {
+			const samples = [];
+			for (let i = 0; i < ITER; i++) {
+				await ensureState(page, op.pre);
+				const dt = await timeClick(page, op.click);
+				samples.push(dt);
+				await sleep(50);
+			}
+			results[op.name] = summarizeSamples(samples);
 		}
-		results[op.name] = summarizeSamples(samples);
 	}
+	results.__gateFails = gateFails;
 
 	// Steady-state DOM shape at 1K rows (element/text/comment counts must be
 	// comparable across frameworks).
@@ -402,7 +644,7 @@ function printReport(all, targetNames) {
 		const row = [op.name.padEnd(8)];
 		for (const c of cols) {
 			const r = all[c][op.name];
-			row.push(`${r.median.toFixed(2)} (min ${r.min.toFixed(2)})`.padEnd(W));
+			row.push(r === null ? 'GATE FAIL'.padEnd(W) : `${r.median.toFixed(2)} (min ${r.min.toFixed(2)})`.padEnd(W));
 		}
 		console.log(row.join('| '));
 	}
@@ -427,10 +669,17 @@ function printReport(all, targetNames) {
 			const r = all[name];
 			console.log(`${name} / ${baselineName} ratio (score; <1 means ${name} faster):`);
 			for (const op of OPS) {
-				const ratio = scoreOf(r[op.name]) / scoreOf(baseline[op.name]);
+				const rv = r[op.name];
+				if (rv === null) {
+					console.log(`  ${op.name.padEnd(8)} GATE FAIL`);
+					continue;
+				}
+				const ratio = scoreOf(rv) / scoreOf(baseline[op.name]);
 				const tag = ratio < 0.95 ? '++ faster' : ratio < 1.05 ? '== ~equal' : '-- slower';
 				console.log(`  ${op.name.padEnd(8)} ${ratio.toFixed(2)}x  ${tag}`);
 			}
+			const gate = gateSummary(r.__gateFails);
+			if (gate !== 'pass') console.log(`  identity gate: ${gate}`);
 			console.log();
 		}
 	}
@@ -470,10 +719,13 @@ function printReport(all, targetNames) {
 				versions: versions[name],
 				ops: Object.fromEntries(
 					Object.entries(all[name])
-						.filter(([key]) => key !== '__dom')
-						.map(([key, r]) => [key, timingStatForJson(r)]),
+						.filter(([key]) => key !== '__dom' && key !== '__gateFails')
+						.map(([key, r]) => [key, r === null ? null : timingStatForJson(r)]),
 				),
-				meta: { dom: all[name].__dom },
+				meta: {
+					dom: all[name].__dom,
+					identityGate: gateSummary(all[name].__gateFails),
+				},
 			})),
 		};
 
@@ -560,7 +812,7 @@ function buildViewHtml(payload, { prevRun, nextRun } = {}) {
 					...OPS.map((op) => ({
 						op: op.name,
 						values: Object.fromEntries(
-							names.map((name) => [name, targets.find((t) => t.name === name).ops[op.name]?.score]),
+							names.map((name) => [name, targets.find((t) => t.name === name).ops[op.name]?.score ?? null]),
 						),
 					})),
 					{ op: 'total', total: true, format: 'ratio', values: total },

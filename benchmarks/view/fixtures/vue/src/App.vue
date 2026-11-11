@@ -62,6 +62,64 @@
 	const select = (id) => (selected.value = id);
 	const remove = (id) =>
 		commit((data) => data.filter((row) => row.id !== id));
+
+	// ── Deterministic shuffle machinery (BYTE-IDENTICAL across all bench
+	// fixtures, replayed by run.mjs for the reorder ops' identity gate) ──────
+	function mulberry32(seed) {
+		return () => {
+			seed |= 0;
+			seed = (seed + 0x6d2b79f5) | 0;
+			let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+			t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+		};
+	}
+	const SHUFFLE_SEED = 42;
+	const shuffleSeeds = mulberry32(SHUFFLE_SEED);
+	const nextShuffleSeed = () => (shuffleSeeds() * 4294967296) >>> 0;
+	function shuffleWithSeed(d, seed) {
+		const rand = mulberry32(seed);
+		const out = d.slice();
+		for (let i = out.length - 1; i > 0; i--) {
+			const j = (rand() * (i + 1)) | 0;
+			const tmp = out[i];
+			out[i] = out[j];
+			out[j] = tmp;
+		}
+		return out;
+	}
+
+	// ── Keyed-reorder matrix. Each op replaces the rows ref with a fresh
+	// array built from the CURRENT one (never in-place).
+	const reverseRows = () => (rows.value = rows.value.toReversed());
+	const shuffleRows = () => {
+		// Seed drawn HERE (once per click) — keeps the stream in lockstep with
+		// the harness's replayed stream.
+		const seed = nextShuffleSeed();
+		rows.value = shuffleWithSeed(rows.value, seed);
+	};
+	const rotateForward = () => {
+		const d = rows.value;
+		rows.value = d.length === 0 ? d : [d[d.length - 1], ...d.slice(0, -1)];
+	};
+	const rotateBackward = () => {
+		const d = rows.value;
+		rows.value = d.length === 0 ? d : [...d.slice(1), d[0]];
+	};
+	const prepend100 = () => (rows.value = buildData(100).concat(rows.value));
+	const append100 = () => (rows.value = rows.value.concat(buildData(100)));
+	const insertMid100 = () => {
+		const d = rows.value;
+		const mid = d.length >> 1;
+		rows.value = d.slice(0, mid).concat(buildData(100), d.slice(mid));
+	};
+	const removeFirst = () => (rows.value = rows.value.slice(1));
+	const removeEvery10 = () => (rows.value = rows.value.filter((_, i) => i % 10 !== 0));
+	// displace_k: move the FIRST k rows (as a group, order preserved) to the END.
+	const displace = (k) => {
+		const d = rows.value;
+		rows.value = d.slice(k).concat(d.slice(0, k));
+	};
 </script>
 
 <template>
@@ -104,6 +162,78 @@
 								@click="swapRows"
 							>
 								Swap Rows
+							</button>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="reverse" @click="reverseRows">
+								Reverse rows
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="shuffle" @click="shuffleRows">
+								Shuffle rows (seeded)
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="rotatef" @click="rotateForward">
+								Rotate last to front
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="rotateb" @click="rotateBackward">
+								Rotate first to end
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="prepend100" @click="prepend100">
+								Prepend 100 rows
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="append100" @click="append100">
+								Append 100 rows
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="insertmid100" @click="insertMid100">
+								Insert 100 rows at middle
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="removefirst" @click="removeFirst">
+								Remove first row
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="removeevery10" @click="removeEvery10">
+								Remove every 10th row
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="displace3" @click="displace(3)">
+								Displace first 3 to end
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="displace4" @click="displace(4)">
+								Displace first 4 to end
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="displace5" @click="displace(5)">
+								Displace first 5 to end
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="displace6" @click="displace(6)">
+								Displace first 6 to end
+							</button>
+						</div>
+						<div class="col-sm-6 smallpad">
+							<button type="button" class="btn btn-primary btn-block" id="displace8" @click="displace(8)">
+								Displace first 8 to end
 							</button>
 						</div>
 					</div>

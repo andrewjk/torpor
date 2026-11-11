@@ -75,10 +75,67 @@ const listReducer = (state, action) => {
 		}
 		case 'SELECT':
 			return { data, selected: action.id };
+		// ── Keyed-reorder matrix ops (run.mjs). All produce a fresh array from
+		// the current one — never mutate in place. The shuffle machinery below
+		// is byte-for-byte the same as every other bench fixture, replayed by
+		// run.mjs for the reorder ops' identity gate.
+		case 'REVERSE':
+			return { data: data.toReversed(), selected };
+		case 'SHUFFLE':
+			// action.seed was drawn in the click handler — one seed per click
+			// keeps the stream in lockstep with the harness's replayed stream.
+			return { data: shuffleWithSeed(data, action.seed), selected };
+		case 'ROTATE_F':
+			return data.length === 0
+				? state
+				: { data: [data[data.length - 1], ...data.slice(0, -1)], selected };
+		case 'ROTATE_B':
+			return data.length === 0 ? state : { data: [...data.slice(1), data[0]], selected };
+		case 'PREPEND_100':
+			return { data: buildData(100).concat(data), selected };
+		case 'APPEND_100':
+			return { data: data.concat(buildData(100)), selected };
+		case 'INSERT_MID_100': {
+			const mid = data.length >> 1;
+			return { data: data.slice(0, mid).concat(buildData(100), data.slice(mid)), selected };
+		}
+		case 'REMOVE_FIRST':
+			return { data: data.slice(1), selected };
+		case 'REMOVE_EVERY_10':
+			return { data: data.filter((_, i) => i % 10 !== 0), selected };
+		// displace_k: move the FIRST k rows (as a group, order preserved) to the END.
+		case 'DISPLACE':
+			return { data: data.slice(action.k).concat(data.slice(0, action.k)), selected };
 		default:
 			return state;
 	}
 };
+
+// ── Deterministic shuffle machinery (BYTE-IDENTICAL across all bench
+// fixtures, replayed by run.mjs for the reorder ops' identity gate) ───────
+function mulberry32(seed) {
+	return () => {
+		seed |= 0;
+		seed = (seed + 0x6d2b79f5) | 0;
+		let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+		t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+	};
+}
+const SHUFFLE_SEED = 42;
+const shuffleSeeds = mulberry32(SHUFFLE_SEED);
+const nextShuffleSeed = () => (shuffleSeeds() * 4294967296) >>> 0;
+function shuffleWithSeed(d, seed) {
+	const rand = mulberry32(seed);
+	const out = d.slice();
+	for (let i = out.length - 1; i > 0; i--) {
+		const j = (rand() * (i + 1)) | 0;
+		const tmp = out[i];
+		out[i] = out[j];
+		out[j] = tmp;
+	}
+	return out;
+}
 
 const Row = memo(
 	({ selected, item, dispatch }) => (
@@ -130,6 +187,66 @@ const Jumbotron = memo(
 						/>
 						<Button id="clear" title="Clear" cb={() => dispatch({ type: 'CLEAR' })} />
 						<Button id="swaprows" title="Swap Rows" cb={() => dispatch({ type: 'SWAP_ROWS' })} />
+					</div>
+					<div className="row">
+						<Button id="reverse" title="Reverse rows" cb={() => dispatch({ type: 'REVERSE' })} />
+						<Button
+							id="shuffle"
+							title="Shuffle rows (seeded)"
+							cb={() => dispatch({ type: 'SHUFFLE', seed: nextShuffleSeed() })}
+						/>
+						<Button id="rotatef" title="Rotate last to front" cb={() => dispatch({ type: 'ROTATE_F' })} />
+						<Button id="rotateb" title="Rotate first to end" cb={() => dispatch({ type: 'ROTATE_B' })} />
+						<Button
+							id="prepend100"
+							title="Prepend 100 rows"
+							cb={() => dispatch({ type: 'PREPEND_100' })}
+						/>
+						<Button
+							id="append100"
+							title="Append 100 rows"
+							cb={() => dispatch({ type: 'APPEND_100' })}
+						/>
+						<Button
+							id="insertmid100"
+							title="Insert 100 rows at middle"
+							cb={() => dispatch({ type: 'INSERT_MID_100' })}
+						/>
+						<Button
+							id="removefirst"
+							title="Remove first row"
+							cb={() => dispatch({ type: 'REMOVE_FIRST' })}
+						/>
+						<Button
+							id="removeevery10"
+							title="Remove every 10th row"
+							cb={() => dispatch({ type: 'REMOVE_EVERY_10' })}
+						/>
+						<Button
+							id="displace3"
+							title="Displace first 3 to end"
+							cb={() => dispatch({ type: 'DISPLACE', k: 3 })}
+						/>
+						<Button
+							id="displace4"
+							title="Displace first 4 to end"
+							cb={() => dispatch({ type: 'DISPLACE', k: 4 })}
+						/>
+						<Button
+							id="displace5"
+							title="Displace first 5 to end"
+							cb={() => dispatch({ type: 'DISPLACE', k: 5 })}
+						/>
+						<Button
+							id="displace6"
+							title="Displace first 6 to end"
+							cb={() => dispatch({ type: 'DISPLACE', k: 6 })}
+						/>
+						<Button
+							id="displace8"
+							title="Displace first 8 to end"
+							cb={() => dispatch({ type: 'DISPLACE', k: 8 })}
+						/>
 					</div>
 				</div>
 			</div>

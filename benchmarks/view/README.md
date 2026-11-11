@@ -2,16 +2,45 @@
 
 Client-side benchmark comparing `@torpor/view` with React, Svelte, Vue and
 Solid. Adapted from the js-framework-bench suite in `torpor-bench`
-(krausest/js-framework-benchmark methodology), trimmed to the core nine ops so
-a full run takes ~1 minute:
+(krausest/js-framework-benchmark methodology), trimmed so a full run takes
+~1–2 minutes. Nine core ops:
 
 `run` (create 1,000 rows), `replace` (re-create), `add` (append 1,000), 
 `update` (every 10th row), `select`, `swap`, `remove`, `runlots` (10,000 rows)
 and `clear` (of the 10,000-row table).
 
+Plus a 14-op keyed-reorder matrix (from `torpor-bench`'s run-reorder harness):
+`reverse`, `shuffle` (seeded), `rotatef`/`rotateb`, `prepend100`, `append100`,
+`insertmid100`, `removefirst`, `removeevery10`, and `displace3…8` (move the
+first k rows, as a group, to the end).
+
 Each framework implements the same keyed 1,000-row table with the same DOM
 shape, driven through the same buttons (`#run`, `#runlots`, `#add`, `#update`,
-`#clear`, `#swaprows`) and per-row select/remove anchors.
+`#clear`, `#swaprows`, plus the reorder row `#reverse`, `#shuffle`,
+`#rotatef`, `#rotateb`, `#prepend100`, `#append100`, `#insertmid100`,
+`#removefirst`, `#removeevery10`, `#displace3…8`) and per-row select/remove
+anchors.
+
+## Reorder ops
+
+Most reorder ops sit far below `performance.now()`'s resolution (a rotate is
+~1 DOM move), so each timed sample loops REPS clicks inside one
+`performance.now()` window and divides: REPS=100 for the rotate pair, REPS=20
+for `displace_k`/`removefirst`/`removeevery10`, REPS=4 for `reverse` +
+`shuffle`, REPS=1 for the 100-row inserts. Every sample starts from a fresh
+1,000-row `#run` (outside the timed window); each click flushes synchronously
+so REPS state changes can't coalesce into one commit.
+
+Correctness is gated before timing: for each reorder op the runner stamps
+every `<tr>` with an expando, performs one click, and asserts (a) every
+surviving row is rendered by the *same* DOM node (the framework moved it, not
+rebuilt it) and (b) DOM order matches the op replayed on the pre-click row-id
+list. `shuffle`'s expected order comes from replaying the fixtures' shared
+deterministic shuffle stream (module-level mulberry32, seed 42, one seed per
+`#shuffle` click — byte-identical in every fixture and mirrored in the
+runner). A gate failure is recorded per target/op, the op's timing is skipped
+(shown as `GATE FAIL` / `—`), and the run carries `meta.identityGate` in the
+JSON payload.
 
 ## Running
 
