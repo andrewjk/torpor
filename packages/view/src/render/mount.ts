@@ -5,6 +5,7 @@ import isServerComponent from "./isServerComponent";
 import context from "./context";
 import newRegion from "./newRegion";
 import pushRegion from "./pushRegion";
+import { registerRegionTree } from "./regionTreeRegistry";
 
 /**
  * Mounts a component into a DOM node
@@ -15,7 +16,13 @@ import pushRegion from "./pushRegion";
  * handlers. (`hydrate` mounts into server-rendered markup, which is already
  * connected.)
  *
- * @param parent The node to mount the component into
+ * When a root region is already live (an embed mounting into an element
+ * inside a mounted page), the component mounts against a region tree of its
+ * own and the surrounding render context is left untouched — so tearing the
+ * embed down later (`unmount(parent)`) disposes only the embed.
+ *
+ * @param parent The node to mount into. Like `hydrate`, it must have no
+ * child elements
  * @param component The component to mount
  * @param props An object containing component props
  */
@@ -42,13 +49,33 @@ export default function mount(
 		parent.firstChild.remove();
 	}
 
+	// Remember the surrounding render context, if any, so the component can
+	// mount into a tree of its own and the host's context can be restored
+	const nested = context.rootRegion !== null;
+	const saved = nested
+		? {
+				activeRegion: context.activeRegion,
+				previousRegion: context.previousRegion,
+				rootRegion: context.rootRegion,
+			}
+		: null;
+
 	// Create and push the root region
-	if (context.rootRegion === null) {
-		context.rootRegion = newRegion(devContext.enabled ? "Root" : undefined);
-		context.previousRegion = context.rootRegion;
-		pushRegion(context.rootRegion);
-	}
+	const root = newRegion(devContext.enabled ? "Root" : undefined);
+	context.rootRegion = root;
+	context.previousRegion = root;
+	pushRegion(root);
 
 	// Call the component's render function
 	component(parent, null, props, undefined, slots);
+
+	if (saved !== null) {
+		// Pop back to the host's render context; the embed keeps living in
+		// its own tree, to be torn down by `unmount(parent)`.
+		context.rootRegion = saved.rootRegion;
+		context.previousRegion = saved.previousRegion;
+		context.activeRegion = saved.activeRegion;
+	}
+
+	registerRegionTree(parent, root);
 }

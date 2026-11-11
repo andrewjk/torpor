@@ -61,6 +61,10 @@ test("stream -- debounce only handles the last event in a burst", async () => {
 	// Only the last event of the burst is handled
 	expect((window as any).__streamLog).toEqual(["d"]);
 	expect(queryByText(container, "Last: d")).not.toBeNull();
+
+	// Test hygiene: the app stays alive (its document listeners included)
+	// until unmounted — later tests dispatch their own events.
+	unmount(container);
 });
 
 test("stream -- unmount drops a pending debounced call", async () => {
@@ -95,4 +99,6 @@ test("stream -- debounce hydrates", async () => {
 
 	expect((window as any).__streamLog).toEqual(["a"]);
 	expect(queryByText(container, "Last: a")).not.toBeNull();
+
+	unmount(container);
 });
