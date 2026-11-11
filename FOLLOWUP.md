@@ -126,8 +126,8 @@ deliberately:
 - Columns are read once at setup (adding a column later won't re-render
   headers). Rows are fully reactive; columns assumed static.
 - Sorting a loader-backed grid refetches with `sortBy`/`sortDirection` in the
-  request but there is no optimistic local sort or stale-request cancellation
-  yet (the `AbortSignal` param exists on the Loader type, unused by DataGrid).
+  request (and superseded requests are aborted via the loader's `AbortSignal`);
+  there is still no optimistic local sort.
 - `aria-rowcount` is set from the loader's `total` when provided; not wired to
   `aria-rowindex` on rows.
 
@@ -137,9 +137,9 @@ ComboBox and SelectBox now accept the shared `load` prop (utils/loader.ts
 `createItemLoader`) and auto-render a ListBox of loaded options when no
 content is slotted in. Left out deliberately:
 
-- Stale-response ordering relies on `$async`'s generation guard; no
-  AbortSignal is passed to loaders yet, so cancelled fetches still run to
-  completion over the wire.
+- Stale-response ordering relies on `$async`'s generation guard; loaders also
+  receive an `AbortSignal` now (superseded requests are aborted, and their
+  rejections swallowed), so well-behaved loaders can cancel the wire request.
 - SelectBox loads once per mount (content stays mounted but hidden), not once
   per open; a refresh-on-reopen option may be wanted.
 - ~~Tree lazy child loading doesn't fit this shape~~ -- it did after all: Tree

@@ -91,12 +91,29 @@ export interface ItemLoaderState<T = any> {
 export function createItemLoader<T = any, TRequest extends LoadRequest = LoadRequest>(
 	options: ItemLoaderOptions<T, TRequest>,
 ): ItemLoaderState<T> {
+	// The in-flight fetch's controller: a re-run (search text changed, item
+	// expanded) aborts it, so loaders that take the signal can cancel the
+	// wire request. The $async generation guard discards stale results
+	// application-side either way.
+	let abort: AbortController | null = null;
+
 	return $watch({
 		get result(): LoadResult<T> | undefined {
 			return $async(() => {
-				const promise = Promise.resolve(options.load(options.getRequest())).then(
-					normalizeLoadResult,
-				);
+				abort?.abort();
+				const controller = new AbortController();
+				abort = controller;
+				const promise = Promise.resolve(options.load(options.getRequest(), controller.signal))
+					.then(normalizeLoadResult)
+					.catch((error) => {
+						// Our own abort is not an error — the superseding fetch
+						// owns the UI, so this one never settles instead of
+						// rejecting into the await boundary
+						if (controller.signal.aborted) {
+							return new Promise<LoadResult<T>>(() => {});
+						}
+						throw error;
+					});
 				// Report successful loads to the consumer; failures surface
 				// through the component's error boundary, not this chain
 				promise.then(

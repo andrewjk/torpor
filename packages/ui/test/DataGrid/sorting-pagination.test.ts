@@ -114,6 +114,83 @@ describe("DataGrid - Sorting", () => {
 
 		expect(requests.at(-1)).toMatchObject({ sortBy: "name", sortDirection: "asc" });
 	});
+
+	it("passes an AbortSignal and aborts superseded requests", async () => {
+		const signals: AbortSignal[] = [];
+		const resolvers: ((value: DataGridLoadEvent) => void)[] = [];
+		const load = vi.fn((_request: any, signal?: AbortSignal) => {
+			signals.push(signal!);
+			return new Promise<DataGridLoadEvent>((r) => resolvers.push(r));
+		});
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, LoaderGrid as any, { load });
+
+		// First load: resolve it so the table (with the sort buttons) renders
+		expect(signals.length).toBe(1);
+		expect(signals[0].aborted).toBe(false);
+		resolvers[0]({ items: [{ name: "Alice" }] });
+		await tick();
+
+		// Sorting starts a second load, which aborts the first — superseded
+		// requests get their signal aborted whether they settled or not
+		await userEvent.click(queryByRole(container, "button", { name: "Name" })!);
+		await tick();
+		expect(signals.length).toBe(2);
+		expect(signals[0].aborted).toBe(true);
+		expect(signals[1].aborted).toBe(false);
+		expect(load).toHaveBeenLastCalledWith(expect.anything(), signals[1]);
+
+		// A third load aborts the second one while it's still in flight
+		await userEvent.click(queryByRole(container, "button", { name: "Name" })!);
+		await tick();
+		expect(signals.length).toBe(3);
+		expect(signals[1].aborted).toBe(true);
+		expect(signals[2].aborted).toBe(false);
+
+		// Only the latest load's rows render
+		resolvers[1]({ items: [{ name: "stale" }] });
+		resolvers[2]({ items: [{ name: "fresh" }] });
+		await tick();
+		expect(bodyColumn(container, 0)).toEqual(["fresh"]);
+	});
+
+	it("an abort rejection is swallowed, not sent to the error boundary", async () => {
+		const resolvers: ((value: DataGridLoadEvent) => void)[] = [];
+		let calls = 0;
+		// A loader implemented like fetch: rejects with AbortError when its
+		// signal fires
+		const load = (_request: any, signal?: AbortSignal) => {
+			calls++;
+			if (calls === 1) {
+				return Promise.resolve({ items: [{ name: "Alice" }] });
+			}
+			return new Promise<DataGridLoadEvent>((resolveInner, reject) => {
+				signal!.addEventListener("abort", () => {
+					const error = new Error("The operation was aborted");
+					error.name = "AbortError";
+					reject(error);
+				});
+				resolvers.push(resolveInner);
+			});
+		};
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, LoaderGrid as any, { load });
+		await tick();
+
+		// Supersede the second load while it's in flight
+		await userEvent.click(queryByRole(container, "button", { name: "Name" })!);
+		await tick();
+		await userEvent.click(queryByRole(container, "button", { name: "Name" })!);
+		await tick();
+
+		// Settle the latest load: the grid shows its rows, not an error
+		resolvers.at(-1)!({ items: [{ name: "Bob" }] });
+		await tick();
+		expect(container.querySelector('[role="alert"]')).toBeNull();
+		expect(bodyColumn(container, 0)).toEqual(["Bob"]);
+	});
 });
 
 describe("DataGrid - Pagination", () => {

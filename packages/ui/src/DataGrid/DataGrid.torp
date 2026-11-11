@@ -228,6 +228,11 @@ export default function DataGrid($props: DataGridProps) {
 	// Incremented on every load; only the latest load's settle updates
 	// the pending flag
 	let loadGeneration = 0;
+	// The in-flight load's controller: starting a new load aborts it, so
+	// loaders that take the signal can cancel the wire request. Loaders that
+	// ignore it still work — the generation check discards stale results
+	// application-side either way.
+	let loadAbort: AbortController | null = null;
 
 	function runLoad(): Promise<LoadResult> {
 		const request: LoadRequest = {};
@@ -243,9 +248,22 @@ export default function DataGrid($props: DataGridProps) {
 		// only the latest load's settle clears the flag, so a reload that
 		// overtakes an older request doesn't drop the indicator early
 		const generation = ++loadGeneration;
+		loadAbort?.abort();
+		const controller = new AbortController();
+		loadAbort = controller;
 		$state.reloading = true;
 		$props.onloadstart?.();
-		const result = Promise.resolve(($props.load as Loader)(request)).then(normalizeLoadResult);
+		const result = Promise.resolve(($props.load as Loader)(request, controller.signal))
+			.then(normalizeLoadResult)
+			.catch((error) => {
+				// Our own abort is not an error — the superseding load owns the
+				// UI, so this one never settles instead of rejecting into the
+				// error boundary
+				if (controller.signal.aborted) {
+					return new Promise<LoadResult>(() => {});
+				}
+				throw error;
+			});
 		// Report successful loads to the consumer; failures surface through
 		// the component's error boundary, not this notification chain
 		result.then(

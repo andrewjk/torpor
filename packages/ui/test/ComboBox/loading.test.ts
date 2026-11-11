@@ -93,6 +93,32 @@ describe("ComboBox - Loading options from a network loader", () => {
 		expect(queryByText(container, "Cat")).toBeInTheDocument();
 	});
 
+	it("aborts the previous request when the search changes", async () => {
+		const signals: AbortSignal[] = [];
+		const load = (_request: any, signal?: AbortSignal) => {
+			signals.push(signal!);
+			// Resolves eventually, but slowly enough that a new request
+			// overtakes it
+			return new Promise<LoadResult>((r) => setTimeout(() => r({ items: [] }), 100));
+		};
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, LoaderComboBox as any, { value: null, load });
+
+		await tick();
+		expect(signals.length).toBe(1);
+		expect(signals[0].aborted).toBe(false);
+
+		const input = getInput(container);
+		await userEvent.click(input);
+		await userEvent.type(input, "c");
+
+		// The initial fetch was superseded by the search fetch
+		expect(signals.length).toBe(2);
+		expect(signals[0].aborted).toBe(true);
+		expect(signals[1].aborted).toBe(false);
+	});
+
 	it("debounces refetches when debounceMs is set", async () => {
 		const deferred = createDeferredLoader();
 		const container = document.createElement("div");
