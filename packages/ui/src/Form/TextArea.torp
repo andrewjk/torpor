@@ -1,4 +1,5 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import createFormField from "../utils/formField";
 import getId from "../utils/getId";
 import {
 	type FieldContext,
@@ -42,11 +43,10 @@ interface TextAreaProps {
 export default function TextArea($props: TextAreaProps | undefined) {
 	let defaultId = getId();
 
-	let blurred = false;
-
 	// Get stuff out of the FormContext and FieldContext
-	const formContext = $context[FormContextName] as FormContext;
-	const fieldContext = $context[FieldContextName] as FieldContext;
+	const formContext = $context[FormContextName] as FormContext | undefined;
+	const fieldContext = $context[FieldContextName] as FieldContext | undefined;
+	const form = createFormField(() => $props?.name, formContext, fieldContext);
 
 	// Use the FieldContext's state, or create a new one
 	let $state =
@@ -65,22 +65,14 @@ export default function TextArea($props: TextAreaProps | undefined) {
 	$bind($state, $props, "value");
 
 	function handleInput(e: Event) {
-		if (formContext) {
-			formContext.validate();
-		}
-		if (fieldContext && blurred) {
-			fieldContext.validate();
-		}
+		form.handleInput();
 		if ($props?.oninput) {
 			$props.oninput(e);
 		}
 	}
 
 	function handleBlur() {
-		if (fieldContext) {
-			fieldContext.validate();
-		}
-		blurred = true;
+		form.handleBlur();
 	}
 
 	@render {
@@ -88,7 +80,7 @@ export default function TextArea($props: TextAreaProps | undefined) {
 			id={$props?.id ?? defaultId}
 			class={["torp-text-area", $props?.class]}
 			{$props?.style}
-			name={$props?.name ?? fieldContext?.name}
+			name={form.name}
 			&value={$state.value}
 			{$props?.rows}
 			{$props?.placeholder}
@@ -96,9 +88,9 @@ export default function TextArea($props: TextAreaProps | undefined) {
 			{$props?.required}
 			{$props?.maxlength}
 			aria-label={$props?.ariaLabel}
-			data-valid={$state.valid ? "valid" : "invalid"}
-			aria-describedby={$state.messageId}
-			aria-invalid={fieldContext && !$state.valid ? "true" : undefined}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+			aria-invalid={form.inField && !form.valid ? "true" : undefined}
 			{$props?.onchange}
 			oninput={handleInput}
 			onblur={handleBlur}

@@ -25,22 +25,23 @@ export interface FormField {
  *
  * ```ts
  * const form = createFormField(
- * 	$props?.name,
+ * 	() => $props?.name,
  * 	$context[FormContextName] as FormContext | undefined,
  * 	$context[FieldContextName] as FieldContext | undefined,
  * );
  * ```
  */
 export default function createFormField(
-	name: string | undefined,
+	name: string | undefined | (() => string | undefined),
 	formContext: FormContext | undefined,
 	fieldContext: FieldContext | undefined,
 ): FormField {
 	let blurred = false;
+	const resolveName = typeof name === "function" ? name : () => name;
 
 	return {
 		get name() {
-			return name ?? fieldContext?.name;
+			return resolveName() ?? fieldContext?.name;
 		},
 		get inField(): boolean {
 			return fieldContext !== undefined;

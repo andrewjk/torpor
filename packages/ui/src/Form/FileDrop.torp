@@ -1,4 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import createFormField from "../utils/formField";
 import getId from "../utils/getId";
 import {
 	type FieldContext,
@@ -41,15 +42,14 @@ export default function FileDrop($props: FileDropProps | undefined) {
 	}
 	let input: HTMLInputElement;
 
-	let blurred = false;
-
 	function getDisabled(): boolean {
 		return $props?.disabled === true;
 	}
 
 	// Get stuff out of the FormContext and FieldContext
-	const formContext = $context[FormContextName] as FormContext;
-	const fieldContext = $context[FieldContextName] as FieldContext;
+	const formContext = $context[FormContextName] as FormContext | undefined;
+	const fieldContext = $context[FieldContextName] as FieldContext | undefined;
+	const form = createFormField(() => $props?.name, formContext, fieldContext);
 
 	// This will change the form's enctype to `multipart/form-data`
 	if (formContext) {
@@ -76,12 +76,7 @@ export default function FileDrop($props: FileDropProps | undefined) {
 		if (all.length === 0) return;
 		const selected = $props?.multiple ? all : all.slice(0, 1);
 
-		if (formContext) {
-			formContext.validate();
-		}
-		if (fieldContext && blurred) {
-			fieldContext.validate();
-		}
+		form.handleInput();
 
 		$props?.onfiles?.(selected);
 	}
@@ -125,10 +120,7 @@ export default function FileDrop($props: FileDropProps | undefined) {
 	}
 
 	function handleBlur() {
-		if (fieldContext) {
-			fieldContext.validate();
-		}
-		blurred = true;
+		form.handleBlur();
 	}
 
 	@render {
@@ -144,9 +136,9 @@ export default function FileDrop($props: FileDropProps | undefined) {
 			tabindex={getDisabled() ? -1 : 0}
 			aria-label={$props?.ariaLabel}
 			aria-disabled={getDisabled() ? "true" : undefined}
-			data-valid={$state.valid ? "valid" : "invalid"}
-			aria-describedby={$state.messageId}
-			aria-invalid={fieldContext && !$state.valid ? "true" : undefined}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+			aria-invalid={form.inField && !form.valid ? "true" : undefined}
 			onclick={handleClick}
 			onkeydown={handleKey}
 			onblur={handleBlur}
@@ -163,7 +155,7 @@ export default function FileDrop($props: FileDropProps | undefined) {
 			id={getInputId()}
 			class="torp-file-drop-input"
 			type="file"
-			name={$props?.name ?? fieldContext?.name}
+			name={form.name}
 			aria-hidden="true"
 			tabindex={-1}
 			multiple={$props?.multiple}

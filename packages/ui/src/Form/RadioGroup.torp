@@ -55,7 +55,7 @@ export default function RadioGroup($props: RadioGroupProps | undefined) {
 	// Wire up the enclosing Form and Field, if any
 	const formContext = $context[FormContextName] as FormContext | undefined;
 	const fieldContext = $context[FieldContextName] as FieldContext | undefined;
-	const form = createFormField($props?.name, formContext, fieldContext);
+	const form = createFormField(() => $props?.name, formContext, fieldContext);
 
 	let $state = $watch({
 		value: $props?.value,

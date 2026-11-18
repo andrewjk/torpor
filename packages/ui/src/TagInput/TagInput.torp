@@ -69,7 +69,7 @@ export default function TagInput($props: TagInputProps | undefined) {
 
 	// Wire up the enclosing Form and Field, if any
 	const form = createFormField(
-		$props?.name,
+		() => $props?.name,
 		$context[FormContextName] as FormContext | undefined,
 		$context[FieldContextName] as FieldContext | undefined,
 	);

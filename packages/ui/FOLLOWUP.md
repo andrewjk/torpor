@@ -7,9 +7,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Duplication and inconsistencies
 
-- **Form wiring is duplicated**: `Form/*` (Input, TextArea, Select, CheckBox,
-  Toggle, File, FileDrop) re-implements the blurred/validate logic that
-  `utils/formField.ts` (`createFormField`) provides.
 - **Form submission isn't uniform**: most inputs use `FormValues`;
   DatePicker and DateRangePicker hand-roll hidden inputs, and DateRangePicker
   submits `name-start` / `name-end` while other multi-value inputs submit
