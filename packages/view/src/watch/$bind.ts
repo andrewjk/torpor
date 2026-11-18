@@ -6,9 +6,10 @@ import $run from "./$run";
  *
  * For each key, `$bind` creates:
  * - **Forward sync** (`props → state`): when the parent pushes a new value via
- *   `$props[key]`, it flows into `$state[key]`. Skips `undefined` values so
- *   that defaults set in the initial `$watch(...)` are preserved when the
- *   parent doesn't provide a value.
+ *   `$props[key]`, it flows into `$state[key]`. `undefined` is skipped on the
+ *   first run only, so defaults set in the initial `$watch(...)` are preserved
+ *   when the parent doesn't provide a value -- while a later `undefined` (a
+ *   parent resetting a bound value to empty) clears the state value.
  * - **Backward sync** (`state → props`): when the component mutates
  *   `$state[key]`, the new value is written back to `$props[key]`, which the
  *   call site's `&key={...}` binding picks up and propagates to the parent.
@@ -46,10 +47,14 @@ export default function $bind(
 					`$bind syncs same-named keys, so the state object must declare it (e.g. in the initial $watch).`,
 			);
 		}
-		// Forward: props → state (skip undefined so $watch defaults survive)
+		// Forward: props → state. `undefined` is skipped on the first run only,
+		// so $watch defaults survive when the prop starts out missing or
+		// undefined; a later `undefined` still clears the value
+		let firstForward = true;
 		$run(() => {
 			const v = props[key];
-			if (v !== undefined) state[key] = v;
+			if (v !== undefined || !firstForward) state[key] = v;
+			firstForward = false;
 		}, `bind:forward:${key}`);
 		// Backward: state → props (skip the initial write — there's nothing to
 		// propagate yet, and echoing the initial state into props would make

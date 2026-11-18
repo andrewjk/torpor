@@ -367,7 +367,9 @@ A refresh is loud regardless of `silent` when the computed has never resolved
 Two-way sync between matching keys on `state` and `props`:
 
 - **Forward** (`props → state`): when the parent pushes `$props[key]`, it flows
-  into `$state[key]`. Skips `undefined` so `$watch` defaults survive.
+  into `$state[key]`. `undefined` is skipped on the first run only, so `$watch`
+  defaults survive when the prop is initially missing or undefined; a later
+  `undefined` (the parent resetting a bound value to empty) clears the value.
 - **Backward** (`state → props`): when the component mutates `$state[key]`, it
   writes back to `$props[key]`, which the call site's `&key={...}` picks up.
 

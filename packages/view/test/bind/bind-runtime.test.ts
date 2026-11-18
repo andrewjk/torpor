@@ -14,7 +14,7 @@ test("$bind forwards props → state on parent write", () => {
 
 test("$bind forward skips undefined so $watch defaults survive", () => {
 	let $state = $watch({ name: "default" });
-	let $props = $watch({ name: undefined });
+	let $props = $watch({ name: undefined as string | undefined });
 
 	$bind($state, $props, "name");
 
@@ -23,6 +23,41 @@ test("$bind forward skips undefined so $watch defaults survive", () => {
 
 	$props.name = "a value";
 	expect($state.name).toBe("a value");
+});
+
+test("$bind clears the state value when the parent pushes undefined", () => {
+	// A parent resetting a bound value to empty must reach the child; the
+	// skip-undefined behavior is only for the initial run
+	let $state = $watch({ name: "default" });
+	let $props = $watch({ name: "parent" as string | undefined });
+
+	$bind($state, $props, "name");
+
+	$props.name = undefined;
+	expect($state.name).toBe(undefined);
+
+	// And the default doesn't come back once cleared
+	$props.name = "again";
+	$props.name = undefined;
+	expect($state.name).toBe(undefined);
+});
+
+test("$bind forward skips an initially-undefined prop without clobbering later clears", () => {
+	let $state = $watch({ name: "default" });
+	let $props = $watch({ name: undefined as string | undefined });
+
+	$bind($state, $props, "name");
+
+	// The prop was undefined at setup; the default survives...
+	expect($state.name).toBe("default");
+
+	// ...a real value syncs...
+	$props.name = "a value";
+	expect($state.name).toBe("a value");
+
+	// ...and clearing it afterwards empties the state
+	$props.name = undefined;
+	expect($state.name).toBe(undefined);
 });
 
 test("$bind backward syncs state → props on state mutation", () => {

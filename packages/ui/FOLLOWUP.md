@@ -5,21 +5,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Bugs
 
-### `$bind` can never clear a value to `undefined` (confirmed)
-
-`packages/view/src/watch/$bind.ts` skips `undefined` on every forward
-(props → state) sync, not just the initial one. A parent therefore cannot
-reset a bound value to empty: `$state.value = undefined` in the parent leaves
-the child's state at its old value.
-
-This affects every clearable single-value component: ColorPicker,
-ColorPalette, DatePicker, DateRangePicker, TimePicker, SelectBox, ComboBox,
-ListBox (single), Tree (single), Accordion (single), MenuRadioGroup.
-
-Possible fix: only skip `undefined` while the prop has never been provided
-(e.g. `key in props`, which the docs say is absent for unpassed optional
-props), or only on the first run.
-
 ### ColorPicker submits its value twice inside a Field (confirmed)
 
 Inside a `Field`, both `ColorPicker` and its inner `ColorPalette` resolve the
