@@ -5,14 +5,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Bugs
 
-## Missing components
-
-Roughly in priority order:
-
-- Smaller: OTP/PIN input, combined DateTimePicker, inline Alert
-  (`role="alert"`, non-toast), VirtualList (only DataGrid virtualizes),
-  Rich text (already in PLAN.md).
-
 ## Duplication and inconsistencies
 
 - **Popover / Contextual are near-copies**: root, trigger, content and the
