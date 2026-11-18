@@ -14,6 +14,7 @@ const components = [
 	"DataGrid",
 	"DatePicker",
 	"DateRangePicker",
+	"DateTimePicker",
 	"Dialog",
 	"Disclosure",
 	"Drawer",

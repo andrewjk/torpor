@@ -1,0 +1,265 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import {
+	Calendar,
+	CalendarDay,
+	CalendarDayHeader,
+	CalendarGrid,
+	CalendarGridHeader,
+	CalendarHeader,
+	CalendarHeaderTrigger,
+} from "../Calendar/index";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
+import { TimePicker } from "../TimePicker/index";
+import { formatDate } from "../utils/dateUtils";
+import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
+import createFormField from "../utils/formField";
+import getId from "../utils/getId";
+
+interface DateTimePickerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The name of the picker's form data field */
+	name?: string;
+	/** The selected date and time */
+	value?: Bindable<Date | undefined>;
+	/** Text to display when the value is empty */
+	placeholder?: string;
+	/** The format for the displayed date (e.g. "d MMM yyyy"); the time follows */
+	dateFormat?: string;
+	/** If set to true, the user cannot interact with this picker */
+	disabled?: boolean;
+	/** An accessible name for the trigger button */
+	ariaLabel?: string;
+	/** Raised when the value has changed */
+	onchange?: (value: Date) => void;
+}
+
+function toTimeText(date: Date): string {
+	const pad = (n: number) => n.toString().padStart(2, "0");
+	return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function toFormText(date: Date): string {
+	const pad = (n: number) => n.toString().padStart(2, "0");
+	return `${formatDate(date, "yyyy-MM-dd")}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+/**
+ * An input for selecting a date and a time together, from a calendar and a
+ * time field in one popout.
+ *
+ * ```
+ * <DateTimePicker name="starts_at" &value={$state.startsAt} />
+ * ```
+ *
+ * The value is a Date. When the time is unset, it defaults to 09:00, and
+ * selecting a day keeps the chosen time.
+ */
+export default function DateTimePicker($props: DateTimePickerProps | undefined) {
+	let defaultId = getId();
+
+	let content: HTMLDivElement | undefined;
+	let closeOnClick = false;
+
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
+
+	// The time field inside is part of this picker, not a separate field:
+	// hide the enclosing Field's context so it doesn't submit its own value
+	$context[FieldContextName] = undefined;
+
+	function getDateFormat(): string {
+		return $props?.dateFormat ?? "yyyy-MM-dd";
+	}
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	let $state = $watch({
+		value: undefined as Date | undefined,
+		visible: false,
+	});
+
+	$bind($state, $props, "value");
+
+	const triggerId = `${$props?.id ?? defaultId}-trigger`;
+	const contentId = `${$props?.id ?? defaultId}-content`;
+
+	function displayText(): string {
+		const value = $state.value;
+		if (value && value instanceof Date) {
+			return `${formatDate($unwrap(value), getDateFormat())} ${toTimeText($unwrap(value))}`;
+		}
+		return $props?.placeholder || "-";
+	}
+
+	// The calendar's value, defaulting to today when the picker is empty
+	function calendarValue(): Date {
+		const value = $state.value;
+		return value ? new Date($unwrap(value)) : new Date();
+	}
+
+	function timeValue(): string {
+		const value = $state.value;
+		return value ? toTimeText($unwrap(value)) : "";
+	}
+
+	function commit(next: Date) {
+		$state.value = next;
+		$props?.onchange?.(next);
+		form.handleInput();
+	}
+
+	// Selecting a day keeps the current time (or 09:00, the calendar's default)
+	function handleDate(date: Date) {
+		const next = new Date($unwrap(date));
+		const current = $state.value;
+		if (current) {
+			next.setHours(current.getHours(), current.getMinutes(), 0, 0);
+		} else {
+			next.setHours(9, 0, 0, 0);
+		}
+		commit(next);
+	}
+
+	function handleTime(time: string | undefined) {
+		const [hours, minutes] = (time ?? "").split(":").map(Number);
+		if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return;
+		const next = calendarValue();
+		next.setHours(hours, minutes, 0, 0);
+		commit(next);
+	}
+
+	function setVisible(visible: boolean) {
+		$state.visible = visible;
+		if (visible) {
+			closeOnClick = false;
+			addDocumentEvent("mousedown", handleDocumentMouseDown);
+			addDocumentEvent("click", handleDocumentClick);
+			// Wait for the popout to be shown before focusing the calendar
+			setTimeout(() => {
+				const grid = content?.querySelector(".torp-calendar-grid");
+				if (grid instanceof HTMLElement && !getDisabled()) {
+					grid.focus();
+				}
+			});
+		} else {
+			removeDocumentEvent("mousedown", handleDocumentMouseDown);
+			removeDocumentEvent("click", handleDocumentClick);
+		}
+	}
+
+	function close() {
+		setVisible(false);
+		const trigger = document.getElementById(triggerId);
+		if (trigger instanceof HTMLElement) {
+			trigger.focus();
+		}
+	}
+
+	function handleDocumentMouseDown() {
+		closeOnClick = true;
+	}
+
+	function handleDocumentClick(e: MouseEvent) {
+		if (closeOnClick && content && !content.contains(e.target as HTMLElement)) {
+			e.preventDefault();
+			setVisible(false);
+		}
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		if (e.key === "Escape") {
+			e.preventDefault();
+			close();
+		}
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-date-time-picker", $props?.class]}
+			{$props?.style}
+			data-valid={form.valid ? "valid" : "invalid"}
+		>
+			<button
+				type="button"
+				id={triggerId}
+				class="torp-date-time-picker-trigger"
+				aria-haspopup="dialog"
+				aria-expanded={$state.visible ? "true" : "false"}
+				aria-controls={$state.visible ? contentId : undefined}
+				aria-label={$props?.ariaLabel}
+				aria-describedby={form.messageId}
+				aria-invalid={form.inField && !form.valid ? "true" : undefined}
+				onblur={() => form.handleBlur()}
+				onclick={(e: MouseEvent) => {
+					e.stopPropagation();
+					setVisible(!$state.visible);
+				}}
+				disabled={getDisabled()}
+			>
+				{displayText()}
+			</button>
+
+			<div
+				id={contentId}
+				class={["torp-date-time-picker-content", $state.visible ? undefined : "hidden"]}
+				role="dialog"
+				aria-label={$props?.ariaLabel ?? "Date and time"}
+				aria-hidden={$state.visible ? undefined : "true"}
+				onkeydown={handleKey}
+				&ref={content}
+			>
+				<Calendar
+					selectable
+					value={calendarValue()}
+					onchange={handleDate}
+					onclose={close}
+				>
+					<CalendarHeader>
+						<CalendarHeaderTrigger type="previous" />
+						<span>{$slot.monthName} {$slot.year}</span>
+						<CalendarHeaderTrigger type="next" />
+					</CalendarHeader>
+					<CalendarGridHeader>
+						@for (let day of $slot.days) {
+							<CalendarDayHeader {day.dayName} {day.shortDayName} />
+						}
+					</CalendarGridHeader>
+					<CalendarGrid>
+						<CalendarDay date={$slot.day.date} muted={$slot.day.muted} active={$slot.day.active} />
+					</CalendarGrid>
+				</Calendar>
+
+				<TimePicker value={timeValue()} onchange={handleTime} disabled={getDisabled()} />
+
+				<button type="button" class="torp-date-time-picker-done" onclick={close}>Done</button>
+			</div>
+		</div>
+
+		@if (form.name && $state.value) {
+			<input type="hidden" name={form.name} value={toFormText($unwrap($state.value))} />
+		}
+	}
+
+	@style {
+		/* Visibility only -- see SelectBoxContent */
+		.torp-date-time-picker-content.hidden {
+			display: none;
+		}
+	}
+}

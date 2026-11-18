@@ -57,6 +57,10 @@
 			"types": "./dist/DateRangePicker/index.d.ts",
 			"import": "./dist/DateRangePicker/index.js"
 		},
+		"./DateTimePicker": {
+			"types": "./dist/DateTimePicker/index.d.ts",
+			"import": "./dist/DateTimePicker/index.js"
+		},
 		"./Dialog": {
 			"types": "./dist/Dialog/index.d.ts",
 			"import": "./dist/Dialog/index.js"
