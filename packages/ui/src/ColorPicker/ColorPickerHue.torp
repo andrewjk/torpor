@@ -1,0 +1,59 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { type ColorPickerContext, ColorPickerContextName } from "./ColorPickerTypes";
+
+interface ColorPickerHueProps {
+	/** Classes for the slider */
+	class?: ClassValue;
+	/** Styles for the slider */
+	style?: StyleValue;
+	/** An accessible name for the slider; falls back to the picker's ariaLabel */
+	ariaLabel?: string;
+}
+
+/**
+ * A hue slider for a ColorPicker, from red through the spectrum and back.
+ */
+export default function ColorPickerHue($props: ColorPickerHueProps | undefined) {
+	// Get stuff out of the ColorPicker context
+	const context = $context[ColorPickerContextName] as ColorPickerContext;
+	if (!context) {
+		throw new Error("ColorPickerHue must be contained within a ColorPicker");
+	}
+
+	function label(): string {
+		const base = $props?.ariaLabel ?? context.getAriaLabel();
+		return base ? `${base} hue` : "Hue";
+	}
+
+	function handleInput(e: Event) {
+		const hue = Number((e.currentTarget as HTMLInputElement).value);
+		if (!Number.isFinite(hue)) return;
+		const hsv = context.getHsv();
+		// A black or gray color has no usable saturation/brightness yet;
+		// moving the hue starts from a vivid color so the change is visible
+		context.commitHsv({
+			h: hue,
+			s: hsv.s || 1,
+			v: hsv.v || 1,
+		});
+	}
+
+	@render {
+		<input
+			type="range"
+			class={["torp-color-picker-hue", $props?.class]}
+			style={[
+				$props?.style,
+				"background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)",
+			]}
+			min="0"
+			max="360"
+			step="1"
+			value={Math.round(context.getHsv().h)}
+			aria-label={label()}
+			aria-disabled={context.getDisabled() ? "true" : undefined}
+			disabled={context.getDisabled()}
+			oninput={handleInput}
+		/>
+	}
+}

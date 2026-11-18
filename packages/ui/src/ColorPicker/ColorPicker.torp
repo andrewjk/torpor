@@ -6,9 +6,20 @@ import {
 	FormContextName,
 } from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
-import type { Color } from "../utils/colorUtils";
+import {
+	type Color,
+	type Hsv,
+	hexToRgba,
+	hsvToHex,
+	rgbToHsv,
+	withAlpha,
+} from "../utils/colorUtils";
 import createFormField from "../utils/formField";
 import ColorPalette from "./ColorPalette.torp";
+import ColorPickerAlpha from "./ColorPickerAlpha.torp";
+import ColorPickerArea from "./ColorPickerArea.torp";
+import ColorPickerEyedropper from "./ColorPickerEyedropper.torp";
+import ColorPickerHue from "./ColorPickerHue.torp";
 import ColorPickerInput from "./ColorPickerInput.torp";
 import { type ColorPickerContext, ColorPickerContextName } from "./ColorPickerTypes";
 
@@ -31,10 +42,18 @@ interface ColorPickerProps {
 	/** If true, selecting the already-selected swatch clears the value */
 	allowClear?: boolean;
 	/**
-	 * If set to true, a text field for arbitrary hex values ("#ff8800") is
-	 * shown below the palette
+	 * If set to true, a text field for arbitrary color values ("#ff8800",
+	 * "rgb(255 136 0)", "hsl(32 100% 50%)") is shown below the palette
 	 */
 	showInput?: boolean;
+	/** If set to true, a 2D saturation/brightness area is shown above the palette */
+	showArea?: boolean;
+	/** If set to true, a hue slider is shown above the palette */
+	showHue?: boolean;
+	/** If set to true, an alpha slider is shown above the palette */
+	showAlpha?: boolean;
+	/** If set to true, an eyedropper button is shown when the browser supports it */
+	showEyedropper?: boolean;
 	/** If set to true, the user cannot interact with this picker */
 	disabled?: boolean;
 	/** An accessible name for the picker */
@@ -46,9 +65,13 @@ interface ColorPickerProps {
 }
 
 /**
- * A swatch color input: a ColorPalette with an optional hex text field,
- * sharing a single bound value. It is not a full color picker (no
- * saturation/value area, hue or alpha sliders).
+ * A color input: a ColorPalette with optional saturation/brightness, hue
+ * and alpha controls and a text field, sharing a single bound value.
+ * Enable `showArea`, `showHue`, `showAlpha` and `showEyedropper` for the
+ * full picker; by default it is just a swatch palette.
+ *
+ * Values are normalized hex colors, with an alpha channel when the color
+ * isn't fully opaque ("#ff8800", "#ff880080").
  *
  * ```
  * <ColorPicker name="accent" showInput &value={$state.accent} />
@@ -86,9 +109,34 @@ export default function ColorPicker($props: ColorPickerProps | undefined) {
 
 	let $state = $watch({
 		value: undefined as string | undefined,
+		h: 0,
+		s: 0,
+		v: 0,
+		a: 1,
 	});
 
 	$bind($state, $props, "value");
+
+	// Keep the hue/saturation/value/alpha controls in sync with the value.
+	// The hue is preserved for grays, which have no meaningful hue of their
+	// own, so dragging into a gray doesn't snap the hue slider to red
+	$run(() => {
+		const value = $state.value;
+		if (value === undefined) {
+			$state.s = 0;
+			$state.v = 0;
+			$state.a = 1;
+			return;
+		}
+		const rgba = hexToRgba(value);
+		const hsv = rgbToHsv(rgba);
+		if (hsv.s > 0 && hsv.v > 0) {
+			$state.h = hsv.h;
+		}
+		$state.s = hsv.s;
+		$state.v = hsv.v;
+		$state.a = rgba.a;
+	});
 
 	function commitValue(next: string | undefined) {
 		if (next !== $state.value) {
@@ -100,6 +148,18 @@ export default function ColorPicker($props: ColorPickerProps | undefined) {
 
 	function handleSelect(value: string | undefined) {
 		commitValue(value);
+	}
+
+	function getHsv(): Hsv {
+		return { h: $state.h, s: $state.s, v: $state.v };
+	}
+
+	function commitHsv(hsv: Hsv, alpha?: number) {
+		commitValue(hsvToHex(hsv, alpha ?? $state.a));
+	}
+
+	function setAlpha(alpha: number) {
+		commitValue(withAlpha($state.value ?? "#000000", alpha));
 	}
 
 	// Only blur when focus leaves the whole picker
@@ -115,6 +175,10 @@ export default function ColorPicker($props: ColorPickerProps | undefined) {
 		getValue: () => $state.value,
 		getAriaLabel: () => $props?.ariaLabel,
 		commitValue,
+		getHsv,
+		commitHsv,
+		getAlpha: () => $state.a,
+		setAlpha,
 	};
 	$context[ColorPickerContextName] = context;
 
@@ -132,6 +196,18 @@ export default function ColorPicker($props: ColorPickerProps | undefined) {
 			&ref={root}
 		>
 			<slot>
+				@if ($props?.showArea) {
+					<ColorPickerArea />
+				}
+				@if ($props?.showHue) {
+					<ColorPickerHue />
+				}
+				@if ($props?.showAlpha) {
+					<ColorPickerAlpha />
+				}
+				@if ($props?.showEyedropper) {
+					<ColorPickerEyedropper />
+				}
 				<ColorPalette
 					class="torp-color-picker-palette"
 					colors={$props?.colors}

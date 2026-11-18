@@ -141,6 +141,102 @@ describe("ColorPicker", () => {
 		expect(within(container).getByRole("radio", { name: "Red" })).toBeInTheDocument();
 	});
 
+	it("renders the advanced controls when enabled", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ColorPickerTest as any, {
+			showArea: true,
+			showHue: true,
+			showAlpha: true,
+		});
+
+		expect(container.querySelector(".torp-color-picker-area")).toBeInTheDocument();
+		expect(container.querySelector(".torp-color-picker-hue")).toBeInTheDocument();
+		expect(container.querySelector(".torp-color-picker-alpha")).toBeInTheDocument();
+	});
+
+	it("changes the color with the saturation/brightness area keys", async () => {
+		const onchange = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ColorPickerTest as any, { showArea: true, value: "#ff0000", onchange });
+
+		const area = container.querySelector<HTMLElement>(".torp-color-picker-area")!;
+		area.focus();
+		fireEvent.keyDown(area, { key: "ArrowLeft", shiftKey: true });
+		await tick();
+
+		// Hue stays red; saturation drops to 90% at full brightness
+		expect(onchange).toHaveBeenLastCalledWith("#ff1919");
+	});
+
+	it("changes the hue with the hue slider", async () => {
+		const onchange = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ColorPickerTest as any, { showHue: true, onchange });
+
+		const hue = container.querySelector<HTMLInputElement>(".torp-color-picker-hue")!;
+		fireEvent.input(hue, { target: { value: "120" } });
+		await tick();
+
+		expect(onchange).toHaveBeenLastCalledWith("#00ff00");
+	});
+
+	it("adds an alpha channel with the alpha slider", async () => {
+		const onchange = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ColorPickerTest as any, {
+			showAlpha: true,
+			value: "#ff0000",
+			onchange,
+		});
+
+		const alpha = container.querySelector<HTMLInputElement>(".torp-color-picker-alpha")!;
+		fireEvent.input(alpha, { target: { value: "50" } });
+		await tick();
+
+		expect(onchange.mock.lastCall![0]).toMatch(/^#ff000080$/);
+	});
+
+	it("parses rgb() and hsl() in the text input", async () => {
+		const onchange = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ColorPickerTest as any, { showInput: true, onchange });
+
+		const input = container.querySelector<HTMLInputElement>(".torp-color-picker-input")!;
+		fireEvent.input(input, { target: { value: "rgb(0, 255, 136)" } });
+		fireEvent.blur(input);
+		await tick();
+		expect(onchange).toHaveBeenLastCalledWith("#00ff88");
+
+		fireEvent.input(input, { target: { value: "hsl(120, 100%, 50%)" } });
+		fireEvent.blur(input);
+		await tick();
+		expect(onchange).toHaveBeenLastCalledWith("#00ff00");
+	});
+
+	it("picks a color with the eyedropper when supported", async () => {
+		const onchange = vi.fn();
+		(window as any).EyeDropper = class {
+			open() {
+				return Promise.resolve({ sRGBHex: "#123456" });
+			}
+		};
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ColorPickerTest as any, { showEyedropper: true, onchange });
+
+		const button = container.querySelector<HTMLButtonElement>(".torp-color-picker-eyedropper")!;
+		fireEvent.click(button);
+		await new Promise((r) => setTimeout(r, 0));
+
+		expect(onchange).toHaveBeenLastCalledWith("#123456");
+		delete (window as any).EyeDropper;
+	});
+
 	it("arrow keys move selection through the palette", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);

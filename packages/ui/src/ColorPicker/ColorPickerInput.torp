@@ -1,5 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { parseHex } from "../utils/colorUtils";
+import { parseColor } from "../utils/colorUtils";
 import { type ColorPickerContext, ColorPickerContextName } from "./ColorPickerTypes";
 
 interface ColorPickerInputProps {
@@ -16,9 +16,9 @@ interface ColorPickerInputProps {
 }
 
 /**
- * The hex text field of a ColorPicker, for entering arbitrary colors as
- * "#rrggbb". Values commit on blur or Enter, invalid text reverting like
- * NumberInput.
+ * The text field of a ColorPicker, for entering arbitrary colors as hex,
+ * `rgb()` or `hsl()`. Values commit on blur or Enter, invalid text
+ * reverting like NumberInput.
  */
 export default function ColorPickerInput($props: ColorPickerInputProps | undefined) {
 	let hexInput: HTMLInputElement | undefined;
@@ -51,7 +51,7 @@ export default function ColorPickerInput($props: ColorPickerInputProps | undefin
 
 	function commit() {
 		$state.editing = false;
-		const next = parseHex($state.text);
+		const next = parseColor($state.text);
 		if ($state.text.trim() !== "" && !next) {
 			// Not a color: revert to the last committed value
 			$state.text = context.getValue() ?? "";
@@ -98,7 +98,7 @@ export default function ColorPickerInput($props: ColorPickerInputProps | undefin
 			class={["torp-color-picker-input", $props?.class]}
 			{$props?.style}
 			spellcheck="false"
-			placeholder="#rrggbb"
+			placeholder="#rrggbb, rgb() or hsl()"
 			aria-label={label()}
 			value={display()}
 			disabled={getDisabled()}

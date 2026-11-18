@@ -8,6 +8,10 @@ export default function ColorPickerTest($props: any) {
 			allowClear={$props.allowClear}
 			columns={$props.columns}
 			showInput={$props.showInput}
+			showArea={$props.showArea}
+			showHue={$props.showHue}
+			showAlpha={$props.showAlpha}
+			showEyedropper={$props.showEyedropper}
 			disabled={$props.disabled}
 			ariaLabel="Accent color"
 			onchange={$props.onchange}

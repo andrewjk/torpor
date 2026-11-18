@@ -1,0 +1,77 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { parseHex } from "../utils/colorUtils";
+import { type ColorPickerContext, ColorPickerContextName } from "./ColorPickerTypes";
+
+interface ColorPickerEyedropperProps {
+	/** Classes for the button */
+	class?: ClassValue;
+	/** Styles for the button */
+	style?: StyleValue;
+	/** An accessible name for the button; falls back to the picker's ariaLabel */
+	ariaLabel?: string;
+	/** Text to display in the button (default: an eyedropper icon) */
+	children?: any;
+}
+
+interface EyeDropperResult {
+	sRGBHex: string;
+}
+
+interface EyeDropperInstance {
+	open: (options?: { signal?: AbortSignal }) => Promise<EyeDropperResult>;
+}
+
+type EyeDropperConstructor = new () => EyeDropperInstance;
+
+/**
+ * A button that samples a color from anywhere on the screen with the
+ * browser's EyeDropper API. Rendered only when the browser supports it.
+ */
+export default function ColorPickerEyedropper($props: ColorPickerEyedropperProps | undefined) {
+	// Get stuff out of the ColorPicker context
+	const context = $context[ColorPickerContextName] as ColorPickerContext;
+	if (!context) {
+		throw new Error("ColorPickerEyedropper must be contained within a ColorPicker");
+	}
+
+	function getEyeDropper(): EyeDropperConstructor | undefined {
+		if (typeof window === "undefined") return undefined;
+		return (window as any).EyeDropper as EyeDropperConstructor | undefined;
+	}
+
+	function label(): string {
+		const base = $props?.ariaLabel ?? context.getAriaLabel();
+		return base ? `${base} eyedropper` : "Pick a color from the screen";
+	}
+
+	async function handleClick() {
+		if (context.getDisabled()) return;
+		const EyeDropper = getEyeDropper();
+		if (!EyeDropper) return;
+		try {
+			const result = await new EyeDropper().open();
+			const color = parseHex(result.sRGBHex);
+			if (color) {
+				context.commitValue(color);
+			}
+		} catch {
+			// The user cancelled the eyedropper; nothing to change
+		}
+	}
+
+	@render {
+		@if (getEyeDropper()) {
+			<button
+				type="button"
+				class={["torp-color-picker-eyedropper", $props?.class]}
+				{$props?.style}
+				aria-label={label()}
+				aria-disabled={context.getDisabled() ? "true" : undefined}
+				disabled={context.getDisabled()}
+				onclick={handleClick}
+			>
+				<slot>💧</slot>
+			</button>
+		}
+	}
+}

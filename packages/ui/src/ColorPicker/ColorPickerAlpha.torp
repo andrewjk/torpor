@@ -1,0 +1,58 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { hsvToHex } from "../utils/colorUtils";
+import { type ColorPickerContext, ColorPickerContextName } from "./ColorPickerTypes";
+
+interface ColorPickerAlphaProps {
+	/** Classes for the slider */
+	class?: ClassValue;
+	/** Styles for the slider */
+	style?: StyleValue;
+	/** An accessible name for the slider; falls back to the picker's ariaLabel */
+	ariaLabel?: string;
+}
+
+const CHECKERBOARD =
+	"repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 50% / 0.75rem 0.75rem";
+
+/**
+ * An alpha (opacity) slider for a ColorPicker.
+ */
+export default function ColorPickerAlpha($props: ColorPickerAlphaProps | undefined) {
+	// Get stuff out of the ColorPicker context
+	const context = $context[ColorPickerContextName] as ColorPickerContext;
+	if (!context) {
+		throw new Error("ColorPickerAlpha must be contained within a ColorPicker");
+	}
+
+	function label(): string {
+		const base = $props?.ariaLabel ?? context.getAriaLabel();
+		return base ? `${base} opacity` : "Opacity";
+	}
+
+	function handleInput(e: Event) {
+		const alpha = Number((e.currentTarget as HTMLInputElement).value);
+		if (!Number.isFinite(alpha)) return;
+		context.setAlpha(alpha / 100);
+	}
+
+	function background(): string {
+		const opaque = hsvToHex(context.getHsv(), 1);
+		return `${CHECKERBOARD}, linear-gradient(to right, transparent, ${opaque})`;
+	}
+
+	@render {
+		<input
+			type="range"
+			class={["torp-color-picker-alpha", $props?.class]}
+			style={[$props?.style, `background: ${background()}`]}
+			min="0"
+			max="100"
+			step="1"
+			value={Math.round(context.getAlpha() * 100)}
+			aria-label={label()}
+			aria-disabled={context.getDisabled() ? "true" : undefined}
+			disabled={context.getDisabled()}
+			oninput={handleInput}
+		/>
+	}
+}

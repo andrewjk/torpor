@@ -1,0 +1,175 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { hsvToHex } from "../utils/colorUtils";
+import { type ColorPickerContext, ColorPickerContextName } from "./ColorPickerTypes";
+
+interface ColorPickerAreaProps {
+	/** Classes for the area */
+	class?: ClassValue;
+	/** Styles for the area */
+	style?: StyleValue;
+}
+
+function clamp(value: number, min: number, max: number): number {
+	return Math.min(max, Math.max(min, value));
+}
+
+/**
+ * A two-dimensional saturation/brightness area for a ColorPicker. Dragging
+ * or using the arrow keys selects a saturation (horizontal) and brightness
+ * (vertical) within the current hue.
+ */
+export default function ColorPickerArea($props: ColorPickerAreaProps | undefined) {
+	let area: HTMLElement;
+	let dragging = false;
+
+	// Get stuff out of the ColorPicker context
+	const context = $context[ColorPickerContextName] as ColorPickerContext;
+	if (!context) {
+		throw new Error("ColorPickerArea must be contained within a ColorPicker");
+	}
+
+	function getDisabled(): boolean {
+		return context.getDisabled();
+	}
+
+	function commit(s: number, v: number) {
+		const hsv = context.getHsv();
+		context.commitHsv({ h: hsv.h, s: clamp(s, 0, 1), v: clamp(v, 0, 1) });
+	}
+
+	function updateFromPointer(e: PointerEvent) {
+		if (!area) return;
+		const rect = area.getBoundingClientRect();
+		if (rect.width <= 0 || rect.height <= 0) return;
+		const s = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+		const v = 1 - clamp((e.clientY - rect.top) / rect.height, 0, 1);
+		commit(s, v);
+	}
+
+	function handlePointerMove(e: PointerEvent) {
+		if (!dragging) return;
+		e.preventDefault();
+		updateFromPointer(e);
+	}
+
+	function stopDragging() {
+		if (!dragging) return;
+		dragging = false;
+		document.removeEventListener("pointermove", handlePointerMove);
+		document.removeEventListener("pointerup", stopDragging);
+		document.removeEventListener("pointercancel", stopDragging);
+	}
+
+	function handlePointerDown(e: PointerEvent) {
+		if (getDisabled()) return;
+		e.preventDefault();
+		dragging = true;
+		updateFromPointer(e);
+		document.addEventListener("pointermove", handlePointerMove);
+		document.addEventListener("pointerup", stopDragging);
+		document.addEventListener("pointercancel", stopDragging);
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		if (getDisabled()) return;
+		const hsv = context.getHsv();
+		const step = e.shiftKey ? 0.1 : 0.01;
+		switch (e.key) {
+			case "ArrowLeft": {
+				e.preventDefault();
+				commit(hsv.s - step, hsv.v);
+				break;
+			}
+			case "ArrowRight": {
+				e.preventDefault();
+				commit(hsv.s + step, hsv.v);
+				break;
+			}
+			case "ArrowDown": {
+				e.preventDefault();
+				commit(hsv.s, hsv.v - step);
+				break;
+			}
+			case "ArrowUp": {
+				e.preventDefault();
+				commit(hsv.s, hsv.v + step);
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				commit(0, 1);
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				commit(1, 0);
+				break;
+			}
+		}
+	}
+
+	$run(() => {
+		return () => stopDragging();
+	});
+
+	function hueColor(): string {
+		return hsvToHex({ h: context.getHsv().h, s: 1, v: 1 });
+	}
+
+	function valueText(): string {
+		const hsv = context.getHsv();
+		return `Saturation ${Math.round(hsv.s * 100)}%, brightness ${Math.round(hsv.v * 100)}%`;
+	}
+
+	@render {
+		<div
+			class={["torp-color-picker-area", $props?.class]}
+			style={[$props?.style, `--torp-color-picker-hue:${hueColor()}`]}
+			role="slider"
+			tabindex={getDisabled() ? -1 : 0}
+			aria-label="Saturation and brightness"
+			aria-valuetext={valueText()}
+			aria-disabled={getDisabled() ? "true" : undefined}
+			onpointerdown={handlePointerDown}
+			onkeydown={handleKey}
+			&ref={area}
+		>
+			<div class="torp-color-picker-area-saturation" />
+			<div class="torp-color-picker-area-value" />
+			<div
+				class="torp-color-picker-area-knob"
+				style={`left:${context.getHsv().s * 100}%;top:${(1 - context.getHsv().v) * 100}%`}
+			/>
+		</div>
+	}
+
+	@style {
+		.torp-color-picker-area {
+			position: relative;
+			touch-action: none;
+			background-color: var(--torp-color-picker-hue, #f00);
+		}
+		.torp-color-picker-area-saturation,
+		.torp-color-picker-area-value {
+			position: absolute;
+			inset: 0;
+			pointer-events: none;
+		}
+		.torp-color-picker-area-saturation {
+			background: linear-gradient(to right, #fff, transparent);
+		}
+		.torp-color-picker-area-value {
+			background: linear-gradient(to top, #000, transparent);
+		}
+		.torp-color-picker-area-knob {
+			position: absolute;
+			width: 0.75rem;
+			height: 0.75rem;
+			border: 2px solid #fff;
+			border-radius: 50%;
+			box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+			transform: translate(-50%, -50%);
+			pointer-events: none;
+		}
+	}
+}
