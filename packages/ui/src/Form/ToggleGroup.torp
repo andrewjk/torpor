@@ -79,7 +79,7 @@ export default function ToggleGroup($props: ToggleGroupProps | undefined) {
 		const item: ToggleItemState = $watch({
 			index: nextItemIndex++,
 			value,
-			disabled: disabled ?? false,
+			disabled: disabled === true,
 		});
 		items.push(item);
 		return item;

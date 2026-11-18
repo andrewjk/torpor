@@ -137,8 +137,8 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 			active: false,
 			headerId: "",
 			contentId: "",
-			disabled: $props?.disabled ?? disabled ?? false,
-			parentDisabled: $props?.disabled ?? false,
+			disabled: $props?.disabled === true || disabled === true,
+			parentDisabled: $props?.disabled === true,
 			setFocused: () => {},
 		});
 		group.registerItem(newItemState);

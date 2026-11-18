@@ -92,7 +92,7 @@ export default function RadioGroup($props: RadioGroupProps | undefined) {
 			index,
 			value,
 			id,
-			disabled: disabled ?? false,
+			disabled: disabled === true,
 			setFocused: () => {},
 		});
 		group.registerItem(itemState);

@@ -35,7 +35,7 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 		value: $props?.value,
 		selected: false,
 		active: false,
-		disabled: $props?.disabled ?? false,
+		disabled: $props?.disabled === true,
 		parentDisabled: false,
 		setFocused,
 	});

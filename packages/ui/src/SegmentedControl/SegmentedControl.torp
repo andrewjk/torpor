@@ -140,8 +140,8 @@ export default function SegmentedControl($props: SegmentedControlProps | undefin
 			index,
 			value,
 			active: false,
-			disabled: disabled ?? false,
-			parentDisabled: $props?.disabled ?? false,
+			disabled: disabled === true,
+			parentDisabled: $props?.disabled === true,
 			setFocused: () => {},
 		});
 		group.registerItem(itemState);

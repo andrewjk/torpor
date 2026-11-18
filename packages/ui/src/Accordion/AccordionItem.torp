@@ -46,7 +46,7 @@ export default function AccordionItem($props: AccordionItemProps | undefined) {
 		expanded: false,
 		headerId: "",
 		contentId: "",
-		disabled: $props?.disabled ?? false,
+		disabled: $props?.disabled === true,
 		parentDisabled: false,
 		setFocused,
 	});

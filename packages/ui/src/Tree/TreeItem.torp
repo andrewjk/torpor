@@ -69,7 +69,7 @@ export default function TreeItem($props: TreeItemProps | undefined) {
 		value: $props?.value ?? "",
 		expanded: false,
 		selected: false,
-		disabled: $props?.disabled ?? false,
+		disabled: $props?.disabled === true,
 		parentDisabled: false,
 		level,
 		hasChildren: false,

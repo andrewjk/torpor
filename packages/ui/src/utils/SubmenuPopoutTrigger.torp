@@ -117,7 +117,7 @@ export default function SubmenuPopoutTrigger($props: SubmenuPopoutTriggerProps |
 	const hoverDelay = $props?.hoverDelay ?? 500;
 	const hoverOpen = createHoverOpen(
 		() => setVisible(true),
-		() => $props?.disabled ?? false,
+		() => $props?.disabled === true,
 		hoverDelay,
 	);
 
