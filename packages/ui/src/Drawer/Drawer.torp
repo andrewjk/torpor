@@ -1,5 +1,6 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import $handle from "../utils/$handle";
+import { createPopoutButtonHandler } from "../utils/handlePopoutButton";
 import { type DrawerContext, DrawerContextName, type DrawerState } from "./DrawerTypes";
 
 interface DrawerProps {
@@ -42,7 +43,8 @@ export default function Drawer($props: DrawerProps | undefined) {
 
 	$bind($state, $props, "visible");
 
-	let result: any;
+
+		const { handleButton, getResult } = createPopoutButtonHandler($state);
 
 	// Set the context to pass down to items
 	let context: DrawerContext = {
@@ -59,30 +61,10 @@ export default function Drawer($props: DrawerProps | undefined) {
 		if (visible) {
 			$props?.onopen?.();
 		} else {
-			$props?.onclose?.(result);
+			$props?.onclose?.(getResult());
 		}
 	});
 
-	function handleButton(type: "confirm" | "cancel" | undefined, value?: any) {
-		// Get the button's result
-		switch (type) {
-			case "confirm": {
-				result = value ?? true;
-				break;
-			}
-			case "cancel": {
-				result = value ?? false;
-				break;
-			}
-			default: {
-				result = value;
-				break;
-			}
-		}
-
-		// Hide the drawer
-		$state.visible = false;
-	}
 
 	function handleClickOutside(e: MouseEvent) {
 		e.preventDefault();

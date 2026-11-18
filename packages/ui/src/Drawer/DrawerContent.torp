@@ -34,6 +34,7 @@ export default function DrawerContent($props: DrawerContentProps | undefined) {
 	let $state = context.state;
 
 	$state.contentId = $props?.id ?? defaultId;
+	$state.contentRole = "dialog";
 
 	$run(() => {
 		if (!$state.visible) {

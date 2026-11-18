@@ -30,6 +30,8 @@ export interface PopoutContext extends FocusApi {
 	state: PopoutState;
 	//modal: boolean;
 	anchorElement?: HTMLElement;
+	/** Focuses the trigger, used when a popout hides */
+	focusTrigger?: () => void;
 
 	/**
 	 * Called from menu content when an arrow key should move to an adjacent item

@@ -1,5 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { disableScroll } from "../mount/disableScroll";
+import PopoutOverlay from "../utils/PopoutOverlay.torp";
 import { type ModalContext, ModalContextName } from "./ModalTypes";
 
 interface ModalOverlayProps {
@@ -21,22 +21,15 @@ export default function ModalOverlay($props: ModalOverlayProps | undefined) {
 	if (!context) {
 		throw new Error("ModalOverlay must be contained within a Modal");
 	}
-	let $state = context.state;
-
-	// Any popup with an overlay is modal
-	$state.modal = true;
 
 	@render {
-		@if ($state.visible) {
-			<div
-				{$props?.id}
-				class={["torp-modal-overlay", $props?.class]}
-				{$props?.style}
-				tabindex="-1"
-				onmount={(_el) => disableScroll()}
-			>
-				<slot />
-			</div>
-		}
+		<PopoutOverlay
+			id={$props?.id}
+			class={["torp-modal-overlay", $props?.class]}
+			style={$props?.style}
+			{context}
+		>
+			<slot />
+		</PopoutOverlay>
 	}
 }

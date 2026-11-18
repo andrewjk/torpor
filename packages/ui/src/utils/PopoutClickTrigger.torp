@@ -64,6 +64,7 @@ export default function PopoutClickTrigger($props?: PopoutClickTriggerProps) {
 
 	function handleMount(el: HTMLElement) {
 		context.anchorElement = el;
+		context.focusTrigger = () => el.focus();
 	}
 
 	@render {

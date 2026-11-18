@@ -1,0 +1,39 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { disableScroll } from "../mount/disableScroll";
+import type { PopoutContext } from "./PopoutTypes";
+
+interface PopoutOverlayProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The containing popout's context (the family-specific one) */
+	context: PopoutContext;
+}
+
+/**
+ * The shared background overlay behind modal popouts. Adding an overlay
+ * automatically sets the component's `modal` value to true.
+ */
+export default function PopoutOverlay($props: PopoutOverlayProps | undefined) {
+	const $state = $props!.context.state;
+
+	// Any popup with an overlay is modal
+	$state.modal = true;
+
+	@render {
+		@if ($state.visible) {
+			<div
+				{$props?.id}
+				class={$props?.class}
+				{$props?.style}
+				tabindex="-1"
+				onmount={(_el) => disableScroll()}
+			>
+				<slot />
+			</div>
+		}
+	}
+}

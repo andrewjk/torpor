@@ -1,5 +1,6 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import $handle from "../utils/$handle";
+import { createPopoutButtonHandler } from "../utils/handlePopoutButton";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import {
 	type Point,
@@ -62,7 +63,8 @@ export default function Popover($props: PopoverProps | undefined) {
 		$state.position = $props?.position ?? { x: 0, y: 0 };
 	});
 
-	let result: any;
+
+		const { handleButton, getResult } = createPopoutButtonHandler($state);
 
 	// Set the context to pass down to items
 	let context: PopoverContext = {
@@ -86,30 +88,10 @@ export default function Popover($props: PopoverProps | undefined) {
 		if (visible) {
 			$props?.onopen?.();
 		} else {
-			$props?.onclose?.(result);
+			$props?.onclose?.(getResult());
 		}
 	});
 
-	function handleButton(type: "confirm" | "cancel" | undefined, value?: any) {
-		// Get the button's result
-		switch (type) {
-			case "confirm": {
-				result = value ?? true;
-				break;
-			}
-			case "cancel": {
-				result = value ?? false;
-				break;
-			}
-			default: {
-				result = value;
-				break;
-			}
-		}
-
-		// Hide the popover
-		$state.visible = false;
-	}
 
 	function handleClickOutside(e: MouseEvent | KeyboardEvent) {
 		e.preventDefault();

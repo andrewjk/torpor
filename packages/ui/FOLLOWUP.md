@@ -7,8 +7,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Duplication and inconsistencies
 
-- **Modal / Drawer are near-copies**: root, overlay and trigger differ only
-  in names.
 - **Form wiring is duplicated**: `Form/*` (Input, TextArea, Select, CheckBox,
   Toggle, File, FileDrop) re-implements the blurred/validate logic that
   `utils/formField.ts` (`createFormField`) provides.
