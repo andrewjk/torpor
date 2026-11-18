@@ -36,7 +36,7 @@ export default function FormPage() {
 					Basic
 				</ExampleTabHeader>
 				<ExampleTabHeader>
-					Toggle
+					Switch
 				</ExampleTabHeader>
 				<ExampleTabHeader>
 					File drop

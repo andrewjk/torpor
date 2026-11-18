@@ -35,8 +35,6 @@ export {
 	RadioGroup,
 	Select,
 	Switch,
-	// Deprecated alias for Switch: Toggle is the ARIA switch, not a toggle button
-	Switch as Toggle,
 	TextArea,
 	ToggleButton,
 	ToggleGroup,
