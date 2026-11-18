@@ -21,7 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import autocannon from 'autocannon';
-import { buildHtmlReport, writeRunResults } from '../lib/html-report.mjs';
+import { buildHtmlReport, speedOrderedColumns, writeRunResults } from '../lib/html-report.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '..', '..');
@@ -360,11 +360,15 @@ function buildBuildHtml(payload, { prevRun, nextRun } = {}) {
 		}),
 	);
 
+	// Columns read fastest → slowest by the total, torpor (the baseline)
+	// pinned first
+	const columns = speedOrderedColumns(names, total, { baseline, lowerIsBetter: false });
+
 	return buildHtmlReport({
 		suite: 'build',
 		title: 'build benchmarks — HTTP request handling',
 		note: `autocannon · ${payload.connections} connections · ${payload.duration}s per case · green = best in row`,
-		columns: names,
+		columns,
 		baseline,
 		generatedAt: payload.generatedAt,
 		prevRun,

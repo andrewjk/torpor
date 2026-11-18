@@ -16,9 +16,9 @@
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
-import { buildHtmlReport, writeRunResults } from '../lib/html-report.mjs';
+import { buildHtmlReport, speedOrderedColumns, writeRunResults } from '../lib/html-report.mjs';
 import { censusDomNodes, deterministicCount } from './lib/dom-nodes.mjs';
 import { scoreOf, summarizeSamples } from './lib/stats.mjs';
 
@@ -309,7 +309,7 @@ function gateSummary(gateFails) {
 const README_START = '<!-- results:auto -->';
 const README_END = '<!-- /results:auto -->';
 
-function updateReadmeResults(payload, readmePath) {
+export function updateReadmeResults(payload, readmePath) {
 	const names = payload.targets.map((t) => t.name);
 	const baseline = names.includes('torpor') ? 'torpor' : names[0];
 	const baselineOps = payload.targets.find((t) => t.name === baseline).ops;
@@ -340,6 +340,10 @@ function updateReadmeResults(payload, readmePath) {
 			return [t.name, weightSum > 0 ? Math.exp(weightedLogSum / weightSum) : NaN];
 		}),
 	);
+
+	// Table columns read fastest → slowest by the total, torpor (the
+	// baseline) pinned first
+	const columns = speedOrderedColumns(names, totals, { baseline, lowerIsBetter: true });
 
 	const best = (opName) => {
 		let bestName = null;
@@ -380,12 +384,12 @@ function updateReadmeResults(payload, readmePath) {
 	};
 
 	const table = [
-		`| op (ms · lower is better) | ${names.map((n) => n.padEnd(7)).join(' | ')} |`,
-		`|---|${names.map(() => '---:').join('|')}|`,
+		`| op (ms · lower is better) | ${columns.map((n) => n.padEnd(7)).join(' | ')} |`,
+		`|---|${columns.map(() => '---:').join('|')}|`,
 		...opNames.map((opName) =>
-			`| ${opName.padEnd(9)} | ${names.map((n) => cell(n, opName).padEnd(7)).join(' | ')} |`,
+			`| ${opName.padEnd(9)} | ${columns.map((n) => cell(n, opName).padEnd(7)).join(' | ')} |`,
 		),
-		`| **total (geo vs ${baseline})** | ${names.map((n) => totalCell(n).padEnd(7)).join(' | ')} |`,
+		`| **total (geo vs ${baseline})** | ${columns.map((n) => totalCell(n).padEnd(7)).join(' | ')} |`,
 	].join('\n');
 
 	const generated = new Date(payload.generatedAt);
@@ -396,7 +400,7 @@ function updateReadmeResults(payload, readmePath) {
 		'',
 		`${generated.toISOString().replace('T', ' ').slice(0, 16)} UTC · interactive report: [view.html](./results/view.html) · archive: [view-${payload.generatedAt ? '' : ''}…]`,
 		'',
-		`Versions: ${versionLine(payload.versions, names)}`,
+		`Versions: ${versionLine(payload.versions, columns)}`,
 		'',
 		table,
 		'',
@@ -409,7 +413,11 @@ function updateReadmeResults(payload, readmePath) {
 	const startIdx = readme.indexOf(README_START);
 	const endIdx = readme.indexOf(README_END);
 	if (startIdx !== -1 && endIdx !== -1) {
-		readme = readme.slice(0, startIdx) + section + '\n' + readme.slice(endIdx + README_END.length);
+		const rest = readme.slice(endIdx + README_END.length);
+		// The replaced section is newline-terminated unless the text after the
+		// marker already starts with one (otherwise the file grows a trailing
+		// newline on every run)
+		readme = readme.slice(0, startIdx) + section + (rest.startsWith('\n') ? '' : '\n') + rest;
 	} else {
 		readme = readme.trimEnd() + '\n\n' + section + '\n';
 	}
@@ -706,7 +714,7 @@ function printReport(all, targetNames) {
 
 // ── Main ────────────────────────────────────────────────────────────────────
 
-(async () => {
+async function main() {
 	const targetNames = TARGETS.map((t) => t.name);
 	const versions = resolveVersions(targetNames);
 	const children = await startServers();
@@ -772,26 +780,24 @@ function printReport(all, targetNames) {
 	} finally {
 		stopServers(children);
 	}
-})().catch((e) => {
-	console.error(e);
-	process.exit(1);
-});
+}
+
+// Run the benchmark only when this file is the entry point — the HTML/README
+// builders are importable for regenerating result pages without a full run.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+	main().catch((e) => {
+		console.error(e);
+		process.exit(1);
+	});
+}
 
 // ── HTML report ─────────────────────────────────────────────────────────────
 
-function buildViewHtml(payload, { prevRun, nextRun } = {}) {
+export function buildViewHtml(payload, { prevRun, nextRun } = {}) {
 	const targets = payload.targets;
 	const names = targets.map((t) => t.name);
 	const baseline = names.includes('torpor') ? 'torpor' : names[0];
 	const baselineOps = targets.find((t) => t.name === baseline).ops;
-	const versionNote = names
-		.map(
-			(n) =>
-				`${n}: ${Object.entries(payload.versions?.[n] ?? {})
-					.map(([p, v]) => `${p} ${v}`)
-					.join(', ')}`,
-		)
-		.join(' · ');
 
 	// Total row: reference-time-weighted geometric mean of per-op scores vs the
 	// baseline (baseline reads exactly 1; <1 faster overall, >1 slower).
@@ -812,6 +818,18 @@ function buildViewHtml(payload, { prevRun, nextRun } = {}) {
 		}),
 	);
 
+	// Columns read fastest → slowest by the total, torpor (the baseline)
+	// pinned first
+	const columns = speedOrderedColumns(names, total, { baseline, lowerIsBetter: true });
+	const versionNote = columns
+		.map(
+			(n) =>
+				`${n}: ${Object.entries(payload.versions?.[n] ?? {})
+					.map(([p, v]) => `${p} ${v}`)
+					.join(', ')}`,
+		)
+		.join(' · ');
+
 	return buildHtmlReport({
 		suite: 'view',
 		title: 'view benchmarks — keyed 1,000-row table',
@@ -819,7 +837,7 @@ function buildViewHtml(payload, { prevRun, nextRun } = {}) {
 			`score = steady-window mean, ${payload.iterations} samples per op · green = best in row`,
 			versionNote,
 		],
-		columns: names,
+		columns,
 		baseline,
 		generatedAt: payload.generatedAt,
 		prevRun,

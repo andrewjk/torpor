@@ -37,6 +37,22 @@ export const RESULTS_PAGES = [
 	{ id: 'build', file: 'build.html', title: 'build (server-side)' },
 ];
 
+/**
+ * Report column order: fastest overall first, ranked by each column's total
+ * (a ratio vs the baseline — `lowerIsBetter` says which end of the ratio
+ * means faster). The baseline is pinned first regardless of where it ranks;
+ * ties keep the run's original order.
+ */
+export function speedOrderedColumns(names, totals, { baseline, lowerIsBetter }) {
+	const rank = (name) => {
+		if (name === baseline) return -Infinity;
+		const v = totals[name];
+		if (typeof v !== 'number' || !Number.isFinite(v)) return Infinity;
+		return lowerIsBetter ? v : -v;
+	};
+	return [...names].sort((a, b) => rank(a) - rank(b) || names.indexOf(a) - names.indexOf(b));
+}
+
 function escapeHtml(s) {
 	return String(s)
 		.replace(/&/g, '&amp;')
