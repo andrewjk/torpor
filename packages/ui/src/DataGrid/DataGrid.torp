@@ -58,7 +58,7 @@ interface DataGridProps {
 	/** Called when a load starts, including reloads triggered by sorting or paging */
 	onloadstart?: () => void;
 	/** Called when the user sorts by a column */
-	onsortchange?: (sortBy: string | undefined, sortDirection: "asc" | "desc") => void;
+	onchange?: (sortBy: string | undefined, sortDirection: "asc" | "desc") => void;
 }
 
 /**
@@ -315,7 +315,7 @@ export default function DataGrid($props: DataGridProps) {
 			$state.sortBy = column.key;
 			$state.sortDirection = "asc";
 		}
-		$props.onsortchange?.($state.sortBy, $state.sortDirection);
+		$props.onchange?.($state.sortBy, $state.sortDirection);
 	}
 
 	// Scrolls the virtual window so a logical row is rendered, before it is

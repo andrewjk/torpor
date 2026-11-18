@@ -54,8 +54,8 @@ export default function MenuBarItemTrigger($props: MenuBarItemTriggerProps | und
 			handleItemKey={handleButtonKey}
 			handleItemFocus={handleButtonFocus}
 			setVisible={itemContext.setVisible}
-			onRegister={(index: number) => (itemContext.index = index)}
-			onActivate={() => (menubarContext.state.active = true)}
+			onregister={(index: number) => (itemContext.index = index)}
+			onactivate={() => (menubarContext.state.active = true)}
 			onclick={handleClick}
 		>
 			<slot />

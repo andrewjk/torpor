@@ -39,7 +39,7 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 			registerItem={registerItem}
 			handleItemKey={handleItemKey}
 			handleItemFocus={handleItemFocus}
-			onActivate={handlePopout}
+			onactivate={handlePopout}
 		>
 			<slot />
 		</SubmenuPopoutTrigger>

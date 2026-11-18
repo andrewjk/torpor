@@ -25,7 +25,7 @@ function bodyColumn(container: HTMLElement, index: number): string[] {
 
 describe("DataGrid - Sorting", () => {
 	it("sorts static data on header click and toggles direction", async () => {
-		const onsortchange = vi.fn();
+		const onchange = vi.fn();
 		const columns: DataColumn[] = [
 			{ key: "name", label: "Name", sortable: true },
 			{ key: "age", label: "Age" },
@@ -35,12 +35,12 @@ describe("DataGrid - Sorting", () => {
 			{ name: "Alice", age: 25 },
 			{ name: "Bob", age: 28 },
 		];
-		const grid = mountGrid({ columns, data, onsortchange });
+		const grid = mountGrid({ columns, data, onchange });
 
 		await userEvent.click(queryByRole(grid, "button", { name: "Name" })!);
 
 		expect(bodyColumn(grid, 0)).toEqual(["Alice", "Bob", "Cara"]);
-		expect(onsortchange).toHaveBeenCalledWith("name", "asc");
+		expect(onchange).toHaveBeenCalledWith("name", "asc");
 		expect(queryByRole(grid, "columnheader", { name: "Name" })).toHaveAttribute(
 			"aria-sort",
 			"ascending",
@@ -49,7 +49,7 @@ describe("DataGrid - Sorting", () => {
 		await userEvent.click(queryByRole(grid, "button", { name: "Name" })!);
 
 		expect(bodyColumn(grid, 0)).toEqual(["Cara", "Bob", "Alice"]);
-		expect(onsortchange).toHaveBeenCalledWith("name", "desc");
+		expect(onchange).toHaveBeenCalledWith("name", "desc");
 		expect(queryByRole(grid, "columnheader", { name: "Name" })).toHaveAttribute(
 			"aria-sort",
 			"descending",

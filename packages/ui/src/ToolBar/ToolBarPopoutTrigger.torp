@@ -39,7 +39,7 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 			registerItem={registerItem}
 			handleItemKey={handleItemKey}
 			handleItemFocus={handleItemFocus}
-			onActivate={handlePopout}
+			onactivate={handlePopout}
 		>
 			<slot />
 		</SubmenuPopoutTrigger>

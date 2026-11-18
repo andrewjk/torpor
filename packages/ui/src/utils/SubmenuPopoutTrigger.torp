@@ -27,7 +27,7 @@ interface SubmenuPopoutTriggerProps {
 	/** The containing group's registration function */
 	registerItem: (item: SubmenuItemState) => { index: number };
 	/** Called with the registration index, for wrappers that need it elsewhere */
-	onRegister?: (index: number) => void;
+	onregister?: (index: number) => void;
 	/** The containing group's key handler, called for keys other than openKey */
 	handleItemKey: (e: KeyboardEvent) => void;
 	/** The containing group's focus handler */
@@ -41,7 +41,7 @@ interface SubmenuPopoutTriggerProps {
 	 * Called with the registration index when the trigger is activated by
 	 * clicking or with openKey, before the popout is shown
 	 */
-	onActivate?: (index: number) => void;
+	onactivate?: (index: number) => void;
 	/** Replaces the default toggle behaviour when the trigger is clicked */
 	onclick?: () => void;
 }
@@ -78,7 +78,7 @@ export default function SubmenuPopoutTrigger($props: SubmenuPopoutTriggerProps |
 	// Register this item with the containing group and store the index
 	const item: SubmenuItemState = { setFocused, setVisible, disabled: $props?.disabled };
 	const { index } = $props!.registerItem(item);
-	$props?.onRegister?.(index);
+	$props?.onregister?.(index);
 
 	function setFocused() {
 		button.focus();
@@ -91,7 +91,7 @@ export default function SubmenuPopoutTrigger($props: SubmenuPopoutTriggerProps |
 	}
 
 	function activate() {
-		$props?.onActivate?.(index);
+		$props?.onactivate?.(index);
 	}
 
 	function handleClick() {
