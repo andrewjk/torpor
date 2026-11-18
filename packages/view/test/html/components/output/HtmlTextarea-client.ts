@@ -7,7 +7,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_event from "../../../../src/render/addEvent";
 import t_first_inside from "../../../../src/render/firstInsideNode";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_region from "../../../../src/render/newRegion";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_control from "../../../../src/render/runControl";

@@ -5,7 +5,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";

@@ -9,7 +9,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_event from "../../../../src/render/addEvent";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";

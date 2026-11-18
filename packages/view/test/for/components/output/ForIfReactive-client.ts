@@ -6,7 +6,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";

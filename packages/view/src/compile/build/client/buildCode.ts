@@ -93,6 +93,14 @@ export default function buildCode(
 	// Build the component
 	buildTemplate(template, map, imports, b, options, errors, warnings);
 
+	// A gathered `t_next` import can end up unused: runs of `t_next` calls
+	// are collapsed into a single `t_skip` call (see buildFragment), which
+	// removes every `t_next` from the emitted code. Drop the import when no
+	// call survived
+	if (imports.has("t_next") && !b.toString().includes("t_next(")) {
+		imports.delete("t_next");
+	}
+
 	let startSize = b.toString().length;
 
 	// Add the gathered imports in alphabetical order

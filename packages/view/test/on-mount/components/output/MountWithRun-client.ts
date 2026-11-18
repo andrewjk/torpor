@@ -4,7 +4,6 @@ import $watch from "../../../../src/watch/$watch";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_event from "../../../../src/render/addEvent";
 import t_fragment from "../../../../src/render/getFragment";
-import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import t_skip from "../../../../src/render/nodeSkip";
 import type SlotRender from "../../../../src/types/SlotRender";
