@@ -1,0 +1,43 @@
+import { ToggleButton, ToggleGroup } from "@torpor/ui/Form";
+
+export default function ExampleToggleButtons() {
+	let $state = $watch({
+		format: ["bold"],
+	});
+
+	@render {
+		<p>Pressed: {$state.format.join(", ") || "-"}</p>
+
+		<ToggleGroup class="example-toggle-group" &value={$state.format} ariaLabel="Text formatting">
+			<ToggleButton class="example-toggle-button" value="bold">Bold</ToggleButton>
+			<ToggleButton class="example-toggle-button" value="italic">Italic</ToggleButton>
+			<ToggleButton class="example-toggle-button" value="underline">Underline</ToggleButton>
+		</ToggleGroup>
+	}
+
+	@style {
+		.example-toggle-group {
+			display: flex;
+			gap: 4px;
+		}
+
+		.example-toggle-button {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: inherit;
+			padding: 6px 12px;
+		}
+
+		.example-toggle-button[aria-pressed="true"] {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: var(--accent-text);
+		}
+
+		.example-toggle-button:focus-visible {
+			outline: 2px solid var(--header);
+			outline-offset: 2px;
+		}
+	}
+}

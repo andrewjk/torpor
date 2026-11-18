@@ -8,6 +8,8 @@ import ExampleBound from "./select-box/ExampleBound.torp";
 import ExampleBoundCode from "./select-box/ExampleBound.torp?raw";
 import ExampleMultiple from "./select-box/ExampleMultiple.torp";
 import ExampleMultipleCode from "./select-box/ExampleMultiple.torp?raw";
+import ExampleField from "./select-box/ExampleField.torp";
+import ExampleFieldCode from "./select-box/ExampleField.torp?raw";
 
 export default function SelectBoxPage() {
 	@head {
@@ -34,6 +36,11 @@ export default function SelectBoxPage() {
 	</SelectBoxContent>
 </SelectBox>
 `.trim()}</code></pre>
+		<p>
+			Inside a Form Field, the SelectBox and its ListBox inherit the Field's name and value, so
+			only the Field needs binding. Pass <code>value</code> explicitly when using either one
+			standalone.
+		</p>
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">
@@ -45,6 +52,9 @@ export default function SelectBoxPage() {
 				</ExampleTabHeader>
 				<ExampleTabHeader>
 					Multiple
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					In a Field
 				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
@@ -60,6 +70,14 @@ export default function SelectBoxPage() {
 					<ExampleBound />
 					<fill name="code">
 						<CodePreview code={ExampleBoundCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleField />
+					<fill name="code">
+						<CodePreview code={ExampleFieldCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>

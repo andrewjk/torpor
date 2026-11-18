@@ -6,6 +6,8 @@ import ExampleBasic from "./color-picker/ExampleBasic.torp";
 import ExampleBasicCode from "./color-picker/ExampleBasic.torp?raw";
 import ExampleInput from "./color-picker/ExampleInput.torp";
 import ExampleInputCode from "./color-picker/ExampleInput.torp?raw";
+import ExampleFull from "./color-picker/ExampleFull.torp";
+import ExampleFullCode from "./color-picker/ExampleFull.torp?raw";
 
 export default function ColorPickerPage() {
 	@head {
@@ -15,19 +17,26 @@ export default function ColorPickerPage() {
 	@render {
 		<h1>ColorPicker</h1>
 		<p>
-			A color input: a ColorPalette with an optional hex text field, sharing a single bound
-			value.
+			A color input: a ColorPalette with optional saturation/brightness, hue and alpha
+			controls and a text field, sharing a single bound value. Values are normalized hex
+			colors, with an alpha channel when the color isn't fully opaque.
 		</p>
 		<h2>Structure</h2>
 		<pre><code>{`
-<ColorPicker>
-	<ColorPalette />
+<ColorPicker showArea showHue showAlpha showEyedropper showInput>
+	<ColorPickerArea />
+	<ColorPickerHue />
+	<ColorPickerAlpha />
+	<ColorPickerEyedropper />
+	<ColorPalette colors={colors} />
 	<ColorPickerInput />
 </ColorPicker>
 `.trim()}</code></pre>
 		<p>
-			With no children, the palette and input are rendered automatically. Compose them
-			explicitly to target each one with its own props and styling.
+			With no children, the parts you enable are rendered automatically. Compose them
+			explicitly to target each one with its own props and styling. Colors in the palette are
+			either hex strings or <code>{`{ value, name }`}</code> objects, where the name is used as
+			the swatch's accessible name.
 		</p>
 		<h2>Demo</h2>
 		<TabGroup>
@@ -36,7 +45,10 @@ export default function ColorPickerPage() {
 					Basic
 				</ExampleTabHeader>
 				<ExampleTabHeader>
-					Hex input
+					Color input
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Full picker
 				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
@@ -52,6 +64,14 @@ export default function ColorPickerPage() {
 					<ExampleInput />
 					<fill name="code">
 						<CodePreview code={ExampleInputCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleFull />
+					<fill name="code">
+						<CodePreview code={ExampleFullCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>

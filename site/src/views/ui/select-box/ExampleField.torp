@@ -1,0 +1,68 @@
+import { Field, Form, Label } from "@torpor/ui/Form";
+import { ListBox, ListBoxItem } from "@torpor/ui/ListBox";
+import { SelectBox, SelectBoxContent, SelectBoxTrigger } from "@torpor/ui/SelectBox";
+
+export default function ExampleField() {
+	let $state = $watch({
+		value: undefined as string | undefined,
+	});
+
+	@render {
+		<p>Value: {$state.value || "-"}</p>
+
+		<Form class="example-form" onsubmit={() => false}>
+			<Field name="pet" &value={$state.value}>
+				<Label>Pet</Label>
+				<SelectBox class="example-select-box" ariaLabel="Pet">
+					<SelectBoxTrigger class="example-select-box-trigger" />
+					<SelectBoxContent class="example-select-box-content">
+						<ListBox class="example-list-box">
+							<ListBoxItem class="example-list-box-item">Cat</ListBoxItem>
+							<ListBoxItem class="example-list-box-item">Chinchilla</ListBoxItem>
+							<ListBoxItem class="example-list-box-item">Dog</ListBoxItem>
+						</ListBox>
+					</SelectBoxContent>
+				</SelectBox>
+			</Field>
+		</Form>
+	}
+
+	@style {
+		.example-form {
+			width: 100%;
+		}
+
+		.example-select-box {
+			width: 200px;
+		}
+
+		.example-select-box-trigger {
+			width: 100%;
+		}
+
+		.example-list-box {
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+		}
+
+		.example-list-box-item {
+			all: unset;
+			box-sizing: border-box;
+			border: 2px solid transparent;
+			cursor: default;
+			padding: 5px;
+		}
+
+		.example-list-box-item[data-state="active"],
+		.example-list-box-item:hover {
+			border-color: var(--accent);
+		}
+
+		.example-list-box-item:focus-visible {
+			box-shadow: black 0px 0px 0px 2px;
+		}
+	}
+}

@@ -1,0 +1,84 @@
+import { ColorPicker } from "@torpor/ui/ColorPicker";
+
+export default function ExampleFull() {
+	let $state = $watch({ value: "#ff8800" });
+
+	@render {
+		<p>Value: {$state.value}</p>
+
+		<ColorPicker
+			class="example-color-picker-full"
+			ariaLabel="Accent color"
+			&value={$state.value}
+			showArea
+			showHue
+			showAlpha
+			showEyedropper
+			showInput
+		/>
+	}
+
+	@style {
+		:global(.example-color-picker-full) {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+			width: 240px;
+		}
+
+		:global(.example-color-picker-full .torp-color-picker-area) {
+			border-radius: 4px;
+			cursor: crosshair;
+			height: 150px;
+		}
+
+		:global(.example-color-picker-full .torp-color-picker-hue),
+		:global(.example-color-picker-full .torp-color-picker-alpha) {
+			border-radius: 4px;
+			height: 12px;
+			width: 100%;
+		}
+
+		:global(.example-color-picker-full .torp-color-picker-eyedropper) {
+			align-self: flex-start;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: inherit;
+			font-size: 16px;
+			height: 32px;
+			width: 32px;
+		}
+
+		:global(.example-color-picker-full .torp-color-palette) {
+			display: grid;
+			gap: 4px;
+			grid-template-columns: repeat(6, 1fr);
+		}
+
+		:global(.example-color-picker-full .torp-color-palette-swatch) {
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			height: 32px;
+		}
+
+		:global(.example-color-picker-full .torp-color-palette-swatch[data-selected="selected"]) {
+			outline: 2px solid var(--header);
+			outline-offset: 2px;
+		}
+
+		:global(.example-color-picker-full .torp-color-picker-input) {
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			box-sizing: border-box;
+			font-size: 14px;
+			padding: 6px 8px;
+			width: 100%;
+		}
+
+		:global(.example-color-picker-full .torp-color-picker-input:focus-visible) {
+			outline: 2px solid var(--header);
+			outline-offset: 2px;
+		}
+	}
+}

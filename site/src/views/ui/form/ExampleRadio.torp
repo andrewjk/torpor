@@ -1,0 +1,56 @@
+import { Field, Form, Label, Radio, RadioGroup } from "@torpor/ui/Form";
+
+export default function ExampleRadio() {
+	let $state = $watch({
+		size: "medium",
+	});
+
+	@render {
+		<p>Value: {$state.size}</p>
+
+		<Form class="example-form" onsubmit={() => false}>
+			<Field class="example-form-field" name="size" &value={$state.size}>
+				<Label>Size</Label>
+				<RadioGroup class="example-radio-group" &value={$state.size} ariaLabel="Size">
+					<Radio class="example-radio" value="small">Small</Radio>
+					<Radio class="example-radio" value="medium">Medium</Radio>
+					<Radio class="example-radio" value="large">Large</Radio>
+				</RadioGroup>
+			</Field>
+		</Form>
+	}
+
+	@style {
+		.example-form {
+			width: 100%;
+		}
+
+		.example-form-field {
+			padding: 10px 0;
+		}
+
+		.example-radio-group {
+			display: flex;
+			gap: 8px;
+		}
+
+		.example-radio {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: inherit;
+			padding: 6px 12px;
+		}
+
+		.example-radio[aria-checked="true"] {
+			background: var(--accent);
+			border-color: var(--accent);
+			color: var(--accent-text);
+		}
+
+		.example-radio:focus-visible {
+			outline: 2px solid var(--header);
+			outline-offset: 2px;
+		}
+	}
+}
