@@ -45,7 +45,9 @@ const $unwrap = (obj: Record<PropertyKey, any>) => obj;
 const $run = (fn: Function) => null;
 const $onmount = (fn: Function) => null;
 const t_fmt = (value: any) => (value ?? "").toString();
-const t_attr = (value: any) => (value ?? "").toString().replaceAll('"', "&quot;")
+const t_attr = (value: any) => (value ?? "").toString().replaceAll('"', "&quot;");
+const t_attr_if = (name: string, value: any) =>
+	value == null || value === false ? "" : name + '="' + t_attr(value) + '"';
 ${
 	imports
 		?.map((imp) =>

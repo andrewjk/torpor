@@ -1,4 +1,4 @@
-import t_attr from "../../../../src/render/formatAttributeText";
+import t_attr_if from "../../../../src/ssr/buildAttribute";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function TextareaValue(
@@ -10,7 +10,7 @@ export default async function TextareaValue(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<textarea ${($props.value) ? `value="${t_attr($props.value)}"` : ""}></textarea>`;
+	t_body += `<textarea ${t_attr_if("value", $props.value)}></textarea>`;
 
 	return { body: t_body, head: t_head };
 }

@@ -1,4 +1,5 @@
 import t_attr from "./render/formatAttributeText";
+import t_attr_if from "./ssr/buildAttribute";
 import t_fmt from "./ssr/formatText";
 import t_class from "./ssr/buildClasses";
 import t_style from "./ssr/buildStyles";
@@ -51,6 +52,7 @@ export {
 	fromWebSocket,
 	t_fmt,
 	t_attr,
+	t_attr_if,
 	t_class,
 	t_style,
 	t_slot_guard,

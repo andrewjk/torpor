@@ -8,10 +8,14 @@
 export default function trimQuotes(text: string): string {
 	let start = 0;
 	let end = text.length;
+	// The `start < end` check stops a value made up entirely of quotes (e.g.
+	// `""`) from over-trimming: `substring` swaps its arguments when start is
+	// past end, which would hand back the untrimmed text
 	while (
-		(text[start] === "'" && text[end - 1] === "'") ||
-		(text[start] === '"' && text[end - 1] === '"') ||
-		(text[start] === "`" && text[end - 1] === "`")
+		start < end &&
+		((text[start] === "'" && text[end - 1] === "'") ||
+			(text[start] === '"' && text[end - 1] === '"') ||
+			(text[start] === "`" && text[end - 1] === "`"))
 	) {
 		start += 1;
 		end -= 1;

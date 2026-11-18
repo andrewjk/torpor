@@ -1,4 +1,4 @@
-import t_attr from "../../../../src/render/formatAttributeText";
+import t_attr_if from "../../../../src/ssr/buildAttribute";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
@@ -15,7 +15,7 @@ export default async function ForOptionalChaining(
 	/* User interface */
 	t_body += `<ul><![>`;
 	for (let item of $props.items) {
-		t_body += `<!^><li ${(item?.name) ? `data-testid="${t_attr(item?.name)}"` : ""} ${(item?.hasChildren === true ? "" : undefined) ? `data-selected="${t_attr(item?.hasChildren === true ? "" : undefined)}"` : ""} ${("x" ?? item?.name) ? `data-fallback="${t_attr("x" ?? item?.name)}"` : ""}> ${t_fmt(item?.name)} </li>`;
+		t_body += `<!^><li ${t_attr_if("data-testid", item?.name)} ${t_attr_if("data-selected", item?.hasChildren === true ? "" : undefined)} ${t_attr_if("data-fallback", "x" ?? item?.name)}> ${t_fmt(item?.name)} </li>`;
 	}
 	t_body += `<!]><!></ul>`;
 

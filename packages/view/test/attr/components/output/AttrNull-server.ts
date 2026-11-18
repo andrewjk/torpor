@@ -1,4 +1,4 @@
-import t_attr from "../../../../src/render/formatAttributeText";
+import t_attr_if from "../../../../src/ssr/buildAttribute";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function AttrNull(
@@ -10,7 +10,7 @@ export default async function AttrNull(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<div ${($props.title) ? `title="${t_attr($props.title)}"` : ""} ${($props.label) ? `aria-label="${t_attr($props.label)}"` : ""} ${($props.count) ? `data-count="${t_attr($props.count)}"` : ""}> Content </div>`;
+	t_body += `<div ${t_attr_if("title", $props.title)} ${t_attr_if("aria-label", $props.label)} ${t_attr_if("data-count", $props.count)}> Content </div>`;
 
 	return { body: t_body, head: t_head };
 }

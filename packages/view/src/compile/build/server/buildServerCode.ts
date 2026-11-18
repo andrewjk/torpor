@@ -32,6 +32,7 @@ const importsMap: Record<string, string> = {
 	t_await_server: 'import { t_await_server } from "${folder}";',
 	t_fmt: 'import { t_fmt } from "${folder}";',
 	t_attr: 'import { t_attr } from "${folder}";',
+	t_attr_if: 'import { t_attr_if } from "${folder}";',
 	t_class: 'import { t_class } from "${folder}";',
 	t_style: 'import { t_style } from "${folder}";',
 	t_slot_guard: 'import { t_slot_guard } from "${folder}";',

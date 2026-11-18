@@ -1,4 +1,4 @@
-import t_attr from "../../../../src/render/formatAttributeText";
+import t_attr_if from "../../../../src/ssr/buildAttribute";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
@@ -13,7 +13,7 @@ export default async function ForRegex(
 	/* User interface */
 	t_body += `<ul><![>`;
 	for (let item of $props.items) {
-		t_body += `<!^><li ${(item) ? `data-testid="${t_attr(item)}"` : ""} ${(/^a/.test(item) ? "" : undefined) ? `data-starts-a="${t_attr(/^a/.test(item) ? "" : undefined)}"` : ""} ${(item.replace(/\b[a-z]/g, (c) => c.toUpperCase())) ? `data-label="${t_attr(item.replace(/\b[a-z]/g, (c) => c.toUpperCase()))}"` : ""}> ${t_fmt(item.replace(/\d+/g, ""))} </li>`;
+		t_body += `<!^><li ${t_attr_if("data-testid", item)} ${t_attr_if("data-starts-a", /^a/.test(item) ? "" : undefined)} ${t_attr_if("data-label", item.replace(/\b[a-z]/g, (c) => c.toUpperCase()))}> ${t_fmt(item.replace(/\d+/g, ""))} </li>`;
 	}
 	t_body += `<!]><!></ul>`;
 

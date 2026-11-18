@@ -578,6 +578,9 @@ Static strings pass through; dynamic values are `{expr}`:
 
 - Boolean attrs: `disabled={bool}`, `checked={bool}`, `readonly={bool}` — the
   attribute is set/removed based on truthiness.
+- `null`, `undefined`, and `false` remove the attribute; `""` and `0` still
+  render (e.g. the meaningful `alt=""` on a decorative image), in both static
+  (`alt=""`) and dynamic (`alt={expr}`) forms.
 - `data-*`/`aria-*` and any dashed attribute go through `setAttribute`.
 - `class` supports a **string**, an **array**, or an **object** (keys are class
   names, values toggle membership):

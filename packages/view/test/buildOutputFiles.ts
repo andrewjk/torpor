@@ -244,6 +244,8 @@ const importsMap: Record<string, string> = {
 		'import t_fmt from "../../../../src/ssr/formatText";',
 	'import { t_attr } from "@torpor/view/ssr";':
 		'import t_attr from "../../../../src/render/formatAttributeText";',
+	'import { t_attr_if } from "@torpor/view/ssr";':
+		'import t_attr_if from "../../../../src/ssr/buildAttribute";',
 	'import { t_class } from "@torpor/view/ssr";':
 		'import t_class from "../../../../src/ssr/buildClasses";',
 	'import { t_style } from "@torpor/view/ssr";':

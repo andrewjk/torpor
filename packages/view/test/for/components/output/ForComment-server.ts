@@ -1,5 +1,5 @@
 import $watch from "../../../../src/ssr/$serverWatch";
-import t_attr from "../../../../src/render/formatAttributeText";
+import t_attr_if from "../../../../src/ssr/buildAttribute";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
@@ -16,7 +16,7 @@ export default async function ForComment(
 	/* User interface */
 	t_body += `<ul><![>`;
 	for (let [index, item] of $props.items.entries()) {
-		t_body += `<!^><li><button ${(item) ? `data-testid="${t_attr(item)}"` : ""} ${($state.selected === item ? "" : undefined) ? `data-selected="${t_attr($state.selected === item ? "" : undefined)}"` : ""}> ${t_fmt(index)}: ${t_fmt(item)} </button></li>`;
+		t_body += `<!^><li><button ${t_attr_if("data-testid", item)} ${t_attr_if("data-selected", $state.selected === item ? "" : undefined)}> ${t_fmt(index)}: ${t_fmt(item)} </button></li>`;
 	}
 	t_body += `<!]><!></ul>`;
 

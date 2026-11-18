@@ -2,7 +2,7 @@ import $async from "../../../../src/ssr/$serverAsync";
 import $pending from "../../../../src/ssr/$serverPending";
 import $refresh from "../../../../src/ssr/$serverRefresh";
 import $watch from "../../../../src/ssr/$serverWatch";
-import t_attr from "../../../../src/render/formatAttributeText";
+import t_attr_if from "../../../../src/ssr/buildAttribute";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
@@ -27,7 +27,7 @@ export default async function SelfDisablingRefresh(
 	});
 
 	/* User interface */
-	t_body += `<p>Users: ${t_fmt($state.users)}</p> <button ${($pending(() => $state.users)) ? `disabled="${t_attr($pending(() => $state.users))}"` : ""}> refresh </button>`;
+	t_body += `<p>Users: ${t_fmt($state.users)}</p> <button ${t_attr_if("disabled", $pending(() => $state.users))}> refresh </button>`;
 
 	return { body: t_body, head: t_head };
 }

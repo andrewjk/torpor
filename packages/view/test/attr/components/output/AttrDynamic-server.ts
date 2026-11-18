@@ -1,4 +1,4 @@
-import t_attr from "../../../../src/render/formatAttributeText";
+import t_attr_if from "../../../../src/ssr/buildAttribute";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function AttrDynamic(
@@ -10,7 +10,7 @@ export default async function AttrDynamic(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<div ${($props.id) ? `id="${t_attr($props.id)}"` : ""} ${($props.title) ? `title="${t_attr($props.title)}"` : ""} ${($props.dataValue) ? `data-value="${t_attr($props.dataValue)}"` : ""}> Content </div>`;
+	t_body += `<div ${t_attr_if("id", $props.id)} ${t_attr_if("title", $props.title)} ${t_attr_if("data-value", $props.dataValue)}> Content </div>`;
 
 	return { body: t_body, head: t_head };
 }

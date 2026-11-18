@@ -80,8 +80,9 @@ export interface RestrictedStaticAttribute {
 /**
  * A dynamic attribute: the value is an expression evaluated at render time.
  *
- * - `format: "attr"` — set only when truthy, HTML-escaped (matches the JS
- *   server build's conditional attribute behavior).
+ * - `format: "attr"` — dropped for null/undefined/false, HTML-escaped
+ *   otherwise (matches the JS server build's conditional attribute behavior;
+ *   empty string and 0 still render).
  * - `format: "class"` — class value semantics (arrays/objects); `scoped` is
  *   the component's style-hash class to append.
  * - `format: "style"` — style value semantics (objects/arrays).

@@ -113,13 +113,11 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 				status.imports.add("t_style");
 				attributes.push(`\${t_style(${value})}`);
 			} else {
-				// Only set the attribute if the value is truthy
-				// e.g. `... ${className ? `class="${className}"` : ''} ...`
-				status.imports.add("t_attr");
-				// Parenthesise the value: it can be any expression (e.g. a
-				// ternary), and `a ? b : c ? x : y` parses as `a ? b : (c ? x : y)`,
-				// which drops the attribute for the truthy branch
-				attributes.push(`\${(${value}) ? \`${name}="\${t_attr(${value})}"\` : ""}`);
+				// `t_attr_if` drops the attribute for null/undefined/false,
+				// matching the client-side `t_attribute`: an empty string or 0
+				// still renders, e.g. the meaningful `alt=""`
+				status.imports.add("t_attr_if");
+				attributes.push(`\${t_attr_if("${name}", ${value})}`);
 			}
 		} else if (value != null && reactive) {
 			// TODO: Match braces, don't replace braces inside code

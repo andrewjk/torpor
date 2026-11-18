@@ -1,4 +1,4 @@
-import t_attr from "../../../../src/render/formatAttributeText";
+import t_attr_if from "../../../../src/ssr/buildAttribute";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function ForTemplateLiteral(
@@ -12,7 +12,7 @@ export default async function ForTemplateLiteral(
 	/* User interface */
 	t_body += `<section><![>`;
 	for (let slide of $props.slides) {
-		t_body += `<!^><p ${(`Go to slide ${slide.index + 1}`) ? `aria-label="${t_attr(`Go to slide ${slide.index + 1}`)}"` : ""}>Slide</p> <p ${(`slide show`) ? `aria-label="${t_attr(`slide show`)}"` : ""}>Constant</p>`;
+		t_body += `<!^><p ${t_attr_if("aria-label", `Go to slide ${slide.index + 1}`)}>Slide</p> <p ${t_attr_if("aria-label", `slide show`)}>Constant</p>`;
 	}
 	t_body += `<!]><!></section>`;
 

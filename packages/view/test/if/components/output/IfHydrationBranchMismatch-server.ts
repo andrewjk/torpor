@@ -1,4 +1,4 @@
-import t_attr from "../../../../src/render/formatAttributeText";
+import t_attr_if from "../../../../src/ssr/buildAttribute";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function IfHydrationBranchMismatch(
@@ -10,7 +10,7 @@ export default async function IfHydrationBranchMismatch(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<span class="badge" ${($props.on) ? `data-on="${t_attr($props.on)}"` : ""}><![>`;
+	t_body += `<span class="badge" ${t_attr_if("data-on", $props.on)}><![>`;
 	if ($props.on) {
 		t_body += `<!^0><span class="icon minus">minus</span>`;
 	}

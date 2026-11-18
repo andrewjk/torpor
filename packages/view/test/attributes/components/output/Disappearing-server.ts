@@ -1,4 +1,5 @@
 import t_attr from "../../../../src/render/formatAttributeText";
+import t_attr_if from "../../../../src/ssr/buildAttribute";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function Attributes(
@@ -10,7 +11,7 @@ export default async function Attributes(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<div ${($props.thing) ? `thing="${t_attr($props.thing)}"` : ""} ${($props.dataThing) ? `data-thing="${t_attr($props.dataThing)}"` : ""} caption="this attribute is for ${t_attr($props.description)}" ${($props.attr) ? `attr="${t_attr($props.attr)}"` : ""}> Hello! </div>`;
+	t_body += `<div ${t_attr_if("thing", $props.thing)} ${t_attr_if("data-thing", $props.dataThing)} caption="this attribute is for ${t_attr($props.description)}" ${t_attr_if("attr", $props.attr)}> Hello! </div>`;
 
 	return { body: t_body, head: t_head };
 }

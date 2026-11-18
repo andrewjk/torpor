@@ -1,4 +1,4 @@
-import t_attr from "../../../../src/render/formatAttributeText";
+import t_attr_if from "../../../../src/ssr/buildAttribute";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function AttrBoolean(
@@ -10,7 +10,7 @@ export default async function AttrBoolean(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<button ${($props.disabled) ? `disabled="${t_attr($props.disabled)}"` : ""}>Click</button> <input type="checkbox" ${($props.checked) ? `checked="${t_attr($props.checked)}"` : ""}> <input type="text" ${($props.readonly) ? `readonly="${t_attr($props.readonly)}"` : ""}>`;
+	t_body += `<button ${t_attr_if("disabled", $props.disabled)}>Click</button> <input type="checkbox" ${t_attr_if("checked", $props.checked)}> <input type="text" ${t_attr_if("readonly", $props.readonly)}>`;
 
 	return { body: t_body, head: t_head };
 }

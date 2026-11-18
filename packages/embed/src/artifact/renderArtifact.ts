@@ -1,6 +1,6 @@
 import type { RestrictedNode, RestrictedProgram } from "@torpor/view/compile";
 import type { ServerComponent } from "@torpor/view/ssr";
-import { t_attr, t_class, t_fmt, t_slot_guard, t_style } from "@torpor/view/ssr";
+import { t_attr, t_attr_if, t_class, t_fmt, t_slot_guard, t_style } from "@torpor/view/ssr";
 import embedProps from "../bridge/embedProps";
 import checkVersion from "../checkVersion";
 import { RUNTIME_VERSION } from "../generated/version";
@@ -416,14 +416,11 @@ function renderAttributes(node: Extract<RestrictedNode, { t: "el" }>, scope: Sco
 			parts.push(t_class(value as never, attribute.scoped));
 		} else if (attribute.format === "style") {
 			parts.push(t_style(value as never));
-		} else if (value) {
-			// Conditional attribute: only set when truthy (server behavior)
-			parts.push(`${attribute.name}="${t_attr(value)}"`);
 		} else {
-			// The server build pushes an empty string for a falsy conditional
-			// attribute; mirror it so byte output matches (including its
-			// resulting spaces when joined)
-			parts.push("");
+			// Conditional attribute: `t_attr_if` drops it for
+			// null/undefined/false (matching the JS server build); an empty
+			// string or 0 still renders
+			parts.push(t_attr_if(attribute.name, value));
 		}
 	}
 	return parts.length === 0 ? "" : ` ${parts.join(" ")}`;

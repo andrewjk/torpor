@@ -1,4 +1,4 @@
-import t_attr from "../../../../src/render/formatAttributeText";
+import t_attr_if from "../../../../src/ssr/buildAttribute";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
@@ -13,7 +13,7 @@ export default async function ForShadow(
 	/* User interface */
 	t_body += `<ul><![>`;
 	for (let row of $props.rows) {
-		t_body += `<!^><li ${(row.name) ? `data-testid="${t_attr(row.name)}"` : ""}> ${t_fmt(row.ok&&"Y"||"N")}:${t_fmt(row.name)}:${t_fmt(row.tags.filter(row=>row.ok).length)} </li>`;
+		t_body += `<!^><li ${t_attr_if("data-testid", row.name)}> ${t_fmt(row.ok&&"Y"||"N")}:${t_fmt(row.name)}:${t_fmt(row.tags.filter(row=>row.ok).length)} </li>`;
 	}
 	t_body += `<!]><!></ul>`;
 
