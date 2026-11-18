@@ -1,6 +1,7 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
 import { createPopoutContent } from "../utils/popoutContent";
+import setContextPosition from "../utils/setContextPosition";
 import { type PopoverContext, PopoverContextName } from "./PopoverTypes";
 
 interface PopoverContentProps {
@@ -39,6 +40,13 @@ export default function PopoverContent($props?: PopoverContentProps | undefined)
 		close: (e) => context.handleClickOutside?.(e),
 		side: $props?.side ?? "bottom",
 		alignment: $props?.alignment ?? "center",
+		position: context.isContextual()
+			? () => {
+					if (context.anchorElement && div) {
+						setContextPosition(context.anchorElement, div, context.state.position);
+					}
+				}
+			: undefined,
 		ignoreAnchorClicks: true,
 		focusFirstElement: () => context.focusFirstElement?.(),
 		refocusAnchorOnHide: true,

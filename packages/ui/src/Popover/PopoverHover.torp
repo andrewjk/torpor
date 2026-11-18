@@ -52,6 +52,30 @@ export default function PopoverHover($props?: PopoverHoverProps) {
 	}
 	const $state = context.state;
 
+	let node: HTMLElement;
+
+	// In contextual mode the content opens at the pointer, or the centre of
+	// the trigger when it was opened by focus
+	function activate(point: { clientX: number; clientY: number }) {
+		if (!context.isContextual() || !node) return;
+		const rect = node.getBoundingClientRect();
+		$state.position = { x: point.clientX - rect.left, y: point.clientY - rect.top };
+	}
+
+	function handleEnter(e: MouseEvent) {
+		if (context.isContextual()) {
+			activate(e);
+		}
+		hover.handleEnter();
+	}
+
+	function handleFocus() {
+		if (context.isContextual() && node) {
+			activate({ clientX: node.offsetWidth / 2, clientY: node.offsetHeight / 2 });
+		}
+		hover.handleFocus();
+	}
+
 	// Set the trigger ID so that it can be used with aria-labelledby
 	$state.triggerId = $props?.id ?? defaultId;
 
@@ -87,12 +111,15 @@ export default function PopoverHover($props?: PopoverHoverProps) {
 			aria-haspopup={$state.contentRole ?? "true"}
 			aria-expanded={$state.visible ? "true" : "false"}
 			aria-controls={$state.contentId}
-			onmouseenter={() => hover.handleEnter()}
+			onmouseenter={handleEnter}
 			onmouseleave={(e: MouseEvent) => hover.handleLeave(e)}
 			onpointerdown={(e: PointerEvent) => hover.handlePointerDown(e)}
-			onfocus={() => hover.handleFocus()}
+			onfocus={handleFocus}
 			onblur={(e: FocusEvent) => hover.handleBlur(e)}
-			onmount={anchor}
+			onmount={(el) => {
+				node = el;
+				anchor(el);
+			}}
 		>
 			<slot />
 		</div>

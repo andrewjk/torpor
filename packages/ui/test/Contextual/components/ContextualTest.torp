@@ -1,0 +1,18 @@
+import {
+	Contextual,
+	ContextualContent,
+	ContextualTrigger,
+} from "../../../src/Contextual/index";
+
+export default function ContextualTest($props: any) {
+	let $state = $watch({
+		visible: false,
+	});
+
+	@render {
+		<Contextual &visible={$state.visible} onopen={$props?.onopen} onclose={$props?.onclose}>
+			<ContextualTrigger>Right-click me</ContextualTrigger>
+			<ContextualContent>Menu</ContextualContent>
+		</Contextual>
+	}
+}

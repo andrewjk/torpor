@@ -1,17 +1,11 @@
-import { type PopoutContext, type PopoutState } from "../utils/PopoutTypes";
+import type { PopoverContext, PopoverState } from "../Popover/PopoverTypes";
 
+/** @deprecated Contextual uses Popover's context */
 export const ContextualContextName: unique symbol = Symbol.for("torp.Contextual");
 
-/** The shared context for popover components (Contextual, Prompt and Contextual) */
-export interface ContextualContext extends PopoutContext {
-	state: ContextualState;
-}
+/** The shared context for Contextual components */
+export type ContextualContext = PopoverContext;
 
-export interface ContextualState extends PopoutState {
-	position: Point;
-}
+export type ContextualState = PopoverState;
 
-export interface Point {
-	x: number;
-	y: number;
-}
+export type { Point } from "../Popover/PopoverTypes";

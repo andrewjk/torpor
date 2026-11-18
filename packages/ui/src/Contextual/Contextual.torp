@@ -1,12 +1,6 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
-import $handle from "../utils/$handle";
-import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
-import {
-	type ContextualContext,
-	ContextualContextName,
-	type ContextualState,
-	type Point,
-} from "./ContextualTypes";
+import Popover from "../Popover/Popover.torp";
+import type { Point } from "../Popover/PopoverTypes";
 
 interface ContextualProps {
 	/** An ID for the root element */
@@ -15,13 +9,13 @@ interface ContextualProps {
 	class?: ClassValue;
 	/** Styles for the root element */
 	style?: StyleValue;
-	/** Whether the contextual is modal. If true, an overlay should be supplied to obscure outside content, and only the context content will be visible to screen readers  */
+	/** Whether the contextual is modal */
 	modal?: boolean;
-	/** Whether the contextual is visible  */
+	/** Whether the contextual is visible */
 	visible: Bindable<boolean | undefined>;
-	/** The element to anchor this contextual to, as an alternative to supplying a ContextualTrigger  */
+	/** The element to anchor this contextual to, as an alternative to supplying a ContextualTrigger */
 	anchor?: HTMLElement;
-	/** The position to display this contextual at  */
+	/** The position to display this contextual at */
 	position?: Point;
 	/** Raised when the contextual has opened */
 	onopen?: () => void;
@@ -31,6 +25,9 @@ interface ContextualProps {
 
 /**
  * A contextual window that is shown to the user at the cursor's location.
+ *
+ * Contextual is Popover in contextual mode: the same root, trigger and
+ * content machinery, positioned at a point instead of at a side.
  *
  * The structure of a Contextual is:
  *
@@ -42,75 +39,26 @@ interface ContextualProps {
  * ```
  */
 export default function Contextual($props: ContextualProps | undefined) {
-	let $state: ContextualState = $watch({
-		visible: false,
-		position: { x: 0, y: 0 },
-		contentId: undefined,
-		triggerId: undefined,
-		contentRole: undefined,
+	// Forward the visible binding through to the Popover
+	let $state = $watch({
+		visible: $props?.visible as boolean | undefined,
 	});
-
 	$bind($state, $props, "visible");
-	$run(() => {
-		$state.position = $props?.position ?? { x: 0, y: 0 };
-	});
-
-	let result: any;
-
-	// Set the context to pass down to items
-	let context: ContextualContext = {
-		handleButton,
-		handleClickOutside,
-		state: $state,
-		//modal: $props?.modal,
-		anchorElement: $props?.anchor ? $unwrap($props.anchor) : undefined,
-	};
-	$context[ContextualContextName] = context;
-
-	// Set the context to pass down to items
-	let popoutContext: PopoutContext = context;
-	$context[PopoutContextName] = popoutContext;
-
-	// Dispatch the open/close events when the contextual is opened or closed
-	$handle((first) => {
-		const visible = $state.visible;
-		if (first) return;
-		if (visible) {
-			$props?.onopen?.();
-		} else {
-			$props?.onclose?.(result);
-		}
-	});
-
-	function handleButton(type: "confirm" | "cancel" | undefined, value?: any) {
-		// Get the button's result
-		switch (type) {
-			case "confirm": {
-				result = value ?? true;
-				break;
-			}
-			case "cancel": {
-				result = value ?? false;
-				break;
-			}
-			default: {
-				result = value;
-				break;
-			}
-		}
-
-		// Hide the contextual
-		$state.visible = false;
-	}
-
-	function handleClickOutside(e: MouseEvent | KeyboardEvent) {
-		e.preventDefault();
-		$state.visible = false;
-	}
 
 	@render {
-		<div {$props?.id} class={["torp-context", $props?.class]} {$props?.style}>
+		<Popover
+			{$props?.id}
+			class={$props?.class}
+			{$props?.style}
+			contextual
+			modal={$props?.modal}
+			&visible={$state.visible}
+			anchor={$props?.anchor}
+			position={$props?.position}
+			onopen={$props?.onopen}
+			onclose={$props?.onclose}
+		>
 			<slot />
-		</div>
+		</Popover>
 	}
 }

@@ -7,9 +7,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Duplication and inconsistencies
 
-- **Popover / Contextual are near-copies**: root, trigger, content and the
-  ~100-line `*Hover` component differ only in names and comments. Make
-  Contextual a positioning mode of Popover, or share one core.
 - **Modal / Drawer are near-copies**: root, overlay and trigger differ only
   in names.
 - **Form wiring is duplicated**: `Form/*` (Input, TextArea, Select, CheckBox,

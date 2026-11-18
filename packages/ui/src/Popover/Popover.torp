@@ -23,6 +23,11 @@ interface PopoverProps {
 	anchor?: HTMLElement;
 	/** The position to display this popover at if it's contextual, as an alternative to supplying a ContextualTrigger  */
 	position?: Point;
+	/**
+	 * If set to true, the popover is positioned at `position` relative to
+	 * its anchor instead of by side/alignment. Contextual uses this mode.
+	 */
+	contextual?: boolean;
 	/** Raised when the popover has opened */
 	onopen?: () => void;
 	/** Raised when the popover has closed */
@@ -31,6 +36,8 @@ interface PopoverProps {
 
 /**
  * A popover window that is shown to the user relative to an anchor element.
+ * Set `contextual` for Contextual's mode, where the content is positioned at
+ * an explicit point instead of beside the anchor.
  *
  * The structure of a Popover is:
  *
@@ -64,6 +71,7 @@ export default function Popover($props: PopoverProps | undefined) {
 		state: $state,
 		//modal: $props?.modal,
 		anchorElement: $props?.anchor ? $unwrap($props.anchor) : undefined,
+		isContextual: () => $props?.contextual === true,
 	};
 	$context[PopoverContextName] = context;
 
@@ -109,7 +117,11 @@ export default function Popover($props: PopoverProps | undefined) {
 	}
 
 	@render {
-		<div {$props?.id} class={["torp-popover", $props?.class]} {$props?.style}>
+		<div
+			{$props?.id}
+			class={["torp-popover", $props?.contextual ? "torp-context" : undefined, $props?.class]}
+			{$props?.style}
+		>
 			<slot />
 		</div>
 	}
