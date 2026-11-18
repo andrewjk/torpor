@@ -1,0 +1,49 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleVariants from "./alert/ExampleVariants.torp";
+import ExampleVariantsCode from "./alert/ExampleVariants.torp?raw";
+
+export default function AlertPage() {
+	@head {
+		<title>Alert | Torpor</title>
+	}
+
+	@render {
+		<h1>Alert</h1>
+		<p>
+			An inline message that is announced by assistive tech as soon as it is shown, for
+			errors, warnings and other important status updates.
+		</p>
+		<p>
+			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/alert/">the WAI ARIA alert pattern</a>.
+		</p>
+		<p>
+			Unlike <a href="/ui/notification">Notification</a> (a toast), an Alert sits in the flow
+			of the page. Show it conditionally when there is something to report.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Alert variant="error">
+	Your changes could not be saved.
+</Alert>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Variants
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleVariants />
+					<fill name="code">
+						<CodePreview code={ExampleVariantsCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

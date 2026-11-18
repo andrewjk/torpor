@@ -1,0 +1,46 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./pin-input/ExampleBasic.torp";
+import ExampleBasicCode from "./pin-input/ExampleBasic.torp?raw";
+
+export default function PinInputPage() {
+	@head {
+		<title>PinInput | Torpor</title>
+	}
+
+	@render {
+		<h1>PinInput</h1>
+		<p>
+			An input for one-time passcodes or PINs, made of one field per character. Typing
+			advances to the next field, Backspace goes back, pasting fills the remaining fields, and
+			the arrow keys move between them.
+		</p>
+		<p>
+			The bound value is the characters only, without separators, so it can be submitted
+			directly. Use <code>oncomplete</code> to act when every character has been entered, or
+			validate completeness with a schema.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<PinInput name="code" length={6} oncomplete={(code) => verify(code)} />
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

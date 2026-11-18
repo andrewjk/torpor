@@ -1,0 +1,46 @@
+import { Meter } from "@torpor/ui/Meter";
+
+export default function ExampleBasic() {
+	let $state = $watch({ value: 72 });
+
+	@render {
+		<p>Value: {$state.value}%</p>
+
+		<Meter
+			class="example-meter"
+			value={$state.value}
+			low={25}
+			high={75}
+			optimum={25}
+			ariaLabel="Disk usage"
+			valuetext={`${$state.value}% of disk used`}
+		/>
+
+		<p>
+			<input type="range" min="0" max="100" &value={$state.value} />
+		</p>
+	}
+
+	@style {
+		:global(.example-meter) {
+			background-color: var(--code-back);
+			border-radius: 4px;
+			height: 10px;
+			width: 240px;
+		}
+
+		:global(.example-meter .torp-meter-bar) {
+			background-color: var(--accent);
+			border-radius: 4px;
+			transition: width 0.2s ease;
+		}
+
+		:global(.example-meter[data-state="suboptimum"] .torp-meter-bar) {
+			background-color: #d18b00;
+		}
+
+		:global(.example-meter[data-state="poor"] .torp-meter-bar) {
+			background-color: var(--danger);
+		}
+	}
+}

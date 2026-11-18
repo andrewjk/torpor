@@ -1,0 +1,42 @@
+import { SortableList } from "@torpor/ui/SortableList";
+
+export default function ExampleBasic() {
+	let $state = $watch({
+		items: ["Write the docs", "Review the pull request", "Ship the release", "Celebrate"],
+	});
+
+	@render {
+		<SortableList class="example-sortable-list" &items={$state.items} ariaLabel="Release steps" />
+		<p>Order: {$state.items.join(", ")}</p>
+	}
+
+	@style {
+		:global(.example-sortable-list) {
+			display: flex;
+			flex-direction: column;
+			gap: 6px;
+			margin: 0;
+			max-width: 360px;
+			padding: 0;
+		}
+
+		:global(.example-sortable-list .torp-sortable-list-item) {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			cursor: grab;
+			padding: 8px 12px;
+			user-select: none;
+		}
+
+		:global(.example-sortable-list .torp-sortable-list-item:focus-visible) {
+			outline: 2px solid var(--header);
+			outline-offset: 2px;
+		}
+
+		:global(.example-sortable-list .torp-sortable-list-item-over) {
+			border-color: var(--accent);
+			border-style: dashed;
+		}
+	}
+}

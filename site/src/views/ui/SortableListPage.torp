@@ -1,0 +1,53 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./sortable-list/ExampleBasic.torp";
+import ExampleBasicCode from "./sortable-list/ExampleBasic.torp?raw";
+
+export default function SortableListPage() {
+	@head {
+		<title>SortableList | Torpor</title>
+	}
+
+	@render {
+		<h1>SortableList</h1>
+		<p>
+			A list whose items can be reordered by dragging, or from the keyboard.
+		</p>
+		<p>
+			With focus on an item, <kbd>Alt</kbd> + <kbd>Up</kbd> and <kbd>Alt</kbd> +{" "}
+			<kbd>Down</kbd> move it one position; <kbd>Alt</kbd> + <kbd>Home</kbd> and{" "}
+			<kbd>Alt</kbd> + <kbd>End</kbd> move it to an end. Every reorder is announced to
+			assistive tech through a live region.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<SortableList &items={$state.items} ariaLabel="Steps">
+	<SortableListItem item={item} index={i}>
+		{item.name}
+	</SortableListItem>
+</SortableList>
+`.trim()}</code></pre>
+		<p>
+			With no children, the items are rendered automatically. <code>getItemLabel</code>{" "}
+			supplies their text, and <code>getItemValue</code> supplies stable keys for custom items.
+		</p>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

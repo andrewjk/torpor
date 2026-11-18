@@ -1,0 +1,34 @@
+import { VirtualList } from "@torpor/ui/VirtualList";
+
+const rows = Array.from({ length: 10000 }, (_, i) => `Row ${i + 1}`);
+
+export default function ExampleBasic() {
+	@render {
+		<p>10,000 rows, only the visible window is rendered.</p>
+
+		<VirtualList
+			class="example-virtual-list"
+			items={rows}
+			itemHeight={32}
+			height={240}
+			overscan={4}
+			ariaLabel="Rows"
+		>
+			<div class="example-virtual-list-row">{$slot.item}</div>
+		</VirtualList>
+	}
+
+	@style {
+		.example-virtual-list {
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			max-width: 360px;
+		}
+
+		.example-virtual-list-row {
+			box-sizing: border-box;
+			border-bottom: 1px solid var(--border);
+			padding: 6px 12px;
+		}
+	}
+}

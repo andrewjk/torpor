@@ -1,0 +1,53 @@
+import { Alert } from "@torpor/ui/Alert";
+
+export default function ExampleVariants() {
+	@render {
+		<div class="example-alerts">
+			<Alert class="example-alert" variant="info">
+				A new version is available.
+			</Alert>
+			<Alert class="example-alert" variant="success">
+				Your changes have been saved.
+			</Alert>
+			<Alert class="example-alert" variant="warning">
+				Your session expires in five minutes.
+			</Alert>
+			<Alert class="example-alert" variant="error">
+				Your changes could not be saved.
+			</Alert>
+		</div>
+	}
+
+	@style {
+		.example-alerts {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+			max-width: 420px;
+		}
+
+		.example-alert {
+			background-color: var(--surface);
+			border: 1px solid var(--border);
+			border-left: 3px solid var(--muted);
+			border-radius: 4px;
+			padding: 10px 12px;
+		}
+
+		.example-alert[data-variant="info"] {
+			border-left-color: var(--header);
+		}
+
+		.example-alert[data-variant="success"] {
+			border-left-color: var(--success);
+		}
+
+		.example-alert[data-variant="warning"] {
+			border-left-color: #d18b00;
+		}
+
+		.example-alert[data-variant="error"] {
+			border-left-color: var(--danger);
+		}
+	}
+}

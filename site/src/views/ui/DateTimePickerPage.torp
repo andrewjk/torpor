@@ -1,0 +1,44 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./date-time-picker/ExampleBasic.torp";
+import ExampleBasicCode from "./date-time-picker/ExampleBasic.torp?raw";
+
+export default function DateTimePickerPage() {
+	@head {
+		<title>DateTimePicker | Torpor</title>
+	}
+
+	@render {
+		<h1>DateTimePicker</h1>
+		<p>
+			An input for selecting a date and a time together, from a calendar and a time field in
+			one popout.
+		</p>
+		<p>
+			The value is a <code>Date</code>. Selecting a day keeps the chosen time (09:00 when the
+			picker is empty), and the picker submits its value as <code>yyyy-MM-ddTHH:mm</code>.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<DateTimePicker name="starts_at" &value={$state.startsAt} />
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

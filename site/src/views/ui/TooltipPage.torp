@@ -1,0 +1,55 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./tooltip/ExampleBasic.torp";
+import ExampleBasicCode from "./tooltip/ExampleBasic.torp?raw";
+
+export default function TooltipPage() {
+	@head {
+		<title>Tooltip | Torpor</title>
+	}
+
+	@render {
+		<h1>Tooltip</h1>
+		<p>
+			A short description of an element, shown on hover or focus and dismissed with Escape.
+		</p>
+		<p>
+			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/">the WAI ARIA guidelines for Tooltips</a>.
+		</p>
+		<p>
+			The trigger is described by the content through <code>aria-describedby</code>.
+			Tooltips should contain only short, non-interactive hints; use{" "}
+			<a href="/ui/popover">PopoverHover</a> for rich hover content.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Tooltip>
+	<TooltipTrigger>Copy</TooltipTrigger>
+	<TooltipContent>Copy to the clipboard</TooltipContent>
+</Tooltip>
+`.trim()}</code></pre>
+		<p>
+			The trigger is a button, so it is reachable by keyboard and works on touch screens.
+			<code>openDelay</code> and <code>closeDelay</code> control the hover timing, and{" "}
+			<code>side</code> and <code>alignment</code> control placement.
+		</p>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

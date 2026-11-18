@@ -1,0 +1,52 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./virtual-list/ExampleBasic.torp";
+import ExampleBasicCode from "./virtual-list/ExampleBasic.torp?raw";
+
+export default function VirtualListPage() {
+	@head {
+		<title>VirtualList | Torpor</title>
+	}
+
+	@render {
+		<h1>VirtualList</h1>
+		<p>
+			A list that renders only the items in and around its scroll viewport, for large
+			collections with fixed-height rows.
+		</p>
+		<p>
+			The slot is rendered once per visible item, with the item and its index passed back as{" "}
+			<code>$slot.item</code> and <code>$slot.index</code>. DataGrid has its own
+			virtualization; use VirtualList for simpler lists.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<VirtualList items={rows} itemHeight={32} height={240} ariaLabel="Rows">
+	<div>{$slot.item.label}</div>
+</VirtualList>
+`.trim()}</code></pre>
+		<p>
+			Set <code>height</code> for a fixed viewport, or omit it to measure the element.{" "}
+			<code>overscan</code> controls how many extra rows are rendered above and below the
+			viewport.
+		</p>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

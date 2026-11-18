@@ -1,0 +1,132 @@
+import { DateTimePicker } from "@torpor/ui/DateTimePicker";
+
+export default function ExampleBasic() {
+	let $state = $watch({
+		value: undefined as Date | undefined,
+	});
+
+	@render {
+		<p>Value: {$state.value ? $state.value.toLocaleString() : "-"}</p>
+
+		<DateTimePicker
+			class="example-date-time-picker"
+			&value={$state.value}
+			ariaLabel="Start date and time"
+		/>
+	}
+
+	@style {
+		.example-date-time-picker {
+			position: relative;
+			width: 220px;
+		}
+
+		:global(.torp-date-time-picker-trigger) {
+			all: unset;
+			box-sizing: border-box;
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			cursor: default;
+			display: block;
+			padding: 5px 10px;
+			white-space: nowrap;
+			width: 100%;
+		}
+
+		:global(.torp-date-time-picker-trigger:focus) {
+			border-color: var(--accent);
+		}
+
+		:global(.torp-date-time-picker-content) {
+			background-color: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			box-sizing: border-box;
+			left: 0;
+			padding: 10px;
+			position: absolute;
+			top: calc(100% + 4px);
+			z-index: 10;
+		}
+
+		:global(.torp-calendar) {
+			text-align: center;
+		}
+
+		:global(.torp-calendar-header) {
+			display: grid;
+			grid-template-columns: auto 1fr auto;
+			margin-block: 0.5rem;
+		}
+
+		:global(.torp-calendar-trigger, .torp-calendar-day) {
+			all: unset;
+			box-sizing: border-box;
+			cursor: default;
+			display: inline-flex;
+			align-items: center;
+			user-select: none;
+			white-space: nowrap;
+			padding: 5px 10px;
+		}
+
+		:global(
+			.torp-calendar-trigger:hover,
+			.torp-calendar-trigger:focus,
+			.torp-calendar-day:hover,
+			.torp-calendar-day:focus,
+			.torp-calendar-day.active
+		) {
+			background-color: var(--accent);
+			border-radius: 4px;
+			color: var(--accent-text);
+		}
+
+		:global(.torp-calendar-day.today) {
+			font-weight: bold;
+		}
+
+		:global(.torp-calendar-day.muted) {
+			color: var(--muted);
+		}
+
+		:global(.torp-time-picker) {
+			align-items: center;
+			display: flex;
+			gap: 4px;
+			margin-top: 8px;
+		}
+
+		:global(.torp-time-picker-part) {
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			font-size: 14px;
+			padding: 4px;
+			width: 40px;
+		}
+
+		:global(.torp-time-picker-part:focus-visible) {
+			outline: 2px solid var(--header);
+			outline-offset: 2px;
+		}
+
+		:global(.torp-time-picker-period) {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: inherit;
+			padding: 4px 8px;
+		}
+
+		:global(.torp-date-time-picker-done) {
+			background: var(--accent);
+			border: 0;
+			border-radius: 4px;
+			color: var(--accent-text);
+			margin-top: 10px;
+			padding: 6px 12px;
+			width: 100%;
+		}
+	}
+}

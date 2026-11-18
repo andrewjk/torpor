@@ -1,0 +1,53 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./meter/ExampleBasic.torp";
+import ExampleBasicCode from "./meter/ExampleBasic.torp?raw";
+
+export default function MeterPage() {
+	@head {
+		<title>Meter | Torpor</title>
+	}
+
+	@render {
+		<h1>Meter</h1>
+		<p>
+			A gauge that shows a measurement within a known range, such as disk usage or a score.
+		</p>
+		<p>
+			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/meter/">the WAI ARIA guidelines for Meters</a>.
+		</p>
+		<p>
+			Unlike <a href="/ui/progress">Progress</a>, a Meter always has a value and can rate it
+			against <code>low</code>, <code>high</code> and <code>optimum</code> thresholds. The
+			indicator and the meter both expose the rating as <code>data-state</code> for styling.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Meter value={72} low={25} high={75} optimum={25}>
+	<MeterIndicator />
+</Meter>
+`.trim()}</code></pre>
+		<p>
+			With no children, the indicator is rendered automatically. Compose it
+			explicitly to target it with its own props and styling.
+		</p>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

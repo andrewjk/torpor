@@ -1,0 +1,45 @@
+import { PinInput } from "@torpor/ui/PinInput";
+
+export default function ExampleBasic() {
+	let $state = $watch({
+		code: "",
+		complete: false,
+	});
+
+	@render {
+		<p>Code: {$state.code || "-"}</p>
+		<p>{$state.complete ? "Code complete" : "Enter the six-digit code"}</p>
+
+		<PinInput
+			class="example-pin-input"
+			length={6}
+			&value={$state.code}
+			ariaLabel="Verification code"
+			oncomplete={() => ($state.complete = true)}
+			onchange={() => ($state.complete = false)}
+		/>
+	}
+
+	@style {
+		.example-pin-input {
+			display: flex;
+			gap: 6px;
+		}
+
+		:global(.example-pin-input .torp-pin-input-field) {
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			box-sizing: border-box;
+			font-size: 20px;
+			height: 48px;
+			padding: 0;
+			text-align: center;
+			width: 40px;
+		}
+
+		:global(.example-pin-input .torp-pin-input-field:focus-visible) {
+			outline: 2px solid var(--header);
+			outline-offset: 2px;
+		}
+	}
+}
