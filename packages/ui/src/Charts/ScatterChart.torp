@@ -1,15 +1,8 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { chartColors } from "../utils/chartColors";
-import {
-	calculateChartBottom,
-	calculateChartLeft,
-	calculateStepLabels,
-	calculateStepValue,
-	calculateValueHeight,
-} from "../utils/chartUtils";
-import GridLines from "./GridLines.torp";
-import XAxis from "./XAxis.torp";
-import YAxis from "./YAxis.torp";
+import Chart from "./Chart.torp";
+import ChartGrid from "./ChartGrid.torp";
+import ChartScatter from "./ChartScatter.torp";
+import ChartYAxis from "./ChartYAxis.torp";
 
 interface Pair {
 	x: number;
@@ -48,176 +41,54 @@ interface ScatterChartProps {
 	showVLines?: boolean;
 }
 
+function maxOf(series: DataSeries[], field: "x" | "y"): number {
+	return series.reduce(
+		(max, s) => Math.max(max, ...s.data.map((point) => point[field])),
+		0,
+	);
+}
+
+/**
+ * A scatter chart preset: one point per `{ x, y }` pair, with a numeric x
+ * axis and the standard value axis, laid out by Chart.
+ */
 export default function ScatterChart($props: ScatterChartProps) {
-	const defaultHeight = 200;
-	const defaultWidth = 400;
-
-	let container: HTMLElement;
-	let measurer: SVGTextElement;
-
-	let $state = $watch({
-		textWidth: 0,
-		textHeight: 0,
-		get calculatedHeight() {
-			return $props.height || defaultHeight;
-		},
-		get calculatedWidth() {
-			return $props.width || container?.clientWidth || defaultWidth;
-		},
-		get maxXValue() {
-			return calculateMaxValue($props.series, "x");
-		},
-		get calculatedXStepValue() {
-			return $props.xStepValue || calculateStepValue($state.maxXValue, $props.xStepCount);
-		},
-		get xStepLabels() {
-			return calculateStepLabels($props.xStepCount || 2, $state.calculatedXStepValue);
-		},
-		get maxYValue() {
-			return calculateMaxValue($props.series, "y");
-		},
-		get calculatedYStepValue() {
-			return $props.yStepValue || calculateStepValue($state.maxYValue, $props.yStepCount);
-		},
-		get yStepLabels() {
-			return calculateStepLabels($props.yStepCount || 2, $state.calculatedYStepValue);
-		},
-		get itemWidth() {
-			return calculateValueHeight(
-				$state.calculatedWidth - $state.chartLeft,
-				$state.textHeight,
-				$state.calculatedXStepValue,
-				$props.xStepCount || 2,
-			);
-		},
-		get valueHeight() {
-			return calculateValueHeight(
-				$state.chartBottom,
-				$state.textHeight,
-				$state.calculatedYStepValue,
-				$props.yStepCount || 2,
-			);
-		},
-		get chartBottom() {
-			return calculateChartBottom($props.xLabel ?? "", $state.calculatedHeight, $state.textHeight);
-		},
-		get chartLeft() {
-			return calculateChartLeft(
-				$state.yStepLabels,
-				$props.yLabel ?? "",
-				$state.textHeight,
-				$state.textWidth,
-			);
-		},
-		get pointSeries() {
-			return buildPointSeries(
-				$props.series,
-				$state.chartLeft,
-				$state.chartBottom,
-				$state.itemWidth,
-				$state.valueHeight,
-			);
-		},
-	});
-
-	$onmount(() => {
-		// HACK: Wait until the measurer is really available
-		setTimeout(() => {
-			const bbox = measurer.getBBox();
-			$state.textWidth = bbox.width;
-			$state.textHeight = bbox.height * 1.5;
-			measurer.remove();
-		}, 1);
-	});
-
-	function calculateMaxValue(series: DataSeries[], field: "x" | "y") {
-		// HACK: Yeah, nested reduces
-		return series.reduce((a, b) => {
-			return Math.max(
-				a,
-				b.data.reduce((c, d) => Math.max(c, field === "x" ? d.x : d.y), 0),
-			);
-		}, 0);
-	}
-
-	function buildPointSeries(
-		theSeries: DataSeries[],
-		theChartLeft: number,
-		theChartBottom: number,
-		theItemWidth: number,
-		theValueHeight: number,
-	) {
-		return theSeries.map((series) => {
-			return series.data.map((item) => {
-				const x = +(theChartLeft + item.x * theItemWidth).toFixed(2);
-				const y = +(theChartBottom - item.y * theValueHeight).toFixed(2);
-				return { x, y };
-			});
-		});
+	// Chart's value scale works on plain numbers, so the points become the
+	// y values and ChartScatter positions them by their x values
+	function chartSeries() {
+		return $props.series.map((series) => ({
+			name: series.name,
+			color: series.color,
+			data: series.data.map((point) => point.y),
+		}));
 	}
 
 	@render {
-		<div {$props?.id} class={["torp-scatter-chart", $props?.class]} {$props?.style} &ref={container}>
-			<svg role={$props?.ariaLabel ? "img" : undefined} aria-label={$props?.ariaLabel} version="1.1" width={$state.calculatedWidth} height={$state.calculatedHeight}>
-				<g>
-					<text &ref={measurer} x="-999" y="-999">8</text>
-
-					@if ($state.textWidth && $state.textHeight) {
-						<XAxis
-							showAxis={!$props.hideXAxis}
-							height={$state.calculatedHeight}
-							width={$state.calculatedWidth}
-							{$state.itemWidth}
-							{$state.textHeight}
-							xLabel={$props.xLabel ?? ""}
-							labels={[]}
-							stepLabels={$state.xStepLabels}
-							stepValue={$state.calculatedXStepValue}
-							{$state.chartLeft}
-							{$state.chartBottom}
-						/>
-						<YAxis
-							showAxis={!$props.hideYAxis}
-							{$state.valueHeight}
-							{$state.textHeight}
-							yLabel={$props.yLabel ?? ""}
-							stepLabels={$state.yStepLabels}
-							stepValue={$state.calculatedYStepValue}
-							{$state.chartLeft}
-							{$state.chartBottom}
-						/>
-						<GridLines
-							{$props.showHLines}
-							{$props.showVLines}
-							width={$state.calculatedWidth}
-							labels={[]}
-							xStepValue={$state.calculatedXStepValue}
-							{$state.xStepLabels}
-							yStepValue={$state.calculatedYStepValue}
-							{$state.yStepLabels}
-							{$state.itemWidth}
-							{$state.valueHeight}
-							{$state.chartLeft}
-							{$state.chartBottom}
-							type="line"
-						/>
-						@for (let [i, series] of $props.series.entries()) {
-							@for (let [j, point] of $state.pointSeries[i].entries()) {
-								<circle
-									cx={point.x}
-									cy={point.y}
-									r="4"
-									fill={series.color || chartColors[i % chartColors.length]}
-								>
-									<title>{
-										`${[series.name, series.data[j].label, series.data[j].x].filter(Boolean).join("\n")}, ${series.data[j].y}`
-										}</title>
-								</circle>
-							}
-						}
-					}
-				</g>
-			</svg>
-		</div>
+		<Chart
+			{$props?.id}
+			class={["torp-scatter-chart", $props?.class]}
+			{$props?.style}
+			ariaLabel={$props?.ariaLabel}
+			series={chartSeries()}
+			height={$props?.height}
+			width={$props?.width}
+			xLabel={$props?.xLabel}
+			yLabel={$props?.yLabel}
+			maxValue={maxOf($props.series, "y")}
+			stepCount={$props?.yStepCount}
+			stepValue={$props?.yStepValue}
+		>
+			<ChartYAxis showAxis={!$props?.hideYAxis} />
+			<ChartGrid hLines={$props?.showHLines} />
+			<ChartScatter
+				series={$props.series}
+				maxX={maxOf($props.series, "x")}
+				stepCount={$props?.xStepCount}
+				stepValue={$props?.xStepValue}
+				showAxis={!$props?.hideXAxis}
+				showVLines={$props?.showVLines}
+				xLabel={$props?.xLabel}
+			/>
+		</Chart>
 	}
 }

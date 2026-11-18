@@ -1,0 +1,21 @@
+import ScatterChart from "../../../src/Charts/ScatterChart.torp";
+
+export default function ScatterChartTest($props: any) {
+	@render {
+		<ScatterChart
+			ariaLabel="Score"
+			height={$props.height ?? 200}
+			xLabel="Effort"
+			yLabel="Score"
+			series={[
+				{
+					name: "Alice",
+					data: [
+						{ x: 1, y: 2 },
+						{ x: 4, y: 8 },
+					],
+				},
+			]}
+		/>
+	}
+}

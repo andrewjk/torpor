@@ -1,0 +1,167 @@
+import { chartColors } from "../utils/chartColors";
+import {
+	calculateStepLabels,
+	calculateStepValue,
+} from "../utils/chartUtils";
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+
+interface Pair {
+	x: number;
+	y: number;
+	/** An extra label for the point's tooltip */
+	label?: string;
+}
+
+interface ScatterSeries {
+	name: string;
+	color?: string;
+	data: Pair[];
+}
+
+interface ChartScatterProps {
+	/** The point series to draw */
+	series: ScatterSeries[];
+	/** The largest x value, for scaling the horizontal axis */
+	maxX: number;
+	/** The number of x axis steps (default 2) */
+	stepCount?: number;
+	/** The size of each x axis step, instead of being calculated */
+	stepValue?: number;
+	/** Whether to draw the x axis and its labels (default true) */
+	showAxis?: boolean;
+	/** Whether to draw vertical grid lines at each x step (default false) */
+	showVLines?: boolean;
+	/** An axis title drawn under the x ticks */
+	xLabel?: string;
+}
+
+/**
+ * Scatter marks for a Chart: one circle per `{ x, y }` pair, positioned
+ * against a numeric x scale and the Chart's value scale. Also draws the
+ * numeric x axis and its vertical grid lines, since the standard axes
+ * assume category labels.
+ */
+export default function ChartScatter($props: ChartScatterProps | undefined) {
+	const context = $context[ChartContextName] as ChartContext;
+	if (!context) {
+		throw new Error("ChartScatter must be contained within a Chart");
+	}
+	const { layout } = context;
+
+	function stepCount(): number {
+		return $props?.stepCount ?? 2;
+	}
+
+	function stepValue(): number {
+		return $props?.stepValue || calculateStepValue($props?.maxX || 1, stepCount());
+	}
+
+	function stepLabels(): number[] {
+		return calculateStepLabels(stepCount(), stepValue());
+	}
+
+	// The domain top the x ticks span; the marks scale against the same
+	// range so they line up with the ticks even when maxX falls between them
+	function domainTop(): number {
+		return Math.max(stepValue() * stepCount(), $props?.maxX || 1);
+	}
+
+	function xFor(value: number): number {
+		return +(layout.plotX + (value / domainTop()) * layout.plotWidth).toFixed(2);
+	}
+
+	function yFor(value: number): number {
+		return +(layout.plotY + layout.plotHeight - value * layout.valueHeight).toFixed(2);
+	}
+
+	function showAxis(): boolean {
+		return $props?.showAxis !== false;
+	}
+
+	function title(): string {
+		return $props?.xLabel ?? "";
+	}
+
+	// Reserve a strip along the bottom for the ticks and title
+	$run(() => {
+		if (!showAxis() && !title()) {
+			layout.release("scatter-xaxis");
+			return;
+		}
+		layout.reserve("scatter-xaxis", "bottom", layout.textHeight * (title() ? 2 : 1));
+		return () => layout.release("scatter-xaxis");
+	});
+
+	function tickY(): number {
+		return layout.plotY + layout.plotHeight + layout.textHeight * (2 / 3) + 4;
+	}
+
+	function titleY(): number {
+		return layout.plotY + layout.plotHeight + layout.textHeight * 2;
+	}
+
+	function tickAnchor(i: number, count: number): string {
+		if (i === 0) return "start";
+		if (i === count - 1) return "end";
+		return "middle";
+	}
+
+	@render {
+		<svg>
+			@if (showAxis()) {
+				<line
+					x1={layout.plotX}
+					y1={layout.plotY + layout.plotHeight + 0.5}
+					x2={layout.plotX + layout.plotWidth}
+					y2={layout.plotY + layout.plotHeight + 0.5}
+					stroke="currentcolor"
+				/>
+			}
+			@if ($props?.showVLines) {
+				@for (let label of stepLabels()) {
+					<line
+						x1={xFor(label)}
+						y1={layout.plotY}
+						x2={xFor(label)}
+						y2={layout.plotY + layout.plotHeight}
+						stroke="currentcolor"
+					/>
+				}
+			}
+			@if (title()) {
+				<text
+					fill="currentcolor"
+					text-anchor="middle"
+					dominant-baseline="text-after-edge"
+					x={layout.plotX + layout.plotWidth / 2}
+					y={titleY()}
+				>
+					{title()}
+				</text>
+			}
+			@for (let [i, label] of stepLabels().entries()) {
+				<text
+					fill="currentcolor"
+					text-anchor={tickAnchor(i, stepLabels().length)}
+					dominant-baseline="text-after-edge"
+					x={xFor(label)}
+					y={tickY()}
+				>
+					{label}
+				</text>
+			}
+			@for (let [i, series] of ($props?.series ?? []).entries()) {
+				@for (let point of series.data) {
+					<circle
+						cx={xFor(point.x)}
+						cy={yFor(point.y)}
+						r="4"
+						fill={series.color || chartColors[i % chartColors.length]}
+					>
+						<title>{`${[series.name, point.label, point.x].filter(Boolean).join("\n")}, ${point.y}`}</title>
+					</circle>
+				}
+			}
+		</svg>
+	}
+}

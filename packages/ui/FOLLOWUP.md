@@ -7,9 +7,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Duplication and inconsistencies
 
-- **Two chart axis systems**: legacy `XAxis` / `YAxis` / `GridLines` are still
-  exported for ScatterChart alongside `ChartXAxis` / `ChartYAxis` / `ChartGrid`.
-  Move ScatterChart onto `Chart` and drop the legacy ones.
 - **Naming drift**: internal `SubmenuPopoutTrigger` uses `onRegister` /
   `onActivate` while everything else is lowercase (`PopoutClickTrigger` uses
   `onactivate`); DataGrid has `onsortchange` where others use `onchange`.
