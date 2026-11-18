@@ -7,7 +7,13 @@ import {
 } from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
 import { createFocusGroup, type FocusItemState } from "../utils/focusGroup";
-import { defaultPalette, parseHex } from "../utils/colorUtils";
+import {
+	type Color,
+	colorName,
+	colorValue,
+	defaultPalette,
+	parseHex,
+} from "../utils/colorUtils";
 import createFormField from "../utils/formField";
 
 interface ColorPaletteProps {
@@ -19,8 +25,19 @@ interface ColorPaletteProps {
 	style?: StyleValue;
 	/** The selected color as "#rrggbb"; undefined if nothing is selected */
 	value?: Bindable<string | undefined>;
-	/** The colors to offer (default: a built-in gray + hue palette) */
-	colors?: string[];
+	/**
+	 * The colors to offer (default: a built-in gray + hue palette). Each entry
+	 * is either a hex string or `{ value, name }`; names are used as the
+	 * swatches' accessible names instead of the raw hex.
+	 */
+	colors?: Color[];
+	/** The number of swatches per row, for up/down arrow movement (default 6) */
+	columns?: number;
+	/**
+	 * If true, selecting the swatch that is already selected clears the
+	 * value. Off by default, like a radio group.
+	 */
+	allowClear?: boolean;
 	/** If set to true, the user cannot interact with this palette */
 	disabled?: boolean;
 	/** An accessible name for the palette */
@@ -33,8 +50,11 @@ interface ColorPaletteProps {
 
 /**
  * A grid of color swatches that behaves like a radio group: one swatch can
- * be selected, clicking it again deselects, and the arrow keys move through
- * the swatches selecting as they go.
+ * be selected, and the arrow keys move focus and selection through the
+ * swatches. Left/Right move by one swatch, Up/Down by one row.
+ *
+ * Set `allowClear` to let clicking (or pressing Space on) the selected swatch
+ * deselect it, like Rating.
  *
  * Use ColorPicker instead when arbitrary hex values should be enterable
  * alongside the palette.
@@ -53,8 +73,12 @@ export default function ColorPalette($props: ColorPaletteProps | undefined) {
 		return $props?.disabled === true;
 	}
 
-	function getColors(): string[] {
+	function getColors(): Color[] {
 		return $props?.colors ?? defaultPalette;
+	}
+
+	function getColumns(): number {
+		return Math.max(1, $props?.columns ?? 6);
 	}
 
 	let $state = $watch({
@@ -69,21 +93,42 @@ export default function ColorPalette($props: ColorPaletteProps | undefined) {
 		return parseHex(color) ?? "";
 	}
 
-	function isSelected(color: string): boolean {
-		return $state.value !== undefined && normalized($state.value) === normalized(color);
+	function isSelected(color: Color): boolean {
+		return $state.value !== undefined && normalized($state.value) === normalized(colorValue(color));
 	}
 
-	function select(color: string) {
+	function select(color: Color) {
 		if (getDisabled()) return;
-		const next = normalized(color);
-		// Selecting the current swatch clears it, like Rating's allowClear
-		$state.value = isSelected(color) ? undefined : next || undefined;
-		form.handleInput();
-		$props?.onchange?.($state.value);
+		let next: string | undefined = normalized(colorValue(color)) || undefined;
+		// Clearing only happens when explicitly allowed, like a radio group
+		if (getAllowClear() && isSelected(color)) {
+			next = undefined;
+		}
+		if (next !== $state.value) {
+			$state.value = next;
+			form.handleInput();
+			$props?.onchange?.(next);
+		}
+	}
+
+	function getAllowClear(): boolean {
+		return $props?.allowClear === true;
+	}
+
+	// Moves to an absolute index, focusing and selecting it. Clamps at the
+	// ends rather than wrapping
+	function moveTo(index: number) {
+		const colors = getColors();
+		if (colors.length === 0) return;
+		const target = Math.max(0, Math.min(colors.length - 1, index));
+		group.handleItemFocus(target);
+		group.itemStates[target]?.setFocused();
+		select(colors[target]);
 	}
 
 	function handleKey(index: number, e: KeyboardEvent) {
 		if (getDisabled()) return;
+		const columns = getColumns();
 		switch (e.key) {
 			case "Enter":
 			case " ": {
@@ -91,17 +136,46 @@ export default function ColorPalette($props: ColorPaletteProps | undefined) {
 				select(getColors()[index]);
 				break;
 			}
-			default: {
-				const before = group.getFocusIndex();
-				group.handleGroupKey(index, e);
-				const after = group.getFocusIndex();
-				if (after !== before && after >= 0) {
-					group.handleItemFocus(after);
-					select(getColors()[after]);
-				}
+			case "ArrowRight": {
+				e.preventDefault();
+				moveTo(index + 1);
+				break;
+			}
+			case "ArrowLeft": {
+				e.preventDefault();
+				moveTo(index - 1);
+				break;
+			}
+			case "ArrowDown": {
+				e.preventDefault();
+				moveTo(index + columns);
+				break;
+			}
+			case "ArrowUp": {
+				e.preventDefault();
+				moveTo(index - columns);
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				moveTo(0);
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				moveTo(getColors().length - 1);
 				break;
 			}
 		}
+	}
+
+	// Before focus enters the group the tab stop is the selected swatch (or
+	// the first one when nothing is selected), like other radio groups
+	function tabStopIndex(): number {
+		const focused = group.getFocusIndex();
+		if (focused !== -1) return focused;
+		const selected = getColors().findIndex((color) => isSelected(color));
+		return selected === -1 ? 0 : selected;
 	}
 
 	// Only blur when focus leaves the whole palette
@@ -125,20 +199,24 @@ export default function ColorPalette($props: ColorPaletteProps | undefined) {
 			&ref={root}
 		>
 			@for (let [i, color] of getColors().entries()) {
-				@key = color
+				@key = colorValue(color)
 				<button
 					type="button"
 					class="torp-color-palette-swatch"
 					role="radio"
-					tabindex={group.isTabStop(i) ? 0 : -1}
+					tabindex={tabStopIndex() === i ? 0 : -1}
 					aria-checked={isSelected(color) ? "true" : "false"}
-					aria-label={normalized(color)}
+					aria-label={colorName(color)}
 					aria-disabled={getDisabled() ? "true" : undefined}
-					data-color={color}
+					data-color={colorValue(color)}
 					data-selected={isSelected(color) ? "selected" : undefined}
 					disabled={getDisabled()}
-					style={`background-color:${color}`}
-					onclick={() => select(color)}
+					style={`background-color:${colorValue(color)}`}
+					onfocus={() => group.handleItemFocus(i)}
+					onclick={() => {
+						group.handleItemFocus(i);
+						select(color);
+					}}
 					onkeydown={(e: KeyboardEvent) => handleKey(i, e)}
 					onmount={(el: HTMLElement) => {
 						const item: FocusItemState = { setFocused: () => el.focus() };

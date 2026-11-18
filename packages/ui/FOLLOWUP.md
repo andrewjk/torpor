@@ -5,37 +5,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Bugs
 
-### ColorPalette tab stop and arrow keys (confirmed)
-
-- The roving tab stop is always swatch 0 when focus hasn't entered the group,
-  not the selected swatch (APG radio group; SegmentedControl and TabGroup
-  already get this right).
-- Clicking a swatch doesn't call `group.handleItemFocus`, so the tab stop
-  isn't updated by mouse interaction.
-- Only Left/Right move (focus group is horizontal); the swatches render as a
-  grid, so Up/Down should move by row.
-- Space on the checked swatch clears it, which radio groups don't normally
-  do -- worth deciding deliberately (Rating's `allowClear` precedent).
-
-### Other ColorPicker issues
-
-- `ColorPicker` declares an `id` prop but never renders it; the root also has
-  no `role="group"` / `aria-label`.
-- Swatch accessible names are the raw hex (`#ff0000`), read out character by
-  character. Colors should accept names, e.g. `{ value, name }`.
-- `defaultPalette` groups are uneven (6/5/6/5/5/5) so they can't form clean
-  rows; blues run dark-to-light while every other hue runs light-to-dark;
-  values are uppercase but compared lowercased.
-- `ColorPickerInput` commits on both `onchange` and `onblur`; `syncInput` and
-  the `$run` beside it duplicate the same logic.
-- `mix`, `luminance`, `hexToRgb`, `rgbToHex` in `utils/colorUtils.ts` are
-  unused.
-- `ColorPicker` passes `colors={$props?.colors ?? defaultPalette}` although
-  the palette already defaults.
-- It isn't a full color picker: no saturation/value area, hue or alpha
-  sliders, eyedropper, or `rgb()`/`hsl()` parsing. Either build those out or
-  name/document it as a swatch picker.
-
 ### Nested inputs inside a Field double-submit (likely, unverified)
 
 `<Field><SelectBox><SelectBoxContent><ListBox>` (as in

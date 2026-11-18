@@ -81,17 +81,8 @@ export default function ColorPickerInput($props: ColorPickerInputProps | undefin
 		}
 	}
 
-	function handleChange() {
-		commit();
-	}
-
 	// Keep the input's value in sync with the text; typing sets the
 	// property directly, so an attribute alone would not update it
-	function syncInput() {
-		if (hexInput && !$state.editing && hexInput.value !== display()) {
-			hexInput.value = display();
-		}
-	}
 	$run(() => {
 		const text = display();
 		const editing = $state.editing;
@@ -99,7 +90,6 @@ export default function ColorPickerInput($props: ColorPickerInputProps | undefin
 			hexInput.value = text;
 		}
 	});
-	$onmount(() => syncInput());
 
 	@render {
 		<input
@@ -113,8 +103,7 @@ export default function ColorPickerInput($props: ColorPickerInputProps | undefin
 			value={display()}
 			disabled={getDisabled()}
 			oninput={handleInput}
-			onchange={handleChange}
-			onblur={handleChange}
+			onblur={commit}
 			onkeydown={handleKey}
 			onmount={(el) => {
 				hexInput = el;

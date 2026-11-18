@@ -26,7 +26,7 @@ describe("ColorPicker", () => {
 		const onchange = vi.fn();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, ColorPickerTest as any, { onchange });
+		mount(container, ColorPickerTest as any, { onchange, allowClear: true });
 
 		const [first] = swatches(container);
 		fireEvent.click(first);
@@ -91,6 +91,54 @@ describe("ColorPicker", () => {
 		await tick();
 
 		expect(onchange).toHaveBeenCalledWith("#ff8800");
+	});
+
+	it("uses the selected swatch as the tab stop", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ColorPickerTest as any, {
+			value: "#333333",
+			colors: ["#111111", "#222222", "#333333"],
+		});
+
+		const buttons = swatches(container);
+		expect(buttons[0]).toHaveAttribute("tabindex", "-1");
+		expect(buttons[2]).toHaveAttribute("tabindex", "0");
+
+		// Clicking moves the tab stop to the clicked swatch
+		fireEvent.click(buttons[1]);
+		await tick();
+		expect(buttons[1]).toHaveAttribute("tabindex", "0");
+		expect(buttons[2]).toHaveAttribute("tabindex", "-1");
+	});
+
+	it("moves by row with up and down arrows", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		const colors = ["#111111", "#222222", "#333333", "#444444", "#555555", "#666666", "#777777"];
+		mount(container, ColorPickerTest as any, { colors, columns: 3 });
+
+		const buttons = swatches(container);
+		buttons[0].focus();
+		fireEvent(buttons[0], new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+		await tick();
+
+		expect(document.activeElement).toBe(buttons[3]);
+		expect(buttons[3]).toHaveAttribute("aria-checked", "true");
+
+		fireEvent(buttons[3], new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
+		await tick();
+		expect(document.activeElement).toBe(buttons[0]);
+	});
+
+	it("uses named colors as accessible names", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ColorPickerTest as any, {
+			colors: [{ value: "#ff0000", name: "Red" }],
+		});
+
+		expect(within(container).getByRole("radio", { name: "Red" })).toBeInTheDocument();
 	});
 
 	it("arrow keys move selection through the palette", async () => {

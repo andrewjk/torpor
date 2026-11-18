@@ -1,9 +1,24 @@
 /** Converts between color representations used by the picker components */
 
-export interface Rgb {
-	r: number;
-	g: number;
-	b: number;
+/** A named color offered by the palette */
+export interface ColorOption {
+	/** The color as "#rrggbb" (or "#rgb") */
+	value: string;
+	/** An accessible name, instead of reading the hex out character by character */
+	name: string;
+}
+
+/** A palette entry: either a raw hex string or a named color */
+export type Color = string | ColorOption;
+
+/** The hex value of a palette entry */
+export function colorValue(color: Color): string {
+	return typeof color === "string" ? color : color.value;
+}
+
+/** The accessible name of a palette entry */
+export function colorName(color: Color): string {
+	return typeof color === "string" ? color : color.name;
 }
 
 /** Parses "#rgb", "#rrggbb" or "rrggbb"; returns undefined when invalid */
@@ -20,84 +35,54 @@ export function parseHex(text: string | undefined | null): string | undefined {
 	return "#" + value.toLowerCase();
 }
 
-export function hexToRgb(hex: string): Rgb {
-	const value = parseHex(hex) ?? "#000000";
-	return {
-		r: parseInt(value.slice(1, 3), 16),
-		g: parseInt(value.slice(3, 5), 16),
-		b: parseInt(value.slice(5, 7), 16),
-	};
-}
+/** A default palette of 6-column rows, each ordered light to dark */
+export const defaultPalette: Color[] = [
+	{ value: "#ffffff", name: "White" },
+	{ value: "#d9d9d9", name: "Light gray" },
+	{ value: "#a6a6a6", name: "Gray" },
+	{ value: "#737373", name: "Dark gray" },
+	{ value: "#404040", name: "Charcoal" },
+	{ value: "#000000", name: "Black" },
 
-function toHexPart(n: number): string {
-	const clamped = Math.min(255, Math.max(0, Math.round(n)));
-	return clamped.toString(16).padStart(2, "0");
-}
+	{ value: "#ffe4e1", name: "Pale red" },
+	{ value: "#ffb3b3", name: "Light red" },
+	{ value: "#ff8080", name: "Red" },
+	{ value: "#ff4d4d", name: "Bright red" },
+	{ value: "#cc0000", name: "Dark red" },
+	{ value: "#800000", name: "Maroon" },
 
-export function rgbToHex({ r, g, b }: Rgb): string {
-	return `#${toHexPart(r)}${toHexPart(g)}${toHexPart(b)}`;
-}
+	{ value: "#ffedcc", name: "Pale orange" },
+	{ value: "#ffd59e", name: "Light orange" },
+	{ value: "#ffb366", name: "Orange" },
+	{ value: "#ff9900", name: "Amber" },
+	{ value: "#cc7a00", name: "Dark orange" },
+	{ value: "#804d00", name: "Brown" },
 
-/** Blends two colors; amount 0 returns a, 1 returns b */
-export function mix(a: string, b: string, amount: number): string {
-	const ca = hexToRgb(a);
-	const cb = hexToRgb(b);
-	const t = Math.min(1, Math.max(0, amount));
-	return rgbToHex({
-		r: ca.r + (cb.r - ca.r) * t,
-		g: ca.g + (cb.g - ca.g) * t,
-		b: ca.b + (cb.b - ca.b) * t,
-	});
-}
+	{ value: "#fff9c4", name: "Pale yellow" },
+	{ value: "#fff176", name: "Light yellow" },
+	{ value: "#ffe94d", name: "Yellow" },
+	{ value: "#ffd600", name: "Gold" },
+	{ value: "#ccab00", name: "Dark yellow" },
+	{ value: "#665900", name: "Olive" },
 
-/** Perceptual lightness in [0..1], for choosing readable text on swatches */
-export function luminance(hex: string): number {
-	const { r, g, b } = hexToRgb(hex);
-	return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-}
+	{ value: "#e8f5e9", name: "Pale green" },
+	{ value: "#a5d6a7", name: "Light green" },
+	{ value: "#66bb6a", name: "Green" },
+	{ value: "#2e7d32", name: "Dark green" },
+	{ value: "#1b5e20", name: "Deep green" },
+	{ value: "#0d3311", name: "Forest" },
 
-/** A default palette, roughly ordered light to dark */
-export const defaultPalette: string[] = [
-	"#FFFFFF",
-	"#F5F5F5",
-	"#D9D9D9",
-	"#BFBFBF",
-	"#8C8C8C",
-	"#595959",
-	"#404040",
-	"#262626",
-	"#0F0F0F",
-	"#000000",
-	"#FFE4E1",
-	"#FFC0CB",
-	"#FF7F7F",
-	"#FF4040",
-	"#E60000",
-	"#A61C00",
-	"#FFEDCC",
-	"#FFD59E",
-	"#FFAA33",
-	"#E67E00",
-	"#B35900",
-	"#FFF9C4",
-	"#FFF176",
-	"#FFEB3B",
-	"#FBC02D",
-	"#F9A825",
-	"#827717",
-	"#E8F5E9",
-	"#A5D6A7",
-	"#66BB6A",
-	"#2E7D32",
-	"#1B5E20",
-	"#0D47A1",
-	"#1565C0",
-	"#1E88E5",
-	"#42A5F5",
-	"#90CAF9",
-	"#E1BEE7",
-	"#CE93D8",
-	"#AB47BC",
-	"#8E24AA",
-	"#4A148C",
+	{ value: "#e3f2fd", name: "Pale blue" },
+	{ value: "#90caf9", name: "Light blue" },
+	{ value: "#42a5f5", name: "Blue" },
+	{ value: "#1e88e5", name: "Bright blue" },
+	{ value: "#1565c0", name: "Dark blue" },
+	{ value: "#0d47a1", name: "Navy" },
+
+	{ value: "#f3e5f5", name: "Pale purple" },
+	{ value: "#ce93d8", name: "Light purple" },
+	{ value: "#ab47bc", name: "Purple" },
+	{ value: "#8e24aa", name: "Dark purple" },
+	{ value: "#6a1b9a", name: "Deep purple" },
+	{ value: "#4a148c", name: "Violet" },
 ];

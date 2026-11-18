@@ -6,7 +6,7 @@ import {
 	FormContextName,
 } from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
-import { defaultPalette } from "../utils/colorUtils";
+import type { Color } from "../utils/colorUtils";
 import createFormField from "../utils/formField";
 import ColorPalette from "./ColorPalette.torp";
 import ColorPickerInput from "./ColorPickerInput.torp";
@@ -21,8 +21,15 @@ interface ColorPickerProps {
 	style?: StyleValue;
 	/** The selected color as "#rrggbb"; undefined if nothing is selected */
 	value?: Bindable<string | undefined>;
-	/** The colors offered in the palette */
-	colors?: string[];
+	/**
+	 * The colors offered in the palette. Each entry is either a hex string or
+	 * `{ value, name }`; names are used as the swatches' accessible names.
+	 */
+	colors?: Color[];
+	/** The number of swatches per row, for up/down arrow movement (default 6) */
+	columns?: number;
+	/** If true, selecting the already-selected swatch clears the value */
+	allowClear?: boolean;
 	/**
 	 * If set to true, a text field for arbitrary hex values ("#ff8800") is
 	 * shown below the palette
@@ -39,8 +46,9 @@ interface ColorPickerProps {
 }
 
 /**
- * A color input: a ColorPalette with an optional hex text field, sharing a
- * single bound value.
+ * A swatch color input: a ColorPalette with an optional hex text field,
+ * sharing a single bound value. It is not a full color picker (no
+ * saturation/value area, hue or alpha sliders).
  *
  * ```
  * <ColorPicker name="accent" showInput &value={$state.accent} />
@@ -112,8 +120,12 @@ export default function ColorPicker($props: ColorPickerProps | undefined) {
 
 	@render {
 		<div
+			{$props?.id}
 			class={["torp-color-picker", $props?.class]}
 			{$props?.style}
+			role="group"
+			aria-label={$props?.ariaLabel}
+			aria-disabled={getDisabled() ? "true" : undefined}
 			data-valid={form.valid ? "valid" : "invalid"}
 			aria-describedby={form.messageId}
 			onfocusout={handleFocusOut}
@@ -122,7 +134,9 @@ export default function ColorPicker($props: ColorPickerProps | undefined) {
 			<slot>
 				<ColorPalette
 					class="torp-color-picker-palette"
-					colors={$props?.colors ?? defaultPalette}
+					colors={$props?.colors}
+					columns={$props?.columns}
+					allowClear={$props?.allowClear}
 					value={$state.value}
 					disabled={getDisabled()}
 					ariaLabel={$props?.ariaLabel}
