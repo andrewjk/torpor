@@ -42,7 +42,9 @@ interface InputProps {
 export default function Input($props: InputProps | undefined) {
 	let defaultId = getId();
 
-	let type = $props?.type ?? "text";
+	function getType(): string {
+		return $props?.type ?? "text";
+	}
 
 	let blurred = false;
 
@@ -95,7 +97,7 @@ export default function Input($props: InputProps | undefined) {
 			id={$props?.id ?? defaultId}
 			class={["torp-input", $props?.class]}
 			{$props?.style}
-			{type}
+			{getType()}
 			name={$props?.name ?? fieldContext?.name}
 			&value={$state.value}
 			{$props?.placeholder}

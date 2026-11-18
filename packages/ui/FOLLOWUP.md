@@ -5,12 +5,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Bugs
 
-### Props captured once at setup
-
-The compiler warns that `type` in `Form/Input.torp` and `inputId` in
-`Form/FileDrop.torp` are plain `let`s initialized from `$props`, so they won't
-update when props change.
-
 ### Smaller issues
 
 - `Charts/GridLines.torp` declares `id` and `class` props but renders neither.

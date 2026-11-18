@@ -36,7 +36,9 @@ interface FileDropProps {
  */
 export default function FileDrop($props: FileDropProps | undefined) {
 	let defaultId = getId();
-	let inputId = `${$props?.id ?? defaultId}-input`;
+	function getInputId(): string {
+		return `${$props?.id ?? defaultId}-input`;
+	}
 	let input: HTMLInputElement;
 
 	let blurred = false;
@@ -58,7 +60,7 @@ export default function FileDrop($props: FileDropProps | undefined) {
 	let $state =
 		fieldContext?.state ??
 		$watch({
-			inputId,
+			inputId: getInputId(),
 			value: null,
 			errors: {} as Record<string, string>,
 			valid: false,
@@ -66,7 +68,7 @@ export default function FileDrop($props: FileDropProps | undefined) {
 		});
 
 	// Set the input ID now that we know it and it will get linked with the associated label
-	$state.inputId = inputId;
+	$state.inputId = getInputId();
 
 	function handleFiles(files: FileList | File[] | undefined | null) {
 		if (getDisabled() || !files) return;
@@ -158,7 +160,7 @@ export default function FileDrop($props: FileDropProps | undefined) {
 		</div>
 
 		<input
-			id={inputId}
+			id={getInputId()}
 			class="torp-file-drop-input"
 			type="file"
 			name={$props?.name ?? fieldContext?.name}
