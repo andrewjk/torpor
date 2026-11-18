@@ -11,6 +11,7 @@ describe("SelectBox (sensible defaults)", () => {
 		mount(container, SelectBoxDefaultsTest, {});
 
 		const trigger = within(container).getByRole("combobox");
+		expect(container.querySelector("label")).toHaveAttribute("for", trigger.id);
 		fireEvent.click(trigger);
 		fireEvent.click(within(container).getByText("Item 1"));
 

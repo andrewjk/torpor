@@ -92,6 +92,13 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 
 	$bind($state, $props, "visible", "value");
 
+	// Point the enclosing Field's Label at the trigger once it registers
+	$run(() => {
+		if (fieldContext && $state.triggerId) {
+			fieldContext.state.inputId = $state.triggerId;
+		}
+	});
+
 	// With no value prop, use the enclosing Field's value as the source and
 	// destination, so only the Field needs binding. The initial undefined is
 	// skipped so an empty Field doesn't clear a default.
