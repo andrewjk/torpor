@@ -1,0 +1,16 @@
+import { Meter } from "../../../src/Meter/index";
+
+export default function MeterTest($props: any) {
+	@render {
+		<Meter
+			value={$props.value ?? 50}
+			min={$props.min}
+			max={$props.max}
+			low={$props.low}
+			high={$props.high}
+			optimum={$props.optimum}
+			valuetext={$props.valuetext}
+			ariaLabel="Disk usage"
+		/>
+	}
+}

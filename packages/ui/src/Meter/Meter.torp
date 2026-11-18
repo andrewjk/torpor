@@ -1,0 +1,126 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { type MeterContext, MeterContextName } from "./MeterTypes";
+import MeterIndicator from "./MeterIndicator.torp";
+
+interface MeterProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The minimum value (default 0) */
+	min?: number;
+	/** The maximum value (default 100) */
+	max?: number;
+	/** The current value */
+	value: number;
+	/** The upper bound of the "low" region */
+	low?: number;
+	/** The lower bound of the "high" region */
+	high?: number;
+	/** The most desirable value, for rating the current value */
+	optimum?: number;
+	/** A human-readable version of the current value, e.g. "12 GB of 20 GB" */
+	valuetext?: string;
+	/** An accessible name for the meter */
+	ariaLabel?: string;
+}
+
+function clamp(value: number, min: number, max: number): number {
+	return Math.min(max, Math.max(min, value));
+}
+
+/**
+ * A gauge that shows a measurement within a known range, such as disk usage
+ * or a score.
+ *
+ * See [the WAI ARIA guidelines for Meters](https://www.w3.org/WAI/ARIA/apg/patterns/meter/).
+ *
+ * Unlike Progress, a Meter always has a value and can rate it against
+ * `low`, `high` and `optimum` thresholds.
+ *
+ * The structure of a Meter is:
+ *
+ * ```
+ * <Meter value={72} low={25} high={75} optimum={25}>
+ * 	<MeterIndicator />
+ * </Meter>
+ * ```
+ *
+ * With no children, the indicator is rendered automatically.
+ */
+export default function Meter($props: MeterProps | undefined) {
+	function getMin(): number {
+		return $props?.min ?? 0;
+	}
+	function getMax(): number {
+		return $props?.max ?? 100;
+	}
+	function getValue(): number {
+		return clamp($props?.value ?? getMin(), getMin(), getMax());
+	}
+
+	// The percentage of the range that the value represents (0..100)
+	function getPct(): number {
+		const min = getMin();
+		const max = getMax();
+		if (max <= min) return 0;
+		return ((getValue() - min) / (max - min)) * 100;
+	}
+
+	// Rate the value against the thresholds, following the ARIA meter
+	// guidance: the region containing the optimum is the good one
+	function getState(): "optimum" | "suboptimum" | "poor" {
+		const low = $props?.low;
+		const high = $props?.high;
+		const optimum = $props?.optimum;
+		const value = getValue();
+		if (low === undefined || high === undefined || optimum === undefined) {
+			return "optimum";
+		}
+		if (optimum <= low) {
+			if (value <= low) return "optimum";
+			return value <= high ? "suboptimum" : "poor";
+		}
+		if (optimum >= high) {
+			if (value >= high) return "optimum";
+			return value >= low ? "suboptimum" : "poor";
+		}
+		return value >= low && value <= high ? "optimum" : "suboptimum";
+	}
+
+	let context: MeterContext = {
+		getPct,
+		getState,
+	};
+	$context[MeterContextName] = context;
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-meter", $props?.class]}
+			{$props?.style}
+			role="meter"
+			aria-label={$props?.ariaLabel}
+			aria-valuemin={getMin()}
+			aria-valuemax={getMax()}
+			aria-valuenow={getValue()}
+			aria-valuetext={$props?.valuetext}
+			data-state={getState()}
+		>
+			<slot>
+				<MeterIndicator />
+			</slot>
+		</div>
+	}
+
+	@style {
+		/* Headless: layout only, so the indicator fills the track. All
+		   appearance is up to the consuming theme */
+		.torp-meter {
+			position: relative;
+			overflow: hidden;
+		}
+	}
+}

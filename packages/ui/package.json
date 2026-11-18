@@ -97,6 +97,10 @@
 			"types": "./dist/NumberInput/index.d.ts",
 			"import": "./dist/NumberInput/index.js"
 		},
+		"./Meter": {
+			"types": "./dist/Meter/index.d.ts",
+			"import": "./dist/Meter/index.js"
+		},
 		"./NavMenu": {
 			"types": "./dist/NavMenu/index.d.ts",
 			"import": "./dist/NavMenu/index.js"

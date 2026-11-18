@@ -23,6 +23,7 @@ const components = [
 	"MaskedInput",
 	"Menu",
 	"MenuBar",
+	"Meter",
 	"Modal",
 	"NavMenu",
 	"NumberInput",

@@ -9,7 +9,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 Roughly in priority order:
 
-- **Meter** (`role="meter"`), distinct from Progress.
 - **Full color picker** (see above).
 - **Sortable list** built on the unused DnD utilities, including the keyboard
   move-before/move-after commands PLAN.md mentions.
