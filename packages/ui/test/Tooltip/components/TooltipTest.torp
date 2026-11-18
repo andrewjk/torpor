@@ -1,0 +1,10 @@
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../../src/Tooltip/index";
+
+export default function TooltipTest($props: any) {
+	@render {
+		<Tooltip openDelay={$props.openDelay ?? 0} closeDelay={$props.closeDelay ?? 0} side={$props.side}>
+			<TooltipTrigger onclick={$props.onclick}>Copy</TooltipTrigger>
+			<TooltipContent>{$props.text ?? "Copy to the clipboard"}</TooltipContent>
+		</Tooltip>
+	}
+}

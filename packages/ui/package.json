@@ -161,6 +161,10 @@
 			"types": "./dist/ToolBar/index.d.ts",
 			"import": "./dist/ToolBar/index.js"
 		},
+		"./Tooltip": {
+			"types": "./dist/Tooltip/index.d.ts",
+			"import": "./dist/Tooltip/index.js"
+		},
 		"./TimePicker": {
 			"types": "./dist/TimePicker/index.d.ts",
 			"import": "./dist/TimePicker/index.js"

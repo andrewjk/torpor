@@ -41,6 +41,7 @@ const components = [
 	"TimePicker",
 	"Tree",
 	"ToolBar",
+	"Tooltip",
 	"icons",
 	"motion",
 ];

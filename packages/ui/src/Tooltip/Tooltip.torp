@@ -1,0 +1,104 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { type TooltipContext, TooltipContextName, type TooltipState } from "./TooltipTypes";
+
+interface TooltipProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** Milliseconds to wait before showing the tooltip (default 500; 0 shows immediately) */
+	openDelay?: number;
+	/** Milliseconds to wait after the pointer leaves before hiding (default 100) */
+	closeDelay?: number;
+	/** Where the tooltip is shown, relative to the trigger (default "top") */
+	side?: "top" | "right" | "bottom" | "left";
+	/** How the tooltip is aligned, relative to the trigger (default "center") */
+	alignment?: "start" | "center" | "end";
+	/** If set to true, hovering and focusing the trigger are ignored */
+	disabled?: boolean;
+	/** Raised when the tooltip has opened */
+	onopen?: () => void;
+	/** Raised when the tooltip has closed */
+	onclose?: () => void;
+}
+
+/**
+ * A short description of an element, shown on hover or focus.
+ *
+ * See [the WAI ARIA guidelines for Tooltips](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/).
+ *
+ * The structure of a Tooltip is:
+ *
+ * ```
+ * <Tooltip>
+ * 	<TooltipTrigger>Copy</TooltipTrigger>
+ * 	<TooltipContent>Copy to the clipboard</TooltipContent>
+ * </Tooltip>
+ * ```
+ *
+ * The trigger is described by the content through `aria-describedby`, and
+ * Escape dismisses the tooltip. Tooltips should contain only short,
+ * non-interactive hints; use PopoverHover for rich hover content.
+ */
+export default function Tooltip($props: TooltipProps | undefined) {
+	let anchorElement: HTMLElement | undefined;
+	let wasVisible = false;
+
+	let $state: TooltipState = $watch({
+		visible: false,
+		contentId: undefined,
+		triggerId: undefined,
+	});
+
+	function show() {
+		$state.visible = true;
+	}
+
+	function hide() {
+		$state.visible = false;
+	}
+
+	// Dispatch the open/close events when the tooltip is shown or hidden
+	$run(() => {
+		const visible = $state.visible;
+		if (visible === wasVisible) return;
+		wasVisible = visible;
+		if (visible) {
+			$props?.onopen?.();
+		} else {
+			$props?.onclose?.();
+		}
+	});
+
+	let context: TooltipContext = {
+		state: $state,
+		get anchorElement() {
+			return anchorElement;
+		},
+		set anchorElement(element: HTMLElement | undefined) {
+			anchorElement = element;
+		},
+		getDisabled: () => $props?.disabled === true,
+		getOpenDelay: () => $props?.openDelay,
+		getCloseDelay: () => $props?.closeDelay,
+		getSide: () => $props?.side ?? "top",
+		getAlignment: () => $props?.alignment ?? "center",
+		show,
+		hide,
+	};
+	$context[TooltipContextName] = context;
+
+	@render {
+		<div {$props?.id} class={["torp-tooltip", $props?.class]} {$props?.style}>
+			<slot />
+		</div>
+	}
+
+	@style {
+		.torp-tooltip {
+			display: inline-block;
+		}
+	}
+}

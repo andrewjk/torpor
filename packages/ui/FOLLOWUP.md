@@ -9,8 +9,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 Roughly in priority order:
 
-- **Tooltip** (APG tooltip: `role="tooltip"`, `aria-describedby`, Escape to
-  dismiss, opens on focus as well as hover). `PopoverHover` is not this.
 - **RadioGroup / Radio** in the Form family -- there's a `CheckBox` but no
   radio.
 - **ToggleButton / ToggleGroup** (`aria-pressed`). Related: `Form/Toggle` is
