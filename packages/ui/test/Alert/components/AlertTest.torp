@@ -1,0 +1,7 @@
+import { Alert } from "../../../src/Alert/index";
+
+export default function AlertTest($props: any) {
+	@render {
+		<Alert variant={$props.variant}>Something went wrong.</Alert>
+	}
+}

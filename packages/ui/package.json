@@ -9,6 +9,10 @@
 			"types": "./dist/Accordion/index.d.ts",
 			"import": "./dist/Accordion/index.js"
 		},
+		"./Alert": {
+			"types": "./dist/Alert/index.d.ts",
+			"import": "./dist/Alert/index.js"
+		},
 		"./Breadcrumb": {
 			"types": "./dist/Breadcrumb/index.d.ts",
 			"import": "./dist/Breadcrumb/index.js"

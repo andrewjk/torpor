@@ -2,6 +2,7 @@ import { defineConfig, type UserConfig } from "vite-plus";
 
 const components = [
 	"Accordion",
+	"Alert",
 	"Breadcrumb",
 	"Calendar",
 	"Carousel",
