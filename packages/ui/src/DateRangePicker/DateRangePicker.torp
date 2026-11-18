@@ -5,6 +5,7 @@ import {
 	type FormContext,
 	FormContextName,
 } from "../Form/FormTypes";
+import FormValues from "../Form/FormValues.torp";
 import { areDatesEqual, formatDate } from "../utils/dateUtils";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getId from "../utils/getId";
@@ -72,6 +73,17 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 		$context[FormContextName] as FormContext | undefined,
 		$context[FieldContextName] as FieldContext | undefined,
 	);
+
+	// Both ends of the range submit under the one field name, like other
+	// multi-value inputs
+	function submittedValues(): string[] | undefined {
+		const value = $state.value;
+		if (!value) return undefined;
+		const values: string[] = [];
+		if (value.start) values.push(formatDate($unwrap(value.start), "yyyy-MM-dd"));
+		if (value.end) values.push(formatDate($unwrap(value.end), "yyyy-MM-dd"));
+		return values.length > 0 ? values : undefined;
+	}
 
 	function getDateFormat(): string {
 		return $props?.dateFormat ?? "yyyy-MM-dd";
@@ -275,17 +287,6 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 			</slot>
 		</div>
 
-		@if (form.name) {
-			<input
-				type="hidden"
-				name={`${form.name}-start`}
-				value={$state.value?.start ? formatDate($unwrap($state.value.start), "yyyy-MM-dd") : ""}
-			/>
-			<input
-				type="hidden"
-				name={`${form.name}-end`}
-				value={$state.value?.end ? formatDate($unwrap($state.value.end), "yyyy-MM-dd") : ""}
-			/>
-		}
+		<FormValues name={form.name} value={submittedValues()} />
 	}
 }

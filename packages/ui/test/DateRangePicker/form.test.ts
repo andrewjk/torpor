@@ -29,7 +29,10 @@ describe("DateRangePicker (in forms)", () => {
 		fireEvent.click(dayButton(container, 10));
 		fireEvent.click(dayButton(container, 20));
 
-		expect(container.querySelector('input[type="hidden"]')).toHaveAttribute("name", "dates-start");
+		const inputs = container.querySelectorAll<HTMLInputElement>(
+			'input[type="hidden"][name="dates"]',
+		);
+		expect([...inputs].map((input) => input.value)).toHaveLength(2);
 	});
 
 	it("validates when a range is completed", async () => {

@@ -82,14 +82,14 @@ describe("DatePicker", () => {
 	it("updates the hidden form input with the selected date", async () => {
 		const { container, trigger } = setup({ name: "startDate" });
 
-		let hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement;
-		expect(hidden.name).toBe("startDate");
-		expect(hidden.value).toBe("");
+		// Empty values are omitted from the form, like other inputs
+		expect(container.querySelector('input[type="hidden"]')).toBeNull();
 
 		await open(document.body, trigger);
 		fireEvent.click(dayButton(container, 15));
 
-		hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement;
+		const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement;
+		expect(hidden.name).toBe("startDate");
 		const now = new Date();
 		expect(hidden.value).toBe(
 			`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-15`,

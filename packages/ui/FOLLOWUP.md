@@ -7,10 +7,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Duplication and inconsistencies
 
-- **Form submission isn't uniform**: most inputs use `FormValues`;
-  DatePicker and DateRangePicker hand-roll hidden inputs, and DateRangePicker
-  submits `name-start` / `name-end` while other multi-value inputs submit
-  repeated `name` entries.
 - **Too much nesting for the common case**: a SelectBox in a Field needs
   `&value` written on Field, SelectBox and ListBox across four levels (ties
   in with the open PLAN.md "sensible defaults" item).

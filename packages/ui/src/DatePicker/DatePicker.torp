@@ -5,6 +5,7 @@ import {
 	type FormContext,
 	FormContextName,
 } from "../Form/FormTypes";
+import FormValues from "../Form/FormValues.torp";
 import { formatDate } from "../utils/dateUtils";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getId from "../utils/getId";
@@ -195,8 +196,9 @@ export default function DatePicker($props: DatePickerProps | undefined) {
 			</slot>
 		</div>
 
-		@if (form.name) {
-			<input type="hidden" name={form.name} value={$state.value ? formatDate($unwrap($state.value), "yyyy-MM-dd") : ""} />
-		}
+		<FormValues
+			name={form.name}
+			value={$state.value ? formatDate($unwrap($state.value), "yyyy-MM-dd") : undefined}
+		/>
 	}
 }

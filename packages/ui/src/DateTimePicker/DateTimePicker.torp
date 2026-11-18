@@ -14,6 +14,7 @@ import {
 	type FormContext,
 	FormContextName,
 } from "../Form/FormTypes";
+import FormValues from "../Form/FormValues.torp";
 import { TimePicker } from "../TimePicker/index";
 import { formatDate } from "../utils/dateUtils";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
@@ -251,9 +252,7 @@ export default function DateTimePicker($props: DateTimePickerProps | undefined) 
 			</div>
 		</div>
 
-		@if (form.name && $state.value) {
-			<input type="hidden" name={form.name} value={toFormText($unwrap($state.value))} />
-		}
+		<FormValues name={form.name} value={$state.value ? toFormText($unwrap($state.value)) : undefined} />
 	}
 
 	@style {
