@@ -1,0 +1,149 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+
+interface VirtualListProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The items to render */
+	items: any[];
+	/** The fixed height of each item, in pixels */
+	itemHeight: number;
+	/** The height of the scroll viewport, in pixels; defaults to the element's height */
+	height?: number;
+	/** Extra items to render above and below the viewport (default 3) */
+	overscan?: number;
+	/** An accessible name for the list */
+	ariaLabel?: string;
+}
+
+/**
+ * A list that renders only the items in and around its scroll viewport, for
+ * large collections with fixed-height rows.
+ *
+ * The slot is rendered once per visible item, with the item and its index
+ * passed back as `$slot.item` and `$slot.index`:
+ *
+ * ```
+ * <VirtualList items={$state.rows} itemHeight={32} height={400} ariaLabel="Log">
+ * 	<div>{$slot.item.label}</div>
+ * </VirtualList>
+ * ```
+ *
+ * DataGrid has its own virtualization; use this for simpler lists.
+ */
+export default function VirtualList($props: VirtualListProps | undefined) {
+	let root: HTMLElement | undefined;
+	let observer: ResizeObserver | undefined;
+
+	function getOverscan(): number {
+		return Math.max(0, $props?.overscan ?? 3);
+	}
+
+	function getItemHeight(): number {
+		return Math.max(1, $props?.itemHeight ?? 1);
+	}
+
+	let $state = $watch({
+		scrollTop: 0,
+		viewport: $props?.height ?? 0,
+		get start(): number {
+			return $cache(() => {
+				return Math.max(0, Math.floor($state.scrollTop / getItemHeight()) - getOverscan());
+			});
+		},
+		get end(): number {
+			return $cache(() => {
+				const items = $props?.items ?? [];
+				// Before the viewport has been measured, render a small window
+				// so the list still has content on the server and before mount
+				const viewport = $state.viewport || getItemHeight() * 10;
+				const count = Math.ceil(viewport / getItemHeight()) + getOverscan() * 2;
+				return Math.min(items.length, $state.start + count);
+			});
+		},
+		get visible(): { item: any; index: number }[] {
+			return $cache(() => {
+				const items = $props?.items ?? [];
+				const visible: { item: any; index: number }[] = [];
+				for (let i = $state.start; i < $state.end; i++) {
+					visible.push({ item: items[i], index: i });
+				}
+				return visible;
+			});
+		},
+	});
+
+	// A height prop takes precedence over the measured height; otherwise
+	// watch the element so CSS-driven sizes work
+	$run(() => {
+		const height = $props?.height;
+		if (height !== undefined) {
+			$state.viewport = height;
+		}
+	});
+
+	function measure() {
+		if ($props?.height === undefined && root) {
+			$state.viewport = root.clientHeight;
+		}
+	}
+
+	function handleScroll(e: Event) {
+		$state.scrollTop = (e.currentTarget as HTMLElement).scrollTop;
+	}
+
+	function attach(el: HTMLElement) {
+		root = el;
+		measure();
+		if ($props?.height === undefined && typeof ResizeObserver !== "undefined") {
+			observer = new ResizeObserver(measure);
+			observer.observe(el);
+		}
+		return () => {
+			observer?.disconnect();
+			observer = undefined;
+			if (root === el) root = undefined;
+		};
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-virtual-list", $props?.class]}
+			style={[$props?.style, $props?.height !== undefined ? `height:${$props.height}px` : undefined]}
+			role="list"
+			aria-label={$props?.ariaLabel}
+			onscroll={handleScroll}
+			onmount={attach}
+		>
+			<div
+				class="torp-virtual-list-spacer"
+				style={`height:${($props?.items?.length ?? 0) * getItemHeight()}px`}
+			>
+				@for (let entry of $state.visible) {
+					@key = entry.index
+					<div
+						class="torp-virtual-list-item"
+						role="listitem"
+						data-index={entry.index}
+						style={`position:absolute;top:${entry.index * getItemHeight()}px;height:${getItemHeight()}px;left:0;right:0`}
+					>
+						<slot item={entry.item} index={entry.index} />
+					</div>
+				}
+			</div>
+		</div>
+	}
+
+	@style {
+		.torp-virtual-list {
+			overflow: auto;
+		}
+		.torp-virtual-list-spacer {
+			position: relative;
+		}
+	}
+}

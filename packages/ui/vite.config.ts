@@ -45,6 +45,7 @@ const components = [
 	"TagInput",
 	"TimePicker",
 	"Tree",
+	"VirtualList",
 	"ToolBar",
 	"Tooltip",
 	"icons",

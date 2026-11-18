@@ -1,0 +1,15 @@
+import { VirtualList } from "../../../src/VirtualList/index";
+
+export default function VirtualListTest($props: any) {
+	@render {
+		<VirtualList
+			items={$props.items ?? Array.from({ length: 100 }, (_, i) => `Item ${i}`)}
+			itemHeight={$props.itemHeight ?? 20}
+			height={$props.height ?? 100}
+			overscan={$props.overscan}
+			ariaLabel="Items"
+		>
+			<span>{$slot.item}</span>
+		</VirtualList>
+	}
+}

@@ -189,6 +189,10 @@
 			"types": "./dist/TimePicker/index.d.ts",
 			"import": "./dist/TimePicker/index.js"
 		},
+		"./VirtualList": {
+			"types": "./dist/VirtualList/index.d.ts",
+			"import": "./dist/VirtualList/index.js"
+		},
 		"./icons": {
 			"types": "./dist/icons/index.d.ts",
 			"import": "./dist/icons/index.js"
