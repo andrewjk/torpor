@@ -1,0 +1,31 @@
+import {
+	Form,
+	ToggleButton,
+	ToggleGroup,
+} from "../../../src/Form/index";
+
+export default function ToggleButtonTest($props: any) {
+	let $state = $watch({
+		pressed: false,
+		format: ($props?.type === "single" ? undefined : []) as any,
+	});
+
+	@render {
+		<Form onsubmit={() => false}>
+			<ToggleButton &pressed={$state.pressed} onchange={$props?.onstandalone}>
+				Bold
+			</ToggleButton>
+
+			<ToggleGroup
+				name="format"
+				type={$props?.type ?? "multiple"}
+				&value={$state.format}
+				ariaLabel="Format"
+				onchange={$props?.ongroup}
+			>
+				<ToggleButton value="bold">Bold</ToggleButton>
+				<ToggleButton value="italic">Italic</ToggleButton>
+			</ToggleGroup>
+		</Form>
+	}
+}

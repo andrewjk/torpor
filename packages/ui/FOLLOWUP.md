@@ -9,9 +9,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 Roughly in priority order:
 
-- **ToggleButton / ToggleGroup** (`aria-pressed`). Related: `Form/Toggle` is
-  actually the APG Switch, so the name will clash with a toggle button;
-  consider renaming it `Switch`.
 - **Meter** (`role="meter"`), distinct from Progress.
 - **Full color picker** (see above).
 - **Sortable list** built on the unused DnD utilities, including the keyboard

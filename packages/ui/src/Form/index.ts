@@ -13,8 +13,10 @@ import Option from "./Option.torp";
 import Radio from "./Radio.torp";
 import RadioGroup from "./RadioGroup.torp";
 import Select from "./Select.torp";
+import Switch from "./Switch.torp";
 import TextArea from "./TextArea.torp";
-import Toggle from "./Toggle.torp";
+import ToggleButton from "./ToggleButton.torp";
+import ToggleGroup from "./ToggleGroup.torp";
 
 export {
 	CheckBox,
@@ -32,6 +34,10 @@ export {
 	Radio,
 	RadioGroup,
 	Select,
+	Switch,
+	// Deprecated alias for Switch: Toggle is the ARIA switch, not a toggle button
+	Switch as Toggle,
 	TextArea,
-	Toggle,
+	ToggleButton,
+	ToggleGroup,
 };

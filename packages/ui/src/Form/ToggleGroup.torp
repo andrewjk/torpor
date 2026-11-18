@@ -1,0 +1,150 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "./FormTypes";
+import FormValues from "./FormValues.torp";
+import createFormField from "../utils/formField";
+import {
+	type ToggleGroupContext,
+	ToggleGroupContextName,
+	type ToggleItemState,
+} from "./ToggleGroupTypes";
+
+interface ToggleGroupProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The name of the group's form data field */
+	name?: string;
+	/**
+	 * Whether one or several buttons can be pressed at once (default
+	 * "multiple", like a formatting toolbar)
+	 */
+	type?: "single" | "multiple";
+	/** The pressed value, or an array of values when type is "multiple" */
+	value?: Bindable<any | any[]>;
+	/** If set to true, the user cannot interact with this group */
+	disabled?: boolean;
+	/** An accessible name for the group */
+	ariaLabel?: string;
+	/** Raised when the pressed value has changed */
+	onchange?: (value: any | any[]) => void;
+}
+
+/**
+ * A group of ToggleButtons, any of which can be pressed independently (or
+ * exactly one, when `type` is "single").
+ *
+ * The structure of a ToggleGroup is:
+ *
+ * ```
+ * <ToggleGroup name="format" &value={$state.format}>
+ * 	<ToggleButton value="bold">Bold</ToggleButton>
+ * 	<ToggleButton value="italic">Italic</ToggleButton>
+ * </ToggleGroup>
+ * ```
+ */
+export default function ToggleGroup($props: ToggleGroupProps | undefined) {
+	const items: ToggleItemState[] = [];
+	let nextItemIndex = 0;
+
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
+
+	function getType(): "single" | "multiple" {
+		return $props?.type ?? "multiple";
+	}
+
+	let $state = $watch({
+		value: ($props?.value ?? (getType() === "single" ? undefined : [])) as any | any[],
+	});
+
+	$bind($state, $props, "value");
+
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	function registerItem(value: any, disabled: boolean | undefined): ToggleItemState {
+		const item: ToggleItemState = $watch({
+			index: nextItemIndex++,
+			value,
+			disabled: disabled ?? false,
+		});
+		items.push(item);
+		return item;
+	}
+
+	function removeItem(index: number) {
+		const i = items.findIndex((item) => item.index === index);
+		if (i === -1) return;
+		items.splice(i, 1);
+		for (let j = i; j < items.length; j++) {
+			items[j].index = j;
+		}
+	}
+
+	function isPressed(value: any): boolean {
+		return Array.isArray($state.value)
+			? $state.value.includes(value)
+			: $state.value !== undefined && $state.value === value;
+	}
+
+	function toggle(value: any) {
+		if (getDisabled()) return;
+		if (getType() === "single") {
+			$state.value = isPressed(value) ? undefined : value;
+		} else {
+			const values = Array.isArray($state.value) ? $state.value : [];
+			$state.value = isPressed(value)
+				? values.filter((v) => v !== value)
+				: values.concat(value);
+		}
+		form.handleInput();
+		$props?.onchange?.($state.value);
+	}
+
+	let context: ToggleGroupContext = {
+		registerItem,
+		removeItem,
+		isPressed,
+		toggle,
+		getDisabled,
+	};
+	$context[ToggleGroupContextName] = context;
+
+	// Only blur when focus leaves the whole group
+	function handleFocusOut(e: FocusEvent) {
+		if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node | null)) {
+			form.handleBlur();
+		}
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-toggle-group", $props?.class]}
+			{$props?.style}
+			role="group"
+			aria-label={$props?.ariaLabel}
+			aria-disabled={getDisabled() ? "true" : undefined}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+			onfocusout={handleFocusOut}
+		>
+			<slot />
+		</div>
+
+		<FormValues name={form.name} value={$state.value} />
+	}
+}

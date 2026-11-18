@@ -1,0 +1,94 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
+import { ToggleGroupContextName, type ToggleGroupContext } from "./ToggleGroupTypes";
+
+interface ToggleButtonProps {
+	/** An ID for the button */
+	id?: string;
+	/** Classes for the button */
+	class?: ClassValue;
+	/** Styles for the button */
+	style?: StyleValue;
+	/** Whether the button is pressed; for a standalone button, bind this */
+	pressed?: Bindable<boolean>;
+	/** The value this button contributes to a ToggleGroup */
+	value?: any;
+	/** If set to true, the user cannot interact with this button */
+	disabled?: boolean;
+	/** Raised when the pressed state changes */
+	onchange?: (pressed: boolean) => void;
+	/** Raised when the button is clicked */
+	onclick?: (e: MouseEvent) => void;
+}
+
+/**
+ * A button that stays pressed until pressed again, exposing its state with
+ * `aria-pressed`.
+ *
+ * See [the WAI ARIA guidelines for Toggle Buttons](https://www.w3.org/WAI/ARIA/apg/patterns/button/).
+ *
+ * Standalone, bind `pressed`; inside a ToggleGroup, set `value` and the
+ * group owns the pressed state.
+ */
+export default function ToggleButton($props: ToggleButtonProps | undefined) {
+	const defaultId = getId();
+
+	// A group is optional: standalone buttons manage their own `pressed`
+	const group = $context[ToggleGroupContextName] as ToggleGroupContext | undefined;
+	const item = group?.registerItem($props?.value, $props?.disabled);
+
+	let $state = $watch({
+		pressed: $props?.pressed ?? false,
+	});
+
+	if (!group) {
+		$bind($state, $props, "pressed");
+	}
+
+	$run(() => {
+		return () => {
+			if (group && item?.index !== undefined) {
+				group.removeItem(item.index);
+			}
+		};
+	});
+
+	function getDisabled(): boolean {
+		return $props?.disabled === true || group?.getDisabled() === true || item?.disabled === true;
+	}
+
+	function isPressed(): boolean {
+		if (group) {
+			return group.isPressed(item ? item.value : $props?.value);
+		}
+		return $state.pressed;
+	}
+
+	function handleClick(e: MouseEvent) {
+		$props?.onclick?.(e);
+		if (getDisabled()) return;
+		if (group) {
+			const next = !group.isPressed(item ? item.value : $props?.value);
+			group.toggle(item ? item.value : $props?.value);
+			$props?.onchange?.(next);
+			return;
+		}
+		$state.pressed = !$state.pressed;
+		$props?.onchange?.($state.pressed);
+	}
+
+	@render {
+		<button
+			type="button"
+			id={$props?.id ?? defaultId}
+			class={["torp-toggle-button", $props?.class]}
+			{$props?.style}
+			aria-pressed={isPressed() ? "true" : "false"}
+			aria-disabled={getDisabled() ? "true" : undefined}
+			disabled={getDisabled()}
+			onclick={handleClick}
+		>
+			<slot />
+		</button>
+	}
+}

@@ -7,7 +7,7 @@ import {
 	FormContextName,
 } from "./FormTypes";
 
-interface ToggleProps {
+interface SwitchProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
@@ -31,9 +31,13 @@ interface ToggleProps {
 /**
  * A switch input in a form, which can be turned on or off.
  *
+ * Named after the switch role: unlike a ToggleButton, a switch has an
+ * on/off state, not a pressed/not-pressed action. `Toggle` is kept as a
+ * deprecated alias for the original name.
+ *
  * See [the WAI ARIA guidelines for Switches](https://www.w3.org/WAI/ARIA/apg/patterns/switch/).
  */
-export default function Toggle($props: ToggleProps | undefined) {
+export default function Switch($props: SwitchProps | undefined) {
 	let defaultId = getId();
 
 	let blurred = false;
@@ -85,7 +89,7 @@ export default function Toggle($props: ToggleProps | undefined) {
 	@render {
 		<input
 			id={$props?.id ?? defaultId}
-			class={["torp-toggle", $props?.class]}
+			class={["torp-switch", "torp-toggle", $props?.class]}
 			type="checkbox"
 			role="switch"
 			name={$props?.name ?? fieldContext?.name}
