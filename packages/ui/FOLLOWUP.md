@@ -5,16 +5,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Bugs
 
-### Nested inputs inside a Field double-submit (likely, unverified)
-
-`<Field><SelectBox><SelectBoxContent><ListBox>` (as in
-`test/SelectBox/components/SelectBoxFormTest.torp` and the site examples):
-`ListBox` resolves the Field's name via `createFormField` just like
-ColorPalette does, so it probably adds a second hidden input and a second
-validation path while mounted. Same likely applies to ComboBox. A general
-fix: composite inputs should hide the Field context (or pass a flag) from the
-inputs they contain.
-
 ### Drag and drop is unreachable
 
 `mount/draggable.ts`, `mount/dropTarget.ts`, `utils/dragState.ts` and

@@ -18,7 +18,9 @@ describe("SelectBox (in forms)", () => {
 		await userEvent.click(within(container).getByRole("combobox"));
 		fireEvent.click(within(container).getByText("Item 1"));
 
-		expect(container.querySelector('input[type="hidden"]')).toHaveAttribute("name", "picked");
+		const inputs = container.querySelectorAll('input[type="hidden"][name="picked"]');
+		expect(inputs.length).toBe(1);
+		expect(inputs[0]).toHaveAttribute("name", "picked");
 	});
 
 	it("validates when an item is selected", async () => {

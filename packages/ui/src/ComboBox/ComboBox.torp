@@ -81,6 +81,11 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 		$context[FormContextName] as FormContext | undefined,
 		$context[FieldContextName] as FieldContext | undefined,
 	);
+
+	// The list inside is part of this input, not a separate field: hide the
+	// enclosing Field's context so it doesn't resolve the Field's name and
+	// submit its own copy of the value
+	$context[FieldContextName] = undefined;
 	let $state: ComboBoxState = $watch({
 		visible: false,
 		value: $props?.value,
