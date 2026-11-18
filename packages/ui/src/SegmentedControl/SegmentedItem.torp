@@ -29,7 +29,7 @@ export default function SegmentedItem($props: SegmentedItemProps | undefined) {
 	}
 
 	// Register this item with the parent SegmentedControl
-	let $state = context.registerItem($props?.index, $props?.value, $props?.disabled);
+	const $state = context.registerItem($props?.index, $props?.value, $props?.disabled);
 
 	$run(() => {
 		return () => {

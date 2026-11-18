@@ -33,7 +33,9 @@ interface NavMenuProps {
  * ```
  */
 export default function NavMenu($props: NavMenuProps | undefined) {
-	let orientation = $props?.orientation ?? "horizontal";
+	function getOrientation(): "horizontal" | "vertical" {
+		return $props?.orientation ?? "horizontal";
+	}
 
 	// The focus group owns the item ledger and roving-tabindex bookkeeping
 	const group = createFocusGroup<ItemState>();
@@ -83,7 +85,7 @@ export default function NavMenu($props: NavMenuProps | undefined) {
 			}
 			default: {
 				group.handleGroupKey(group.getFocusIndex(), e, {
-					vertical: orientation === "vertical",
+					vertical: getOrientation() === "vertical",
 				});
 				break;
 			}
@@ -99,7 +101,7 @@ export default function NavMenu($props: NavMenuProps | undefined) {
 			tabindex="0"
 			role="menubar"
 			aria-label={$props?.ariaLabel}
-			aria-orientation={orientation}
+			aria-orientation={getOrientation()}
 			onfocus={handleFocus}
 		>
 			<slot />

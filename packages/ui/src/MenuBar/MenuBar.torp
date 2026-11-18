@@ -34,7 +34,9 @@ interface MenuBarProps {
  * ```
  */
 export default function MenuBar($props: MenuBarProps | undefined) {
-	let orientation = $props?.orientation ?? "horizontal";
+	function getOrientation(): "horizontal" | "vertical" {
+		return $props?.orientation ?? "horizontal";
+	}
 
 	let $state = $watch({
 		active: false,
@@ -86,7 +88,7 @@ export default function MenuBar($props: MenuBarProps | undefined) {
 
 	function handleButtonKey(e: KeyboardEvent) {
 		group.handleGroupKey(group.getFocusIndex(), e, {
-			vertical: orientation === "vertical",
+			vertical: getOrientation() === "vertical",
 		});
 	}
 
@@ -102,7 +104,7 @@ export default function MenuBar($props: MenuBarProps | undefined) {
 			tabindex="-1"
 			role="menubar"
 			aria-label={$props?.ariaLabel}
-			aria-orientation={orientation}
+			aria-orientation={getOrientation()}
 		>
 			<slot />
 		</div>

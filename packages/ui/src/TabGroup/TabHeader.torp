@@ -37,7 +37,7 @@ export default function TabHeader($props: TabHeaderProps | undefined) {
 	if (!context) {
 		throw new Error("TabHeader must be contained within a TabGroup");
 	}
-	let $state = context.registerHeader($props?.index, $props?.value, $props?.disabled);
+	const $state = context.registerHeader($props?.index, $props?.value, $props?.disabled);
 
 	const itemContext: TabItemContext = {
 		triggerItem: context.triggerItem,

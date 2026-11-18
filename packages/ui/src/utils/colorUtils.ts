@@ -178,7 +178,9 @@ export function rgbToHex({ r, g, b, a = 1 }: Rgba | (Rgb & { a?: number })): str
 	return alpha === 255 ? rgb : `${rgb}${toHexPart(alpha)}`;
 }
 
-export const rgbaToHex = rgbToHex;
+export function rgbaToHex(rgba: Rgba): string {
+	return rgbToHex(rgba);
+}
 
 /** Converts RGB to hue/saturation/value */
 export function rgbToHsv({ r, g, b }: Rgb): Hsv {

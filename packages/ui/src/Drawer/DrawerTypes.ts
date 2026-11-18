@@ -5,7 +5,7 @@ export interface DrawerContext {
 	handleButton: (type: "confirm" | "cancel" | undefined, value?: any) => void;
 	// HACK: We need to be able to let children (i.e. Dialogs) override the click outside functionality
 	// There may be a more elegant way to accomplish this too
-	handleClickOutside?: (e: MouseEvent) => void;
+	handleClickOutside?: (e: MouseEvent | KeyboardEvent) => void;
 	state: DrawerState;
 	// HACK: focusFirstElement is necessary because if we focus the first element e.g. in a Dialog's
 	// onMount, it will scroll the page to the focused element and mess up our careful positioning
@@ -24,4 +24,6 @@ export interface DrawerState {
 	position: "left" | "right" | "top" | "bottom";
 	triggerId?: string;
 	contentId?: string;
+	/** The role of the drawer's content, for the trigger's aria-haspopup */
+	contentRole?: string;
 }

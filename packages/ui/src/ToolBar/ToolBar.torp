@@ -33,7 +33,9 @@ interface ToolBarProps {
  * ```
  */
 export default function ToolBar($props: ToolBarProps | undefined) {
-	let orientation = $props?.orientation ?? "horizontal";
+	function getOrientation(): "horizontal" | "vertical" {
+		return $props?.orientation ?? "horizontal";
+	}
 
 	// The focus group owns the item ledger and roving-tabindex bookkeeping
 	const group = createFocusGroup<ItemState>();
@@ -55,7 +57,9 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 		handleItemKey,
 		registerItem,
 		handlePopout,
-		orientation,
+		get orientation() {
+			return getOrientation();
+		},
 	};
 	$context[ToolBarContextName] = context;
 
@@ -85,7 +89,7 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 				break;
 			}
 			default: {
-				group.handleGroupKey(index, e, { vertical: orientation === "vertical" });
+				group.handleGroupKey(index, e, { vertical: getOrientation() === "vertical" });
 				break;
 			}
 		}
@@ -108,7 +112,7 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 			tabindex="0"
 			role="toolbar"
 			aria-label={$props?.ariaLabel}
-			aria-orientation={orientation === "vertical" ? "vertical" : undefined}
+			aria-orientation={getOrientation() === "vertical" ? "vertical" : undefined}
 			onfocus={handleFocus}
 		>
 			<slot />

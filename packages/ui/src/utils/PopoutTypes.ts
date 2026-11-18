@@ -57,6 +57,8 @@ export interface PopoutState {
 	contentRole?: string;
 	/** Whether the popout is modal (e.g. it has an overlay) */
 	modal?: boolean;
+	/** The selected value, for input popouts such as SelectBox and ComboBox */
+	value?: any;
 	/** The ID of the active descendant element, for aria-activedescendant */
 	activeDescendant?: string;
 }
