@@ -1,0 +1,49 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./focus-group/ExampleBasic.torp";
+import ExampleBasicCode from "./focus-group/ExampleBasic.torp?raw";
+
+export default function FocusGroupPage() {
+	@head {
+		<title>FocusGroup | Torpor</title>
+	}
+
+	@render {
+		<h1>FocusGroup</h1>
+		<p>
+			A group of controls that acts as a single tab stop: tabbing into the group lands on one
+			item, the arrow keys move focus between items, and Home and End jump to the ends.
+			Disabled items are skipped.
+		</p>
+		<p>
+			Use FocusGroup for plain button rows. Use <a href="/ui/tool-bar">ToolBar</a> when the
+			group needs popouts or separators, and <a href="/ui/segmented-control">SegmentedControl</a>
+			when exactly one item must be active.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<FocusGroup ariaLabel="Text formatting">
+	<FocusGroupButton>Bold</FocusGroupButton>
+	<FocusGroupButton>Italic</FocusGroupButton>
+</FocusGroup>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

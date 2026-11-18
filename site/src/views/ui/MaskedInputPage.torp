@@ -1,0 +1,47 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./masked-input/ExampleBasic.torp";
+import ExampleBasicCode from "./masked-input/ExampleBasic.torp?raw";
+
+export default function MaskedInputPage() {
+	@head {
+		<title>MaskedInput | Torpor</title>
+	}
+
+	@render {
+		<h1>MaskedInput</h1>
+		<p>
+			An input that formats its contents as the user types -- phone numbers, credit cards,
+			product codes -- displaying literals automatically while binding only the underlying
+			characters.
+		</p>
+		<p>
+			In a mask, <code>9</code> accepts a digit, <code>L</code> a letter and{" "}
+			<code>a</code> an alphanumeric character; any other character is a literal shown as-is.
+			Use <code>{"\\x"}</code> to escape a token character as a literal. Incomplete values are
+			allowed, so validate completeness with a schema when it is required.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<MaskedInput mask="(999) 999-9999" &value={$state.phone} />
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

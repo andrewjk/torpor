@@ -1,0 +1,32 @@
+import { MaskedInput } from "@torpor/ui/MaskedInput";
+
+export default function ExampleBasic() {
+	let $state = $watch({ phone: "" });
+
+	@render {
+		<div>
+			<MaskedInput
+				class="example-masked-input"
+				mask="(999) 999-9999"
+				&value={$state.phone}
+				ariaLabel="Phone number"
+			/>
+			<p>Raw value: {$state.phone}</p>
+		</div>
+	}
+
+	@style {
+		:global(.example-masked-input) {
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			font-size: 16px;
+			padding: 8px;
+			width: 180px;
+		}
+
+		:global(.example-masked-input:focus-visible) {
+			outline: 2px solid var(--header);
+			outline-offset: 2px;
+		}
+	}
+}

@@ -1,0 +1,32 @@
+import { FocusGroup, FocusGroupButton } from "@torpor/ui/FocusGroup";
+
+export default function ExampleBasic() {
+	@render {
+		<FocusGroup class="example-focus-group" ariaLabel="Text formatting">
+			<FocusGroupButton class="example-focus-group-button">Bold</FocusGroupButton>
+			<FocusGroupButton class="example-focus-group-button">Italic</FocusGroupButton>
+			<FocusGroupButton class="example-focus-group-button">Underline</FocusGroupButton>
+		</FocusGroup>
+	}
+
+	@style {
+		:global(.example-focus-group) {
+			display: flex;
+			gap: 4px;
+		}
+
+		:global(.example-focus-group-button) {
+			background: var(--background);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: inherit;
+			font-size: 14px;
+			padding: 8px 12px;
+		}
+
+		:global(.example-focus-group-button:focus-visible) {
+			outline: 2px solid var(--header);
+			outline-offset: 2px;
+		}
+	}
+}
