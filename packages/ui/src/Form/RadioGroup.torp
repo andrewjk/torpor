@@ -1,0 +1,221 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import { createFocusGroup } from "../utils/focusGroup";
+import getId from "../utils/getId";
+import createFormField from "../utils/formField";
+import FormValues from "./FormValues.torp";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "./FormTypes";
+import {
+	type RadioGroupContext,
+	RadioGroupContextName,
+	type RadioItemState,
+} from "./RadioGroupTypes";
+
+interface RadioGroupProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The name of the group's form data field */
+	name?: string;
+	/** The value of the selected radio */
+	value: Bindable<any>;
+	/** If set to true, the user cannot interact with this group */
+	disabled?: boolean;
+	/** An accessible name for the group */
+	ariaLabel?: string;
+	/** Raised when the selected value has changed */
+	onchange?: (value: any) => void;
+}
+
+/**
+ * A group of radios, of which exactly one can be selected.
+ *
+ * See [the WAI ARIA guidelines for Radio Groups](https://www.w3.org/WAI/ARIA/apg/patterns/radiogroup/).
+ *
+ * The structure of a RadioGroup is:
+ *
+ * ```
+ * <RadioGroup name="size" &value={$state.size}>
+ * 	<Radio value="small">Small</Radio>
+ * 	<Radio value="large">Large</Radio>
+ * </RadioGroup>
+ * ```
+ */
+export default function RadioGroup($props: RadioGroupProps | undefined) {
+	let defaultId = getId();
+	let nextItemIndex = 0;
+
+	// Wire up the enclosing Form and Field, if any
+	const formContext = $context[FormContextName] as FormContext | undefined;
+	const fieldContext = $context[FieldContextName] as FieldContext | undefined;
+	const form = createFormField($props?.name, formContext, fieldContext);
+
+	let $state = $watch({
+		value: $props?.value,
+	});
+
+	$bind($state, $props, "value");
+
+	const group = createFocusGroup<RadioItemState>();
+
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	function registerItem(
+		index: number | undefined,
+		value: any,
+		disabled: boolean | undefined,
+		id: string,
+	): RadioItemState {
+		if (index === undefined) {
+			index = nextItemIndex++;
+		}
+
+		const existing = group.itemStates.find((item) => item.index === index);
+		if (existing) {
+			return existing;
+		}
+
+		if (value === undefined) {
+			value = index.toString();
+		}
+
+		const itemState: RadioItemState = $watch({
+			index,
+			value,
+			id,
+			disabled: disabled ?? false,
+			setFocused: () => {},
+		});
+		group.registerItem(itemState);
+		updateInputId();
+		return itemState;
+	}
+
+	function isSelected(item: RadioItemState): boolean {
+		return $state.value === item.value;
+	}
+
+	function select(item: RadioItemState) {
+		if (getDisabled() || item.disabled) return;
+		group.handleItemFocus(item.index!);
+		if ($state.value === item.value) return;
+		$state.value = item.value;
+		updateInputId();
+		form.handleInput();
+		$props?.onchange?.(item.value);
+	}
+
+	function move(index: number, target: "start" | "previous" | "next" | "end") {
+		const before = group.getFocusIndex();
+		group.moveFocus(index, target);
+		const after = group.getFocusIndex();
+		if (after !== -1 && after !== before) {
+			select(group.itemStates[after]);
+		}
+	}
+
+	function handleKey(index: number, e: KeyboardEvent) {
+		if (getDisabled()) return;
+		switch (e.key) {
+			case "ArrowRight":
+			case "ArrowDown": {
+				e.preventDefault();
+				move(index, "next");
+				break;
+			}
+			case "ArrowLeft":
+			case "ArrowUp": {
+				e.preventDefault();
+				move(index, "previous");
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				move(index, "start");
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				move(index, "end");
+				break;
+			}
+		}
+	}
+
+	function getSelectedId(): string | undefined {
+		return group.itemStates.find(isSelected)?.id;
+	}
+
+	// Keep the Field's Label pointing at the selected radio, or the first one
+	function updateInputId() {
+		const id = getSelectedId() ?? group.itemStates[0]?.id;
+		if (id && fieldContext) {
+			fieldContext.state.inputId = id;
+		}
+	}
+
+	$run(() => {
+		// Read the value so this re-runs when the selection changes
+		$state.value;
+		updateInputId();
+	});
+
+	let context: RadioGroupContext = {
+		registerItem,
+		removeItem: (index) => group.removeItem(index),
+		isSelected,
+		select,
+		handleKey,
+		handleItemFocus: (index) => group.handleItemFocus(index),
+		isTabStop: (index) => {
+			let tabStop = group.getFocusIndex();
+			if (tabStop === -1) {
+				const selected = group.itemStates.findIndex(isSelected);
+				tabStop = selected === -1 ? 0 : selected;
+			}
+			return tabStop === index;
+		},
+		getSelectedId,
+		getDisabled,
+		getValid: () => form.valid,
+		getMessageId: () => form.messageId,
+		inField: () => form.inField,
+	};
+	$context[RadioGroupContextName] = context;
+
+	// Only blur when focus leaves the whole group
+	function handleFocusOut(e: FocusEvent) {
+		if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node | null)) {
+			form.handleBlur();
+		}
+	}
+
+	@render {
+		<div
+			id={$props?.id ?? defaultId}
+			class={["torp-radio-group", $props?.class]}
+			{$props?.style}
+			role="radiogroup"
+			aria-label={$props?.ariaLabel}
+			aria-disabled={getDisabled() ? "true" : undefined}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+			aria-invalid={form.inField && !form.valid ? "true" : undefined}
+			onfocusout={handleFocusOut}
+		>
+			<slot />
+		</div>
+
+		<FormValues name={form.name} value={$state.value} />
+	}
+
+}

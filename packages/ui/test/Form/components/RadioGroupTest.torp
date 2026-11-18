@@ -1,0 +1,21 @@
+import { Field, Form, Label, Message, Radio, RadioGroup } from "../../../src/Form/index";
+
+export default function RadioGroupTest($props: any) {
+	let $state = $watch({
+		size: $props?.value as string | undefined,
+	});
+
+	@render {
+		<Form onsubmit={() => false}>
+			<Field name="size" &value={$state.size}>
+				<Label>Size</Label>
+				<RadioGroup &value={$state.size} ariaLabel="Size" onchange={$props?.onchange}>
+					<Radio value="small">Small</Radio>
+					<Radio value="medium">Medium</Radio>
+					<Radio value="large">Large</Radio>
+				</RadioGroup>
+				<Message />
+			</Field>
+		</Form>
+	}
+}

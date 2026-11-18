@@ -10,6 +10,8 @@ import Label from "./Label.torp";
 import Message from "./Message.torp";
 import MessageSummary from "./MessageSummary.torp";
 import Option from "./Option.torp";
+import Radio from "./Radio.torp";
+import RadioGroup from "./RadioGroup.torp";
 import Select from "./Select.torp";
 import TextArea from "./TextArea.torp";
 import Toggle from "./Toggle.torp";
@@ -27,6 +29,8 @@ export {
 	Message,
 	MessageSummary,
 	Option,
+	Radio,
+	RadioGroup,
 	Select,
 	TextArea,
 	Toggle,

@@ -9,8 +9,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 Roughly in priority order:
 
-- **RadioGroup / Radio** in the Form family -- there's a `CheckBox` but no
-  radio.
 - **ToggleButton / ToggleGroup** (`aria-pressed`). Related: `Form/Toggle` is
   actually the APG Switch, so the name will clash with a toggle button;
   consider renaming it `Switch`.
