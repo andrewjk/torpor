@@ -32,7 +32,6 @@ interface DialogProps {
  *
  * ```
  * <Dialog>
- * 	<ModalOverlay /> (optional -- will set `modal` to true)
  * 	<DialogHeader /> (optional)
  * 	<DialogBody /> (optional)
  * 	<DialogFooter> (optional)

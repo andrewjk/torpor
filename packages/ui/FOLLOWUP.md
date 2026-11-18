@@ -5,12 +5,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Bugs
 
-### Smaller issues
-
-- `Charts/GridLines.torp` declares `id` and `class` props but renders neither.
-- Popover's doc comment mentions a non-existent `PopoverTriggerContextual`.
-- Dialog's structure comment shows `<ModalOverlay />` inside `<Dialog>`.
-
 ## Missing components
 
 Roughly in priority order:

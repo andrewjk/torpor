@@ -24,7 +24,7 @@ interface GridLinesProps {
 
 export default function GridLines($props: GridLinesProps) {
 	@render {
-		<svg>
+		<svg {$props.id} class={$props.class} {$props.style}>
 			@if ($props.showHLines && $props.yStepLabels) {
 				@for (let [i, label] of $props.yStepLabels!.entries()) {
 					<line
