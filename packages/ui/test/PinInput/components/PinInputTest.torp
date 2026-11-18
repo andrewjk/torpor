@@ -1,0 +1,23 @@
+import { Field, Form, Label } from "../../../src/Form/index";
+import { PinInput } from "../../../src/PinInput/index";
+
+export default function PinInputTest($props: any) {
+	let $state = $watch({
+		code: "",
+	});
+
+	@render {
+		<Form onsubmit={() => false}>
+			<Field name="code" &value={$state.code}>
+				<Label>Code</Label>
+				<PinInput
+					&value={$state.code}
+					length={$props?.length ?? 4}
+					onchange={$props?.onchange}
+					oncomplete={$props?.oncomplete}
+					ariaLabel="Verification code"
+				/>
+			</Field>
+		</Form>
+	}
+}

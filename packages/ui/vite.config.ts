@@ -30,6 +30,7 @@ const components = [
 	"NumberInput",
 	"Notification",
 	"Pagination",
+	"PinInput",
 	"Progress",
 	"Popover",
 	"Rating",

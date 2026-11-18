@@ -1,0 +1,220 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
+import FormValues from "../Form/FormValues.torp";
+import createFormField from "../utils/formField";
+
+interface PinInputProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The name of the input's form data field */
+	name?: string;
+	/** The entered characters, without separators */
+	value?: Bindable<string | undefined>;
+	/** The number of characters (default 6) */
+	length?: number;
+	/** Whether digits only or any characters are accepted (default "numeric") */
+	type?: "numeric" | "text";
+	/** If set to true, the characters are obscured like a password */
+	mask?: boolean;
+	/** If set to true, the user cannot interact with this input */
+	disabled?: boolean;
+	/** An accessible name for the whole input */
+	ariaLabel?: string;
+	/** Raised when the value has changed */
+	onchange?: (value: string) => void;
+	/** Raised when every character has been entered */
+	oncomplete?: (value: string) => void;
+}
+
+/**
+ * An input for one-time passcodes or PINs, made of one field per character.
+ * Typing advances to the next field, Backspace goes back, pasting fills the
+ * remaining fields, and the arrow keys move between them.
+ *
+ * ```
+ * <PinInput name="code" length={6} oncomplete={(code) => verify(code)} />
+ * ```
+ */
+export default function PinInput($props: PinInputProps | undefined) {
+	let defaultId = getId();
+	const inputs: HTMLInputElement[] = [];
+
+	// Wire up the enclosing Form and Field, if any
+	const formContext = $context[FormContextName] as FormContext | undefined;
+	const fieldContext = $context[FieldContextName] as FieldContext | undefined;
+	const form = createFormField($props?.name, formContext, fieldContext);
+
+	let $state = $watch({
+		value: ($props?.value ?? "") as string,
+	});
+
+	$bind($state, $props, "value");
+
+	function getLength(): number {
+		return Math.max(1, $props?.length ?? 6);
+	}
+
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	function sanitize(text: string): string {
+		if ($props?.type === "text") return text;
+		return text.replace(/[^0-9]/g, "");
+	}
+
+	/** Keeps the Field's Label pointing at the first character field */
+	function updateInputId() {
+		if (fieldContext) {
+			const el = inputs[0];
+			fieldContext.state.inputId = el?.id || `${$props?.id ?? defaultId}-0`;
+		}
+	}
+
+	$run(() => {
+		$state.value;
+		updateInputId();
+	});
+
+	function commit(next: string) {
+		next = next.slice(0, getLength());
+		if (next === $state.value) return;
+		$state.value = next;
+		form.handleInput();
+		$props?.onchange?.(next);
+		if (next.length === getLength()) {
+			$props?.oncomplete?.(next);
+		}
+	}
+
+	function focusAt(index: number) {
+		const clamped = Math.min(getLength() - 1, Math.max(0, index));
+		inputs[clamped]?.focus();
+	}
+
+	function handleInput(index: number, e: Event) {
+		const el = e.currentTarget as HTMLInputElement;
+		const current = $state.value ?? "";
+		const text = sanitize(el.value);
+		if (text === "") {
+			// The character was deleted
+			commit(current.slice(0, index) + current.slice(index + 1));
+			return;
+		}
+		// Typing replaces the character at this position; a longer value
+		// (from an IME or an autofill) fills the following positions
+		const before = current.slice(0, index);
+		const after = current.slice(index + Math.max(1, text.length));
+		commit(before + text + after);
+		focusAt(index + text.length);
+	}
+
+	function handlePaste(index: number, e: ClipboardEvent) {
+		if (getDisabled()) return;
+		e.preventDefault();
+		const pasted = sanitize(e.clipboardData?.getData("text") ?? "");
+		if (!pasted) return;
+		const current = $state.value ?? "";
+		const before = current.slice(0, index);
+		const after = current.slice(index + pasted.length);
+		commit(before + pasted + after);
+		focusAt(index + pasted.length);
+	}
+
+	function handleKey(index: number, e: KeyboardEvent) {
+		if (getDisabled()) return;
+		const current = $state.value ?? "";
+		switch (e.key) {
+			case "Backspace": {
+				e.preventDefault();
+				if (current[index] !== undefined) {
+					commit(current.slice(0, index) + current.slice(index + 1));
+				} else {
+					commit(current.slice(0, index - 1) + current.slice(index));
+					focusAt(index - 1);
+				}
+				break;
+			}
+			case "Delete": {
+				e.preventDefault();
+				commit(current.slice(0, index) + current.slice(index + 1));
+				break;
+			}
+			case "ArrowLeft": {
+				e.preventDefault();
+				focusAt(index - 1);
+				break;
+			}
+			case "ArrowRight": {
+				e.preventDefault();
+				focusAt(index + 1);
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				focusAt(0);
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				focusAt(getLength() - 1);
+				break;
+			}
+		}
+	}
+
+	function handleFocus(e: FocusEvent) {
+		(e.currentTarget as HTMLInputElement).select();
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-pin-input", $props?.class]}
+			{$props?.style}
+			role="group"
+			aria-label={$props?.ariaLabel}
+			aria-disabled={getDisabled() ? "true" : undefined}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+			aria-invalid={form.inField && !form.valid ? "true" : undefined}
+		>
+			@for (let i of Array.from({ length: getLength() }, (_, i) => i)) {
+				<input
+					id={`${$props?.id ?? defaultId}-${i}`}
+					class="torp-pin-input-field"
+					type={$props?.mask ? "password" : "text"}
+					inputmode={$props?.type === "text" ? undefined : "numeric"}
+					autocomplete={i === 0 ? "one-time-code" : "off"}
+					maxlength="1"
+					aria-label={`Character ${i + 1}`}
+					disabled={getDisabled()}
+					value={($state.value ?? "")[i] ?? ""}
+					oninput={(e: Event) => handleInput(i, e)}
+					onkeydown={(e: KeyboardEvent) => handleKey(i, e)}
+					onpaste={(e: ClipboardEvent) => handlePaste(i, e)}
+					onfocus={handleFocus}
+					onmount={(el: HTMLInputElement) => {
+						inputs[i] = el;
+						if (i === 0) updateInputId();
+						return () => {
+							if (inputs[i] === el) inputs[i] = undefined as any;
+						};
+					}}
+				/>
+			}
+		</div>
+
+		<FormValues name={form.name} value={$state.value} />
+	}
+}

@@ -121,6 +121,10 @@
 			"types": "./dist/Pagination/index.d.ts",
 			"import": "./dist/Pagination/index.js"
 		},
+		"./PinInput": {
+			"types": "./dist/PinInput/index.d.ts",
+			"import": "./dist/PinInput/index.js"
+		},
 		"./Progress": {
 			"types": "./dist/Progress/index.d.ts",
 			"import": "./dist/Progress/index.js"
