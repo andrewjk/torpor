@@ -21,8 +21,11 @@ interface ComboBoxProps {
 	style?: StyleValue;
 	/** The name of the input's form data field */
 	name?: string;
-	/** The data value selected by the user, or an array of values if multiple is set */
-	value: Bindable<any>;
+	/**
+	 * The data value selected by the user, or an array of values if multiple
+	 * is set. Defaults to the enclosing Field's value when omitted.
+	 */
+	value?: Bindable<any>;
 	/** Whether multiple values can be selected at the same time */
 	multiple?: boolean;
 	/**
@@ -76,10 +79,11 @@ interface ComboBoxProps {
  */
 export default function ComboBox($props: ComboBoxProps | undefined) {
 	// Wire up the enclosing Form and Field, if any
+	const fieldContext = $context[FieldContextName] as FieldContext | undefined;
 	const form = createFormField(
 		() => $props?.name,
 		$context[FormContextName] as FormContext | undefined,
-		$context[FieldContextName] as FieldContext | undefined,
+		fieldContext,
 	);
 
 	// The list inside is part of this input, not a separate field: hide the
@@ -88,7 +92,7 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 	$context[FieldContextName] = undefined;
 	let $state: ComboBoxState = $watch({
 		visible: false,
-		value: $props?.value,
+		value: $props?.value ?? fieldContext?.state.value,
 		contentId: undefined,
 		triggerId: undefined,
 		contentRole: undefined,
@@ -97,6 +101,25 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 	});
 
 	$bind($state, $props, "visible", "value");
+
+	// With no value prop, use the enclosing Field's value as the source and
+	// destination, so only the Field needs binding. The initial undefined is
+	// skipped so an empty Field doesn't clear a default.
+	let firstFromField = true;
+	$run(() => {
+		const value = fieldContext?.state.value;
+		const skip = firstFromField && value === undefined;
+		firstFromField = false;
+		if (!fieldContext || $props?.value !== undefined || skip) return;
+		if (value !== $state.value) {
+			$state.value = value;
+		}
+	});
+	$run(() => {
+		if ($props?.value === undefined && fieldContext) {
+			fieldContext.state.value = $state.value;
+		}
+	});
 
 	if ($props?.load !== undefined && typeof $props.load !== "function") {
 		throw new Error("ComboBox: `load` must be a function");

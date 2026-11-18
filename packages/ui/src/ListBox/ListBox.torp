@@ -26,8 +26,12 @@ interface ListBoxProps {
 	style?: StyleValue;
 	/** Whether a single ListBoxItem or multiple ListBoxItems can be selected at the same time */
 	type?: "single" | "multiple";
-	/** The value of the selected ListBoxItem, or an array of values if the type is "multiple" */
-	value: Bindable<any | any[]>;
+	/**
+	 * The value of the selected ListBoxItem, or an array of values if the
+	 * type is "multiple". Defaults to the enclosing SelectBox/ComboBox value
+	 * when omitted.
+	 */
+	value?: Bindable<any | any[]>;
 	/** If set to true, the user cannot interact with any items in the ListBox */
 	disabled?: boolean;
 	/** An ARIA label for describing the ListBox to screen readers  */
@@ -86,15 +90,34 @@ export default function ListBox($props: ListBoxProps | undefined) {
 		return $props?.type ?? "single";
 	}
 
+	// Maybe get stuff out of a popout context (SelectBox, ComboBox)
+	const popoutContext = $context[PopoutContextName] as PopoutContext | undefined;
+
 	// This may come from a PopoutContext, or we may need to handle it ourselves
 	let searchText: string | undefined;
 
 	let $state = $watch({
-		value: $props?.value ?? (getType() === "single" ? undefined : []),
+		value:
+			$props?.value ??
+			popoutContext?.state.value ??
+			(getType() === "single" ? undefined : []),
 		searchText: undefined as string | undefined,
 	});
 
 	$bind($state, $props, "value", "searchText");
+
+	// With no value prop, follow the containing SelectBox/ComboBox value.
+	// The initial undefined is skipped so it doesn't erase the multiple default.
+	let firstFromPopout = true;
+	$run(() => {
+		const value = popoutContext?.state.value;
+		const skip = firstFromPopout && value === undefined;
+		firstFromPopout = false;
+		if (!popoutContext || $props?.value !== undefined || skip) return;
+		if (value !== $state.value) {
+			$state.value = value;
+		}
+	});
 
 	if ($props?.load !== undefined && typeof $props.load !== "function") {
 		throw new Error("ListBox: `load` must be a function");
@@ -113,7 +136,6 @@ export default function ListBox($props: ListBoxProps | undefined) {
 
 	// Maybe get stuff out of a popout context
 	let handleButton: HandleButtonPress | undefined = undefined;
-	const popoutContext = $context[PopoutContextName] as PopoutContext;
 	if (popoutContext) {
 		handleButton = popoutContext.handleButton;
 

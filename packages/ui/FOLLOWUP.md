@@ -7,9 +7,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Duplication and inconsistencies
 
-- **Too much nesting for the common case**: a SelectBox in a Field needs
-  `&value` written on Field, SelectBox and ListBox across four levels (ties
-  in with the open PLAN.md "sensible defaults" item).
 - **Loader exported twice**: `createItemLoader` / `normalizeLoadResult` come
   from both `./ComboBox` and `./SelectBox`; DataGrid, Tree and TagInput use it
   too. Give it its own `./loader` subpath.

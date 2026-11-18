@@ -1,0 +1,26 @@
+import { Field, Form } from "../../../src/Form/index";
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
+import { SelectBox, SelectBoxContent, SelectBoxTrigger } from "../../../src/SelectBox/index";
+
+/** The common case: only the Field is bound */
+export default function SelectBoxDefaultsTest() {
+	let $state = $watch({
+		picked: undefined as string | undefined,
+	});
+
+	@render {
+		<Form onsubmit={() => false}>
+			<Field name="picked" &value={$state.picked}>
+				<SelectBox ariaLabel="Items">
+					<SelectBoxTrigger />
+					<SelectBoxContent>
+						<ListBox>
+							<ListBoxItem>Item 1</ListBoxItem>
+							<ListBoxItem>Item 2</ListBoxItem>
+						</ListBox>
+					</SelectBoxContent>
+				</SelectBox>
+			</Field>
+		</Form>
+	}
+}
