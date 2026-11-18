@@ -165,4 +165,17 @@ describe("ColorPicker in a Field", () => {
 		const form = container.querySelector("form")!;
 		expect(new FormData(form).getAll("accent")).toEqual(["#ff0000"]);
 	});
+
+	it("clearing the hex input clears the submitted value and the palette", async () => {
+		const container = mountField();
+
+		const input = container.querySelector<HTMLInputElement>(".torp-color-picker-input")!;
+		fireEvent.input(input, { target: { value: "" } });
+		fireEvent.blur(input);
+		await tick();
+
+		const form = container.querySelector("form")!;
+		expect(new FormData(form).getAll("accent")).toEqual([]);
+		expect(container.querySelector(".torp-color-palette-swatch[aria-checked='true']")).toBeNull();
+	});
 });

@@ -5,13 +5,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Bugs
 
-### ColorPicker submits a stale value after the hex input is cleared (confirmed)
-
-Clearing the hex input commits `undefined` to the picker, but the palette is
-passed `value={$state.value}` and (because of the `$bind` issue above) keeps
-its old value -- the old swatch stays `aria-checked`, and the palette's own
-hidden input still submits the cleared color.
-
 ### ColorPalette tab stop and arrow keys (confirmed)
 
 - The roving tab stop is always swatch 0 when focus hasn't entered the group,
