@@ -7,9 +7,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Duplication and inconsistencies
 
-- **Loader exported twice**: `createItemLoader` / `normalizeLoadResult` come
-  from both `./ComboBox` and `./SelectBox`; DataGrid, Tree and TagInput use it
-  too. Give it its own `./loader` subpath.
 - **Two chart axis systems**: legacy `XAxis` / `YAxis` / `GridLines` are still
   exported for ScatterChart alongside `ChartXAxis` / `ChartYAxis` / `ChartGrid`.
   Move ScatterChart onto `Chart` and drop the legacy ones.

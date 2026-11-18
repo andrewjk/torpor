@@ -49,6 +49,7 @@ const components = [
 	"ToolBar",
 	"Tooltip",
 	"icons",
+	"loader",
 	"motion",
 ];
 

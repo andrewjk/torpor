@@ -197,6 +197,10 @@
 			"types": "./dist/icons/index.d.ts",
 			"import": "./dist/icons/index.js"
 		},
+		"./loader": {
+			"types": "./dist/loader/index.d.ts",
+			"import": "./dist/loader/index.js"
+		},
 		"./motion": {
 			"types": "./dist/motion/index.d.ts",
 			"import": "./dist/motion/index.js"
