@@ -3,6 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it, vi } from "vite-plus/test";
 import ColorPickerComposedTest from "./components/ColorPickerComposedTest.torp";
+import ColorPickerFieldTest from "./components/ColorPickerFieldTest.torp";
 import ColorPickerTest from "./components/ColorPickerTest.torp";
 
 const tick = () => new Promise((r) => setTimeout(r));
@@ -147,5 +148,21 @@ describe("ColorPicker (subcomponents)", () => {
 		// The composed palette reflects the input's value
 		const selected = container.querySelector('[data-selected="selected"]')!;
 		expect(selected).toHaveAttribute("data-color", "#00FF88");
+	});
+});
+
+describe("ColorPicker in a Field", () => {
+	function mountField() {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ColorPickerFieldTest as any, {});
+		return container;
+	}
+
+	it("submits its value once, not once per subcomponent", () => {
+		const container = mountField();
+
+		const form = container.querySelector("form")!;
+		expect(new FormData(form).getAll("accent")).toEqual(["#ff0000"]);
 	});
 });

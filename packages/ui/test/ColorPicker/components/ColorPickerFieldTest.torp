@@ -1,0 +1,20 @@
+import { ColorPicker } from "../../../src/ColorPicker/index";
+import { Field, Form } from "../../../src/Form/index";
+
+export default function ColorPickerFieldTest($props: any) {
+	let $state = $watch({
+		value: "#ff0000" as string | undefined,
+	});
+
+	@render {
+		<Form onsubmit={() => false}>
+			<Field name="accent" &value={$state.value}>
+				<ColorPicker
+					&value={$state.value}
+					colors={$props.colors ?? ["#FF0000", "#00FF88", "#0000FF"]}
+					showInput
+				/>
+			</Field>
+		</Form>
+	}
+}

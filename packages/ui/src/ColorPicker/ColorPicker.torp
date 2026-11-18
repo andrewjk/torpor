@@ -58,12 +58,19 @@ interface ColorPickerProps {
  * With no children, the palette and input are rendered automatically.
  */
 export default function ColorPicker($props: ColorPickerProps | undefined) {
+	let root: HTMLElement;
+
 	// Wire up the enclosing Form and Field, if any
 	const form = createFormField(
 		$props?.name,
 		$context[FormContextName] as FormContext | undefined,
 		$context[FieldContextName] as FieldContext | undefined,
 	);
+
+	// The palette and input inside are parts of this picker, not standalone
+	// fields: hide the enclosing Field's context so they don't resolve its
+	// name and each submit their own copy of the value
+	$context[FieldContextName] = undefined;
 
 	function getDisabled(): boolean {
 		return $props?.disabled === true;
@@ -87,6 +94,13 @@ export default function ColorPicker($props: ColorPickerProps | undefined) {
 		commitValue(value);
 	}
 
+	// Only blur when focus leaves the whole picker
+	function handleFocusOut(e: FocusEvent) {
+		if (!root.contains(e.relatedTarget as Node | null)) {
+			form.handleBlur();
+		}
+	}
+
 	// Set the context to pass down to the input
 	let context: ColorPickerContext = {
 		getDisabled,
@@ -97,7 +111,14 @@ export default function ColorPicker($props: ColorPickerProps | undefined) {
 	$context[ColorPickerContextName] = context;
 
 	@render {
-		<div class={["torp-color-picker", $props?.class]} {$props?.style}>
+		<div
+			class={["torp-color-picker", $props?.class]}
+			{$props?.style}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+			onfocusout={handleFocusOut}
+			&ref={root}
+		>
 			<slot>
 				<ColorPalette
 					class="torp-color-picker-palette"

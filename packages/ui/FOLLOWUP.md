@@ -5,12 +5,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Bugs
 
-### ColorPicker submits its value twice inside a Field (confirmed)
-
-Inside a `Field`, both `ColorPicker` and its inner `ColorPalette` resolve the
-Field's name through `createFormField` and each render `FormValues`, so the
-form submits e.g. `accent=#ff0000` twice. The palette also double-validates.
-
 ### ColorPicker submits a stale value after the hex input is cleared (confirmed)
 
 Clearing the hex input commits `undefined` to the picker, but the palette is
