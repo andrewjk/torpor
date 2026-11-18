@@ -1,0 +1,19 @@
+import { SortableList } from "../../../src/SortableList/index";
+
+export default function SortableListTest($props: any) {
+	let $state = $watch({
+		items: ($props?.items ?? ["one", "two", "three"]) as string[],
+		status: "",
+	});
+
+	@render {
+		<SortableList
+			&items={$state.items}
+			ariaLabel="Steps"
+			disabled={$props?.disabled}
+			onchange={$props?.onchange}
+			onmove={$props?.onmove}
+		/>
+		<span class="result">{$state.items.join(",")}</span>
+	}
+}

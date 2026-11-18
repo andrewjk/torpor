@@ -141,6 +141,10 @@
 			"types": "./dist/Slider/index.d.ts",
 			"import": "./dist/Slider/index.js"
 		},
+		"./SortableList": {
+			"types": "./dist/SortableList/index.d.ts",
+			"import": "./dist/SortableList/index.js"
+		},
 		"./Splitter": {
 			"types": "./dist/Splitter/index.d.ts",
 			"import": "./dist/Splitter/index.js"

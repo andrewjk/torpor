@@ -1,0 +1,132 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
+import { moveToSlot } from "../utils/reorderList";
+import SortableListItem from "./SortableListItem.torp";
+import {
+	type SortableListContext,
+	SortableListContextName,
+} from "./SortableListTypes";
+
+interface SortableListProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The items, in display order */
+	items: Bindable<any[]>;
+	/** Extracts the text for an item (defaults to the item itself) */
+	getItemLabel?: (item: any) => string;
+	/** Extracts a stable key for an item (defaults to its position) */
+	getItemValue?: (item: any) => any;
+	/** If set to true, the user cannot reorder the items */
+	disabled?: boolean;
+	/** An accessible name for the list */
+	ariaLabel?: string;
+	/** Raised when the items have been reordered */
+	onchange?: (items: any[]) => void;
+	/** Raised with the source and destination positions after a reorder */
+	onmove?: (from: number, to: number) => void;
+}
+
+/**
+ * A list whose items can be reordered by dragging, or from the keyboard
+ * with Alt+Up / Alt+Down (and Alt+Home / Alt+End for the ends).
+ *
+ * See [the WAI ARIA guidelines for listbox reordering](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/).
+ *
+ * The structure of a SortableList is:
+ *
+ * ```
+ * <SortableList &items={$state.items} ariaLabel="Steps">
+ * 	<SortableListItem item={item} index={i}>...</SortableListItem>
+ * </SortableList>
+ * ```
+ *
+ * With no children, the items are rendered automatically.
+ */
+export default function SortableList($props: SortableListProps | undefined) {
+	let defaultId = getId();
+
+	let $state = $watch({
+		items: ($props?.items ?? []) as any[],
+		status: "",
+	});
+
+	$bind($state, $props, "items");
+
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	function getItemLabel(item: any): string {
+		if ($props?.getItemLabel) return String($props.getItemLabel(item));
+		return typeof item === "string" || typeof item === "number" ? String(item) : "";
+	}
+
+	function keyFor(item: any, index: number): any {
+		return $props?.getItemValue ? $props.getItemValue(item) : index;
+	}
+
+	function announce(message: string) {
+		$state.status = message;
+	}
+
+	function move(from: number, insertAt: number) {
+		if (getDisabled()) return;
+		const items = $state.items;
+		if (from < 0 || from >= items.length) return;
+		const to = Math.min(items.length - 1, Math.max(0, from < insertAt ? insertAt - 1 : insertAt));
+		if (to === from) return;
+		const moved = items[from];
+		const next = moveToSlot(items, from, insertAt);
+		$state.items = next;
+		$props?.onchange?.(next);
+		$props?.onmove?.(from, to);
+		announce(`Moved ${getItemLabel(moved) || "item"} to position ${to + 1} of ${next.length}.`);
+	}
+
+	let context: SortableListContext = {
+		kind: `sortable-list:${defaultId}`,
+		getItems: () => $state.items,
+		getItemLabel,
+		getDisabled,
+		move,
+		announce,
+	};
+	$context[SortableListContextName] = context;
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-sortable-list", $props?.class]}
+			{$props?.style}
+			role="list"
+			aria-label={$props?.ariaLabel}
+			aria-disabled={getDisabled() ? "true" : undefined}
+		>
+			<slot>
+				@for (let [i, item] of $state.items.entries()) {
+					@key = keyFor(item, i)
+					<SortableListItem {item} index={i} total={$state.items.length}>
+						{getItemLabel(item)}
+					</SortableListItem>
+				}
+			</slot>
+
+			<div class="torp-sortable-list-status" role="status" aria-live="polite">{$state.status}</div>
+		</div>
+	}
+
+	@style {
+		.torp-sortable-list-status {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+			white-space: nowrap;
+		}
+	}
+}

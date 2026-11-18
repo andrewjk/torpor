@@ -35,6 +35,7 @@ const components = [
 	"SelectBox",
 	"SegmentedControl",
 	"Slider",
+	"SortableList",
 	"Splitter",
 	"Stepper",
 	"TabGroup",
