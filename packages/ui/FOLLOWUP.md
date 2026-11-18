@@ -5,13 +5,6 @@ reproduced with a throwaway test; the rest come from reading the source.
 
 ## Bugs
 
-### Drag and drop is unreachable
-
-`mount/draggable.ts`, `mount/dropTarget.ts`, `utils/dragState.ts` and
-`utils/reorderList.ts` are not in the `package.json` exports and nothing in
-the package uses them, so the "done" drag-and-drop item in PLAN.md can't be
-used by consumers. Add an export (e.g. `./mount` and/or `./dnd`).
-
 ### Props captured once at setup
 
 The compiler warns that `type` in `Form/Input.torp` and `inputId` in

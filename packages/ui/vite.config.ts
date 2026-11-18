@@ -16,6 +16,7 @@ const components = [
 	"Dialog",
 	"Disclosure",
 	"Drawer",
+	"dnd",
 	"FocusGroup",
 	"Form",
 	"ListBox",
