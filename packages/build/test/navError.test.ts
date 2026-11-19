@@ -14,7 +14,7 @@ vi.mock("@torpor/view", () => ({
 
 import { DATA_REUSE_HEADER } from "../src/dataRequest";
 import loadData from "../src/nav/loadData";
-import navigate from "../src/nav/navigate";
+import navigate, { type NavigationResult } from "../src/nav/navigate";
 import $page from "../src/state/$page";
 import client from "../src/state/client";
 import Router from "../src/site/Router";
@@ -41,6 +41,11 @@ const redirectingLoad = async () =>
 	new Response(null, { status: 303, headers: { location: "/login" } });
 
 const notFoundLoad = async () => new Response("nope", { status: 404 });
+
+/** The error a failed navigation carried, for assertions. */
+function failedError(result: NavigationResult): unknown {
+	return result.type === "failed" ? result.error : undefined;
+}
 
 function routesWith(load: (ev: any) => Promise<Response>, withErrorRoute = true): ManifestRoute[] {
 	const routes: ManifestRoute[] = [
@@ -128,6 +133,56 @@ describe("loadData", () => {
 			// fallback, which Node's Response leaves empty)
 			expect(result?.error?.message ?? "").not.toContain("host 404 page");
 		} finally {
+			vi.unstubAllGlobals();
+		}
+	});
+
+	test("a rejected fetch becomes a renderable 503 error", async () => {
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => {
+				throw new TypeError("network down");
+			}),
+		);
+		const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+		try {
+			const handler: RouteHandler = {
+				path: "/posts",
+				type: PAGE_ROUTE,
+				endPoint: () => Promise.resolve({ default: {} }),
+				serverEndPoint: () => Promise.resolve({ default: { load: async () => {} } }),
+			};
+			const result = await loadData(handler, {}, "/posts", new URLSearchParams(), [], {});
+
+			expect(result?.error).toEqual({ status: 503, message: "Could not reach the server." });
+		} finally {
+			consoleError.mockRestore();
+			vi.unstubAllGlobals();
+		}
+	});
+
+	test("the 503 message says offline when the browser reports no network", async () => {
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => {
+				throw new TypeError("network down");
+			}),
+		);
+		const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+		const online = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+		try {
+			const handler: RouteHandler = {
+				path: "/posts",
+				type: PAGE_ROUTE,
+				endPoint: () => Promise.resolve({ default: {} }),
+				serverEndPoint: () => Promise.resolve({ default: { load: async () => {} } }),
+			};
+			const result = await loadData(handler, {}, "/posts", new URLSearchParams(), [], {});
+
+			expect(result?.error).toEqual({ status: 503, message: "You're offline." });
+		} finally {
+			online.mockRestore();
+			consoleError.mockRestore();
 			vi.unstubAllGlobals();
 		}
 	});
@@ -238,7 +293,7 @@ describe("layout slot reuse", () => {
 
 		// Instead of the old crash (reading 'parentNode' of null, swallowed into
 		// the "Script syntax error" placeholder) the whole chain re-renders
-		expect(navigated).toBe(true);
+		expect(navigated.type).toBe("rendered");
 		expect(unmountMock).toHaveBeenCalledTimes(1);
 		expect(mountMock).toHaveBeenCalledTimes(1);
 		expect(mountMock.mock.calls[0][1]).toBe(layoutComponent);
@@ -263,7 +318,7 @@ describe("layout slot reuse", () => {
 
 		const navigated = await navigate(new URL("http://localhost/dashboard"));
 
-		expect(navigated).toBe(true);
+		expect(navigated.type).toBe("rendered");
 		expect(unmountMock).toHaveBeenCalledTimes(1);
 		expect(mountMock).toHaveBeenCalledTimes(1);
 		expect(mountMock.mock.calls[0][1]).toBe(layoutComponent);
@@ -289,7 +344,7 @@ describe("layout slot reuse", () => {
 
 		const navigated = await navigate(new URL("http://localhost/dashboard"));
 
-		expect(navigated).toBe(true);
+		expect(navigated.type).toBe("rendered");
 		expect(clearLayoutSlotMock).toHaveBeenCalledTimes(1);
 		expect(clearLayoutSlotMock.mock.calls[0][0]).toBe(rootSlot);
 		// The chain below the live layout is rendered into its slot rather than
@@ -310,7 +365,7 @@ describe("navigate", () => {
 
 		// The navigation succeeds: the error page is rendered in place and
 		// the caller keeps the requested url in the address bar
-		expect(navigated).toBe(true);
+		expect(navigated.type).toBe("rendered");
 		expect(mountMock).toHaveBeenCalledTimes(1);
 		// The error route's component was rendered
 		expect(mountMock.mock.calls[0][1]).toBe(errorComponent);
@@ -323,7 +378,7 @@ describe("navigate", () => {
 
 		const navigated = await navigate(new URL("http://localhost/posts"));
 
-		expect(navigated).toBe(false);
+		expect(navigated.type).toBe("failed");
 		expect(mountMock).not.toHaveBeenCalled();
 	});
 
@@ -332,7 +387,7 @@ describe("navigate", () => {
 
 		const navigated = await navigate(new URL("http://localhost/posts"));
 
-		expect(navigated).toBe(false);
+		expect(navigated.type).toBe("redirect");
 		expect(mountMock).not.toHaveBeenCalled();
 	});
 
@@ -357,7 +412,8 @@ describe("navigate", () => {
 
 			// The caller falls back to a full page load instead of the click
 			// rejecting with the import error
-			expect(navigated).toBe(false);
+			expect(navigated.type).toBe("failed");
+			expect(failedError(navigated)).toBeInstanceOf(TypeError);
 			expect(mountMock).not.toHaveBeenCalled();
 			// The tab bar/active-link state points at the page still on screen
 			expect($page.url).toBe(current);
@@ -367,7 +423,7 @@ describe("navigate", () => {
 		}
 	});
 
-	test("a failed data request falls back and restores $page", async () => {
+	test("a failed data request without an error route falls back and restores $page", async () => {
 		client.router.addPages([
 			{
 				path: "/posts",
@@ -390,13 +446,126 @@ describe("navigate", () => {
 		);
 		const current = new URL("http://localhost/current");
 		$page.url = current;
+		$page.status = 200;
 		const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
 		try {
 			const navigated = await navigate(new URL("http://localhost/posts"));
 
-			expect(navigated).toBe(false);
+			expect(navigated.type).toBe("failed");
+			// The reactive state points back at the page still on screen
 			expect($page.url).toBe(current);
+			expect($page.status).toBe(200);
+		} finally {
+			consoleError.mockRestore();
+			vi.unstubAllGlobals();
+		}
+	});
+
+	test("a rejected data request renders the error page in place", async () => {
+		client.router.addPages([
+			{
+				path: "/posts",
+				type: PAGE_ROUTE,
+				endPoint: () => Promise.resolve({ default: { component: pageComponent } }),
+				subFolder: undefined,
+			},
+			{
+				path: "/posts/~server",
+				type: PAGE_SERVER_ROUTE,
+				endPoint: () => Promise.resolve({ default: { load: async () => {} } }),
+				subFolder: undefined,
+			},
+			{
+				path: "/_error",
+				type: ERROR_ROUTE,
+				endPoint: () => Promise.resolve({ default: { component: errorComponent } }),
+				subFolder: undefined,
+			},
+		]);
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => {
+				throw new TypeError("network down");
+			}),
+		);
+		const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+
+		try {
+			const navigated = await navigate(new URL("http://localhost/posts"));
+
+			// The 503 renders in the shell at the requested url, rather than
+			// the caller blanking it with a document load that would fail too
+			expect(navigated.type).toBe("rendered");
+			expect(mountMock).toHaveBeenCalledTimes(1);
+			expect(mountMock.mock.calls[0][1]).toBe(errorComponent);
+			expect($page.status).toBe(503);
+			expect($page.error?.message).toBe("Could not reach the server.");
+			expect($page.url.pathname).toBe("/posts");
+		} finally {
+			consoleError.mockRestore();
+			vi.unstubAllGlobals();
+		}
+	});
+
+	test("an error page whose own data fails renders over the live shell", async () => {
+		// The root layout is on screen with live data and a slot region
+		const node = document.createElement("main");
+		document.body.appendChild(node);
+		const liveSlot = { startNode: node, endNode: node };
+		client.layoutStack = [
+			{ path: "/_layout", data: { user: "alice" }, reuse: false, slotRegion: liveSlot },
+		];
+
+		const layoutComponent = () => {};
+		client.router.addPages([
+			{
+				path: "/_layout",
+				type: PAGE_ROUTE,
+				endPoint: () => Promise.resolve({ default: { component: layoutComponent } }),
+				subFolder: undefined,
+			},
+			{
+				path: "/_layout/~server",
+				type: PAGE_SERVER_ROUTE,
+				endPoint: () => Promise.resolve({ default: { load: async () => {} } }),
+				subFolder: undefined,
+			},
+			{
+				path: "/posts",
+				type: PAGE_ROUTE,
+				endPoint: () => Promise.resolve({ default: { component: pageComponent } }),
+				subFolder: undefined,
+			},
+			{
+				path: "/_error",
+				type: ERROR_ROUTE,
+				endPoint: () => Promise.resolve({ default: { component: errorComponent } }),
+				subFolder: undefined,
+			},
+		]);
+		const fetchMock = vi.fn(async () => {
+			throw new TypeError("network down");
+		});
+		vi.stubGlobal("fetch", fetchMock);
+		const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+
+		try {
+			const navigated = await navigate(new URL("http://localhost/posts"));
+
+			// The page's request and the error page's own request (its root
+			// layout has a server load) both fail; the error still renders in
+			// the live layout instead of blanking the shell
+			expect(fetchMock).toHaveBeenCalledTimes(2);
+			expect(navigated.type).toBe("rendered");
+			expect($page.status).toBe(503);
+			expect(mountMock).not.toHaveBeenCalled();
+			expect(clearLayoutSlotMock).toHaveBeenCalledWith(liveSlot);
+			expect(fillLayoutSlotMock).toHaveBeenCalledTimes(1);
+			expect(fillLayoutSlotMock.mock.calls[0][0]).toBe(errorComponent);
+			// The live layout was adopted for reuse with its data intact
+			expect(client.layoutStack[0].reuse).toBe(true);
+			expect(client.layoutStack[0].data).toEqual({ user: "alice" });
 		} finally {
 			consoleError.mockRestore();
 			vi.unstubAllGlobals();
@@ -408,7 +577,7 @@ describe("navigate", () => {
 
 		const navigated = await navigate(new URL("http://localhost/nope"));
 
-		expect(navigated).toBe(true);
+		expect(navigated.type).toBe("rendered");
 		expect(mountMock).toHaveBeenCalledTimes(1);
 		expect(mountMock.mock.calls[0][1]).toBe(errorComponent);
 		expect($page.status).toBe(404);
@@ -417,8 +586,9 @@ describe("navigate", () => {
 
 	test("a server-only route falls back to a full page load", async () => {
 		// e.g. a `/logout` +server route: there's no client component, so the
-		// client can't render it -- navigate must return false (not throw) so
-		// the click handler does a full page load and hits the server route
+		// client can't render it -- navigate reports `server-only` (rather than
+		// throwing) so the click handler does a full page load and hits the
+		// server route
 		client.router.addPages([
 			{
 				path: "/logout",
@@ -430,7 +600,7 @@ describe("navigate", () => {
 
 		const navigated = await navigate(new URL("http://localhost/logout"));
 
-		expect(navigated).toBe(false);
+		expect(navigated.type).toBe("server-only");
 		expect(mountMock).not.toHaveBeenCalled();
 	});
 
@@ -448,7 +618,7 @@ describe("navigate", () => {
 
 		const navigated = await navigate(new URL("http://localhost/"));
 
-		expect(navigated).toBe(true);
+		expect(navigated.type).toBe("rendered");
 		expect(mountMock.mock.calls[0][1]).toBe(pageComponent);
 		expect($page.status).toBe(200);
 	});
@@ -556,17 +726,21 @@ describe("prefetch", () => {
 			return Response.json({ loads: [{ pageLoad: true }] });
 		});
 		vi.stubGlobal("fetch", fetchMock);
+		const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 		try {
 			const handler = serverHandler();
 
-			await expect(
-				loadData(handler, {}, "/posts", new URLSearchParams(), [], {}, true),
-			).rejects.toThrow(TypeError);
+			// The prefetch resolves with the unreachable error rather than
+			// rejecting, and is dropped from the cache ...
+			const prefetched = await loadData(handler, {}, "/posts", new URLSearchParams(), [], {}, true);
+			expect(prefetched?.error?.status).toBe(503);
 
+			// ... so the navigation retries and gets fresh data
 			const result = await loadData(handler, {}, "/posts", new URLSearchParams(), [], {});
 			expect(fetchMock).toHaveBeenCalledTimes(2);
 			expect(result?.data).toEqual({ pageLoad: true });
 		} finally {
+			consoleError.mockRestore();
 			vi.unstubAllGlobals();
 		}
 	});
@@ -610,14 +784,28 @@ describe("prefetch", () => {
 			type: PAGE_ROUTE,
 			endPoint: () => Promise.resolve({ default: { component: pageComponent, load } }),
 		};
+		const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
-		await expect(
-			loadData(handler, {}, "/posts", new URLSearchParams(), [], { load }, true),
-		).rejects.toThrow(TypeError);
+		try {
+			// The throwing load becomes a renderable 500 for the prefetch ...
+			const prefetched = await loadData(
+				handler,
+				{},
+				"/posts",
+				new URLSearchParams(),
+				[],
+				{ load },
+				true,
+			);
+			expect(prefetched?.error).toEqual({ status: 500, message: "Internal error" });
 
-		const result = await loadData(handler, {}, "/posts", new URLSearchParams(), [], { load });
-		expect(calls).toBe(2);
-		expect(result?.data).toEqual({ loaded: true });
+			// ... and is dropped, so the navigation retries and succeeds
+			const result = await loadData(handler, {}, "/posts", new URLSearchParams(), [], { load });
+			expect(calls).toBe(2);
+			expect(result?.data).toEqual({ loaded: true });
+		} finally {
+			consoleError.mockRestore();
+		}
 	});
 
 	test("a prefetch skips layouts already on screen without adopting their slots", async () => {

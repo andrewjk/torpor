@@ -27,6 +27,45 @@ await load("/posts");
 await reload();
 `.trim()}
 		/>
+		<p>
+			<code>load</code> and <code>reload</code> return whether the page was
+			rendered in place. They return <code>false</code> when the document has
+			to take over: a <code>+server</code> route, a redirect, or a failed
+			navigation.
+		</p>
+
+		<h2>Offline and failed navigations</h2>
+		<p>
+			A page whose data can't be loaded shows its nearest error page inside the
+			shell, so an offline navigation keeps the layout (and any unsaved form
+			state) instead of blanking the screen. If the page itself can't render
+			&mdash; typically because its JavaScript chunk was never fetched while
+			offline &mdash; the current page is kept and a
+			<code>torpor:navigation-failed</code> event is fired on
+			<code>window</code>:
+		</p>
+		<CodePreview
+			code={`
+import type { NavigationFailureDetail } from "@torpor/build/nav";
+
+window.addEventListener("torpor:navigation-failed", (event) => {
+	const { href } = (event as CustomEvent<NavigationFailureDetail>).detail;
+	showNotice("Still offline - couldn't open " + href);
+});
+`}
+		/>
+		<p>
+			The event is cancelable: call <code>preventDefault()</code> to ask for a
+			full document navigation anyway, e.g. when a service worker caches the
+			target page. While online, failed navigations fall back to a full page
+			load, which also recovers from a stale chunk after a deploy. Links to
+			<code>+server</code> routes and redirects always use the document.
+		</p>
+		<p>
+			Error pages should not assume their layouts' data is available: when
+			the error page's own server data can't load either, layouts that
+			weren't already on screen render with empty data.
+		</p>
 
 		<h2>Building URLs</h2>
 		<p>

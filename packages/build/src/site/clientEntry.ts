@@ -1,6 +1,8 @@
 import manifest from "@torpor/build/manifest";
 import loadData from "../nav/loadData.ts";
 import navigate from "../nav/navigate.ts";
+import type { NavigationResult } from "../nav/navigate.ts";
+import handleNavigationFailure from "../nav/navigationFailure.ts";
 import $page from "../state/$page.ts";
 import client from "../state/client";
 import type LayoutPath from "../types/LayoutPath";
@@ -33,20 +35,21 @@ window.addEventListener("click", async (e) => {
 		const href = link.href;
 		const url = new URL(href);
 
-		let navigated = false;
+		let result: NavigationResult;
 		try {
-			navigated = await navigate(url);
+			result = await navigate(url);
 		} catch (error) {
 			// `navigate` already catches its own failures, but never let an
-			// unexpected throw swallow the full-page fallback
+			// unexpected throw swallow the fallback
 			console.error(error);
+			result = { type: "failed", error };
 		}
-		if (navigated) {
+		if (result.type === "rendered") {
 			// Save the scroll position of the outgoing page on the current
 			// history entry, so that going (or coming) back can restore it
 			window.history.replaceState({ scroll: window.scrollY }, "", document.location.href);
 			window.history.pushState({ scroll: 0 }, "", url);
-		} else {
+		} else if (handleNavigationFailure(href, result) === "document") {
 			window.location.href = href;
 		}
 	}
@@ -137,8 +140,10 @@ function ignoreAnchorMouseEvent(link: HTMLAnchorElement, e: Event) {
 // Listen for changes to the URL that occur when the user navigates using the
 // back or forward buttons
 window.addEventListener("popstate", async () => {
-	const navigated = await navigateToLocation(document.location);
-	if (!navigated) {
+	const result = await navigateToLocation(document.location);
+	if (result.type !== "rendered") {
+		// TODO: keep the page and notify the app when offline, like a click
+		// failure; the url has already moved here, so that needs a history fix
 		window.location.reload();
 		return;
 	}
@@ -152,7 +157,10 @@ window.addEventListener("popstate", async () => {
 // Do the initial navigation and hydration
 await navigateToLocation(document.location, true);
 
-async function navigateToLocation(location: Location, firstTime = false) {
+async function navigateToLocation(
+	location: Location,
+	firstTime = false,
+): Promise<NavigationResult> {
 	// Reset $page on submit and link navigation
 	// TODO: Should we put data in $page.data??
 	$page.form = undefined;

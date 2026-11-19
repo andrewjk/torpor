@@ -8,7 +8,24 @@ import findErrorRoute from "../site/findErrorRoute";
 import type LayoutPath from "../types/LayoutPath";
 import type PageEndPoint from "../types/PageEndPoint";
 import formSubmit from "./formSubmit";
-import loadData from "./loadData";
+import loadData, { errorLayoutStack } from "./loadData";
+
+/**
+ * What a navigation did, so its caller knows whether the page is rendered or
+ * the document has to take over.
+ *
+ * - `rendered`: the route (or its nearest error page) is in place.
+ * - `server-only`: the route has no client component (e.g. a `+server` route),
+ *   so only a document load can handle it.
+ * - `redirect`: a load redirected, which a fetch can't follow.
+ * - `failed`: nothing rendered; the caller keeps the current page and decides
+ *   between a document load and telling the app (see `handleNavigationFailure`).
+ */
+export type NavigationResult =
+	| { type: "rendered" }
+	| { type: "server-only" }
+	| { type: "redirect" }
+	| { type: "failed"; error?: unknown };
 
 /**
  * Navigations run one at a time. Each mutates shared client state
@@ -20,8 +37,7 @@ import loadData from "./loadData";
  */
 let pendingNavigation: Promise<unknown> = Promise.resolve();
 
-// @ts-ignore
-export default function navigate(rawUrl: URL, withHydration = false): Promise<boolean> {
+export default function navigate(rawUrl: URL, withHydration = false): Promise<NavigationResult> {
 	const result = pendingNavigation.then(() => navigateNow(rawUrl, withHydration));
 	// Keep the chain alive even when a navigation fails, so one bad navigation
 	// can't wedge every later one
@@ -29,32 +45,38 @@ export default function navigate(rawUrl: URL, withHydration = false): Promise<bo
 	return result;
 }
 
-async function navigateNow(rawUrl: URL, withHydration: boolean): Promise<boolean> {
-	// A failed route-module import (e.g. a stale dev dep hash) or a throwing
-	// load must not reject the click handler's promise: the caller's full-page
-	// fallback would never run and the link would appear dead. Restore $page to
-	// the page that is still on screen and return false so the caller reloads,
-	// which picks up the new modules.
+async function navigateNow(rawUrl: URL, withHydration: boolean): Promise<NavigationResult> {
+	// A failed route-module import (e.g. a stale dev dep hash), a throwing
+	// load or a failed render must not reject the click handler's promise: the
+	// caller's fallback would never run and the link would appear dead.
 	const previousUrl = $page.url;
 	const previousStatus = $page.status;
 	const previousError = $page.error;
+	let result: NavigationResult;
 	try {
-		return await renderNavigation(rawUrl, withHydration);
+		result = await renderNavigation(rawUrl, withHydration);
 	} catch (error) {
+		console.error(error);
+		result = { type: "failed", error };
+	}
+	if (result.type === "failed" && !withHydration) {
+		// Nothing is on screen for this url: point the reactive state back at
+		// the page that is still there, in case the caller keeps it (e.g. a
+		// failed navigation while offline). The initial hydration already has
+		// its server-rendered page on screen, so there is nothing to restore.
 		$page.url = previousUrl;
 		$page.status = previousStatus;
 		$page.error = previousError;
-		console.error(error);
-		return false;
 	}
+	return result;
 }
 
-async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<boolean> {
+async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<NavigationResult> {
 	let parent = document.getElementById("app");
 	if (!parent) {
 		// TODO: 500
 		console.log("500");
-		return false;
+		return { type: "failed" };
 	}
 
 	// The base path is stripped before matching (routes are base-free), but
@@ -92,7 +114,7 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<bo
 			// Leave the current page alone; the caller falls back to a full
 			// page load, and the server renders the error page (or passes the
 			// raw response through, when it has no error page)
-			return false;
+			return { type: "failed" };
 		}
 		route = errorRoute;
 		$page.status = 404;
@@ -103,12 +125,13 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<bo
 
 	// There must be a client endpoint with a component. Routes with no client
 	// component (a pure `+server` route like `/logout`) can't be rendered
-	// client-side, so return false and let the caller do a full page load
+	// client-side, so report `server-only` and let the caller do a full page
+	// load
 	let clientEndPoint: PageEndPoint | undefined = handler.endPoint
 		? (await handler.endPoint())?.default
 		: undefined;
 	if (!clientEndPoint?.component) {
-		return false;
+		return { type: "server-only" };
 	}
 
 	let newLayoutStack: LayoutPath[] = [];
@@ -118,18 +141,16 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<bo
 	// to us, somehow...
 	const result = await loadData(handler, params, path, query, newLayoutStack, clientEndPoint);
 	if (result === undefined) {
-		// A load redirected, or (on a prerendered site with no server) the
-		// ~server request couldn't be made. Leave the current page alone;
-		// the caller (e.g. the client entry) falls back to a full page load,
-		// which follows the redirect
-		return false;
+		// A load redirected: the client can't follow it through fetch, so the
+		// caller falls back to a full page load, which does
+		return { type: "redirect" };
 	}
 	let data = result.data;
 	if (result.error) {
 		if (withHydration) {
 			// The server rendered this page fine moments ago -- keep its
 			// markup rather than hydrating an error page over it
-			return false;
+			return { type: "failed" };
 		}
 		// The load failed -- render the nearest error page at this url, so
 		// the address bar keeps the url the user asked for: a transient
@@ -139,14 +160,14 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<bo
 		if (!errorRoute) {
 			// No error page -- the caller falls back to a full page load,
 			// where the server passes the error response through
-			return false;
+			return { type: "failed" };
 		}
 		route = errorRoute;
 		handler = errorRoute.handler;
 		params = errorRoute.params || {};
 		clientEndPoint = handler.endPoint ? (await handler.endPoint())?.default : undefined;
 		if (!clientEndPoint?.component) {
-			return false;
+			return { type: "failed" };
 		}
 
 		$page.status = result.error.status;
@@ -155,7 +176,7 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<bo
 		// The error page starts fresh: drop the layouts collected for the
 		// route that failed (the error route's own layouts are loaded into
 		// the empty stack, reusing whatever the current page shares)
-		newLayoutStack.length = 0;
+		newLayoutStack = [];
 		const errorResult = await loadData(
 			handler,
 			params,
@@ -164,12 +185,21 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<bo
 			newLayoutStack,
 			clientEndPoint,
 		);
-		if (errorResult === undefined || errorResult.error) {
-			// The error page's own load failed too -- fall back to a full
-			// page load
-			return false;
+		if (errorResult === undefined) {
+			// The error page's own load redirected: only a document load can
+			// follow it
+			return { type: "redirect" };
 		}
-		data = errorResult.data;
+		if (errorResult.error) {
+			// The error page's own data can't load either (offline, or the
+			// server is down). Render it over the shell with the layouts and
+			// data that are already on screen rather than blanking the page
+			// with a document load that would fail too.
+			newLayoutStack = errorLayoutStack(handler, params);
+			data = {};
+		} else {
+			data = errorResult.data;
+		}
 	}
 	// We may have form data in a hidden input -- not sure if this is the best
 	// way to do it
@@ -338,5 +368,5 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<bo
 	// Reset prefetched data on each navigation
 	client.prefetchedData = {};
 
-	return true;
+	return { type: "rendered" };
 }

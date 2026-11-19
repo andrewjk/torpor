@@ -35,152 +35,39 @@ conservative (an extra binding is harmless, a missing one is a
 scope. Control-node callbacks still bind every var in scope, which could be
 tightened if it shows up in profiles.
 
-### Client navigation blanks offline: the full-document fallback
+### Client navigation offline: remaining follow-ups
 
-Seen in Mallet's desktop app while emulating offline (DevTools network
-offline, or only the cloud service unreachable): clicking a section or a
-record leaves an empty shell, and the network panel shows a `document`
-request for the target URL failing with `net::ERR_INTERNET_DISCONNECTED`.
+The full-document fallback now only runs when a navigation failed while
+online, after the app cancels `torpor:navigation-failed`, or when the target
+is a by-design document navigation (a pure `+server` route or a redirect).
+Offline, the page is kept and the event fires. Load failures render in place:
+a rejected `~server` fetch becomes a `503` and a throwing client `load()` a
+`500`, both rendered by the nearest error page, and the error page's own
+failing load renders over the live layouts instead of blanking the shell.
+`navigate` reports a tagged result (`rendered` / `server-only` / `redirect` /
+`failed`) so callers can tell the cases apart; `load` and `reload` keep their
+boolean return.
 
-Note that the "cloud service unreachable" variant happens with
-`navigator.onLine === true` — a plain `navigator.onLine` gate would not have
-covered it. What covers both variants is rendering the load failure inside
-the shell (below).
+Deliberately left out:
 
-Where:
-
-- `packages/build/src/site/clientEntry.ts` — the click handler awaits
-  `navigate(url)`; when it returns `false` it runs `window.location.href =
-  href` (around line 50). The `popstate` handler runs
-  `window.location.reload()` on the same condition (around line 142).
-- `packages/build/src/nav/navigate.ts` — `navigateNow` catches any throw from
-  `renderNavigation`, including a failed dynamic import of the route module
-  (`Failed to fetch dynamically imported module` in dev, a stale chunk hash
-  after a deploy), restores `$page` and returns `false`.
-- `packages/build/src/nav/loadData.ts` — `requestServerData`'s `fetch`
-  propagates rejections out of `navigate`, and a throwing client `load()` in
-  `runClientLoad` takes the same path; a non-ok response already returns
-  `{ error }` and renders the nearest error page inside the layout. The gap
-  is rejections (and throws).
-- `packages/build/src/nav/formSubmit.ts` — the mirror surface: the POST
-  `fetch` (line 35) is awaited with no try/catch, so offline it rejects
-  unhandled and the user gets no feedback at all.
-
-Why it matters: offline, the document request cannot succeed either (unless a
-service worker has that exact URL cached), so a working shell — often holding
-an optimistically edited form/outbox — is replaced by a blank or generic
-offline page. A failed client navigation should keep the user where they are
-and let the app say "still offline", not navigate.
-
-Precedent: SvelteKit hit the same cascade — a hover-time preload failing
-offline escalated through the error-page load into a hard navigation
-(sveltejs/kit#9508) — and fixed it in the router (sveltejs/kit#11944), but
-not with `navigator.onLine`, which the reporter had proposed and the
-maintainers passed over. They made preload failures never cascade into real
-navigations (a token/set state machine), and their failure tier renders the
-error page in place, hard-navigating only when even the root error page's
-own load fails (that is what #9508's cascade was). Remix renders loader
-failures as error boundaries in place. This is settled router territory; the
-design question is which failure channel gets which response.
-
-Complications a fix must account for:
-
-- **`false` is overloaded.** `renderNavigation` returns `false` for by-design
-  server navigations too: a pure `+server` route like `/logout` (no client
-  component) and a redirect the fetch couldn't follow (the `undefined` from
-  `loadData`). Gating the fallback on `navigated === false &&
-  navigator.onLine === false` turns those links into silent no-ops while
-  offline. The return needs a reason (`"server-only" | "redirect" |
-  "module-failed" | "render-failed"`), and only failure reasons should be
-  suppressible.
-- **Error-route recursion.** A failed load falls back to the nearest `_error`
-  route (navigate.ts), whose own `loadData` runs — and if its layout chain
-  has any server load (a root `_layout.server.ts` with the session user is
-  the common case) a second doomed `~server` request fires: `skipServerData`
-  needs an explicit `serverData: false`, and the DATA_REUSE_HEADER only
-  tells the server not to recompute reused layouts — the request still has
-  to reach it. Offline that rejects too, and the shell blanks anyway. The
-  fix needs an error render that doesn't require fresh data (reuse the live
-  layouts, synthetic error props), or the common app shape still blanks.
-- **Hover poisons click.** `client.prefetchedServerData[key]` holds a
-  promise; a click landing while a doomed prefetch is in flight consumes
-  that same promise and inherits its rejection — the delete-on-rejection
-  cleanup only helps later navigations. The same poisoned-prefetch race as
-  #9508. The rejection→`{ error }` conversion below cures it for free.
-- **popstate can't leave everything alone.** By the time popstate fires the
-  URL has already moved, so suppressing the reload leaves old content under
-  a new URL — breaking an invariant that the scroll restore (it compares
-  `document.location.pathname`), `maybePrefetch` and app code reading
-  `$page.url` against `location` all assume. Pushing the entry back instead
-  traps the back button. "No worse than a failed reload" is defensible, but
-  it is a decision, not a freebie; suppressing clicks only is the safe v1.
-- **The catch-all escalates app bugs.** A throwing client `load()` — a
-  programming error, not a network issue — funnels to the same document
-  fallback today. SvelteKit routes unexpected errors through `handleError`
-  and still renders the error page. Splitting "infrastructure failed" from
-  "the load threw" is the root fix, and it shrinks the suppression's blast
-  radius to the one case it is genuinely needed for: a route module that was
-  never fetched.
-- **Form submits are the mirror surface.** `formSubmit.ts`'s POST `fetch` is
-  awaited bare, so offline it rejects unhandled with zero feedback (the
-  shell survives, but silently). Whatever failure event/hook is picked
-  should be reusable by the form path, or the framework grows two
-  inconsistent failure vocabularies.
-- **A new API surface.** `dispatchEvent`/`CustomEvent` appear nowhere in
-  `packages/build/src` today — the failure event would be the first
-  client-side extension point, and the codebase already mixes `t-`,
-  `X-Torpor-` and `data-tb-` prefixes, so pick the naming deliberately.
-
-Proposed, in order of leverage:
-
-- **Rejection → renderable error, first.** In
-  `packages/build/src/nav/loadData.ts` (`requestServerData`, around line 290) a thrown `fetch` propagates out of `navigate` and triggers the
-  document fallback; a non-ok response already returns `{ error }` and
-  renders the nearest error page inside the layout (keeping the shell).
-  Return `{ error: { status: 503, message: "You're offline." } }` (or a
-  shape the error page can render) instead of rejecting. This is the
-  load-bearing fix: it needs no connectivity hint, it covers the cases
-  `navigator.onLine` misses (captive portals, dead DNS — `onLine` true,
-  network down) and the cloud-unreachable variant (where `onLine` is also
-  true), and it cures the poisoned prefetch. Extend the same policy to a
-  throwing client `load()` and to the error route's own load, via the
-  fresh-data-free error render above.
-- **Tag the `false` return with a reason** so by-design server navigations
-  (pure `+server` routes, redirects) keep the document fallback — offline
-  included — and only failure reasons become suppressible.
-- **`navigator.onLine` as a hint, not the gate.** In the click handler, when
-  navigation failed for an infrastructure reason and `navigator.onLine ===
-  false`, leave `location.href` and history alone and dispatch `window`
-  event `torpor:navigation-failed` with
-  `{ detail: { href, error?, reason: "offline" } }`. Apps can listen and
-  show a notice. Include the caught error (onLine is only a hint — Electron
-  can report stale values). Consider making the event cancelable — an app
-  whose service worker caches the target shell may prefer the document
-  load (and the framework must then not double-fallback); a
-  `client.navigationFailed` hook would work too. With the error render in
-  place this suppression has one remaining job: a lazy route module that
-  was never fetched, which no in-shell render can recover. Keep the
-  full-document fallback while online: it is the correct recovery for a
-  stale chunk hash, because a reload picks up the new manifest. Unhandled,
-  a suppressed click is a dead link — console.warn by default, and the
-  docs must say "listen, or your links silently do nothing offline".
-- Optional eager prefetch: apps with lazy route modules and no service worker
-  (Vite dev is the common one) cannot render a page whose module was never
-  fetched, even with the fallback suppressed. Mallet works around that with a
-  dev-only `import.meta.glob("../routes/**/+page.ts")` prefetch. The TODO
-  above `maybePrefetch` already proposes `data-tb-prefetch="eager"`; a router
-  option or an exported `prefetchRoutes()` would make it a supported pattern
-  for every app, not a private helper. Built apps are covered by their service
-  worker's precache; this is for development and for apps without one.
-
-Test shape: stub a route whose `endPoint()` rejects, set
-`navigator.onLine = false`, click an anchor, and assert `location` and
-`history` are unchanged plus `torpor:navigation-failed` fired. With
-`navigator.onLine = true` the existing full-page fallback should still run.
-Add: the poisoned prefetch (hover offline, then click while the prefetch is
-in flight); the error-route recursion (a root `_layout.server.ts` with a
-session load); a pure `+server` route link while offline (the by-design
-document navigation must not regress into a silent no-op); and popstate.
+- **popstate suppression.** A failed popstate still reloads the document. By
+  the time popstate fires the URL has already moved, so keeping the page
+  needs a history fix (push the entry back, or accept a URL/content
+  mismatch) — a separate decision.
+- **Form submits.** `formSubmit.ts`'s POST `fetch` is still awaited bare: a
+  rejected submit is an unhandled rejection with no user feedback (the shell
+  survives). It should share the failure vocabulary, e.g. a `reason` on the
+  same event for submit failures.
+- **Eager prefetch.** Apps with lazy route modules and no service worker
+  (Vite dev is the common one) still can't render a page whose module was
+  never fetched offline. Mallet works around it with a dev-only
+  `import.meta.glob("../routes/**/+page.ts")` prefetch; a router option or an
+  exported `prefetchRoutes()` (the `data-tb-prefetch="eager"` TODO) would
+  make it a supported pattern. Built apps are covered by their service
+  worker's precache.
+- **A default notice.** With no listener the click is swallowed (the
+  framework `console.warn`s). A built-in notice, or a `client.navigationFailed`
+  hook alongside the event, was considered; neither shipped.
 
 ### Standard schema validation: remaining integration points
 

@@ -46,10 +46,7 @@ export default async function loadData(
 	// adopt their live slot regions: it may never be followed by a navigation
 	const layoutStack = client.layoutStack;
 	const layouts = (handler.layouts ?? []).map((layout, index) => {
-		let layoutPath = layout.path;
-		for (let key in params) {
-			layoutPath = layoutPath.replace(`[${key}]`, params[key]);
-		}
+		const layoutPath = resolveLayoutPath(layout.path, params);
 		const previous = layoutStack.at(index);
 		const rendered = previous?.path === layoutPath;
 		const reuse = !prefetch && rendered;
@@ -101,7 +98,7 @@ export default async function loadData(
 			// A new layout: run its client load (its server data already
 			// arrived in the single request)
 			const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
-			const response = await runClientLoad(
+			const loaded = await runClientLoad(
 				layoutEndPoint,
 				clientLocation(layoutPath),
 				query,
@@ -109,10 +106,8 @@ export default async function loadData(
 				stackLayout.data,
 				prefetch,
 			);
-			if (response) {
-				if (isRedirect(response)) return;
-				return { data, error: await errorOf(response) };
-			}
+			if (loaded?.redirect) return;
+			if (loaded?.error) return { data, error: loaded.error };
 			const serverData = server.loads?.[index];
 			if (serverData) Object.assign(stackLayout.data, serverData);
 		}
@@ -122,7 +117,7 @@ export default async function loadData(
 	}
 
 	// The page's client load, then its server data
-	const response = await runClientLoad(
+	const loaded = await runClientLoad(
 		clientEndPoint,
 		clientLocation(path),
 		query,
@@ -130,14 +125,46 @@ export default async function loadData(
 		data,
 		prefetch,
 	);
-	if (response) {
-		if (isRedirect(response)) return;
-		return { data, error: await errorOf(response) };
-	}
+	if (loaded?.redirect) return;
+	if (loaded?.error) return { data, error: loaded.error };
 	const pageServerData = server.loads?.[handler.layouts?.length ?? 0];
 	if (pageServerData) Object.assign(data, pageServerData);
 
 	return { data };
+}
+
+/** The path of a layout with its `[param]` segments substituted. */
+function resolveLayoutPath(path: string, params: Record<string, string>): string {
+	for (let key in params) {
+		path = path.replace(`[${key}]`, params[key]);
+	}
+	return path;
+}
+
+/**
+ * Builds the layout stack for an error page whose own loads can't run (offline,
+ * or the server is down): layouts already on screen keep their data and slot
+ * regions, so the error renders over the shell instead of the shell being
+ * replaced by a document load that would fail too. Layouts that aren't on
+ * screen render with no data.
+ */
+export function errorLayoutStack(
+	handler: RouteHandler,
+	params: Record<string, string>,
+): LayoutPath[] {
+	const stack: LayoutPath[] = [];
+	(handler.layouts ?? []).forEach((layout, index) => {
+		const path = resolveLayoutPath(layout.path, params);
+		const previous = client.layoutStack.at(index);
+		const rendered = previous?.path === path;
+		stack.push({
+			path,
+			data: rendered && previous ? { ...previous.data } : {},
+			reuse: rendered,
+			slotRegion: rendered && previous ? previous.slotRegion : null,
+		});
+	});
+	return stack;
 }
 
 type ServerData = {
@@ -255,12 +282,15 @@ async function loadServerData(
 
 		const pending = requestServerData(path, query, reusedLayouts);
 		client.prefetchedServerData[key] = pending;
-		// A failed prefetch mustn't poison the navigation that follows it
-		void pending.catch(() => {
-			if (client.prefetchedServerData[key] === pending) {
-				delete client.prefetchedServerData[key];
-			}
-		});
+		// A failed prefetch mustn't poison the navigation that follows it: drop
+		// the entry so that navigation retries. One that is already awaiting
+		// this promise still sees the failure and renders the error page.
+		void pending.then(
+			(result) => {
+				if (isLoadError(result)) dropPrefetch(client.prefetchedServerData, key, pending);
+			},
+			() => dropPrefetch(client.prefetchedServerData, key, pending),
+		);
 		return pending;
 	}
 
@@ -276,6 +306,18 @@ async function loadServerData(
 /** The `/~server` request cache key: the page path and its query. */
 function serverDataKey(path: string, query: URLSearchParams): string {
 	return path + (query.size > 0 ? `?${query}` : "");
+}
+
+/** Whether a load resolved to an error result (as opposed to data/nothing). */
+function isLoadError(value: unknown): value is { error: { status: number; message: string } } {
+	return typeof value === "object" && value !== null && "error" in value;
+}
+
+/** Removes a failed prefetch, unless the navigation has already consumed it. */
+function dropPrefetch(prefetches: Record<string, any>, key: string, pending: unknown): void {
+	if (prefetches[key] === pending) {
+		delete prefetches[key];
+	}
 }
 
 /**
@@ -300,26 +342,43 @@ async function requestServerData(
 		headers[DATA_REUSE_HEADER] = JSON.stringify(reusedLayouts);
 	}
 
-	const response = await fetch(url, {
-		redirect: "manual",
-		headers,
-	});
-	if (isRedirect(response)) {
-		return undefined;
+	// A rejected fetch is the common offline failure (as is a body that fails
+	// mid-read, e.g. the connection drops while streaming). Render it as an
+	// error in place rather than throwing away the shell with a document load
+	// that would fail too.
+	try {
+		const response = await fetch(url, {
+			redirect: "manual",
+			headers,
+		});
+		if (isRedirect(response)) {
+			return undefined;
+		}
+		if (!response.ok) {
+			return { error: await errorOf(response) };
+		}
+		// A site without a server (e.g. a static host) responds with the page's
+		// html rather than json; there's nothing to merge
+		const type = response.headers.get("Content-Type");
+		if (type?.includes("application/x-ndjson")) {
+			return await readServerDataStream(response);
+		}
+		if (!type?.includes("application/json")) {
+			return {};
+		}
+		return (await response.json()) as ServerData;
+	} catch (error) {
+		console.error("The server data request failed", error);
+		return { error: unreachableError() };
 	}
-	if (!response.ok) {
-		return { error: await errorOf(response) };
-	}
-	// A site without a server (e.g. a static host) responds with the page's
-	// html rather than json; there's nothing to merge
-	const type = response.headers.get("Content-Type");
-	if (type?.includes("application/x-ndjson")) {
-		return await readServerDataStream(response);
-	}
-	if (!type?.includes("application/json")) {
-		return {};
-	}
-	return (await response.json()) as ServerData;
+}
+
+/** The error rendered when the server can't be reached at all. */
+function unreachableError(): { status: number; message: string } {
+	return {
+		status: 503,
+		message: navigator.onLine === false ? "You're offline." : "Could not reach the server.",
+	};
 }
 
 /**
@@ -430,22 +489,27 @@ function hasServerData(handler: RouteHandler): boolean {
 
 /**
  * The result of running a route's client load: the json it returned (if any),
- * or the non-ok Response the caller should turn into an error page. Cached as
- * a whole because a Response body can only be read once.
+ * a redirect the client can't follow, or an error to render in place. Cached
+ * as a whole when a prefetch warms it, because a Response body can only be
+ * read once.
  */
 type ClientLoadResult = {
+	/** The json the load returned, if any. */
 	data?: Record<string, any>;
-	response?: Response;
+	/** The load redirected: only a document load can follow it. */
+	redirect?: true;
+	/** The load failed: render the nearest error page. */
+	error?: { status: number; message: string };
 };
 
 /**
- * Runs a route's client-side load, merging its json data into `data`. Returns
- * a non-ok Response for the caller to turn into an error page.
+ * Runs a route's client-side load, merging its json data into `data` and
+ * returning the redirect or error for the caller to handle.
  *
  * A prefetch caches the in-flight promise, not its resolved value, so a
  * navigation that lands while the load is still running continues the same
  * request instead of running it a second time. The navigation that follows
- * consumes (and clears) the entry; a failed promise is dropped so the
+ * consumes (and clears) the entry; a failed prefetch is dropped so the
  * navigation retries.
  */
 async function runClientLoad(
@@ -455,7 +519,7 @@ async function runClientLoad(
 	params: Record<string, string>,
 	data: Record<string, any>,
 	prefetch: boolean,
-): Promise<Response | undefined> {
+): Promise<ClientLoadResult | undefined> {
 	if (!endPoint?.load) return;
 
 	const clientKey = location + (query.size > 0 ? `?${query}` : "");
@@ -474,11 +538,12 @@ async function runClientLoad(
 		prefetchedData[clientKey] = promise;
 		pending = promise;
 		// A failed prefetch mustn't poison the navigation that follows it
-		void promise.catch(() => {
-			if (prefetchedData[clientKey] === promise) {
-				delete prefetchedData[clientKey];
-			}
-		});
+		void promise.then(
+			(result) => {
+				if (result.error) dropPrefetch(prefetchedData, clientKey, promise);
+			},
+			() => dropPrefetch(prefetchedData, clientKey, promise),
+		);
 	} else if (!prefetch) {
 		// The navigation consumes the warm entry
 		delete prefetchedData[clientKey];
@@ -497,19 +562,26 @@ async function loadClientResponse(
 	for (let [name, value] of query) {
 		clientUrl.searchParams.append(name, value);
 	}
-	const response = await load({ url: clientUrl, params, data });
-	if (!response) return {};
-	if (!response.ok) return { response };
-	const body = await readResponseBody(response);
-	return body ? { data: body } : {};
+	try {
+		const response = await load({ url: clientUrl, params, data });
+		if (!response) return {};
+		if (isRedirect(response)) return { redirect: true };
+		if (!response.ok) return { error: await errorOf(response) };
+		const body = await readResponseBody(response);
+		return body ? { data: body } : {};
+	} catch (error) {
+		// A throwing load (or a body that fails mid-read) is a page error, not
+		// a navigation failure: render the error page over the shell rather
+		// than blanking it with a document load that would run the same load
+		// again
+		console.error("The client load failed", error);
+		return { error: { status: 500, message: "Internal error" } };
+	}
 }
 
-function mergeClientLoad(
-	result: ClientLoadResult,
-	data: Record<string, any>,
-): Response | undefined {
+function mergeClientLoad(result: ClientLoadResult, data: Record<string, any>): ClientLoadResult {
 	if (result.data) Object.assign(data, result.data);
-	return result.response;
+	return result;
 }
 
 function clientLocation(path: string): string {
