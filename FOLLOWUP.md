@@ -46,7 +46,9 @@ a rejected `~server` fetch becomes a `503` and a throwing client `load()` a
 failing load renders over the live layouts instead of blanking the shell.
 `navigate` reports a tagged result (`rendered` / `server-only` / `redirect` /
 `failed`) so callers can tell the cases apart; `load` and `reload` keep their
-boolean return.
+boolean return. A rejected form submission fires `torpor:submit-failed`, keeps
+the form as the user left it, and falls back to a native submission when the
+app cancels the event.
 
 Deliberately left out:
 
@@ -54,10 +56,6 @@ Deliberately left out:
   the time popstate fires the URL has already moved, so keeping the page
   needs a history fix (push the entry back, or accept a URL/content
   mismatch) — a separate decision.
-- **Form submits.** `formSubmit.ts`'s POST `fetch` is still awaited bare: a
-  rejected submit is an unhandled rejection with no user feedback (the shell
-  survives). It should share the failure vocabulary, e.g. a `reason` on the
-  same event for submit failures.
 - **Eager prefetch.** Apps with lazy route modules and no service worker
   (Vite dev is the common one) still can't render a page whose module was
   never fetched offline. Mallet works around it with a dev-only
@@ -65,9 +63,10 @@ Deliberately left out:
   exported `prefetchRoutes()` (the `data-tb-prefetch="eager"` TODO) would
   make it a supported pattern. Built apps are covered by their service
   worker's precache.
-- **A default notice.** With no listener the click is swallowed (the
-  framework `console.warn`s). A built-in notice, or a `client.navigationFailed`
-  hook alongside the event, was considered; neither shipped.
+- **A default notice.** With no listener, a suppressed navigation or a failed
+  submit is silent apart from the framework's `console.warn`. A built-in
+  notice, or a `client.navigationFailed` hook alongside the events, was
+  considered; neither shipped.
 
 ### Standard schema validation: remaining integration points
 

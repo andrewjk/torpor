@@ -68,3 +68,45 @@ test("a 5xx response replaces the document with the error page", async () => {
 	expect(document.title).toBe("error");
 	expect(document.body.innerHTML).toContain("error page");
 });
+
+test("a rejected submit fires torpor:submit-failed and keeps the page", async () => {
+	fetchMock.mockRejectedValue(new TypeError("network down"));
+	const listener = vi.fn();
+	const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+	const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
+	window.addEventListener("torpor:submit-failed", listener);
+	try {
+		await submit();
+
+		expect(listener).toHaveBeenCalledTimes(1);
+		const event = listener.mock.calls[0][0] as CustomEvent;
+		expect(event.cancelable).toBe(true);
+		expect(event.detail.action).toBe("http://localhost/posts");
+		expect(event.detail.error).toBeInstanceOf(TypeError);
+		// The submission was swallowed (the app didn't cancel), so warn
+		expect(consoleWarn).toHaveBeenCalled();
+	} finally {
+		window.removeEventListener("torpor:submit-failed", listener);
+		consoleWarn.mockRestore();
+		consoleError.mockRestore();
+	}
+});
+
+test("cancelling torpor:submit-failed does a native submit", async () => {
+	fetchMock.mockRejectedValue(new TypeError("network down"));
+	const nativeSubmit = vi.spyOn(HTMLFormElement.prototype, "submit").mockImplementation(() => {});
+	const cancel = (event: Event) => event.preventDefault();
+	const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+	window.addEventListener("torpor:submit-failed", cancel);
+	try {
+		await submit();
+
+		// The app asked the document to take over, like a submission from a
+		// page without JavaScript
+		expect(nativeSubmit).toHaveBeenCalledTimes(1);
+	} finally {
+		window.removeEventListener("torpor:submit-failed", cancel);
+		nativeSubmit.mockRestore();
+		consoleError.mockRestore();
+	}
+});

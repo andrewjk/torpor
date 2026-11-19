@@ -2,6 +2,16 @@ import $page from "../state/$page";
 import load from "./load";
 import reload from "./reload";
 
+/**
+ * The detail of the `torpor:submit-failed` window event.
+ */
+export type SubmitFailureDetail = {
+	/** The url the form was submitted to. */
+	action: string;
+	/** The failure that stopped the submit. */
+	error?: unknown;
+};
+
 export default async function formSubmit(e: SubmitEvent): Promise<void> {
 	// We'll take it from here
 	e.preventDefault();
@@ -32,11 +42,21 @@ export default async function formSubmit(e: SubmitEvent): Promise<void> {
 			"X-Torpor-Form-Submit": "",
 		},
 	};
-	const response = await fetch(
-		action,
-		// @ts-ignore -- don't know what it's complaining about here
-		options,
-	);
+	let response: Response;
+	try {
+		response = await fetch(
+			action,
+			// @ts-ignore -- don't know what it's complaining about here
+			options,
+		);
+	} catch (error) {
+		// A rejected fetch is a failed submission -- offline, or the server
+		// couldn't be reached. Nothing navigates and the form keeps what the
+		// user typed, so the app can show its own notice and let them retry.
+		console.error("The form submit failed", error);
+		handleSubmitFailure(form, action, error);
+		return;
+	}
 
 	if (
 		response.status === 200 &&
@@ -81,4 +101,32 @@ export default async function formSubmit(e: SubmitEvent): Promise<void> {
 			window.location.reload();
 		}
 	}
+}
+
+/**
+ * Tells the app that a client form submission failed (offline, or the server
+ * couldn't be reached), so it can show its own notice. The form keeps the
+ * values the user typed, ready for the app to retry.
+ *
+ * Dispatched on `window` as a cancelable `torpor:submit-failed` `CustomEvent`.
+ * An app that cancels it asks for a native form submission after all, e.g. a
+ * service worker serves the POST, or the browser's own offline handling is
+ * preferred.
+ */
+function handleSubmitFailure(form: HTMLFormElement, action: string, error: unknown): void {
+	const event = new CustomEvent<SubmitFailureDetail>("torpor:submit-failed", {
+		cancelable: true,
+		detail: { action, error },
+	});
+	// `dispatchEvent` returns false when a handler cancelled it
+	if (!window.dispatchEvent(event)) {
+		// The prototype call, because a field named "submit" shadows `form.submit`
+		HTMLFormElement.prototype.submit.call(form);
+		return;
+	}
+
+	console.warn(
+		`The form submission to ${action} failed; staying on the current page. ` +
+			"Listen for torpor:submit-failed to show your own notice.",
+	);
 }

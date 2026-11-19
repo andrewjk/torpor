@@ -124,6 +124,29 @@ export default function NewPost($props: { form?: { saved?: boolean } }) {
 			submission.
 		</p>
 
+		<h2>Failed submissions</h2>
+		<p>
+			If the submit request itself fails &mdash; offline, or the server can't
+			be reached &mdash; the page stays put and the form keeps its values. A
+			<code>torpor:submit-failed</code> event is fired on <code>window</code>
+			so the app can show a notice and let the user retry:
+		</p>
+		<CodePreview
+			code={`
+import type { SubmitFailureDetail } from "@torpor/build/nav";
+
+window.addEventListener("torpor:submit-failed", (event) => {
+	const { action } = (event as CustomEvent<SubmitFailureDetail>).detail;
+	showNotice("Couldn't submit to " + action + " - check your connection");
+});
+`}
+		/>
+		<p>
+			The event is cancelable: call <code>preventDefault()</code> to fall back
+			to a native form submission, like a page without JavaScript, e.g. when a
+			service worker handles the POST itself.
+		</p>
+
 		<h2>Flash messages</h2>
 		<p>
 			An action can set a one-time message, typically before a
