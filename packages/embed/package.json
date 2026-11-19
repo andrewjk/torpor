@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/embed",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Load and render torpor components authored at runtime: REPLs, feed embeds, custom sections",
 	"type": "module",
 	"exports": {
@@ -43,7 +43,7 @@
 		"sucrase": "^3.35.1"
 	},
 	"peerDependencies": {
-		"@torpor/view": ">=1.3.0"
+		"@torpor/view": ">=1.3.2"
 	},
 	"devDependencies": {
 		"@torpor/view": "workspace:^",

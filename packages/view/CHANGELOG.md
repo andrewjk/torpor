@@ -1,5 +1,14 @@
 # @torpor/view
 
+## 1.3.2
+
+<sub>2026-11-19</sub>
+
+- _(patch)_ Fix: multiline headers in dev boundary labels
+- _(patch)_ Fix: empty attribute values -- `alt=""` rendered as `alt="&quot;&quot;"` and `alt={""}` dropped the attribute
+- _(patch)_ Fix: unused t_next import in compiled code
+- _(patch)_ Fix: $bind clears bound values to undefined
+
 ## 1.3.1
 
 <sub>2026-11-11</sub>

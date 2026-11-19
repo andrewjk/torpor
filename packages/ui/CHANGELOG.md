@@ -1,5 +1,39 @@
 # @torpor/ui
 
+## 1.4.0
+
+<sub>2026-11-19</sub>
+
+- _(minor)_ Fix: move loader exports to @torpor/ui/loader
+- _(minor)_ Fix: move ScatterChart onto Chart and drop the legacy axis exports
+- _(minor)_ Fix: ColorPicker palette tab stops, arrow keys and accessibility
+- _(minor)_ Feat: export drag and drop helpers from @torpor/ui/dnd
+- _(minor)_ Feat: add an accessible Tooltip component
+- _(minor)_ Feat: add RadioGroup and Radio form components
+- _(minor)_ Feat: add ToggleButton and ToggleGroup, rename Toggle to Switch
+- _(minor)_ Feat: add a Meter component distinct from Progress
+- _(minor)_ Feat: add saturation, hue, alpha and eyedropper controls to ColorPicker
+- _(minor)_ Feat: add a SortableList with drag and keyboard reordering
+- _(minor)_ Feat: add an inline Alert component
+- _(minor)_ Feat: add a PinInput for OTP and PIN codes
+- _(minor)_ Feat: add a combined DateTimePicker
+- _(minor)_ Feat: add a VirtualList for large fixed-height collections
+- _(patch)_ Fix: ColorPicker submits twice in a Field
+- _(patch)_ Fix: stale ColorPicker value after hex clear
+- _(patch)_ Fix: SelectBox and ComboBox no longer submit twice in a Field
+- _(patch)_ Fix: Input type and FileDrop input id update when props change
+- _(patch)_ Fix: GridLines renders its id and class, plus doc comment corrections
+- _(patch)_ Fix: share one core between Popover and Contextual
+- _(patch)_ Fix: share the trigger, overlay and button logic between Modal and Drawer
+- _(patch)_ Fix: Form inputs share createFormField instead of duplicating validation
+- _(patch)_ Fix: pickers submit through FormValues with uniform field names
+- _(patch)_ Fix: SelectBox, ComboBox and ListBox inherit Field and popout values
+- _(patch)_ Fix: lowercase popout trigger callbacks and DataGrid onchange
+- _(patch)_ Fix: use one disabled check style across components
+- _(patch)_ Fix: keep menu orientation props live
+- _(patch)_ Fix: remove the deprecated Toggle alias in favour of Switch
+- _(patch)_ Fix: point SelectBox and ComboBox Field labels at the trigger
+
 ## 1.3.6
 
 <sub>2026-11-11</sub>

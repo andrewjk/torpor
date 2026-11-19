@@ -1,5 +1,12 @@
 # @torpor/build
 
+## 1.9.0
+
+<sub>2026-11-19</sub>
+
+- _(minor)_ Feat: keep the page and fire `torpor:navigation-failed` when a navigation fails offline
+- _(minor)_ Feat: fire torpor:submit-failed when a client form submission fails
+
 ## 1.8.7
 
 <sub>2026-11-11</sub>

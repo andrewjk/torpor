@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+<sub>2026-11-19</sub>
+
+- _(patch)_ Fix: empty attribute values -- `alt=""` rendered as `alt="&quot;&quot;"` and `alt={""}` dropped the attribute
+
 ## 1.0.0
 
 <sub>2026-11-11</sub>
