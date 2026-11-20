@@ -5,6 +5,83 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
+### Found using Torpor in Other (2026-11-20)
+
+Seen while building Other's website (`@torpor/build` 1.9.0, `@torpor/view`
+1.3.2, `@torpor/adapter-cloudflare` 1.0.29, Vite+ 1.6.0, TypeScript 7.0.2).
+
+#### Nothing in a typical app type-checks `.torp` files
+
+Other has a type error check, a type-aware lint (`vp check`), `tsc --noEmit`
+and `tb --build`. With `const probe: number = "not a number"` in a page's
+script block, **all three passed**. A `.torp` file's TypeScript is only
+checked by the editor, so a type error can ship.
+
+`@torpor/check` (`torp-check`) is the tool for this, but it **crashes in a
+TypeScript 7 project**: `TypeError: Cannot read properties of undefined
+(reading 'ES2022')` at `ts.ScriptTarget.ES2022` (`checkFile` chunk).
+`typescript` is only a devDependency of `@torpor/check` (6.0.3), so the
+published package uses the app's TypeScript. TS 7's native package doesn't
+expose the compiler enums or API (see "TypeScript 7 (native) is not yet
+supported by the language server" below). The language server falls back to
+its bundled TypeScript; the check CLI has no fallback.
+
+Possible fixes:
+
+- give `@torpor/check` the same fallback as the language server, or depend on
+  a TypeScript it can run;
+- make the type check reachable from the usual commands, e.g. a `tb check`,
+  or a `vp check` / oxlint integration;
+- either way, document in the getting-started guide what checks `.torp`
+  files.
+
+#### `event.form()` returns a record, not `FormData`
+
+`ServerLoadEvent.form` is `() => Promise<FormDataRecord>`
+(`Record<string, FormDataEntryValue | FormDataEntryValue[]>`). Writing
+`(await event.form()).get("name")` out of habit (the name says "form", and
+`request.formData()` is the web standard) only fails at type-check time:
+"This expression is not callable". It's a fine shape, but the name invites
+the mistake.
+
+Options:
+
+- rename it (`formValues()`), or keep `form()` and add `formData()` for the
+  standard object;
+- say in the `form` JSDoc and the actions docs that it's a plain object, with
+  repeated keys as arrays.
+
+#### `optimizeDeps.rollupOptions` deprecation warning on every dev start
+
+`tb --dev` prints this on every start: "`optimizeDeps.rollupOptions` /
+`ssr.optimizeDeps.rollupOptions` is deprecated. Use
+`optimizeDeps.rolldownOptions` instead." With `VITE_DEPRECATION_TRACE=1` the
+stack runs `runDev` (`@torpor/build` `runOpenApi` chunk) → `_createServer` →
+`resolveConfig` → `resolveDepOptimizationOptions`, **in
+`@voidzero-dev/vite-plus-core@1.2.0`**.
+
+The app uses Vite+ 1.6.0, but `@torpor/build` 1.9.0 lists `vite` as a hard
+dependency pinned through the catalog (`"vite":
+"npm:@voidzero-dev/vite-plus-core@1.2.0"` in the published package). So
+`tb --dev` runs Torpor's own Vite, while the app's plugins (e.g.
+`@cloudflare/vite-plugin`, which picks `rolldownOptions` or `esbuildOptions`
+by checking its Vite) were resolved against 1.6.0.
+
+I didn't pin down which config key sets `optimizeDeps.rollupOptions`. The
+two Vites are the likely cause, and they're worth fixing anyway: two copies
+of Vite in one dev server can disagree in subtler ways than a warning.
+Suggestion: make `vite` a peerDependency of `@torpor/build` (with a range) so
+the app's Vite is used.
+
+Smaller things from the same day:
+
+- `VITE_DEPRECATION_TRACE=1 vp run website#dev` didn't print the trace (the
+  variable didn't reach the child, perhaps because Vite Task filters the
+  environment). Running the dev script directly did. That's for the Vite+
+  side, not Torpor.
+- The new "No route path on the annotation, so params are loosely typed"
+  warning is useful: it caught five new Other routes.
+
 ### Loop-var resolution in @for bodies: open points
 
 The read-only loop-var bindings shipped (`appendForVarBindings` shadows, writes
@@ -118,6 +195,34 @@ UI page at `/docs`, plus a `tb --openapi` CLI command. Deliberately left out:
   routes (type 3) are included.
 - **The docs page loads Swagger UI from unpkg**: no offline/bundled UI
   option; a Scalar/self-hosted alternative could be added later.
+
+Found while building Other's REST API (2026-11-21). Other kept its own
+generator (`@headless/codegen`'s `generateOpenApi`), because the plugin
+couldn't express these:
+
+- **No data-driven or per-request documents**: the document is built once
+  from the route tree. Other serves one document per workspace, at
+  `/api/w/[workspace]/v1/openapi.json`, where the record types, their fields
+  and their transitions come from that workspace's data. To the plugin,
+  `records/[type]/[id]/[action]` is one generic route. A hook would help, e.g.
+  `openApi({ extend: (doc, event) => doc })`, or a documented way for a
+  `+server` route to build a document and merge in its own paths.
+  `buildOpenApiDocument` is exported but only takes route entries.
+- **JSON Schema needs a Standard Schema first**: an app whose schemas are
+  already JSON Schema (Other's field types emit it directly, ADR 0002)
+  would have to wrap each one in a fake Standard Schema to get it in. An
+  escape hatch would fix this: a raw `openapi` object on an endpoint
+  (`requestBody`, `responses`, `parameters`) that's merged over what's
+  generated.
+- **No headers or statuses beyond 200/422**: Other's API needs
+  `If-Match` request headers, `ETag`/`Location` response headers, and
+  201/204/400/401/403/404/409/428 with one shared `Error` schema in
+  `components`. These go with response schemas and `$ref` dedup above. The
+  same raw `openapi` override would cover them for now.
+- **Tags, operationIds and summaries** come from nowhere. Integrators'
+  tools (Power Automate, n8n, generated SDKs) name actions from
+  `operationId` and group them by tag, so derived paths alone aren't enough
+  for them.
 
 ### DataGrid: known gaps from the first version
 
