@@ -68,6 +68,36 @@ actions: {
 `}
 		/>
 
+		<h2>Reading form data</h2>
+		<p>
+			<code>event.form()</code> returns a plain record of the submitted
+			values &mdash; one value per field, or an array when a field was
+			submitted with multiple values (a multi select, say). It is not the
+			web standard <code>FormData</code>; for that &mdash; e.g.
+			<code>get(name)</code> / <code>getAll(name)</code> on individual
+			fields &mdash; use <code>event.formData()</code>:
+		</p>
+		<CodePreview
+			code={`
+actions: {
+	default: async (event) => {
+		// A plain object: { title: "Hello", tags: ["a", "b"] }
+		const values = await event.form();
+		// The standard FormData, for per-field access
+		const data = await event.formData();
+		data.getAll("tags");
+		await createPost({ title: values.title });
+	},
+},
+`}
+		/>
+		<p>
+			Both read the request body once, so they can be used together. When the
+			endpoint declares a schema for the action, <code>form()</code> returns
+			the schema's validated and typed values, while
+			<code>formData()</code> still returns the raw submitted data.
+		</p>
+
 		<h2>Validation</h2>
 		<p>
 			Declare a schema for an action (any

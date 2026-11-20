@@ -57,11 +57,21 @@ export default interface ServerLoadEvent<
 	 */
 	json: () => Promise<Body>;
 	/**
-	 * Reads the request body as form data, returning a record of field values.
-	 * When the endpoint declares a schema for the form, the values are
-	 * validated and typed by the schema's output.
+	 * Reads the request body as form data, returning a record of the field
+	 * values: one value per field, or an array when a field was submitted with
+	 * multiple values (e.g. a multi select). This is a plain object, not the
+	 * web standard `FormData` -- for that, use `formData()`. When the endpoint
+	 * declares a schema for the form, the values are validated and typed by
+	 * the schema's output.
 	 */
 	form: () => Promise<FormBody>;
+	/**
+	 * Reads the request body as the web standard `FormData` object, for
+	 * `get(name)` / `getAll(name)` access to individual fields. For a plain
+	 * record of the values -- validated and typed when the endpoint declares a
+	 * schema for the form -- use `form()`.
+	 */
+	formData: () => Promise<FormData>;
 	/**
 	 * Reads the URL's query string, returning a record of param values. When
 	 * the endpoint declares a schema for the query (get/head handlers and the

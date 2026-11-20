@@ -10,22 +10,6 @@ Each entry should describe what was seen, where, and any relevant context.
 Seen while building Other's website (`@torpor/build` 1.9.0, `@torpor/view`
 1.3.2, `@torpor/adapter-cloudflare` 1.0.29, Vite+ 1.6.0, TypeScript 7.0.2).
 
-#### `event.form()` returns a record, not `FormData`
-
-`ServerLoadEvent.form` is `() => Promise<FormDataRecord>`
-(`Record<string, FormDataEntryValue | FormDataEntryValue[]>`). Writing
-`(await event.form()).get("name")` out of habit (the name says "form", and
-`request.formData()` is the web standard) only fails at type-check time:
-"This expression is not callable". It's a fine shape, but the name invites
-the mistake.
-
-Options:
-
-- rename it (`formValues()`), or keep `form()` and add `formData()` for the
-  standard object;
-- say in the `form` JSDoc and the actions docs that it's a plain object, with
-  repeated keys as arrays.
-
 #### `optimizeDeps.rollupOptions` deprecation warning on every dev start
 
 `tb --dev` prints this on every start: "`optimizeDeps.rollupOptions` /

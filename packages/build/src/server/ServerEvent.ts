@@ -27,6 +27,11 @@ export default class ServerEvent {
 	// for matching so it isn't parsed twice
 	#url: URL | undefined;
 
+	// The request's form body, parsed at most once per request: the schema
+	// validation and the event's `form()`/`formData()` accessors share a
+	// single read, since a request body can't be read twice
+	#formData: Promise<FormData> | undefined;
+
 	/** The request URL, parsed lazily. */
 	get url(): URL {
 		return (this.#url ??= new URL(this.request.url));
@@ -92,5 +97,14 @@ export default class ServerEvent {
 	 */
 	json(): Promise<unknown> {
 		return this.request.json();
+	}
+
+	/**
+	 * Reads the request body as the web standard FormData object. The body is
+	 * parsed at most once per request, so that everything that reads the form
+	 * (schema validation, `event.form()`, `event.formData()`) shares the read.
+	 */
+	formData(): Promise<FormData> {
+		return (this.#formData ??= this.request.formData());
 	}
 }

@@ -1118,10 +1118,12 @@ async function runAction(
 			let serverParams: ServerLoadEvent | undefined = undefined;
 			try {
 				// If the endpoint declares a schema for this action, validate the
-				// submitted form data up front and reject with 422 if it fails
+				// submitted form data up front and reject with 422 if it fails.
+				// The form data is parsed on the event, so the action's
+				// `event.form()` / `event.formData()` share this read of the body
 				const schema = endpointSchema(serverEndPoint, actionName);
 				const form = schema
-					? await validate(schema, await formDataToRecord(ev.request))
+					? await validate(schema, await formDataToRecord(await ev.formData()))
 					: undefined;
 
 				serverParams = buildServerParams(ev, url, params, form ? { form } : {});
@@ -1325,8 +1327,11 @@ function buildServerParams(
 		// typed here
 		json: (): Promise<any> =>
 			values.json !== undefined ? Promise.resolve(values.json) : ev.json(),
-		form: (): Promise<any> =>
-			values.form !== undefined ? Promise.resolve(values.form) : formDataToRecord(ev.request),
+		form: async (): Promise<any> =>
+			values.form !== undefined
+				? Promise.resolve(values.form)
+				: formDataToRecord(await ev.formData()),
+		formData: (): Promise<FormData> => ev.formData(),
 		query: (): Promise<any> =>
 			values.query !== undefined
 				? Promise.resolve(values.query)
