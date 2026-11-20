@@ -15,9 +15,13 @@ export default interface RouteHandler {
 	serverEndPoint?: () => Promise<any>;
 	serverHooks?: (() => Promise<any>)[];
 
-	// The endpoint module and the resolved server hooks are cached on the
-	// handler after first use, so warm requests don't pay for the loaders
-	modulePromise?: Promise<any>;
+	// The endpoint module, the sibling server endpoint module and the resolved
+	// server hooks are cached on the handler after first use, so warm requests
+	// don't pay for the loaders. The resolved *values* are cached, never the
+	// loader promises: on workerd, a promise created by a request that ends
+	// before it settles can never settle, so a cached promise would fail every
+	// later request for the route
 	resolvedModule?: any;
-	resolvedHooks?: Promise<ServerHook[]>;
+	resolvedServerModule?: any;
+	resolvedHooks?: ServerHook[];
 }

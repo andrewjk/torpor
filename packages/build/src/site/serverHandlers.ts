@@ -219,7 +219,7 @@ export function createServerLoad(
 		// before folder hooks, so a guard can skip data loading entirely
 		const routeMiddleware: MiddlewareFunction[] = [];
 		const endPointModule = handler.serverEndPoint
-			? (await handler.serverEndPoint())?.default
+			? (await resolveServerModule(handler))?.default
 			: handler.type === PAGE_SERVER_ROUTE || handler.type === SERVER_ROUTE
 				? (await resolveModule(handler))?.default
 				: undefined;
@@ -249,7 +249,7 @@ export function createServerLoad(
 						} else if (ev.request.method === "POST") {
 							// The server end point comes from the sibling /+page.server.ts, if applicable
 							const serverEndPoint: PageServerEndPoint | undefined =
-								handler.serverEndPoint && (await handler.serverEndPoint()).default;
+								handler.serverEndPoint && (await resolveServerModule(handler)).default;
 							return handleResponse(
 								ev,
 								url,
@@ -347,19 +347,55 @@ export function createServerLoad(
 }
 
 /**
- * Resolves the route's endpoint module, caching it on the handler so warm
- * requests don't pay for the loader promise.
+ * Resolves the route's endpoint module, caching the module on the handler so
+ * warm requests don't pay for the loader. The loader promise itself is never
+ * cached: a request that ends before it settles leaves it permanently
+ * unsettled on workerd (promises can't resolve across requests), and every
+ * later request for the route would fail on it. Two cold requests may each
+ * call the loader; `import()` is module-cached, so that costs an extra
+ * promise at most.
  */
 async function resolveModule(handler: RouteHandler): Promise<any> {
-	return (handler.resolvedModule ??= await (handler.modulePromise ??= handler.endPoint()));
+	// In dev the loaders go through Vite's module runner, which re-imports a
+	// module when its file is edited -- caching here would serve stale code
+	// until restart, so dev resolves fresh on every request
+	if (devMode) return await handler.endPoint();
+	if (handler.resolvedModule === undefined) {
+		handler.resolvedModule = await handler.endPoint();
+	}
+	return handler.resolvedModule;
 }
 
+/**
+ * Resolves the route's sibling server endpoint module (`+page.server.ts`),
+ * caching the module value like `resolveModule` does. The direct
+ * `serverEndPoint()` calls (route middleware, page actions, data requests,
+ * view loads) go through here so a warm route doesn't re-import per request.
+ */
+async function resolveServerModule(handler: RouteHandler): Promise<any> {
+	if (!handler.serverEndPoint) return undefined;
+	if (devMode) return await handler.serverEndPoint();
+	if (handler.resolvedServerModule === undefined) {
+		handler.resolvedServerModule = await handler.serverEndPoint();
+	}
+	return handler.resolvedServerModule;
+}
+
+/**
+ * Resolves the route's folder hooks, caching the hook list on the handler as
+ * a value (never the promise -- see `resolveModule`).
+ */
 async function loadServerHooks(handler: RouteHandler): Promise<ServerHook[]> {
 	if (!handler.serverHooks) return [];
-	// Resolve each hook module once and cache the result on the handler
-	return (handler.resolvedHooks ??= Promise.all(
-		handler.serverHooks.map(async (load) => (await load()).default),
-	));
+	if (devMode) {
+		return await Promise.all(handler.serverHooks.map(async (load) => (await load()).default));
+	}
+	if (handler.resolvedHooks === undefined) {
+		handler.resolvedHooks = await Promise.all(
+			handler.serverHooks.map(async (load) => (await load()).default),
+		);
+	}
+	return handler.resolvedHooks;
 }
 
 /**
@@ -418,9 +454,7 @@ async function loadData(
 	functionName: string,
 	params: Record<string, any>,
 ) {
-	// The endpoint module is cached on the handler, so once warm this is a
-	// plain property read
-	const mod = handler.resolvedModule ?? (await resolveModule(handler));
+	const mod = await resolveModule(handler);
 	const serverEndPoint: ServerEndPoint | undefined = mod?.default;
 	// `functionName` is computed from the request method, so the handlers are
 	// accessed through a loose record
@@ -499,7 +533,7 @@ async function loadPageData(
 	reusedLayouts: Set<string>,
 ): Promise<Response> {
 	const serverEndPoint: PageServerEndPoint | undefined =
-		handler.serverEndPoint && (await handler.serverEndPoint())?.default;
+		handler.serverEndPoint && (await resolveServerModule(handler))?.default;
 
 	// Validate params and the load query against the page's server endpoint
 	// schemas, mirroring a normal page render. Params come from the url, so a
@@ -721,7 +755,7 @@ async function loadView(
 
 	// There may be a server endpoint
 	const serverEndPoint: PageServerEndPoint | undefined =
-		handler.serverEndPoint && (await handler.serverEndPoint())?.default;
+		handler.serverEndPoint && (await resolveServerModule(handler))?.default;
 
 	// Validate the route params and the load query against the server
 	// endpoint's schemas, if it declares any. Params come from the URL, so a
