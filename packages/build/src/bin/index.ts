@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 import run, { loadSite } from "../run/run";
+import runCheck from "../run/runCheck";
 import runOpenApi from "../run/runOpenApi";
 
 const workingDir = process.cwd();
@@ -13,6 +14,8 @@ if (process.argv.includes("--openapi")) {
 	} finally {
 		await vite.close();
 	}
+} else if (process.argv.includes("--check")) {
+	runCheck(workingDir);
 } else if (process.argv.includes("--dev")) {
 	await run(workingDir, "dev");
 } else if (process.argv.includes("--build")) {

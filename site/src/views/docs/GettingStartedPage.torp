@@ -30,6 +30,20 @@ npm install @torpor/view
 			and go to definition for <code>.torp</code> files.
 		</p>
 
+		<h2>Type checking</h2>
+		<p>
+			A <code>.torp</code> file's TypeScript is only checked by the editor by
+			default &mdash; <code>tsc --noEmit</code> doesn't see it, since the file
+			isn't part of the tsconfig program. To check it from the command line
+			(as a build or CI step), install <code>&#64;torpor/check</code> and run
+			<code>tb --check</code> in a Build project, or the <code>torp-check</code>
+			command directly:
+		</p>
+		<pre><code>{`
+npm install --save-dev @torpor/check
+tb --check
+`.trim()}</code></pre>
+
 		<h2>Next steps</h2>
 		<ul>
 			<li>

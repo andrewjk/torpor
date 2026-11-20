@@ -10,31 +10,6 @@ Each entry should describe what was seen, where, and any relevant context.
 Seen while building Other's website (`@torpor/build` 1.9.0, `@torpor/view`
 1.3.2, `@torpor/adapter-cloudflare` 1.0.29, Vite+ 1.6.0, TypeScript 7.0.2).
 
-#### Nothing in a typical app type-checks `.torp` files
-
-Other has a type error check, a type-aware lint (`vp check`), `tsc --noEmit`
-and `tb --build`. With `const probe: number = "not a number"` in a page's
-script block, **all three passed**. A `.torp` file's TypeScript is only
-checked by the editor, so a type error can ship.
-
-`@torpor/check` (`torp-check`) is the tool for this, but it **crashes in a
-TypeScript 7 project**: `TypeError: Cannot read properties of undefined
-(reading 'ES2022')` at `ts.ScriptTarget.ES2022` (`checkFile` chunk).
-`typescript` is only a devDependency of `@torpor/check` (6.0.3), so the
-published package uses the app's TypeScript. TS 7's native package doesn't
-expose the compiler enums or API (see "TypeScript 7 (native) is not yet
-supported by the language server" below). The language server falls back to
-its bundled TypeScript; the check CLI has no fallback.
-
-Possible fixes:
-
-- give `@torpor/check` the same fallback as the language server, or depend on
-  a TypeScript it can run;
-- make the type check reachable from the usual commands, e.g. a `tb check`,
-  or a `vp check` / oxlint integration;
-- either way, document in the getting-started guide what checks `.torp`
-  files.
-
 #### `event.form()` returns a record, not `FormData`
 
 `ServerLoadEvent.form` is `() => Promise<FormDataRecord>`

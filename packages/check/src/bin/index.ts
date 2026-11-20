@@ -35,6 +35,8 @@ if (errors.length > 0) {
 	console.log();
 	printErrors(path.dirname(pathArg), errors);
 	console.log(`Found ${chalk.red(errors.length)} error${errors.length === 1 ? "" : "s"}`);
+	// A failing check should fail the command (and any CI step running it)
+	process.exitCode = 1;
 } else {
 	console.log("No errors found");
 }

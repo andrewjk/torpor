@@ -1,11 +1,14 @@
 import tsvfs from "@typescript/vfs";
 import fs from "node:fs";
 import path from "path";
-import ts, { type LanguageService } from "typescript";
+import type { LanguageService } from "typescript";
+import loadTypeScriptModule, { type TypeScriptModule } from "./typescriptLoader";
 import type SourceMap from "./types/SourceMap";
 import type VirtualTypeScript from "./types/VirtualTypeScript";
 
 let vts: VirtualTypeScript = {
+	// @ts-ignore This will definitely be set
+	ts: undefined,
 	// @ts-ignore This will definitely be set
 	env: undefined,
 	// @ts-ignore This will definitely be set
@@ -13,14 +16,10 @@ let vts: VirtualTypeScript = {
 	projectRoot: "",
 	configPath: undefined,
 	// This is just the default config, it should be overwritten by the one from
-	// the user's tsconfig.json
+	// the user's tsconfig.json (it's built in loadVts, once the TypeScript
+	// module -- which owns the compiler enums -- has been loaded)
 	config: {
-		options: {
-			target: ts.ScriptTarget.ES2022,
-			module: ts.ModuleKind.ESNext,
-			moduleResolution: ts.ModuleResolutionKind.Bundler,
-			esModuleInterop: true,
-		},
+		options: {},
 		include: [],
 		exclude: [],
 	},
@@ -50,10 +49,28 @@ export default function loadVts(vtsPath: string): VirtualTypeScript | undefined 
 			return;
 		}
 
+		// The TypeScript module to check with: the project's own version when
+		// it provides the compiler API, otherwise the one bundled with this
+		// package (TypeScript 7's native package does not)
+		const ts = loadTypeScriptModule(vts.projectRoot);
+		vts.ts = ts;
+
+		// The default config, used when the user's tsconfig.json can't be read
+		vts.config = {
+			options: {
+				target: ts.ScriptTarget.ES2022,
+				module: ts.ModuleKind.ESNext,
+				moduleResolution: ts.ModuleResolutionKind.Bundler,
+				esModuleInterop: true,
+			},
+			include: [],
+			exclude: [],
+		};
+
 		// Maybe load tsconfig from a file
 		// TODO: reload if the file is changed
 		try {
-			let fileConfig = loadTypeScriptConfig();
+			let fileConfig = loadTypeScriptConfig(ts);
 			if (fileConfig?.options) {
 				vts.config = {
 					options: fileConfig.options,
@@ -74,11 +91,13 @@ export default function loadVts(vtsPath: string): VirtualTypeScript | undefined 
 	return vts;
 }
 
-function loadTypeScriptConfig(): Record<string, any> | undefined {
-	const configFileName = ts.findConfigFile(vts.projectRoot, ts.sys.fileExists);
+function loadTypeScriptConfig(ts: TypeScriptModule): Record<string, any> | undefined {
+	const configFileName = ts.findConfigFile(vts.projectRoot, (fileName) =>
+		ts.sys.fileExists(fileName),
+	);
 	if (configFileName) {
 		vts.configPath = path.dirname(configFileName);
-		const configFile = ts.readConfigFile(configFileName, ts.sys.readFile);
+		const configFile = ts.readConfigFile(configFileName, (fileName) => ts.sys.readFile(fileName));
 		return ts.parseJsonConfigFileContent(configFile.config, ts.sys, vts.projectRoot);
 	}
 }

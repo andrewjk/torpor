@@ -3,7 +3,6 @@ import chalk from "chalk";
 import fg from "fast-glob";
 import fs from "node:fs";
 import path from "node:path";
-import ts from "typescript";
 import { loadDocument } from "./loadDocument";
 import loadVts from "./loadVts";
 import processErrors from "./processErrors";
@@ -19,6 +18,10 @@ export default function check(folder: string): Diagnostic[] {
 	if (vts === undefined) {
 		return [];
 	}
+
+	// The compiler module the project is checked with (already loaded by
+	// loadVts)
+	const ts = vts.ts;
 
 	// Convert tsconfig includes and excludes to globs
 	let pathToGlob = (f: string) => {

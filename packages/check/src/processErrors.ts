@@ -1,5 +1,6 @@
 import fs from "node:fs";
-import ts, { type DiagnosticMessageChain } from "typescript";
+import type ts from "typescript";
+import type { DiagnosticMessageChain } from "typescript";
 import type Diagnostic from "./types/Diagnostic";
 import type SourceMap from "./types/SourceMap";
 import type VirtualTypeScript from "./types/VirtualTypeScript";

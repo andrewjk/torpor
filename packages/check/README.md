@@ -21,3 +21,8 @@ torp-check [path]
 
 Checks all Torpor files in the given folder (or a single file), and prints any
 errors found. If no path is given, the current folder is checked.
+
+The project's own TypeScript is used when it provides the compiler API;
+otherwise (e.g. the TypeScript 7 native package, which doesn't expose the
+compiler enums) the TypeScript bundled with this package is used. In a Build
+project, `tb --check` runs the same check without invoking `torp-check` directly.

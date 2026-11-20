@@ -65,6 +65,11 @@ npm run dev
 				<code>$page</code> state object &mdash; see
 				<a href="/build/navigation">Navigation</a>
 			</li>
+			<li>
+				A <code>tb --check</code> command that type-checks
+				<code>.torp</code> and <code>.ts</code> files, using
+				<code>&#64;torpor/check</code> from the site's dependencies
+			</li>
 		</ul>
 	}
 }
