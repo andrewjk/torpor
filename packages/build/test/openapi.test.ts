@@ -318,6 +318,50 @@ describe("buildOpenApiDocument", () => {
 		);
 		expect(doc.components).toBeUndefined();
 	});
+
+	test("endpoint tags apply to every operation, with per-operation metadata", () => {
+		const doc = buildOpenApiDocument(
+			[
+				{
+					path: "/api/posts",
+					endPoint: {
+						openapi: {
+							tags: ["Posts"],
+							get: { summary: "List posts", operationId: "listPosts" },
+							post: {
+								summary: "Create a post",
+								operationId: "createPost",
+								tags: ["Writes"],
+							},
+						},
+						get: async () => undefined,
+						post: async () => undefined,
+					},
+				},
+			],
+			{},
+		);
+
+		const pathItem = (doc.paths as any)["/api/posts"];
+		// The endpoint's tags apply to every operation ...
+		expect(pathItem.get.tags).toEqual(["Posts"]);
+		// ... with summaries and stable operationIds for integrator tools
+		expect(pathItem.get.summary).toBe("List posts");
+		expect(pathItem.get.operationId).toBe("listPosts");
+		// A handler's own tags override the endpoint's
+		expect(pathItem.post.tags).toEqual(["Writes"]);
+		expect(pathItem.post.operationId).toBe("createPost");
+	});
+
+	test("operations without tags leave them off", () => {
+		const doc = buildOpenApiDocument(
+			[{ path: "/api/plain", endPoint: { get: async () => undefined } }],
+			{},
+		);
+		// The generated operationId stays; there are no tags to invent
+		expect((doc.paths as any)["/api/plain"].get.operationId).toBe("getApiPlain");
+		expect((doc.paths as any)["/api/plain"].get.tags).toBeUndefined();
+	});
 });
 
 describe("openApi plugin", () => {

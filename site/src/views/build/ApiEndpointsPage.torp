@@ -134,16 +134,20 @@ openApi({
 			What the schemas can't express can be written directly: export an
 			<code>openapi</code> object keyed by handler name, for a JSON Schema
 			request body (no Standard Schema wrapper needed), response statuses and
-			headers, extra parameters, or an operation's summary and tags. Generated
-			request bodies and responses are replaced; parameters are merged by name
-			and location:
+			headers, extra parameters, or a handler's summary, operationId and tags.
+			Generated request bodies and responses are replaced; parameters are
+			merged by name and location. The endpoint's <code>tags</code> apply to
+			every operation, for tools that group by tag, and <code>operationId</code>
+			names them for integrators (Power Automate, generated SDKs and so on):
 		</p>
 		<CodePreview
 			code={`
 export default {
 	openapi: {
+		tags: ["Posts"],
 		post: {
 			summary: "Create a post",
+			operationId: "createPost",
 			parameters: [
 				{ name: "If-Match", in: "header", schema: { type: "string" } },
 			],

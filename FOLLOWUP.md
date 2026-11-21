@@ -119,17 +119,6 @@ UI page at `/docs`, plus a `tb --openapi` CLI command. Deliberately left out:
 - **The docs page loads Swagger UI from unpkg**: no offline/bundled UI
   option; a Scalar/self-hosted alternative could be added later.
 
-### OpenAPI generation: from Other implementation
-
-Found while building Other's REST API (2026-11-21). Other kept its own
-generator (`@headless/codegen`'s `generateOpenApi`), because the plugin
-couldn't express these:
-
-- **Tags, operationIds and summaries** come from nowhere. Integrators'
-  tools (Power Automate, n8n, generated SDKs) name actions from
-  `operationId` and group them by tag, so derived paths alone aren't enough
-  for them.
-
 ### DataGrid: known gaps from the first version
 
 Built with static `data` or a network `load` function (the shared loader shape

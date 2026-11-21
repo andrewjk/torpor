@@ -112,7 +112,11 @@ function buildPathItem(
 				: {}),
 			responses,
 		};
-		pathItem[method === "del" ? "delete" : method] = mergeOperation(generated, overrides?.[method]);
+		pathItem[method === "del" ? "delete" : method] = mergeOperation(
+			generated,
+			overrides?.[method],
+			overrides?.tags,
+		);
 	}
 
 	return count > 0 ? pathItem : undefined;
@@ -125,15 +129,21 @@ function buildPathItem(
  * while `requestBody` and `responses` replace the generated values -- the
  * generated responses are stubs, so an operation that documents a `201`
  * shouldn't also claim a `200`.
+ *
+ * The endpoint's `tags` apply to every operation; a handler's own tags win.
  */
 function mergeOperation(
 	generated: Record<string, unknown>,
 	raw: OpenApiOperation | undefined,
+	sharedTags: string[] | undefined,
 ): Record<string, unknown> {
-	if (!raw) return generated;
+	const tags = raw?.tags ?? sharedTags;
 	const merged = { ...generated, ...raw };
+	if (tags) {
+		merged.tags = tags;
+	}
 	const generatedParameters = generated.parameters as Record<string, unknown>[] | undefined;
-	if (raw.parameters && generatedParameters) {
+	if (raw?.parameters && generatedParameters) {
 		merged.parameters = mergeParameters(generatedParameters, raw.parameters);
 	}
 	return merged;

@@ -165,4 +165,10 @@ export type OpenApiOperation = {
 };
 
 /** The raw OpenAPI overrides for one endpoint, keyed by handler name. */
-export type OpenApiEndpointOverrides = Partial<Record<OpenApiMethod, OpenApiOperation>>;
+export type OpenApiEndpointOverrides = Partial<Record<OpenApiMethod, OpenApiOperation>> & {
+	/**
+	 * Tags applied to every operation in this endpoint, for tools that group
+	 * operations by tag. A handler's own `tags` override them.
+	 */
+	tags?: string[];
+};
