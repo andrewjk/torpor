@@ -130,5 +130,38 @@ openApi({
 			<code>tb --openapi</code> writes the base document: the hook needs a
 			request, so it isn't applied to the file.
 		</p>
+		<p>
+			What the schemas can't express can be written directly: export an
+			<code>openapi</code> object keyed by handler name, for a JSON Schema
+			request body (no Standard Schema wrapper needed), response statuses and
+			headers, extra parameters, or an operation's summary and tags. Generated
+			request bodies and responses are replaced; parameters are merged by name
+			and location:
+		</p>
+		<CodePreview
+			code={`
+export default {
+	openapi: {
+		post: {
+			summary: "Create a post",
+			parameters: [
+				{ name: "If-Match", in: "header", schema: { type: "string" } },
+			],
+			requestBody: {
+				content: { "application/json": { schema: postJsonSchema } },
+			},
+			responses: {
+				"201": {
+					description: "Created",
+					headers: { Location: { schema: { type: "string" } } },
+				},
+				"409": { description: "Conflict" },
+			},
+		},
+	},
+	post: async ({ json }) => created(await createPost(await json())),
+} satisfies ServerEndPoint;
+`}
+		/>
 	}
 }

@@ -94,6 +94,11 @@ export type ResolvedOpenApiOptions = {
  */
 export type OpenApiEndPoint = {
 	schema?: Record<string, StandardSchemaV1 | undefined> | undefined;
+	/**
+	 * Raw OpenAPI overrides for this endpoint's operations, keyed by handler
+	 * name, merged over what the document builder derives from the schemas.
+	 */
+	openapi?: OpenApiEndpointOverrides | undefined;
 	[method: string]: unknown;
 };
 
@@ -111,3 +116,37 @@ export type OpenApiRouteEntry = {
  * document route to import each `+server` endpoint lazily.
  */
 export type OpenApiLoader = () => Promise<{ default: OpenApiEndPoint }>;
+
+/**
+ * The handler names of a `+server` endpoint, as keys in its raw OpenAPI
+ * overrides (`del` is the DELETE handler).
+ */
+export type OpenApiMethod = "get" | "post" | "patch" | "put" | "del" | "options" | "head";
+
+/**
+ * A raw OpenAPI operation, merged over the generated one. Use it for what the
+ * endpoint's schemas can't express:
+ *
+ * - a JSON Schema `requestBody` directly, with no Standard Schema wrapper
+ * - response statuses and headers (`responses` replaces the generated stubs)
+ * - extra `parameters` (headers like `If-Match` sit alongside the generated
+ *   path/query parameters)
+ * - `summary`, `description`, `operationId` and `tags`, for tools that name
+ *   and group operations
+ *
+ * Any other OpenAPI operation field (`security`, `deprecated`, ...) passes
+ * through.
+ */
+export type OpenApiOperation = {
+	summary?: string;
+	description?: string;
+	operationId?: string;
+	tags?: string[];
+	parameters?: Record<string, unknown>[];
+	requestBody?: Record<string, unknown>;
+	responses?: Record<string, unknown>;
+	[key: string]: unknown;
+};
+
+/** The raw OpenAPI overrides for one endpoint, keyed by handler name. */
+export type OpenApiEndpointOverrides = Partial<Record<OpenApiMethod, OpenApiOperation>>;

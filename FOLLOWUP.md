@@ -125,12 +125,6 @@ Found while building Other's REST API (2026-11-21). Other kept its own
 generator (`@headless/codegen`'s `generateOpenApi`), because the plugin
 couldn't express these:
 
-- **JSON Schema needs a Standard Schema first**: an app whose schemas are
-  already JSON Schema (Other's field types emit it directly, ADR 0002)
-  would have to wrap each one in a fake Standard Schema to get it in. An
-  escape hatch would fix this: a raw `openapi` object on an endpoint
-  (`requestBody`, `responses`, `parameters`) that's merged over what's
-  generated.
 - **No headers or statuses beyond 200/422**: Other's API needs
   `If-Match` request headers, `ETag`/`Location` response headers, and
   201/204/400/401/403/404/409/428 with one shared `Error` schema in

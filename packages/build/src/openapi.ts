@@ -8,8 +8,11 @@ export { buildOpenApiDocument, createOpenApiHandler, openApi, openApiDocsHtml, O
 export type {
 	JsonSchema,
 	OpenApiEndPoint,
+	OpenApiEndpointOverrides,
 	OpenApiExtend,
 	OpenApiLoader,
+	OpenApiMethod,
+	OpenApiOperation,
 	OpenApiPluginOptions,
 	OpenApiRouteEntry,
 	ResolvedOpenApiOptions,

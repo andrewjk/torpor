@@ -1,5 +1,10 @@
 import type { StandardSchemaV1 } from "../types/StandardSchema";
-import type { OpenApiPluginOptions, OpenApiRouteEntry, JsonSchema } from "./types";
+import type {
+	JsonSchema,
+	OpenApiOperation,
+	OpenApiPluginOptions,
+	OpenApiRouteEntry,
+} from "./types";
 
 // The endpoint handler names, in the order they appear in docs
 const METHODS = ["get", "post", "patch", "put", "del", "options", "head"] as const;
@@ -67,6 +72,7 @@ function buildPathItem(
 	options: OpenApiPluginOptions,
 ): Record<string, unknown> | undefined {
 	const endPoint = entry.endPoint;
+	const overrides = endPoint.openapi;
 	const pathItem: Record<string, unknown> = {};
 	let count = 0;
 
@@ -92,7 +98,7 @@ function buildPathItem(
 			responses["422"] = { description: "Validation failed" };
 		}
 
-		pathItem[method === "del" ? "delete" : method] = {
+		const generated: Record<string, unknown> = {
 			operationId: operationId(method, entry.path),
 			...(parameters.length ? { parameters } : {}),
 			...(schema && BODY_METHODS.includes(method)
@@ -105,9 +111,49 @@ function buildPathItem(
 				: {}),
 			responses,
 		};
+		pathItem[method === "del" ? "delete" : method] = mergeOperation(generated, overrides?.[method]);
 	}
 
 	return count > 0 ? pathItem : undefined;
+}
+
+/**
+ * Merges a raw operation over the generated one. Generated fields can be
+ * overridden or extra ones added; `parameters` are merged by name + location
+ * (so an `If-Match` header sits alongside the generated path parameters),
+ * while `requestBody` and `responses` replace the generated values -- the
+ * generated responses are stubs, so an operation that documents a `201`
+ * shouldn't also claim a `200`.
+ */
+function mergeOperation(
+	generated: Record<string, unknown>,
+	raw: OpenApiOperation | undefined,
+): Record<string, unknown> {
+	if (!raw) return generated;
+	const merged = { ...generated, ...raw };
+	const generatedParameters = generated.parameters as Record<string, unknown>[] | undefined;
+	if (raw.parameters && generatedParameters) {
+		merged.parameters = mergeParameters(generatedParameters, raw.parameters);
+	}
+	return merged;
+}
+
+function mergeParameters(
+	generated: Record<string, unknown>[],
+	raw: Record<string, unknown>[],
+): Record<string, unknown>[] {
+	const merged = [...generated];
+	for (const parameter of raw) {
+		const index = merged.findIndex(
+			(existing) => existing.name === parameter.name && existing.in === parameter.in,
+		);
+		if (index === -1) {
+			merged.push(parameter);
+		} else {
+			merged[index] = parameter;
+		}
+	}
+	return merged;
 }
 
 function convert(schema: StandardSchemaV1, options: OpenApiPluginOptions): JsonSchema {

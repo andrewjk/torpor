@@ -1,5 +1,6 @@
 import type { RouteParamsOf } from "./ParseRouteParams";
 import type MiddlewareFunction from "../server/types/MiddlewareFunction";
+import type { OpenApiEndpointOverrides } from "../openapi/types";
 import type { FormDataRecord, QueryRecord } from "./ServerLoadEvent";
 import type { StandardSchemaV1 } from "./StandardSchema";
 import type ServerRequest from "./ServerRequest";
@@ -95,6 +96,29 @@ type ServerEndPoint<
 	 * ```
 	 */
 	schema?: Schemas | undefined;
+	/**
+	 * Raw OpenAPI overrides for this endpoint's operations, keyed by handler
+	 * name (`del` for DELETE), merged over what the `openApi()` plugin derives
+	 * from the schemas. Use it for a JSON Schema request body (no Standard
+	 * Schema wrapper needed), response statuses and headers, extra parameters,
+	 * or an operation's summary/operationId/tags, e.g.
+	 *
+	 * ```ts
+	 * export default {
+	 *   openapi: {
+	 *     post: {
+	 *       requestBody: { content: { "application/json": { schema: postJsonSchema } } },
+	 *       responses: {
+	 *         "201": { description: "Created", headers: { Location: { schema: { type: "string" } } } },
+	 *         "409": { description: "Conflict" },
+	 *       },
+	 *     },
+	 *   },
+	 *   post: async (event) => created(await createPost(await event.json())),
+	 * } satisfies ServerEndPoint;
+	 * ```
+	 */
+	openapi?: OpenApiEndpointOverrides | undefined;
 	/**
 	 * Performs a GET. Its schema validates the query string.
 	 */

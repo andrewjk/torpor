@@ -164,6 +164,111 @@ describe("buildOpenApiDocument", () => {
 			),
 		).toThrowError(/\/api\/posts.*toJsonSchema/s);
 	});
+
+	test("a raw override replaces the generated request body and responses", () => {
+		// A JSON Schema body, with no Standard Schema (or converter) involved
+		const rawBody = { type: "object", properties: { title: { type: "string" } } };
+		const doc = buildOpenApiDocument(
+			[
+				{
+					path: "/api/posts",
+					endPoint: {
+						openapi: {
+							post: {
+								requestBody: {
+									required: true,
+									content: { "application/json": { schema: rawBody } },
+								},
+								responses: {
+									"201": {
+										description: "Created",
+										headers: { Location: { schema: { type: "string" } } },
+									},
+									"409": { description: "Conflict" },
+								},
+							},
+						},
+						post: async () => undefined,
+					},
+				},
+			],
+			// No toJsonSchema: the endpoint declares no schemas
+			{},
+		);
+
+		const post = (doc.paths as any)["/api/posts"].post;
+		expect(post.requestBody.content["application/json"].schema).toEqual(rawBody);
+		expect(post.responses["201"].headers.Location).toEqual({ schema: { type: "string" } });
+		expect(post.responses["409"].description).toBe("Conflict");
+		// The raw responses replace the generated stubs, rather than adding to
+		// them: an operation that returns 201 shouldn't also document a 200
+		expect(post.responses["200"]).toBeUndefined();
+		expect(post.responses["422"]).toBeUndefined();
+	});
+
+	test("raw parameters merge with the generated ones", () => {
+		const doc = buildOpenApiDocument(
+			[
+				{
+					path: "/api/posts/[id]",
+					endPoint: {
+						schema: { params: paramsAndQuerySchema },
+						openapi: {
+							get: {
+								parameters: [
+									{
+										name: "If-Match",
+										in: "header",
+										required: true,
+										schema: { type: "string" },
+									},
+									// Overrides the generated path param, by name + location
+									{
+										name: "id",
+										in: "path",
+										required: true,
+										schema: { type: "string", format: "uuid" },
+									},
+								],
+							},
+						},
+						get: async () => undefined,
+					},
+				},
+			],
+			{ toJsonSchema },
+		);
+
+		const parameters = (doc.paths as any)["/api/posts/{id}"].get.parameters;
+		expect(parameters).toHaveLength(2);
+		expect(parameters.find((p: any) => p.name === "If-Match")).toMatchObject({ in: "header" });
+		expect(parameters.find((p: any) => p.name === "id").schema.format).toBe("uuid");
+	});
+
+	test("any other operation field passes through", () => {
+		const doc = buildOpenApiDocument(
+			[
+				{
+					path: "/api/posts",
+					endPoint: {
+						openapi: {
+							get: { security: [{ bearer: [] }], deprecated: true },
+							del: { summary: "Delete every post" },
+						},
+						get: async () => undefined,
+						del: async () => undefined,
+					},
+				},
+			],
+			{},
+		);
+
+		const pathItem = (doc.paths as any)["/api/posts"];
+		expect(pathItem.get.security).toEqual([{ bearer: [] }]);
+		expect(pathItem.get.deprecated).toBe(true);
+		// `del` overrides map to the delete operation
+		expect(pathItem.delete.summary).toBe("Delete every post");
+	});
 });
 
 describe("openApi plugin", () => {
