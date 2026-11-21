@@ -141,6 +141,8 @@ export default async function runDev(site: Site, configVite?: ViteDevServer): Pr
 	const connectingUrl = `${process.env.PROTOCOL}//${process.env.HOST}:${process.env.PORT}`;
 	console.log(`\nConnecting to ${connectingUrl}`);
 
+	silenceRollupOptionsDeprecation();
+
 	const vite = await createViteServer(config);
 
 	// Load the SSR entry once before binding the listener: it triggers Vite's
@@ -346,4 +348,35 @@ function addTorpOptimizerSettings(optimizeDeps: NonNullable<UserConfig["optimize
 	}
 	optimizeDeps.rolldownOptions ??= {};
 	optimizeDeps.rolldownOptions.plugins ??= [torpor()];
+}
+
+/**
+ * Drops Vite's `optimizeDeps.rollupOptions` deprecation warning, which it
+ * prints on every dev start (and on internal restarts) even though the config
+ * above sets the new key, and nothing ever sets the old one.
+ *
+ * It's a bug in vite-plus-core's compat proxy, present through 8.3.8000: to
+ * migrate `rollupOptions` to `rolldownOptions` it defines `rollupOptions` as an
+ * enumerable getter that returns `rolldownOptions`; `resolveDepOptimizationOptions`
+ * then merges the config's `optimizeDeps` into the defaults (`for...in` sees the
+ * getter, `rolldownOptions` is merged into a *new* object), and the two keys
+ * end up pointing at different objects -- which is the warning's condition.
+ * It only fires when the config pre-sets `optimizeDeps.rolldownOptions`, as
+ * `addTorpOptimizerSettings` must to run the torpor plugin in the dep
+ * optimizer, so it's the framework's config that trips it on every app.
+ *
+ * The message is noise (the optimizer runs on `rolldownOptions`, the torpor
+ * plugin included), so it's filtered. A user debugging dep optimization can
+ * still see the underlying trace with `VITE_DEPRECATION_TRACE=1`, which goes
+ * through `console.trace` and is left alone. Remove this once the proxy stops
+ * resurrecting the deprecated key.
+ */
+function silenceRollupOptionsDeprecation(): void {
+	const warn = console.warn;
+	console.warn = (...args: unknown[]) => {
+		if (typeof args[0] === "string" && args[0].startsWith("`optimizeDeps.rollupOptions`")) {
+			return;
+		}
+		warn.apply(console, args);
+	};
 }

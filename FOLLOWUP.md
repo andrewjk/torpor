@@ -10,28 +10,6 @@ Each entry should describe what was seen, where, and any relevant context.
 Seen while building Other's website (`@torpor/build` 1.9.0, `@torpor/view`
 1.3.2, `@torpor/adapter-cloudflare` 1.0.29, Vite+ 1.6.0, TypeScript 7.0.2).
 
-#### `optimizeDeps.rollupOptions` deprecation warning on every dev start
-
-`tb --dev` prints this on every start: "`optimizeDeps.rollupOptions` /
-`ssr.optimizeDeps.rollupOptions` is deprecated. Use
-`optimizeDeps.rolldownOptions` instead." With `VITE_DEPRECATION_TRACE=1` the
-stack runs `runDev` (`@torpor/build` `runOpenApi` chunk) → `_createServer` →
-`resolveConfig` → `resolveDepOptimizationOptions`, **in
-`@voidzero-dev/vite-plus-core@1.2.0`**.
-
-The app uses Vite+ 1.6.0, but `@torpor/build` 1.9.0 lists `vite` as a hard
-dependency pinned through the catalog (`"vite":
-"npm:@voidzero-dev/vite-plus-core@1.2.0"` in the published package). So
-`tb --dev` runs Torpor's own Vite, while the app's plugins (e.g.
-`@cloudflare/vite-plugin`, which picks `rolldownOptions` or `esbuildOptions`
-by checking its Vite) were resolved against 1.6.0.
-
-I didn't pin down which config key sets `optimizeDeps.rollupOptions`. The
-two Vites are the likely cause, and they're worth fixing anyway: two copies
-of Vite in one dev server can disagree in subtler ways than a warning.
-Suggestion: make `vite` a peerDependency of `@torpor/build` (with a range) so
-the app's Vite is used.
-
 Smaller things from the same day:
 
 - `VITE_DEPRECATION_TRACE=1 vp run website#dev` didn't print the trace (the

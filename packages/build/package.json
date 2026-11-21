@@ -89,13 +89,16 @@
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
 		"cookie": "^2.0.1",
-		"dotenv": "^18.0.8",
-		"vite": "catalog:",
-		"vite-plus": "catalog:"
+		"dotenv": "^18.0.8"
+	},
+	"peerDependencies": {
+		"vite": ">=1.2.0"
 	},
 	"devDependencies": {
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
 		"esno": "^4.8.0",
-		"typescript": "^7.0.2"
+		"typescript": "^7.0.2",
+		"vite": "catalog:",
+		"vite-plus": "catalog:"
 	}
 }
