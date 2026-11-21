@@ -1,3 +1,4 @@
+import type ServerLoadEvent from "../types/ServerLoadEvent";
 import type { StandardSchemaV1 } from "../types/StandardSchema";
 
 /**
@@ -19,6 +20,19 @@ export type JsonSchema = Record<string, unknown>;
  * ```
  */
 export type ToJsonSchema = (schema: StandardSchemaV1) => JsonSchema;
+
+/**
+ * Extends the generated document per request, for documents whose content
+ * comes from data rather than the route tree alone: one document per
+ * tenant/workspace served from a dynamic route segment, extra paths built from
+ * a database, and so on. Gets a fresh copy of the base document (mutating it
+ * is safe) and the request's event, which carries `url`, `params`,
+ * `cookies`, `session`, `appData` and the rest.
+ */
+export type OpenApiExtend = (
+	doc: Record<string, unknown>,
+	event: ServerLoadEvent,
+) => Record<string, unknown> | Promise<Record<string, unknown>>;
 
 /**
  * Options for the openApi plugin.
@@ -48,6 +62,16 @@ export type OpenApiPluginOptions = {
 	 * their paths and methods only.
 	 */
 	toJsonSchema?: ToJsonSchema;
+	/**
+	 * Extends the generated document per request, e.g. for one document per
+	 * workspace served from a dynamic route segment, or for paths built from
+	 * data the route tree doesn't describe. The hook is given a fresh copy of
+	 * the base document and the request's event (`params` included).
+	 *
+	 * `tb --openapi` writes the base document: the hook needs a request, so it
+	 * isn't applied to the file.
+	 */
+	extend?: OpenApiExtend;
 };
 
 /**
@@ -61,6 +85,7 @@ export type ResolvedOpenApiOptions = {
 	title: string;
 	version: string;
 	toJsonSchema: ToJsonSchema | undefined;
+	extend: OpenApiExtend | undefined;
 };
 
 /**
@@ -80,3 +105,9 @@ export type OpenApiRouteEntry = {
 	path: string;
 	endPoint: OpenApiEndPoint;
 };
+
+/**
+ * Loads one route's default-exported endpoint module, used by the generated
+ * document route to import each `+server` endpoint lazily.
+ */
+export type OpenApiLoader = () => Promise<{ default: OpenApiEndPoint }>;

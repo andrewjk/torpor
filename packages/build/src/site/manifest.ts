@@ -195,10 +195,10 @@ export default {
 
 /**
  * Generates the module code for the OpenAPI document endpoint: a map of
- * route path to endpoint loader, and a cached handler that loads every
- * endpoint and builds the document on first use.
+ * route path to endpoint loader, and a handler (from `createOpenApiHandler`)
+ * that builds the document from them. Exported so its wiring can be tested.
  */
-function openApiGlueCode(site: Site, options: ResolvedOpenApiOptions): string {
+export function openApiGlueCode(site: Site, options: ResolvedOpenApiOptions): string {
 	const loaders = site.routes
 		.filter((r) => r.type === SERVER_ROUTE)
 		// Don't document the docs page itself
@@ -214,22 +214,15 @@ function openApiGlueCode(site: Site, options: ResolvedOpenApiOptions): string {
 		.join(",\n    ");
 
 	return `
-import { buildOpenApiDocument, OPEN_API_STATE_KEY } from "@torpor/build/openapi";
-let __openApiDoc;
+import { createOpenApiHandler, OPEN_API_STATE_KEY } from "@torpor/build/openapi";
 const __openApiRoutes = {
     ${loaders}
 };
-async function __openApiGet() {
-    if (!__openApiDoc) {
-        const __entries = [];
-        for (const [__path, __loader] of Object.entries(__openApiRoutes)) {
-            __entries.push({ path: __path, endPoint: (await __loader()).default });
-        }
-        __openApiDoc = buildOpenApiDocument(__entries, __site.pluginState.get(OPEN_API_STATE_KEY));
-    }
-    return new Response(JSON.stringify(__openApiDoc), {
-        headers: { "Content-Type": "application/json" },
-    });
-}
+// The handler is called with the request's event, so the extend hook can
+// build a document from it (e.g. one document per route param)
+const __openApiGet = createOpenApiHandler(
+    __openApiRoutes,
+    () => __site.pluginState.get(OPEN_API_STATE_KEY),
+);
 `;
 }

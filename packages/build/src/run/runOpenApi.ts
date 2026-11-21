@@ -46,6 +46,11 @@ export default async function runOpenApi(
 	const doc = buildOpenApiDocument(entries, options);
 	await writeFile(path.resolve(site.root, outFile), JSON.stringify(doc, null, 2) + "\n");
 
+	if (options.extend) {
+		console.log(
+			'Note: the openApi() "extend" hook runs per request, so the written document is the base document',
+		);
+	}
 	console.log(
 		`OpenAPI document written to ${outFile} (${Object.keys(doc.paths ?? {}).length} paths)`,
 	);

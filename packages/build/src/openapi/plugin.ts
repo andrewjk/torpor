@@ -36,6 +36,10 @@ export const OPEN_API_STATE_KEY: symbol = Symbol.for("@torpor/build/openapi");
  * parameters, `get`/`head` schemas become query parameters, and
  * `post`/`patch`/`put`/`del`/`options` schemas become request bodies.
  *
+ * Pass `extend` to build the document per request (e.g. one per workspace),
+ * with the request's event available; `tb --openapi` writes the base document
+ * only.
+ *
  * The resolved options are stored in `site.pluginState` under
  * `OPEN_API_STATE_KEY`, which the manifest plugin reads at build time to
  * generate the document endpoint.
@@ -56,6 +60,7 @@ export function openApi(options: OpenApiPluginOptions = {}): SitePlugin {
 			title: options.title ?? "API",
 			version: options.version ?? "1.0.0",
 			toJsonSchema: options.toJsonSchema,
+			extend: options.extend,
 		};
 		site.pluginState.set(OPEN_API_STATE_KEY, resolved);
 

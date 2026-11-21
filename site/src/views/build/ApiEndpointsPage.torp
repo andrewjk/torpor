@@ -85,8 +85,50 @@ const data = await post.get();
 		<h2>OpenAPI</h2>
 		<p>
 			Handler schemas are converted to JSON Schema, so a full OpenAPI document
-			can be generated for the site. Run <code>tb --openapi</code> to write it to
-			<code>openapi.json</code> (or pass a file path).
+			can be generated for the site. Add the <code>openApi()</code> plugin to
+			<code>site.plugins</code> with your schema library's converter; the
+			document is served at <code>/openapi.json</code> with a Swagger UI page at
+			<code>/docs</code> (both configurable). Run <code>tb --openapi</code> to
+			write it to a file instead (or pass a file path).
+		</p>
+		<CodePreview
+			code={`
+import { openApi } from "@torpor/build/openapi";
+import { z } from "zod";
+
+site.plugins = [
+	openApi({
+		title: "My API",
+		toJsonSchema: (s) => z.toJSONSchema(s as z.ZodType, { io: "input" }),
+	}),
+];
+`}
+		/>
+		<p>
+			Some documents depend on data rather than the route tree alone &mdash; one
+			per workspace, say, where the record types come from that workspace's
+			database. Pass <code>extend</code> to build the document per request: it
+			gets a copy of the generated document and the request's event, so its
+			route params, session and so on are available:
+		</p>
+		<CodePreview
+			code={`
+openApi({
+	path: "/api/w/[workspace]/v1/openapi.json",
+	extend: (doc, event) => {
+		const workspace = event.params.workspace;
+		// Build this workspace's paths from its data
+		doc.paths["/api/w/" + workspace + "/records"] = {
+			get: { summary: "Records in " + workspace },
+		};
+		return doc;
+	},
+});
+`}
+		/>
+		<p>
+			<code>tb --openapi</code> writes the base document: the hook needs a
+			request, so it isn't applied to the file.
 		</p>
 	}
 }

@@ -5,20 +5,6 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
-### Found using Torpor in Other (2026-11-20)
-
-Seen while building Other's website (`@torpor/build` 1.9.0, `@torpor/view`
-1.3.2, `@torpor/adapter-cloudflare` 1.0.29, Vite+ 1.6.0, TypeScript 7.0.2).
-
-Smaller things from the same day:
-
-- `VITE_DEPRECATION_TRACE=1 vp run website#dev` didn't print the trace (the
-  variable didn't reach the child, perhaps because Vite Task filters the
-  environment). Running the dev script directly did. That's for the Vite+
-  side, not Torpor.
-- The new "No route path on the annotation, so params are loosely typed"
-  warning is useful: it caught five new Other routes.
-
 ### Loop-var resolution in @for bodies: open points
 
 The read-only loop-var bindings shipped (`appendForVarBindings` shadows, writes
@@ -133,18 +119,12 @@ UI page at `/docs`, plus a `tb --openapi` CLI command. Deliberately left out:
 - **The docs page loads Swagger UI from unpkg**: no offline/bundled UI
   option; a Scalar/self-hosted alternative could be added later.
 
+### OpenAPI generation: from Other implementation
+
 Found while building Other's REST API (2026-11-21). Other kept its own
 generator (`@headless/codegen`'s `generateOpenApi`), because the plugin
 couldn't express these:
 
-- **No data-driven or per-request documents**: the document is built once
-  from the route tree. Other serves one document per workspace, at
-  `/api/w/[workspace]/v1/openapi.json`, where the record types, their fields
-  and their transitions come from that workspace's data. To the plugin,
-  `records/[type]/[id]/[action]` is one generic route. A hook would help, e.g.
-  `openApi({ extend: (doc, event) => doc })`, or a documented way for a
-  `+server` route to build a document and merge in its own paths.
-  `buildOpenApiDocument` is exported but only takes route entries.
 - **JSON Schema needs a Standard Schema first**: an app whose schemas are
   already JSON Schema (Other's field types emit it directly, ADR 0002)
   would have to wrap each one in a fake Standard Schema to get it in. An

@@ -254,9 +254,11 @@ describe("manifest plugin", () => {
 		const plugin = manifest(site, true);
 		const code = (plugin.load as any).call({}, MODULE_ID, { ssr: true }) as string;
 		expect(code).toContain('from "@torpor/build/openapi"');
-		expect(code).toContain(
-			"buildOpenApiDocument(__entries, __site.pluginState.get(OPEN_API_STATE_KEY))",
-		);
+		// The document route hands the request to the handler (so an `extend`
+		// hook can build the document from it), and the handler reads the
+		// plugin's options at runtime
+		expect(code).toContain("const __openApiGet = createOpenApiHandler(");
+		expect(code).toContain("() => __site.pluginState.get(OPEN_API_STATE_KEY)");
 		expect(code).toContain("__openApiRoutes");
 		// Inline endpoints are loaded via __site
 		expect(code).toContain(

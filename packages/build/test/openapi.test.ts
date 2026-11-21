@@ -6,23 +6,26 @@ import { createServer as createViteServer } from "vite";
 import buildOpenApiDocument from "../src/openapi/document";
 import openApiDocsHtml from "../src/openapi/docsHtml";
 import { OPEN_API_STATE_KEY, openApi } from "../src/openapi/plugin";
-import type { JsonSchema } from "../src/openapi/types";
+import { createOpenApiHandler } from "../src/openapi/serve";
+import type { JsonSchema, ResolvedOpenApiOptions } from "../src/openapi/types";
 import Site from "../src/site/Site";
+import { openApiGlueCode } from "../src/site/manifest";
 import runOpenApi from "../src/run/runOpenApi";
 import { runTest } from "../src/test";
+import type ServerLoadEvent from "../src/types/ServerLoadEvent";
 import type { StandardSchemaV1 } from "../src/types/StandardSchema";
 
 /**
  * A standard schema that carries its JSON Schema form alongside it, so that
  * tests can pass a simple converter without depending on a schema library.
  */
-function schemaWith(json: JsonSchema): StandardSchemaV1 {
+function schemaWith(json: JsonSchema): StandardSchemaV1 & { json: JsonSchema } {
 	return {
 		json,
 		"~standard": {
 			version: 1,
 			vendor: "test",
-			validate: (value) => ({ value }),
+			validate: (value: unknown) => ({ value }),
 			types: { input: undefined as any, output: undefined as any },
 		},
 	} as any;
@@ -216,6 +219,105 @@ describe("openApiDocsHtml", () => {
 	test("includes the document url", () => {
 		const html = openApiDocsHtml("/openapi.json");
 		expect(html).toContain(`url: "/openapi.json"`);
+	});
+});
+
+/**
+ * A minimal event for the document handler: only its `url` is needed by the
+ * tests' hooks.
+ */
+function eventFor(path: string): ServerLoadEvent {
+	return { url: new URL(`http://localhost${path}`) } as ServerLoadEvent;
+}
+
+describe("createOpenApiHandler", () => {
+	const endPoint = { get: async () => undefined };
+
+	test("builds the base document once and serves it", async () => {
+		let loads = 0;
+		const handler = createOpenApiHandler(
+			{
+				"/api/posts": async () => {
+					loads++;
+					return { default: endPoint };
+				},
+			},
+			() => ({}),
+		);
+
+		const first = await handler(eventFor("/openapi.json"));
+		const second = await handler(eventFor("/openapi.json"));
+
+		// The endpoint loaders ran once, for the first request
+		expect(loads).toBe(1);
+		expect(first.headers.get("Content-Type")).toBe("application/json");
+		const doc = await second.json();
+		expect(doc.openapi).toBe("3.1.0");
+		expect(doc.paths["/api/posts"]).toBeDefined();
+	});
+
+	test("applies extend per request with the request's event", async () => {
+		const handler = createOpenApiHandler(
+			{ "/api/posts": async () => ({ default: endPoint }) },
+			() => ({
+				// One document per workspace: the paths come from the route params
+				extend: async (doc, event) => {
+					(doc.paths as Record<string, unknown>)[event.url.pathname] = {
+						get: { summary: `Document for ${event.url.pathname}` },
+					};
+					return doc;
+				},
+			}),
+		);
+
+		const one = await (await handler(eventFor("/api/w/one/v1/openapi.json"))).json();
+		const two = await (await handler(eventFor("/api/w/two/v1/openapi.json"))).json();
+
+		expect(one.paths["/api/w/one/v1/openapi.json"].get.summary).toBe(
+			"Document for /api/w/one/v1/openapi.json",
+		);
+		expect(two.paths["/api/w/two/v1/openapi.json"]).toBeDefined();
+		// Each request got its own copy, so one's extension didn't leak into
+		// two's document (or into the cached base)
+		expect(two.paths["/api/w/one/v1/openapi.json"]).toBeUndefined();
+		expect(one.paths["/api/posts"]).toBeDefined();
+		expect(two.paths["/api/posts"]).toBeDefined();
+	});
+
+	test("extend can replace the returned document", async () => {
+		const handler = createOpenApiHandler(
+			{ "/api/posts": async () => ({ default: endPoint }) },
+			() => ({
+				extend: () => ({ openapi: "3.1.0", info: { title: "Custom", version: "1" }, paths: {} }),
+			}),
+		);
+
+		const doc = await (await handler(eventFor("/openapi.json"))).json();
+		expect(doc.info.title).toBe("Custom");
+		expect(doc.paths).toEqual({});
+	});
+});
+
+describe("openApiGlueCode", () => {
+	test("generates a document route that hands the request to the handler", () => {
+		const site = new Site();
+		site.addRoute("/api/posts", { server: { get: async () => undefined } });
+		const options: ResolvedOpenApiOptions = {
+			path: "/openapi.json",
+			docs: undefined,
+			title: "API",
+			version: "1.0.0",
+			toJsonSchema: undefined,
+			extend: (doc) => doc,
+		};
+
+		const glue = openApiGlueCode(site, options);
+
+		// The handler gets the request (so `extend` can build a document from
+		// it), and reads the plugin's options at runtime
+		expect(glue).toContain("createOpenApiHandler(");
+		expect(glue).toContain("() => __site.pluginState.get(OPEN_API_STATE_KEY)");
+		expect(glue).toContain('"/api/posts"');
 	});
 });
 
