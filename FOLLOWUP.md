@@ -125,11 +125,6 @@ Found while building Other's REST API (2026-11-21). Other kept its own
 generator (`@headless/codegen`'s `generateOpenApi`), because the plugin
 couldn't express these:
 
-- **No headers or statuses beyond 200/422**: Other's API needs
-  `If-Match` request headers, `ETag`/`Location` response headers, and
-  201/204/400/401/403/404/409/428 with one shared `Error` schema in
-  `components`. These go with response schemas and `$ref` dedup above. The
-  same raw `openapi` override would cover them for now.
 - **Tags, operationIds and summaries** come from nowhere. Integrators'
   tools (Power Automate, n8n, generated SDKs) name actions from
   `operationId` and group them by tag, so derived paths alone aren't enough

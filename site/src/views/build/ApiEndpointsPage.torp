@@ -163,5 +163,26 @@ export default {
 } satisfies ServerEndPoint;
 `}
 		/>
+		<p>
+			Definitions shared between operations go in the plugin's
+			<code>components</code>, and operations reference them with <code>$ref</code>
+			&mdash; one <code>Error</code> schema for every endpoint's failure
+			responses, for example:
+		</p>
+		<CodePreview
+			code={`
+openApi({
+	components: {
+		schemas: {
+			Error: {
+				type: "object",
+				properties: { message: { type: "string" } },
+				required: ["message"],
+			},
+		},
+	},
+});
+`}
+		/>
 	}
 }

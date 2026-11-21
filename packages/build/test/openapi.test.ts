@@ -269,6 +269,55 @@ describe("buildOpenApiDocument", () => {
 		// `del` overrides map to the delete operation
 		expect(pathItem.delete.summary).toBe("Delete every post");
 	});
+
+	test("includes document-level components, for shared definitions", () => {
+		const errorSchema = {
+			type: "object",
+			properties: { message: { type: "string" } },
+			required: ["message"],
+		};
+		const doc = buildOpenApiDocument(
+			[
+				{
+					path: "/api/posts",
+					endPoint: {
+						openapi: {
+							post: {
+								responses: {
+									"201": { description: "Created" },
+									"409": {
+										description: "Conflict",
+										content: {
+											"application/json": {
+												schema: { $ref: "#/components/schemas/Error" },
+											},
+										},
+									},
+								},
+							},
+						},
+						post: async () => undefined,
+					},
+				},
+			],
+			{ components: { schemas: { Error: errorSchema } } },
+		);
+
+		expect(doc.components).toEqual({ schemas: { Error: errorSchema } });
+		// Operations reference the shared schema with $ref
+		const conflict = (doc.paths as any)["/api/posts"].post.responses["409"];
+		expect(conflict.content["application/json"].schema).toEqual({
+			$ref: "#/components/schemas/Error",
+		});
+	});
+
+	test("omits components when none are configured", () => {
+		const doc = buildOpenApiDocument(
+			[{ path: "/api/plain", endPoint: { get: async () => undefined } }],
+			{},
+		);
+		expect(doc.components).toBeUndefined();
+	});
 });
 
 describe("openApi plugin", () => {
@@ -414,6 +463,7 @@ describe("openApiGlueCode", () => {
 			version: "1.0.0",
 			toJsonSchema: undefined,
 			extend: (doc) => doc,
+			components: undefined,
 		};
 
 		const glue = openApiGlueCode(site, options);

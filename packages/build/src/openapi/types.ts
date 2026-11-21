@@ -72,6 +72,21 @@ export type OpenApiPluginOptions = {
 	 * isn't applied to the file.
 	 */
 	extend?: OpenApiExtend;
+	/**
+	 * Document-level components, referenced from operations with `$ref`:
+	 * `schemas`, `responses`, `parameters`, `headers`, `securitySchemes` and
+	 * so on. Use it for definitions shared between operations, e.g. one
+	 * `Error` schema that every endpoint's 4xx responses reference:
+	 *
+	 * ```ts
+	 * openApi({
+	 *   components: {
+	 *     schemas: { Error: { type: "object", properties: { message: { type: "string" } } } },
+	 *   },
+	 * })
+	 * ```
+	 */
+	components?: Record<string, unknown>;
 };
 
 /**
@@ -86,6 +101,7 @@ export type ResolvedOpenApiOptions = {
 	version: string;
 	toJsonSchema: ToJsonSchema | undefined;
 	extend: OpenApiExtend | undefined;
+	components: Record<string, unknown> | undefined;
 };
 
 /**

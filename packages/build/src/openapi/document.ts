@@ -57,6 +57,7 @@ export default function buildOpenApiDocument(
 			title: options.title ?? "API",
 			version: options.version ?? "1.0.0",
 		},
+		...(options.components ? { components: options.components } : {}),
 		paths,
 	};
 }

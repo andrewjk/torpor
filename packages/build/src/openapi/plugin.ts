@@ -61,6 +61,7 @@ export function openApi(options: OpenApiPluginOptions = {}): SitePlugin {
 			version: options.version ?? "1.0.0",
 			toJsonSchema: options.toJsonSchema,
 			extend: options.extend,
+			components: options.components,
 		};
 		site.pluginState.set(OPEN_API_STATE_KEY, resolved);
 
