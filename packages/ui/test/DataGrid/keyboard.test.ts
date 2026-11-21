@@ -3,6 +3,10 @@ import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 import { DataGrid } from "../../src/DataGrid/index";
+import LoaderGrid from "./components/LoaderGrid.torp";
+import PagedGrid from "./components/PagedGrid.torp";
+
+const tick = () => new Promise((r) => setTimeout(r));
 
 function mountGrid(): HTMLElement {
 	const container = document.createElement("div");
@@ -29,6 +33,20 @@ function cell(container: HTMLElement, row: number, col: number): HTMLElement {
 function press(element: HTMLElement, key: string, modifiers: Record<string, boolean> = {}) {
 	element.dispatchEvent(
 		new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true, ...modifiers }),
+	);
+}
+
+function mountComponent(component: any, props: Record<string, any> = {}): HTMLElement {
+	const container = document.createElement("div");
+	document.body.appendChild(container);
+	mount(container, component, props);
+	return container;
+}
+
+/** The text of every rendered body cell in the first column, in row order */
+function bodyTexts(container: HTMLElement): string[] {
+	return Array.from(container.querySelectorAll('tbody td[data-cell$=":0"]'), (td) =>
+		td.textContent!.trim(),
 	);
 }
 
@@ -111,5 +129,99 @@ describe("DataGrid - Keyboard navigation", () => {
 
 		press(button, "ArrowDown");
 		expect(document.activeElement).toBe(button);
+	});
+});
+
+describe("DataGrid - PageUp/PageDown", () => {
+	afterEach(() => {
+		document.body.innerHTML = "";
+	});
+
+	it("moves to the next page with PageDown, keeping the row position", () => {
+		// PagedGrid: five rows, two per page
+		const container = mountComponent(PagedGrid);
+		cell(container, 1, 0).focus();
+
+		press(cell(container, 1, 0), "PageDown");
+
+		expect(bodyTexts(container)).toEqual(["C", "D"]);
+		expect(document.activeElement).toBe(cell(container, 1, 0));
+		expect(cell(container, 1, 0).textContent!.trim()).toBe("D");
+	});
+
+	it("moves to the previous page with PageUp, keeping the row position", () => {
+		const container = mountComponent(PagedGrid);
+		cell(container, 1, 0).focus();
+
+		press(cell(container, 1, 0), "PageDown");
+		expect(document.activeElement).toBe(cell(container, 1, 0));
+		expect(cell(container, 1, 0).textContent!.trim()).toBe("D");
+
+		press(cell(container, 1, 0), "PageUp");
+
+		expect(bodyTexts(container)).toEqual(["A", "B"]);
+		expect(document.activeElement).toBe(cell(container, 1, 0));
+		expect(cell(container, 1, 0).textContent!.trim()).toBe("B");
+	});
+
+	it("clamps PageDown on the last page, settling on its last row", () => {
+		const container = mountComponent(PagedGrid);
+		cell(container, 0, 0).focus();
+
+		press(cell(container, 0, 0), "PageDown"); // page 2
+		press(cell(container, 0, 0), "PageDown"); // page 3 has just "E"
+		expect(bodyTexts(container)).toEqual(["E"]);
+		// The requested row position (1) clamps to the partial page's last row
+		expect(document.activeElement).toBe(cell(container, 0, 0));
+
+		press(cell(container, 0, 0), "PageDown");
+
+		expect(bodyTexts(container)).toEqual(["E"]);
+		expect(document.activeElement).toBe(cell(container, 0, 0));
+	});
+
+	it("clamps PageUp on the first page, settling on its first row", () => {
+		const container = mountComponent(PagedGrid);
+		cell(container, 1, 0).focus();
+
+		press(cell(container, 1, 0), "PageUp");
+
+		expect(bodyTexts(container)).toEqual(["A", "B"]);
+		expect(document.activeElement).toBe(cell(container, 0, 0));
+	});
+
+	it("keeps focus in place on a grid without paging", () => {
+		const container = mountGrid();
+		cell(container, 0, 0).focus();
+
+		press(cell(container, 0, 0), "PageDown");
+
+		expect(document.activeElement).toBe(cell(container, 0, 0));
+	});
+
+	it("restores focus after a paged loader reload", async () => {
+		const requests: any[] = [];
+		const resolvers: ((value: any) => void)[] = [];
+		const load = (request: any) =>
+			new Promise((r) => {
+				requests.push(request);
+				resolvers.push(r);
+			});
+		const container = mountComponent(LoaderGrid, { load, pageSize: 2 });
+
+		resolvers[0]({ items: [{ name: "A" }, { name: "B" }], total: 6 });
+		await tick();
+		cell(container, 1, 0).focus();
+
+		press(cell(container, 1, 0), "PageDown");
+		await tick();
+		expect(requests.at(-1)).toMatchObject({ page: 2, pageSize: 2 });
+
+		resolvers.at(-1)!({ items: [{ name: "C" }, { name: "D" }], total: 6 });
+		await tick();
+
+		expect(bodyTexts(container)).toEqual(["C", "D"]);
+		expect(document.activeElement).toBe(cell(container, 1, 0));
+		expect(cell(container, 1, 0).textContent!.trim()).toBe("D");
 	});
 });

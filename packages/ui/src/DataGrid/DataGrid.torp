@@ -67,6 +67,11 @@ interface DataGridProps {
  *
  * See [the WAI-ARIA guidelines for grids](https://www.w3.org/WAI/ARIA/apg/patterns/grid/).
  *
+ * Keyboard navigation: arrows move between cells, Home/End (with Ctrl for
+ * the grid corners) jump to row edges, and PageUp/PageDown move a page of
+ * rows -- one viewport when `virtual`, the adjacent page when `pageSize`
+ * paginates.
+ *
  * The structure of a DataGrid is a table of DataGridColumnHeaders and
  * DataGridCells, rendered automatically from the columns and rows:
  *
@@ -270,12 +275,16 @@ export default function DataGrid($props: DataGridProps) {
 			(r) => {
 				if (generation === loadGeneration) {
 					$state.reloading = false;
+					// Restore focus to a page-flip target now that its rows
+					// have loaded (queued after the render)
+					applyPendingFocus();
 				}
 				$props.onload?.(r);
 			},
 			() => {
 				if (generation === loadGeneration) {
 					$state.reloading = false;
+					pendingFocus = null;
 				}
 			},
 		);
@@ -309,6 +318,9 @@ export default function DataGrid($props: DataGridProps) {
 		if (!column.sortable) {
 			return;
 		}
+		// A sort reorders the rows, so a pending page-flip focus target no
+		// longer points at what the user was on
+		pendingFocus = null;
 		if ($state.sortBy === column.key) {
 			$state.sortDirection = $state.sortDirection === "asc" ? "desc" : "asc";
 		} else {
@@ -339,6 +351,11 @@ export default function DataGrid($props: DataGridProps) {
 	}
 
 	function focusCell(row: number, col: number) {
+		// Clamp to the current grid size: pages can render fewer rows than
+		// the requested position (a partial last page), and rows can shrink
+		// after a load
+		row = Math.min(Math.max(0, row), Math.max(0, $state.rows.length - 1));
+		col = Math.min(Math.max(0, col), Math.max(0, $props.columns.length - 1));
 		makeRowVisible(row);
 		$state.activeCell = { row, col };
 		tableElement.querySelector<HTMLElement>(`[data-cell="${cellId(row, col)}"]`)?.focus();
@@ -353,6 +370,82 @@ export default function DataGrid($props: DataGridProps) {
 		}
 		const [row, col] = cell.getAttribute("data-cell")!.split(":").map(Number);
 		$state.activeCell = { row, col };
+	}
+
+	// The number of pages to paginate over, or undefined when a loader
+	// doesn't report `total` (keyboard paging then advances while the
+	// current page is full, since a partial page must be the last one)
+	function pageCount(): number | undefined {
+		const pageSize = $props.pageSize;
+		if (!pageSize) {
+			return undefined;
+		}
+		if (hasLoader) {
+			const total = $state.loadResult?.total;
+			return total === undefined ? undefined : Math.max(1, Math.ceil(total / pageSize));
+		}
+		return Math.max(1, Math.ceil(($props.data ?? []).length / pageSize));
+	}
+
+	// Focus to apply once a page-flip reload settles: a loader's new rows
+	// arrive after the keydown, so the target cell doesn't exist yet. Applied
+	// after the new page's rows have rendered; cleared if the load fails, so
+	// a dead target can't steal focus
+	let pendingFocus: { row: number; col: number } | null = null;
+
+	function applyPendingFocus() {
+		const target = pendingFocus;
+		if (!target) {
+			return;
+		}
+		pendingFocus = null;
+		// Queued from the load's settle handler, which is registered before
+		// the $async continuation that re-renders the new page's rows -- so
+		// this lands after it, when the cells exist
+		Promise.resolve().then(() => focusCell(target.row, target.col));
+	}
+
+	// Moves focus one page of rows up or down (APG grid: "Down one page").
+	// A virtual grid steps by its visible row count; a paged grid flips to
+	// the adjacent page, keeping the column and the row's position in the
+	// page. Returns whether the key was handled, so the browser's default
+	// scroll still applies to grids without paging.
+	function pageStep(row: number, col: number, direction: -1 | 1): boolean {
+		const pageSize = $props.pageSize;
+		if (!pageSize) {
+			return false;
+		}
+		const page = $state.page;
+		if (direction === -1) {
+			if (page > 1) {
+				goToPage(page - 1, row, col);
+			} else {
+				// Clamped at the first page: settle on its first row
+				focusCell(0, col);
+			}
+			return true;
+		}
+		const pages = pageCount();
+		const hasNext = pages === undefined ? $state.rows.length === pageSize : page < pages;
+		if (hasNext) {
+			goToPage(page + 1, row, col);
+		} else {
+			// Clamped at the last page: settle on its last row
+			focusCell($state.rows.length - 1, col);
+		}
+		return true;
+	}
+
+	function goToPage(page: number, row: number, col: number) {
+		if (hasLoader) {
+			pendingFocus = { row, col };
+		}
+		$state.page = page;
+		if (!hasLoader) {
+			// Static pages slice synchronously, so the target cell exists
+			// as soon as the page state settles
+			focusCell(row, col);
+		}
 	}
 
 	// Standard grid keyboard navigation (roving tabindex over body cells)
@@ -413,6 +506,8 @@ export default function DataGrid($props: DataGridProps) {
 					e.preventDefault();
 					const step = Math.max(1, Math.floor(getViewportHeight() / getRowHeight()));
 					focusCell(Math.max(0, active.row - step), col);
+				} else if (pageStep(row, col, -1)) {
+					e.preventDefault();
 				}
 				break;
 			}
@@ -421,6 +516,8 @@ export default function DataGrid($props: DataGridProps) {
 					e.preventDefault();
 					const step = Math.max(1, Math.floor(getViewportHeight() / getRowHeight()));
 					focusCell(Math.min(maxRow, active.row + step), col);
+				} else if (pageStep(row, col, 1)) {
+					e.preventDefault();
 				}
 				break;
 			}

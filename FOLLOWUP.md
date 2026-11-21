@@ -122,8 +122,6 @@ Built with static `data` or a network `load` function (the shared loader shape
 lives in `src/ui/utils/loader.ts`, ready to port to ComboBox etc.). Left out
 deliberately:
 
-- No PageUp/PageDown keyboard navigation (APG grid suggests it when rows
-  paginate); arrows/Home/End/Ctrl+Home/Ctrl+End only.
 - No selection model (row or cell), so no `aria-selected`; APG's
   "optional interactive" behaviors (editable cells, checkboxes) are unhandled.
 - No virtualization -- every row of the current page renders. Fine for paged
