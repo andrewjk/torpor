@@ -1,0 +1,29 @@
+import { DataGrid } from "../../../src/DataGrid/index";
+
+/**
+ * One column initially; buttons add a second by mutating the array and by
+ * replacing it, so both reactivity paths are exercised
+ */
+export default function DynamicColumnsGrid() {
+	let $state = $watch({
+		columns: [{ key: "name", label: "Name" }],
+		rows: [
+			{ name: "Alice", role: "Admin", age: 30 },
+			{ name: "Bob", role: "Editor", age: 28 },
+		],
+	});
+
+	@render {
+		<DataGrid columns={$state.columns} data={$state.rows} />
+		<button onclick={() => $state.columns.push({ key: "role", label: "Role" })}>
+			push column
+		</button>
+		<button
+			onclick={() =>
+				($state.columns = [{ key: "name", label: "Name" }, { key: "age", label: "Age" }])
+			}
+		>
+			replace columns
+		</button>
+	}
+}

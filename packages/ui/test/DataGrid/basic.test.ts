@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vite-plus/test";
 import { DataGrid } from "../../src/DataGrid/index";
 import type { DataColumn, DataGridLoadEvent } from "../../src/DataGrid/index";
 import LoaderGrid from "./components/LoaderGrid.torp";
+import DynamicColumnsGrid from "./components/DynamicColumnsGrid.torp";
 import PagedGrid from "./components/PagedGrid.torp";
 import StaticGrid from "./components/StaticGrid.torp";
 
@@ -92,6 +93,31 @@ describe("DataGrid - Basic", () => {
 		const container = mountGrid({ columns, data: [{ first: "Ada", last: "Lovelace" }] });
 
 		expect(queryByText(container, "Ada Lovelace")).toBeInTheDocument();
+	});
+
+	it("re-renders headers and cells when columns change", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, DynamicColumnsGrid);
+
+		expect(queryAllByRole(container, "gridcell")).toHaveLength(2);
+		expect(queryByRole(container, "columnheader", { name: "Role" })).not.toBeInTheDocument();
+
+		// Adding a column to the same array re-renders headers and cells
+		await userEvent.click(queryByText(container, "push column")!);
+		await tick();
+
+		expect(queryByRole(container, "columnheader", { name: "Role" })).toBeInTheDocument();
+		expect(queryAllByRole(container, "gridcell")).toHaveLength(4);
+
+		// Replacing the array does too, dropping the pushed column
+		await userEvent.click(queryByText(container, "replace columns")!);
+		await tick();
+
+		expect(queryByRole(container, "columnheader", { name: "Role" })).not.toBeInTheDocument();
+		expect(queryByRole(container, "columnheader", { name: "Age" })).toBeInTheDocument();
+		expect(queryAllByRole(container, "gridcell")).toHaveLength(4);
+		expect(queryByText(container, "30")).toBeInTheDocument();
 	});
 
 	it("shows the empty slot when there are no rows", async () => {

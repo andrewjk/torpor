@@ -120,15 +120,19 @@ export default function DataGrid($props: DataGridProps) {
 	let tableElement: HTMLElement;
 	let wrap: HTMLElement;
 
-	// Columns are assumed static once passed; precompute entries with indices
-	// so cells can be keyed and addressed by position
-	const columnEntries = $props.columns.map((column, index) => ({ column, index }));
-
+	// Columns re-read from the (possibly reactive) prop, so headers, cells
+	// and sorting update when the app adds or replaces a column
 	let $state = $watch({
 		page: $props.page ?? 1,
 		sortBy: $props.sortBy,
 		sortDirection: $props.sortDirection ?? "asc",
 		activeCell: { row: 0, col: 0 },
+
+		// The columns with their positions, so cells can be keyed and
+		// addressed by index
+		get columnEntries(): { column: DataColumn; index: number }[] {
+			return $props.columns.map((column, index) => ({ column, index }));
+		},
 
 		// True while a loader request is in flight, so reloads (which keep the
 		// stale rows visible) can flag the table with aria-busy / data-loading
@@ -146,7 +150,7 @@ export default function DataGrid($props: DataGridProps) {
 			if (hasLoader) {
 				return this.loadResult?.items ?? [];
 			}
-			return sortRows($props.data ?? [], this.sortBy, this.sortDirection, columnEntries.map((e) => e.column));
+			return sortRows($props.data ?? [], this.sortBy, this.sortDirection, this.columnEntries.map((e) => e.column));
 		},
 		get totalCount(): number {
 			if (hasLoader && this.loadResult?.total !== undefined) {
@@ -616,7 +620,7 @@ export default function DataGrid($props: DataGridProps) {
 					}
 					<thead>
 						<tr role="row" aria-rowindex={isRowSubset() ? 1 : undefined}>
-							@for (let entry of columnEntries) {
+							@for (let entry of $state.columnEntries) {
 								@key = entry.column.key
 								<DataGridColumnHeader column={entry.column} />
 							}
@@ -638,7 +642,7 @@ export default function DataGrid($props: DataGridProps) {
 							@for (let rowEntry of $state.bodyEntries) {
 								@key = rowEntry.row
 								<tr role="row" aria-rowindex={ariaRowIndex(rowEntry.index)}>
-									@for (let entry of columnEntries) {
+									@for (let entry of $state.columnEntries) {
 										@key = entry.column.key
 										<DataGridCell
 											column={entry.column}

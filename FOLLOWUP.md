@@ -127,8 +127,6 @@ deliberately:
 - No virtualization -- every row of the current page renders. Fine for paged
   grids; a virtual-scroll variant will want windowed rendering plus
   `aria-rowcount`/-rowindex handling.
-- Columns are read once at setup (adding a column later won't re-render
-  headers). Rows are fully reactive; columns assumed static.
 - Sorting a loader-backed grid refetches with `sortBy`/`sortDirection` in the
   request (and superseded requests are aborted via the loader's `AbortSignal`);
   there is still no optimistic local sort.
