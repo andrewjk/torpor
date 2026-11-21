@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vite-plus/test";
 import { DataGrid } from "../../src/DataGrid/index";
 import type { DataColumn, DataGridLoadEvent } from "../../src/DataGrid/index";
 import LoaderGrid from "./components/LoaderGrid.torp";
+import PagedGrid from "./components/PagedGrid.torp";
 import StaticGrid from "./components/StaticGrid.torp";
 
 const tick = () => new Promise((r) => setTimeout(r));
@@ -56,7 +57,10 @@ describe("DataGrid - Basic", () => {
 
 		const grid = queryByRole(container, "grid");
 		expect(grid).toHaveAttribute("aria-label", "People");
+		// Every row is in the DOM, so no counts or positions are needed
 		expect(grid).not.toHaveAttribute("aria-rowcount");
+		expect(container.querySelector("thead tr")).not.toHaveAttribute("aria-rowindex");
+		expect(container.querySelector("tbody tr")).not.toHaveAttribute("aria-rowindex");
 	});
 
 	it("renders a caption when provided", () => {
@@ -117,6 +121,62 @@ describe("DataGrid - Basic", () => {
 	});
 });
 
+describe("DataGrid - Row counts and positions", () => {
+	/** The aria-rowindex of every rendered body row, in order */
+	function bodyRowIndexes(container: HTMLElement): (string | null)[] {
+		return [...container.querySelectorAll("tbody tr:not(.torp-data-grid-spacer)")].map((tr) =>
+			tr.getAttribute("aria-rowindex"),
+		);
+	}
+
+	function pressPageDown(container: HTMLElement) {
+		const cell = container.querySelector<HTMLElement>('td[data-cell="0:0"]')!;
+		cell.focus();
+		cell.dispatchEvent(
+			new KeyboardEvent("keydown", { key: "PageDown", bubbles: true, cancelable: true }),
+		);
+	}
+
+	it("positions paged rows across page flips", async () => {
+		// PagedGrid: five data rows, two per page
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, PagedGrid);
+
+		expect(queryByRole(container, "grid")).toHaveAttribute("aria-rowcount", "6");
+		expect(container.querySelector("thead tr")).toHaveAttribute("aria-rowindex", "1");
+		expect(bodyRowIndexes(container)).toEqual(["2", "3"]);
+
+		await userEvent.click(queryByText(container, "next page")!);
+		await tick();
+
+		expect(bodyRowIndexes(container)).toEqual(["4", "5"]);
+	});
+
+	it("reports -1 for a paged loader without a total, keeping row positions", async () => {
+		const resolvers: ((value: DataGridLoadEvent) => void)[] = [];
+		const load = () =>
+			new Promise<DataGridLoadEvent>((r) => {
+				resolvers.push(r);
+			});
+		const container = mountGrid({ columns: [{ key: "name" }], load, pageSize: 2 });
+
+		resolvers[0]({ items: [{ name: "A" }, { name: "B" }] });
+		await tick();
+
+		expect(queryByRole(container, "grid")).toHaveAttribute("aria-rowcount", "-1");
+		expect(bodyRowIndexes(container)).toEqual(["2", "3"]);
+
+		// Page 2's rows keep counting through the header
+		pressPageDown(container);
+		await tick();
+		resolvers.at(-1)!({ items: [{ name: "C" }, { name: "D" }] });
+		await tick();
+
+		expect(bodyRowIndexes(container)).toEqual(["4", "5"]);
+	});
+});
+
 describe("DataGrid - Loading from a loader function", () => {
 	it("shows a loading state, then renders rows and reports the total", async () => {
 		let resolve!: (value: DataGridLoadEvent) => void;
@@ -155,7 +215,10 @@ describe("DataGrid - Loading from a loader function", () => {
 		resolve({ items: [{ name: "Alice" }], total: 100 });
 		await tick();
 
-		expect(queryByRole(container, "grid")).toHaveAttribute("aria-rowcount", "100");
+		// The total counts the header row (APG grid-and-table-properties)
+		expect(queryByRole(container, "grid")).toHaveAttribute("aria-rowcount", "101");
+		expect(container.querySelector("thead tr")).toHaveAttribute("aria-rowindex", "1");
+		expect(container.querySelector("tbody tr")).toHaveAttribute("aria-rowindex", "2");
 	});
 
 	it("accepts loaders that return a bare array", async () => {

@@ -129,6 +129,36 @@ describe("DataGrid - virtualization", () => {
 		await tick();
 
 		const table = within(container).getByRole("grid");
-		expect(table).toHaveAttribute("aria-rowcount", "500");
+		// The 500 data rows plus the header row
+		expect(table).toHaveAttribute("aria-rowcount", "501");
+	});
+
+	it("positions rendered rows with aria-rowindex as the window moves", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, VirtualDataGridTest as any, {
+			count: 500,
+			virtual: true,
+			rowHeight: 10,
+			height: 100,
+			overscan: 2,
+		});
+		await tick();
+
+		const rowIndexes = () =>
+			getBodyRows(container).map((tr) => Number(tr.getAttribute("aria-rowindex")));
+
+		// The header is row 1, so the first data row is 2
+		expect(rowIndexes()[0]).toBe(2);
+
+		// Scrolling moves the window; indexes follow the data positions
+		const wrap = getWrap(container);
+		wrap.scrollTop = 2000; // row 200
+		fireEvent.scroll(wrap);
+		await tick();
+
+		const indexes = rowIndexes();
+		expect(indexes[0]).toBe(200);
+		expect(indexes).toEqual(Array.from({ length: indexes.length }, (_, i) => 200 + i));
 	});
 });

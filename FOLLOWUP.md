@@ -132,8 +132,6 @@ deliberately:
 - Sorting a loader-backed grid refetches with `sortBy`/`sortDirection` in the
   request (and superseded requests are aborted via the loader's `AbortSignal`);
   there is still no optimistic local sort.
-- `aria-rowcount` is set from the loader's `total` when provided; not wired to
-  `aria-rowindex` on rows.
 
 ### Loader adoption in ComboBox/SelectBox: known gaps
 

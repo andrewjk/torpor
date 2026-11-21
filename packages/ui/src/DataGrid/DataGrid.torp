@@ -72,6 +72,12 @@ interface DataGridProps {
  * rows -- one viewport when `virtual`, the adjacent page when `pageSize`
  * paginates.
  *
+ * When rows are windowed (virtual), paged (`pageSize`) or loaded in part,
+ * the grid sets aria-rowcount -- the full set's size including the header
+ * row, or -1 when a paged loader doesn't report a total -- and positions
+ * each rendered row with aria-rowindex (the header is row 1, data rows
+ * count from 2).
+ *
  * The structure of a DataGrid is a table of DataGridColumnHeaders and
  * DataGridCells, rendered automatically from the columns and rows:
  *
@@ -312,6 +318,41 @@ export default function DataGrid($props: DataGridProps) {
 			return undefined;
 		}
 		return $state.sortDirection === "asc" ? "ascending" : "descending";
+	}
+
+	// Whether the grid represents more rows than it renders, so
+	// aria-rowcount and aria-rowindex apply (APG grid-and-table-properties:
+	// when the DOM holds a subset, it must say so and position each of its
+	// rows). A virtual window, a page slice, or a partial lazy load.
+	function isRowSubset(): boolean {
+		return hasLoader || isVirtual() || !!$props.pageSize;
+	}
+
+	// The aria-rowcount value: the full set's size, including the header
+	// row. A paged loader without `total` reports -1 (more rows exist,
+	// count unknown); grids rendering everything report nothing.
+	function ariaRowcount(): number | undefined {
+		if (!isRowSubset()) {
+			return undefined;
+		}
+		if (hasLoader && $props.pageSize && $state.loadResult?.total === undefined) {
+			return -1;
+		}
+		return $state.totalCount + 1;
+	}
+
+	// The 1-based position of a rendered row within the full grid, for
+	// aria-rowindex: the header row is row 1, so data rows start at 2.
+	// Rendered row indexes are positions in the full set already -- body
+	// entries number virtual windows from the global start -- except for
+	// page slices, which are offset by the page's first row.
+	function ariaRowIndex(index: number): number | undefined {
+		if (!isRowSubset()) {
+			return undefined;
+		}
+		const pageSize = !isVirtual() ? $props.pageSize : undefined;
+		const pageOffset = pageSize ? ($state.page - 1) * pageSize : 0;
+		return index + pageOffset + 2;
 	}
 
 	function toggleSort(column: DataColumn) {
@@ -564,7 +605,7 @@ export default function DataGrid($props: DataGridProps) {
 					role="grid"
 					aria-label={$props.ariaLabel}
 					aria-labelledby={$props.ariaLabelledBy}
-					aria-rowcount={hasLoader || isVirtual() ? $state.totalCount : undefined}
+					aria-rowcount={ariaRowcount()}
 					aria-busy={$state.reloading ? "true" : undefined}
 					data-loading={$state.reloading ? "true" : undefined}
 					onkeydown={handleKeydown}
@@ -574,7 +615,7 @@ export default function DataGrid($props: DataGridProps) {
 						<caption>{$props.caption}</caption>
 					}
 					<thead>
-						<tr role="row">
+						<tr role="row" aria-rowindex={isRowSubset() ? 1 : undefined}>
 							@for (let entry of columnEntries) {
 								@key = entry.column.key
 								<DataGridColumnHeader column={entry.column} />
@@ -596,7 +637,7 @@ export default function DataGrid($props: DataGridProps) {
 							}
 							@for (let rowEntry of $state.bodyEntries) {
 								@key = rowEntry.row
-								<tr role="row">
+								<tr role="row" aria-rowindex={ariaRowIndex(rowEntry.index)}>
 									@for (let entry of columnEntries) {
 										@key = entry.column.key
 										<DataGridCell
