@@ -89,9 +89,6 @@ deliberately left out:
 - **Client-side pre-submit validation** (`nav/formSubmit.ts`): validate form
   data in the browser before POSTing for instant feedback. Requires shipping
   schemas to the client and a shared error shape into `$page.form`.
-- **makeApi query typing**: `makeApi` callers get their body param from the
-  endpoint's json schema, but GET callers can't pass a validated/typed query
-  object; the query string must still be appended to the URL manually.
 - **Layout endpoint schemas**: schemas declared on `_layout.server` endpoints
   are not applied to the layout's own load/actions; the page's server
   endpoint schema is the one used for shared params/query validation during

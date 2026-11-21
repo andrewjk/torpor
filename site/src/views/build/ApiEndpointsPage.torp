@@ -71,14 +71,17 @@ export default {
 		<p>
 			Call an endpoint from client code with <code>makeApi</code>. Params are
 			filled in from the route path, JSON responses are parsed, and the result is
-			typed from the endpoint's responses. Failed (non-2xx) requests throw:
+			typed from the endpoint's responses. GET and HEAD take a query object,
+			typed and validated by the handler's schema, which is serialized into the
+			query string (array values repeat the key). Failed (non-2xx) requests
+			throw:
 		</p>
 		<CodePreview
 			code={`
 import type endpoint from "@/routes/api/posts/[id]/+server";
 
 const post = makeApi<"/api/posts/[id]", typeof endpoint>("/api/posts/[id]", { id: 5 });
-const data = await post.get();
+const data = await post.get({ sort: "asc" });
 `}
 		/>
 

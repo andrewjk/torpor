@@ -53,12 +53,61 @@ describe("makeApi", () => {
 		expect(options.headers).toBeUndefined();
 	});
 
-	test("does not attach a body to GET or HEAD requests", async () => {
+	test("serializes GET arguments as query params, never a body", async () => {
 		fetchMock.mockResolvedValue(jsonResponse({}));
 		const api = makeApi<string, any>("/api/time");
-		await api.get({ unwanted: true });
-		const [, options] = fetchMock.mock.calls[0];
+		await api.get({ sort: "asc", limit: 10, active: true });
+		const [url, options] = fetchMock.mock.calls[0];
+		expect(url).toBe("/api/time?sort=asc&limit=10&active=true");
 		expect(options.body).toBeUndefined();
+	});
+
+	test("repeats array values, skips empty ones, and encodes values", async () => {
+		fetchMock.mockResolvedValue(jsonResponse({}));
+		const api = makeApi<string, any>("/api/search");
+		await api.get({
+			tag: ["a b", "c"],
+			empty: undefined,
+			none: null,
+			q: "a&b=c",
+			when: new Date("2026-01-02T03:04:05.000Z"),
+		});
+		const [url] = fetchMock.mock.calls[0];
+		const params = new URL(url, "http://localhost").searchParams;
+		expect(params.getAll("tag")).toEqual(["a b", "c"]);
+		expect(params.has("empty")).toBe(false);
+		expect(params.has("none")).toBe(false);
+		expect(params.get("q")).toBe("a&b=c");
+		expect(params.get("when")).toBe("2026-01-02T03:04:05.000Z");
+	});
+
+	test("appends to a query string already in the path", async () => {
+		fetchMock.mockResolvedValue(jsonResponse({}));
+		const api = makeApi<string, any>("/api/time?x=1");
+		await api.get({ y: 2 });
+		expect(fetchMock.mock.calls[0][0]).toBe("/api/time?x=1&y=2");
+	});
+
+	test("HEAD queries are serialized the same way", async () => {
+		fetchMock.mockResolvedValue(jsonResponse({}));
+		const api = makeApi<string, any>("/api/time");
+		await api.head({ a: 1 });
+		const [url, options] = fetchMock.mock.calls[0];
+		expect(url).toBe("/api/time?a=1");
+		expect(options.method).toBe("HEAD");
+		expect(options.body).toBeUndefined();
+	});
+
+	test("rejects query values that can't be serialized", async () => {
+		fetchMock.mockResolvedValue(jsonResponse({}));
+		const api = makeApi<string, any>("/api/time");
+		await expect(api.get({ filter: { nested: 1 } as any })).rejects.toThrow(/Cannot serialize/);
+	});
+
+	test("rejects a non-object query", async () => {
+		fetchMock.mockResolvedValue(jsonResponse({}));
+		const api = makeApi<string, any>("/api/time");
+		await expect(api.get("nope" as any)).rejects.toThrow(/must be an object/);
 	});
 
 	test("resolves to the raw Response for non-JSON bodies", async () => {

@@ -14,4 +14,5 @@ declare global {
 }
 
 export { load, reload, route, makeApi, DATA_REQUEST_HEADER, DATA_REUSE_HEADER };
+export type { ApiMethods, ApiQuery, ApiQueryValue } from "./nav/api";
 export type { NavigationFailureDetail, SubmitFailureDetail };
