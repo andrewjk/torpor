@@ -122,8 +122,8 @@ Built with static `data` or a network `load` function (the shared loader shape
 lives in `src/ui/utils/loader.ts`, ready to port to ComboBox etc.). Left out
 deliberately:
 
-- No selection model (row or cell), so no `aria-selected`; APG's
-  "optional interactive" behaviors (editable cells, checkboxes) are unhandled.
+- APG's "optional interactive" behaviors (editable cells, checkboxes) are
+  unhandled; row and cell selection itself ships via the `selection` prop.
 - No virtualization -- every row of the current page renders. Fine for paged
   grids; a virtual-scroll variant will want windowed rendering plus
   `aria-rowcount`/-rowindex handling.

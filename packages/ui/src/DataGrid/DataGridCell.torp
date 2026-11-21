@@ -43,6 +43,7 @@ export default function DataGridCell($props: DataGridCellProps | undefined) {
 			{$props?.style}
 			data-cell={context.getCellId(getRowIndex(), getColIndex())}
 			tabindex={context.isActiveCell(getRowIndex(), getColIndex()) ? 0 : -1}
+			aria-selected={context.isSelectedCell(getRowIndex(), getColIndex()) ? "true" : undefined}
 		>
 			<slot />
 		</td>

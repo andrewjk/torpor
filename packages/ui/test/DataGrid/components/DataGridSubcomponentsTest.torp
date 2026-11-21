@@ -10,6 +10,7 @@ export default function DataGridSubcomponentsTest() {
 			align ? `torp-data-grid-align-${align}` : undefined,
 		getCellValue: (row: any, column: DataColumn) => row?.[column.key],
 		isActiveCell: (row: number, col: number) => row === 0 && col === 0,
+		isSelectedCell: (row: number, col: number) => row === 1 && col === 0,
 		getCellId: (row: number, col: number) => `${row}:${col}`,
 	};
 

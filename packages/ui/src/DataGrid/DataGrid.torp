@@ -59,6 +59,16 @@ interface DataGridProps {
 	onloadstart?: () => void;
 	/** Called when the user sorts by a column */
 	onchange?: (sortBy: string | undefined, sortDirection: "asc" | "desc") => void;
+	/** Whether clicking or pressing Space selects a row or a cell */
+	selection?: "row" | "cell";
+	/**
+	 * The current selection: the row index in `row` mode, or a `{ row, col }`
+	 * position in `cell` mode (0-based, within the current page). Two-way
+	 * bindable; cleared when the grid pages or sorts.
+	 */
+	selected?: Bindable<number | { row: number; col: number } | undefined>;
+	/** Called after the selection changes, with the selected row and (in cell mode) its column */
+	onselect?: (row: any, column: DataColumn | undefined) => void;
 }
 
 /**
@@ -77,6 +87,10 @@ interface DataGridProps {
  * row, or -1 when a paged loader doesn't report a total -- and positions
  * each rendered row with aria-rowindex (the header is row 1, data rows
  * count from 2).
+ *
+ * When `selection` is set, clicking a cell or pressing Space selects it
+ * (or its row) and sets aria-selected; the selection binds through
+ * `selected` and reports through `onselect`.
  *
  * The structure of a DataGrid is a table of DataGridColumnHeaders and
  * DataGridCells, rendered automatically from the columns and rows:
@@ -127,6 +141,7 @@ export default function DataGrid($props: DataGridProps) {
 		sortBy: $props.sortBy,
 		sortDirection: $props.sortDirection ?? "asc",
 		activeCell: { row: 0, col: 0 },
+		selected: $props.selected,
 
 		// The columns with their positions, so cells can be keyed and
 		// addressed by index
@@ -179,7 +194,7 @@ export default function DataGrid($props: DataGridProps) {
 		},
 	});
 
-	$bind($state, $props, "page", "sortBy", "sortDirection");
+	$bind($state, $props, "page", "sortBy", "sortDirection", "selected");
 
 	// --- Virtualization ---
 
@@ -317,6 +332,48 @@ export default function DataGrid($props: DataGridProps) {
 		return active.row === row && active.col === col;
 	}
 
+	function isSelectedRow(row: number): boolean {
+		return $props.selection === "row" && $state.selected === row;
+	}
+
+	function isSelectedCell(row: number, col: number): boolean {
+		if ($props.selection !== "cell") {
+			return false;
+		}
+		const selected = $state.selected;
+		return (
+			!!selected && typeof selected === "object" && selected.row === row && selected.col === col
+		);
+	}
+
+	// Selects the row or cell at a rendered position (a click or Space)
+	function select(row: number, col: number) {
+		const mode = $props.selection;
+		if (!mode) {
+			return;
+		}
+		// Clamp to the current grid size, like keyboard focus
+		row = Math.min(Math.max(0, row), Math.max(0, $state.rows.length - 1));
+		col = Math.min(Math.max(0, col), Math.max(0, $props.columns.length - 1));
+		if (mode === "row") {
+			$state.selected = row;
+		} else {
+			$state.selected = { row, col };
+		}
+		$props.onselect?.($state.rows[row], mode === "cell" ? $props.columns[col] : undefined);
+	}
+
+	// Clicking a cell selects it (or its row) when a selection mode is set
+	function handleClick(e: MouseEvent) {
+		const target = e.target as HTMLElement;
+		const cell = target.closest?.("td[data-cell]");
+		if (!$props.selection || !cell || target.closest("button,input,select,textarea,a[href]")) {
+			return;
+		}
+		const [row, col] = cell.getAttribute("data-cell")!.split(":").map(Number);
+		select(row, col);
+	}
+
 	function ariaSort(key: string): "ascending" | "descending" | undefined {
 		if ($state.sortBy !== key) {
 			return undefined;
@@ -363,9 +420,10 @@ export default function DataGrid($props: DataGridProps) {
 		if (!column.sortable) {
 			return;
 		}
-		// A sort reorders the rows, so a pending page-flip focus target no
-		// longer points at what the user was on
+		// A sort reorders the rows, so a pending page-flip focus target and an
+		// index-based selection no longer point at what the user was on
 		pendingFocus = null;
+		$state.selected = undefined;
 		if ($state.sortBy === column.key) {
 			$state.sortDirection = $state.sortDirection === "asc" ? "desc" : "asc";
 		} else {
@@ -485,6 +543,8 @@ export default function DataGrid($props: DataGridProps) {
 		if (hasLoader) {
 			pendingFocus = { row, col };
 		}
+		// A different page re-points an index-based selection at other rows
+		$state.selected = undefined;
 		$state.page = page;
 		if (!hasLoader) {
 			// Static pages slice synchronously, so the target cell exists
@@ -546,6 +606,13 @@ export default function DataGrid($props: DataGridProps) {
 				focusCell(e.ctrlKey || e.metaKey ? maxRow : row, maxCol);
 				break;
 			}
+			case " ": {
+				if ($props.selection) {
+					e.preventDefault();
+					select(row, col);
+				}
+				break;
+			}
 			case "PageUp": {
 				if (isVirtual()) {
 					e.preventDefault();
@@ -584,6 +651,7 @@ export default function DataGrid($props: DataGridProps) {
 		getAlignClass: alignClass,
 		getCellValue: cellValue,
 		isActiveCell,
+		isSelectedCell,
 		getCellId: cellId,
 	};
 	$context[DataGridContextName] = context;
@@ -614,6 +682,7 @@ export default function DataGrid($props: DataGridProps) {
 					data-loading={$state.reloading ? "true" : undefined}
 					onkeydown={handleKeydown}
 					onfocusin={handleFocusin}
+					onclick={handleClick}
 				>
 					@if ($props.caption) {
 						<caption>{$props.caption}</caption>
@@ -641,7 +710,11 @@ export default function DataGrid($props: DataGridProps) {
 							}
 							@for (let rowEntry of $state.bodyEntries) {
 								@key = rowEntry.row
-								<tr role="row" aria-rowindex={ariaRowIndex(rowEntry.index)}>
+								<tr
+									role="row"
+									aria-rowindex={ariaRowIndex(rowEntry.index)}
+									aria-selected={isSelectedRow(rowEntry.index) ? "true" : undefined}
+								>
 									@for (let entry of $state.columnEntries) {
 										@key = entry.column.key
 										<DataGridCell

@@ -1,0 +1,35 @@
+import { DataGrid } from "../../../src/DataGrid/index";
+
+/**
+ * A selectable grid (five rows, two per page); the current selection is
+ * rendered below it so tests can read the bound state
+ */
+/** A grid with row or cell selection; the selection binds through `&selected` */
+export default function SelectableGrid($props: { selection?: "row" | "cell"; onselect?: (row: any, column: any) => void }) {
+	let $state = $watch({
+		selected: undefined as number | { row: number; col: number } | undefined,
+		columns: [
+			{ key: "name", label: "Name" },
+			{ key: "role", label: "Role" },
+		],
+		rows: [
+			{ name: "Alice", role: "Admin" },
+			{ name: "Bob", role: "Editor" },
+			{ name: "Cara", role: "Viewer" },
+			{ name: "Dan", role: "Editor" },
+			{ name: "Eve", role: "Admin" },
+		],
+	});
+
+	@render {
+		<DataGrid
+			columns={$state.columns}
+			data={$state.rows}
+			pageSize={2}
+			selection={$props.selection}
+			&selected={$state.selected}
+			onselect={$props.onselect}
+		/>
+		<p class="selection">{JSON.stringify($state.selected)}</p>
+	}
+}

@@ -37,6 +37,8 @@ export interface DataGridContext {
 	getCellValue: (row: any, column: DataColumn) => any;
 	/** Whether a cell is the single tab stop (roving tabindex) */
 	isActiveCell: (row: number, col: number) => boolean;
+	/** Whether a cell is the current selection (cell selection mode) */
+	isSelectedCell: (row: number, col: number) => boolean;
 	/** The data-cell ID for a cell */
 	getCellId: (row: number, col: number) => string;
 }
