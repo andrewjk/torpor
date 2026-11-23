@@ -1,5 +1,19 @@
 # @torpor/build
 
+## 1.10.0
+
+<sub>2026-11-23</sub>
+
+- _(minor)_ Feat: add tb --check to type-check .torp files
+- _(minor)_ Feat: add event.formData() for standard FormData
+- _(minor)_ Fix: stop optimizeDeps deprecation warning
+- _(minor)_ Feat: add an extend hook for per-request OpenAPI documents
+- _(minor)_ Feat: add raw OpenAPI overrides to endpoints
+- _(minor)_ Feat: support shared OpenAPI components
+- _(minor)_ Feat: support OpenAPI tags and operationIds
+- _(minor)_ Feat: type makeApi GET queries from schemas
+- _(patch)_ Fix: don't cache route-module promises
+
 ## 1.9.0
 
 <sub>2026-11-19</sub>

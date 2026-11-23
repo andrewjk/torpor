@@ -1,5 +1,11 @@
 # @torpor/adapter-cloudflare
 
+## 1.0.30
+
+<sub>2026-11-23</sub>
+
+- _(patch)_ Fix: stop optimizeDeps deprecation warning
+
 ## 1.0.29
 
 <sub>2026-11-19</sub>

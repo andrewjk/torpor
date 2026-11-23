@@ -1,5 +1,14 @@
 # @torpor/ui
 
+## 1.5.0
+
+<sub>2026-11-23</sub>
+
+- _(minor)_ Feat: add PageUp/PageDown navigation to DataGrid
+- _(minor)_ Feat: add row and cell selection to DataGrid
+- _(patch)_ Fix: wire aria-rowindex to DataGrid rows
+- _(patch)_ Fix: make DataGrid columns reactive
+
 ## 1.4.0
 
 <sub>2026-11-19</sub>

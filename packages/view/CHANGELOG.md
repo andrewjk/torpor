@@ -1,5 +1,13 @@
 # @torpor/view
 
+## 1.3.3
+
+<sub>2026-11-23</sub>
+
+- _(patch)_ Fix: compile dashed props on components
+- _(patch)_ Fix: dispose @if branch bindings before they re-run
+- _(patch)_ Fix: keep tracking after iterating a watched array
+
 ## 1.3.2
 
 <sub>2026-11-19</sub>

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.7
+
+<sub>2026-11-23</sub>
+
+- _(patch)_ Fix: stop optimizeDeps deprecation warning
+
 ## 1.2.6
 
 <sub>2026-11-19</sub>

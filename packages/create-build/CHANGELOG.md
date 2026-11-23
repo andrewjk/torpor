@@ -1,5 +1,11 @@
 # @torpor/create-build
 
+## 1.0.2
+
+<sub>2026-11-23</sub>
+
+- _(patch)_ Fix: stop optimizeDeps deprecation warning
+
 ## 1.0.1
 
 <sub>2026-09-08</sub>

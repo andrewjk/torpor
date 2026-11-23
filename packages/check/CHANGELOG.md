@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.18
+
+<sub>2026-11-23</sub>
+
+- _(patch)_ Feat: add tb --check to type-check .torp files
+
 ## 1.0.17
 
 <sub>2026-11-19</sub>
