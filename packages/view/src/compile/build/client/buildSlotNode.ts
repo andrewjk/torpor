@@ -2,6 +2,7 @@ import type SourceSpan from "../../types/SourceSpan";
 import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
 import isSpecialNode from "../../utils/isSpecialNode";
+import propKey from "../../utils/propKey";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
@@ -43,7 +44,7 @@ export default function buildSlotNode(node: ElementNode, status: BuildStatus, b:
 		b.append(`const ${propsName} = $watch({`);
 		for (let p of props) {
 			let value = p.value;
-			addMappedText(`${p.name}: `, value, ",", p.span, status, b);
+			addMappedText(`${propKey(p.name)}: `, value, ",", p.span, status, b);
 		}
 		b.append("});");
 		// TODO: Map these things:

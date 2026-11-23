@@ -7,6 +7,7 @@ import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
 import fillUsesContext from "../../utils/fillUsesContext";
 import isSpecialNode from "../../utils/isSpecialNode";
+import propKey from "../../utils/propKey";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildServerStatus from "./BuildServerStatus";
@@ -56,7 +57,7 @@ export default function buildServerComponentNode(
 		// Set the props that we gathered
 		b.append(`const ${propsName} = {`);
 		for (let p of props) {
-			b.append(p.name ? `${p.name}: ${p.value},` : `${p.value},`);
+			b.append(p.name ? `${propKey(p.name)}: ${p.value},` : `${p.value},`);
 		}
 		b.append("};");
 

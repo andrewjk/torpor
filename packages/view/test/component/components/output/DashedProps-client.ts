@@ -1,0 +1,57 @@
+import $run from "../../../../src/watch/$run";
+import $watch from "../../../../src/watch/$watch";
+import t_add_element from "../../../../src/render/addElement";
+import t_add_fragment from "../../../../src/render/addFragment";
+import t_anchor from "../../../../src/render/nodeAnchor";
+import t_attribute from "../../../../src/render/setAttribute";
+import t_fragment from "../../../../src/render/getFragment";
+import t_fragment_el from "../../../../src/render/getElementFragment";
+import t_root from "../../../../src/render/nodeRoot";
+import t_root_el from "../../../../src/render/nodeRootElement";
+import type SlotRender from "../../../../src/types/SlotRender";
+
+export default function Component(
+	$parent: ParentNode,
+	$anchor: Node | null,
+	_$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>,
+): void {
+
+	/* User interface */
+	const t_fragments: DocumentFragment[] = [];
+
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<!>`);
+	const t_root_0 = t_root(t_fragment_0);
+	let t_comp_anchor_1 = t_anchor(t_root_0) as HTMLElement;
+
+	/* @component */
+	let t_props_1 = $watch({
+		"aria-hidden": "true" as const,
+	});
+	Icon(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
+
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
+
+}
+
+function Icon(
+	$parent: ParentNode,
+	$anchor: Node | null,
+	$props: { "aria-hidden": string },
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>,
+): void {
+
+	/* User interface */
+	const t_fragment_els: Element[] = [];
+
+	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<i>i</i>`);
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_i_1 = t_root_0 as HTMLElement;
+	$run(() => {
+		t_attribute(t_i_1, "aria-hidden", $props["aria-hidden"]);
+	});
+	t_add_element(t_i_1, $parent, $anchor);
+
+}

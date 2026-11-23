@@ -4,6 +4,7 @@ import Builder from "../../utils/Builder";
 import bindingTarget from "../../utils/bindingTarget";
 import fillUsesContext from "../../utils/fillUsesContext";
 import isSpecialNode from "../../utils/isSpecialNode";
+import propKey from "../../utils/propKey";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
@@ -137,18 +138,12 @@ export default function buildComponentNode(
 			let value = p.value;
 			p.preText ??= "";
 			p.postText ??= "";
+			const key = p.name ? `${propKey(p.name)}: ` : "";
 			if (p.spans.length === 1) {
-				addMappedText(
-					p.name ? `${p.name}: ` + p.preText : p.preText,
-					value,
-					p.postText + ",",
-					p.spans[0],
-					status,
-					b,
-				);
+				addMappedText(key + p.preText, value, p.postText + ",", p.spans[0], status, b);
 			} else {
 				addMappedTextWithOffsets(
-					p.name ? `${p.name}: ` + p.preText : p.preText,
+					key + p.preText,
 					value,
 					p.postText + ",",
 					p.spans,
