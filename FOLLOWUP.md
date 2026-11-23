@@ -67,17 +67,6 @@ that sums a field in a `for…of` must re-run when an element's field changes.
 **Workaround** (in App's invoices demo): `.slice()` or `.filter()`
 instead of spreading, and read the other state before iterating.
 
-### Bindings in an `@if` branch run once more as it turns false
-
-Seen in App's trades demo app (2026-11). When an `@if` condition turns
-false, the bindings inside the branch run one more time before the branch is
-removed, so they read state that's already gone (e.g. `current()!.title` after
-`current()` became undefined) and can throw. The app works around it with
-optional chaining inside branches. Expected: once the condition is false, the
-branch's effects are disposed before they'd re-run, not after. Not re-checked
-against the current runtime; a repro would be an `@if (item)` whose branch
-reads `item!.name`, then setting `item` to undefined.
-
 ### Loop-var resolution in @for bodies: open points
 
 The read-only loop-var bindings shipped (`appendForVarBindings` shadows, writes

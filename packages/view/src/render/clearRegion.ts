@@ -139,6 +139,13 @@ function releaseRegion(region: Region) {
 	// the dominant cost in long-lived sessions where list items are
 	// repeatedly created and cleared (e.g. js-framework-bench iterations).
 	for (const effect of region.effects) {
+		// Mark the effect destroyed before running its cleanup, so that a
+		// queued re-run (the effect may already be in the current flush's
+		// queue — e.g. an `@if` branch binding whose condition turned false
+		// in this same flush) is skipped: the branch is gone, and running
+		// its bindings again would read state it no longer owns
+		effect.destroyed = true;
+
 		if (typeof effect.cleanup === "function") {
 			effect.cleanup();
 			effect.cleanup = undefined;

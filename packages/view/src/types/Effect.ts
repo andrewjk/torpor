@@ -41,6 +41,23 @@ export default interface Effect {
 	extent: number;
 
 	/**
+	 * Monotonic creation order, assigned by `$run`. The effect queue is run in
+	 * this order, so an effect always re-runs before effects that were created
+	 * while it was running (its "children" — e.g. a control statement's branch
+	 * effects). That is what lets a branch be disposed before its own bindings
+	 * re-run when the branch's condition turns false.
+	 */
+	seq: number;
+
+	/**
+	 * True once the effect's owning region has been released (`clearRegion`).
+	 * A destroyed effect is skipped if it's still queued: e.g. an `@if`
+	 * branch's bindings must not run again in the same flush in which the
+	 * control statement disposed the branch.
+	 */
+	destroyed?: boolean;
+
+	/**
 	 * True while the effect is linked into the current run queue. Reset as
 	 * soon as the effect is processed, so a signal write later in the same
 	 * flush — or during the effect's own run — can correctly re-queue it.

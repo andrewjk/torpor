@@ -42,7 +42,16 @@ export default function triggerEffects(): void {
 	// index-based loop. An effect that already ran in this flush can be
 	// re-queued the same way — `queued` is reset as each effect is
 	// processed, so a later write re-runs it with fresh values.
+	//
+	// Effects are run in creation order (`Effect.seq`): an effect always
+	// runs before effects that were created while it was running. For
+	// control statements (`@if`/`@switch`/`@for`/…) that ordering is what
+	// disposes a branch before its own bindings re-run: the control effect
+	// (created first) re-evaluates the condition and clears the previous
+	// branch — destroying its effects — before the queued branch effects
+	// (created inside it) get their turn.
 	const queue = context.effectsToRun;
+	queue.sort((a, b) => a.seq - b.seq);
 	for (let i = 0; i < queue.length; i++) {
 		const effect = queue[i];
 		context.batchOperation++;
@@ -51,6 +60,14 @@ export default function triggerEffects(): void {
 		// during this run — or during a later effect's run in the same
 		// flush — can re-queue it if a source changed again
 		effect.queued = false;
+
+		// The effect's region was released after it was queued (e.g. an
+		// `@if` branch that the control effect cleared earlier in this same
+		// flush). Its cleanup has run and its subscriptions are detached;
+		// running it again would read state the branch no longer owns
+		if (effect.destroyed) {
+			continue;
+		}
 
 		try {
 			checkEffect(effect);

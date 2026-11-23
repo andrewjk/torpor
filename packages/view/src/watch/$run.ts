@@ -7,6 +7,9 @@ import runEffect from "./runEffect";
 
 // TODO: Take a pipeline of operators e.g. debounce
 
+// Monotonic counter for effect creation order (see `Effect.seq`)
+let effectSeq = 0;
+
 /**
  * Runs and re-runs a function that depends on a watched object
  *
@@ -26,6 +29,7 @@ export default function $run(
 		firstSource: null,
 		nextEffect: null,
 		extent: 0,
+		seq: ++effectSeq,
 		queued: false,
 		didError: false,
 		didSuspend: false,
