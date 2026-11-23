@@ -11,7 +11,7 @@ import deepWrap from "./deepWrap";
 import $unwrap from "./$unwrap";
 import propagateSignal from "./propagateSignal";
 import { proxyDataSymbol, proxyKeysSymbol } from "./symbols";
-import trackProxySignal from "./trackProxySignal";
+import trackProxySignal, { ensureProxySignal } from "./trackProxySignal";
 import trackSignal from "./trackSignal";
 
 /**
@@ -281,12 +281,15 @@ const arrayWrapper: Record<PropertyKey, any> = {
 	// the row effects that subscribed through `item.data.row`, while skipping
 	// the per-element trap entirely. `data.shallow` arrays are left unwrapped,
 	// matching the `get` trap's deep-only behaviour.
+	//
+	// The iteration subscribes the reading effect to `length` only — every
+	// array mutation notifies `length` (push/splice via `arrayHandle`, direct
+	// index assignment via the `set` trap), so that is all a `for…of` depends
+	// on. Reads made in the loop body (and everything after the iteration)
+	// stay tracked like any other effect read; the list's own item-building
+	// key reads are untracked by the compiler instead (see `buildForNode`).
 	[Symbol.iterator]: function (data: ProxyData, target: any, _key: PropertyKey) {
 		trackProxySignal(data, "length");
-		// HACK: This prevents lists being re-run on every random property
-		// access by disabling the active effect before properties get
-		// accessed. I'm not sure if this is the best way to achieve this...
-		context.activeTarget = null;
 		return function arrayIterator() {
 			let index = 0;
 			return {
@@ -300,11 +303,10 @@ const arrayWrapper: Record<PropertyKey, any> = {
 							target[index] = value;
 						}
 					}
-					// Mirror the `get` trap's per-index signal creation (a plain
-					// index is never subscribed during iteration — activeTarget is
-					// null — but keeping the signal means a later direct `arr[i]`
-					// read inside an effect reuses it, exactly as before).
-					trackProxySignal(data, String(index));
+					// Create the per-index signal (without subscribing) so a later
+					// direct `arr[i]` read inside an effect reuses it, exactly as
+					// before
+					ensureProxySignal(data, String(index));
 					index++;
 					return { value, done: false };
 				},

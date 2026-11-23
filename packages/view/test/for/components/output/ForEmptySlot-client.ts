@@ -1,3 +1,4 @@
+import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_add_fragment from "../../../../src/render/addFragment";
@@ -79,7 +80,7 @@ export default function App(
 			() => {
 				let t_new_items_1: ListItemSpec[] = [];
 				for (let item of $props.items) {
-					t_new_items_1.push({ data: item, key: item });
+					t_new_items_1.push({ data: item, key: $peek(() => item) });
 				}
 				return t_new_items_1;
 			},

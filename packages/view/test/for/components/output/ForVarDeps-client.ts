@@ -1,3 +1,4 @@
+import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -36,7 +37,7 @@ export default function ForVarDeps(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let { id, a, b } of $props.items) {
-				t_new_items_1.push({ data: { id, a, b }, key: id });
+				t_new_items_1.push({ data: { id, a, b }, key: $peek(() => id) });
 			}
 			return t_new_items_1;
 		},

@@ -1,3 +1,4 @@
+import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_add_fragment from "../../../../src/render/addFragment";
@@ -43,7 +44,7 @@ export default function ForAwaitReactive(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let id of $props.ids) {
-				t_new_items_1.push({ data: { id }, key: id });
+				t_new_items_1.push({ data: { id }, key: $peek(() => id) });
 			}
 			return t_new_items_1;
 		},

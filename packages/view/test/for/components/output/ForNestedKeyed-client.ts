@@ -1,3 +1,4 @@
+import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_add_fragment from "../../../../src/render/addFragment";
@@ -45,7 +46,7 @@ export default function ForNestedKeyed(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let g of $props.groups) {
-				t_new_items_1.push({ data: { g }, key: g.id });
+				t_new_items_1.push({ data: { g }, key: $peek(() => g.id) });
 			}
 			return t_new_items_1;
 		},
@@ -68,7 +69,7 @@ export default function ForNestedKeyed(
 					let t_new_items_2: ListItemSpec[] = [];
 					const g = t_item_1.data.g;
 					for (let it of g.items) {
-						t_new_items_2.push({ data: it, key: it.id });
+						t_new_items_2.push({ data: it, key: $peek(() => it.id) });
 					}
 					return t_new_items_2;
 				},

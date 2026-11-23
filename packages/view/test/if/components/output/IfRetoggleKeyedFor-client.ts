@@ -1,3 +1,4 @@
+import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_add_fragment from "../../../../src/render/addFragment";
@@ -58,7 +59,7 @@ export default function IfRetoggle(
 				() => {
 					let t_new_items_1: ListItemSpec[] = [];
 					for (let tab of tabs()) {
-						t_new_items_1.push({ data: tab, key: tab.id });
+						t_new_items_1.push({ data: tab, key: $peek(() => tab.id) });
 					}
 					return t_new_items_1;
 				},

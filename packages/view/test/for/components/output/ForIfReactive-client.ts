@@ -1,3 +1,4 @@
+import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_add_fragment from "../../../../src/render/addFragment";
@@ -44,7 +45,7 @@ export default function ForIfReactive(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let t of $props.todos) {
-				t_new_items_1.push({ data: { t }, key: t.id });
+				t_new_items_1.push({ data: { t }, key: $peek(() => t.id) });
 			}
 			return t_new_items_1;
 		},

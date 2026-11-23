@@ -1,3 +1,4 @@
+import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -38,7 +39,7 @@ export default function ForLeafRow(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let row of $props.items) {
-				t_new_items_1.push({ data: row, key: row.id });
+				t_new_items_1.push({ data: row, key: $peek(() => row.id) });
 			}
 			return t_new_items_1;
 		},

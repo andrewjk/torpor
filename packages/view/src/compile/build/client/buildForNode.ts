@@ -142,11 +142,16 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	const dataExpr = singleVar ? forVarNames[0] : `{ ${forVarNames.join(", ")} }`;
 	if (key !== undefined) {
 		// Emit the push on a single line, with the key expression mapped to
-		// its source span
+		// its source span. The key is read untracked ($peek): a key read
+		// (`row.id`) must not subscribe the list effect to every row's key
+		// property, or the whole list would re-run (and reallocate every
+		// spec) whenever a row's key field mutates in place. Key changes are
+		// picked up when the list re-runs for any other reason.
+		status.imports.add("$peek");
 		addMappedText(
-			`${listItemsName}.push({ data: ${dataExpr}, key: `,
+			`${listItemsName}.push({ data: ${dataExpr}, key: $peek(() => `,
 			`${keyStatement || "undefined"}`,
-			" });",
+			") });",
 			key.span,
 			status,
 			b,

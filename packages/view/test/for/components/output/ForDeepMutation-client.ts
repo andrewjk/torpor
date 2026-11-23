@@ -1,3 +1,4 @@
+import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -36,7 +37,7 @@ export default function ForDeepMutation(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let item of $props.items) {
-				t_new_items_1.push({ data: item, key: item.label });
+				t_new_items_1.push({ data: item, key: $peek(() => item.label) });
 			}
 			return t_new_items_1;
 		},

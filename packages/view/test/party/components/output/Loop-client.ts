@@ -1,3 +1,4 @@
+import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -38,7 +39,7 @@ export default function Colors(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let color of colors) {
-				t_new_items_1.push({ data: color, key: color });
+				t_new_items_1.push({ data: color, key: $peek(() => color) });
 			}
 			return t_new_items_1;
 		},

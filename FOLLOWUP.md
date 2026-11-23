@@ -5,68 +5,6 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
-### Iterating a watched array stops tracking for the rest of the effect
-
-Found in App's invoices mini demo (2026-11-23). A filtered list never
-changed when its filter did:
-
-```ts
-export function invoices() {
-  const all = [...state.rows.invoice].sort(byNumber); // iterates the watched array
-  switch (state.filter) { … }                         // never tracked
-}
-// App.torp: @for (let invoice of invoices()) { … }
-```
-
-Narrowed down with a bare `$run` in the browser: inside an effect, after a
-`for…of`, a spread or `Array.from` over a watched array, nothing read later in
-that effect is tracked. `.filter()`, `.map()`, `.slice()`, `.find()` and
-`.length` are fine (they go through the `get` trap, not the iterator).
-
-**Where:** `packages/view/src/watch/proxyGet.ts`, `arrayWrapper[Symbol.iterator]`:
-
-```ts
-trackProxySignal(data, "length");
-// HACK: This prevents lists being re-run on every random property
-// access by disabling the active effect before properties get accessed.
-context.activeTarget = null;
-return function arrayIterator() { … };
-```
-
-`context.activeTarget` is cleared when the iterator is fetched and never put
-back, so the effect loses tracking from then on, not just for the elements.
-The comment's intent is for the compiler-emitted list `buildItems` (reading
-`item.id` for keys shouldn't subscribe the list to every row). But the same
-iterator runs for any iteration in any effect, so:
-
-1. Reads after the loop aren't tracked (the bug above).
-2. Reads inside the loop body aren't either: `$run(() => { let total = 0;
-   for (const row of $state.rows) total += row.amount; … })` won't re-run when a
-   row's `amount` changes. For a list that's the point; for a computed total
-   it's a stale value.
-
-**Possible fixes:**
-
-- **Least change:** save and restore. Take `const previous =
-  context.activeTarget` when the iterator is fetched, and put it back when the
-  iteration ends: in `next()` on `done`, and in a `return()` method (called on
-  `break`, `return` or a throw out of `for…of`). Fixes (1), keeps (2) as it is.
-  Watch for re-entrancy (an iteration inside an iteration, or an effect that
-  starts while iterating): restore exactly the saved value, not `null`/the
-  current one.
-- **Better:** stop the iterator touching `activeTarget` at all, and do the
-  untracking where it's wanted. The compiler emits the list's `buildItems`, so
-  it can wrap the item-building loop's key reads in an `untrack(() => …)` (or a
-  flag on the list's effect) and leave every other iteration tracked like
-  `.map()` is. Fixes both (1) and (2).
-
-Either way, a regression test: a `$run` that spreads a watched array and then
-reads another watched property must re-run when that property changes; and one
-that sums a field in a `for…of` must re-run when an element's field changes.
-
-**Workaround** (in App's invoices demo): `.slice()` or `.filter()`
-instead of spreading, and read the other state before iterating.
-
 ### Loop-var resolution in @for bodies: open points
 
 The read-only loop-var bindings shipped (`appendForVarBindings` shadows, writes

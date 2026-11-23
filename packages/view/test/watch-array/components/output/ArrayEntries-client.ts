@@ -1,3 +1,4 @@
+import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -37,7 +38,7 @@ export default function ArrayEntries(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let [i, item] of $props.items.entries()) {
-				t_new_items_1.push({ data: { i, item }, key: item.id });
+				t_new_items_1.push({ data: { i, item }, key: $peek(() => item.id) });
 			}
 			return t_new_items_1;
 		},
