@@ -144,8 +144,11 @@ see [TORPOR_AGENTS.md](TORPOR_AGENTS.md).
 
 - User-facing changes get a bump file in `.bumpy/` (see its README), added in
   the same commit as the change (`pnpm bump:add`, or by hand)
-- The body is a **one-line** summary with a `Fix:`/`Feat:` prefix -- the same
-  text as the commit's subject line
+- The body is a **one-line** summary with the `Fix:`/`Feat:` prefix as the
+  commit's subject line and no longer than 100 characters
+- Breaking changes: prefix the commit subject with `!` (`!Fix: ...`) and add a
+  `BREAKING:` line to the bump file describing what breaks and what to use
+  instead
 - Longer context belongs in commit discussions, docs, or `FOLLOWUP.md`, not
   the bump file
 
