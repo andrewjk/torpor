@@ -23,14 +23,6 @@ Either only deep-wrap plain objects and arrays (prototype is
 collections, or keep per-object metadata in a `WeakMap` instead of on the
 target. That would also fix frozen objects.
 
-### `unmount()` on a never-mounted element tears down the app (confirmed)
-
-`render/unmount.ts`: when `parent` has no registered region tree, the `else`
-branch clears `context.rootRegion`. Calling `unmount(someEmptyDiv)` disposes
-the whole running page (its effects stop and its content is cleared).
-Unregistered parents should be a no-op, apart from removing their own
-children.
-
 ### A mount that throws leaves the render context dirty (confirmed)
 
 `render/mount.ts` sets `context.rootRegion` and pushes the root region, then

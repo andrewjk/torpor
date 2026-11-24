@@ -87,3 +87,30 @@ test("mounting again after unmount works -- hydrated then mounted", async () => 
 	expect(container.querySelector("#content")).not.toBeNull();
 	expect(queryByText(container, "Hello")).not.toBeNull();
 });
+
+test("unmount on an unregistered element does not tear down the app", async () => {
+	(window as any).__unmountLog = [];
+
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, source, "client");
+	mountComponent(container, component);
+
+	expect((window as any).__unmountLog).toEqual(["mount"]);
+
+	// A container that was never mounted into: unmount must not dispose the
+	// running app's root region (it used to clear `context.rootRegion`)
+	const other = document.createElement("div");
+	other.innerHTML = "<span>keep</span>";
+	document.body.appendChild(other);
+
+	unmount(other);
+
+	expect((window as any).__unmountLog).toEqual(["mount"]);
+	expect(container.querySelector("#content")).not.toBeNull();
+	expect(other.childNodes.length).toBe(0);
+
+	// The running app is still live: unmounting its own container still runs
+	// its cleanups normally
+	unmount(container);
+	expect((window as any).__unmountLog).toContain("cleanup");
+});

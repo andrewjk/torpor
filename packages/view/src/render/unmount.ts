@@ -13,6 +13,10 @@ import { containedTrees, registeredRegionTree, unregisterRegionTree } from "./re
  * embed is disposed and the host's render context is left untouched. Any
  * embeds living inside a root container are disposed along with it.
  *
+ * When no tree was mounted into `parent`, this is a no-op apart from
+ * disposing any embeds living inside it and removing `parent`'s own child
+ * nodes — it never touches the running app's root context.
+ *
  * Call this before `mount`ing a fresh component tree into the same container
  * (e.g. when client-side navigating to a route whose layout chain differs
  * from the previous one). `mount` refuses to mount into a non-empty parent
@@ -32,19 +36,21 @@ export default function unmount(parent: ParentNode): void {
 		unregisterRegionTree(nestedParent);
 	}
 
-	if (owned !== undefined && owned !== context.rootRegion) {
-		// A nested tree: dispose it and leave the surrounding render context
-		// — the host's — untouched.
-		clearRegion(owned);
-		unregisterRegionTree(parent);
-	} else {
-		if (context.rootRegion !== null) {
-			clearRegion(context.rootRegion);
+	if (owned !== undefined) {
+		if (owned !== context.rootRegion) {
+			// A nested tree: dispose it and leave the surrounding render
+			// context — the host's — untouched.
+			clearRegion(owned);
+			unregisterRegionTree(parent);
+		} else {
+			// The root tree: dispose it and reset the render context.
+			// `owned !== undefined` is what tells us the root really belongs to
+			// this container — an unregistered parent must not tear down
+			// whatever app happens to be running elsewhere.
+			clearRegion(owned);
 			context.rootRegion = null as unknown as Region;
 			context.previousRegion = null as unknown as Region;
 			context.activeRegion = null as unknown as Region;
-		}
-		if (owned !== undefined) {
 			unregisterRegionTree(parent);
 		}
 	}
