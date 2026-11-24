@@ -25,9 +25,6 @@ target. That would also fix frozen objects.
 
 ### Smaller reactivity issues
 
-- **Map/Set `delete` of a missing key notifies** (confirmed): it re-runs
-  `size` / iteration readers although nothing changed. Check the result of
-  `target.delete` first.
 - **Index writes always notify `length`** (confirmed, known TODO in
   `proxySet`): `arr[0] = 9` re-runs every `length` reader, including whole
   `@for` lists.

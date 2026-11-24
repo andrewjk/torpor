@@ -133,7 +133,7 @@ test("watched map values are reactive objects", () => {
 	// Storing a proxy stores the raw object, so identity is preserved
 	let $obj = $watch({ count: 5 });
 	map.set("b", $obj);
-	expect($unwrap(map.get("b"))).toBe($unwrap($obj));
+	expect($unwrap(map.get("b")!)).toBe($unwrap($obj));
 });
 
 test("watched map forEach re-runs effects", () => {
@@ -173,4 +173,32 @@ test("watched map with object keys works", () => {
 	map.set(key, 1);
 	expect(runs).toBe(2);
 	expect(value).toBe(1);
+});
+
+test("deleting a missing map key doesn't re-run effects", () => {
+	let map = $watch(new Map([["a", 1]]));
+	let sizeRuns = 0;
+	let iterationRuns = 0;
+
+	$run(() => {
+		sizeRuns++;
+		void map.size;
+	});
+
+	$run(() => {
+		iterationRuns++;
+		void [...map.keys()];
+	});
+
+	expect(sizeRuns).toBe(1);
+	expect(iterationRuns).toBe(1);
+
+	expect(map.delete("missing")).toBe(false);
+	expect(sizeRuns).toBe(1);
+	expect(iterationRuns).toBe(1);
+
+	// A real delete still notifies
+	expect(map.delete("a")).toBe(true);
+	expect(sizeRuns).toBe(2);
+	expect(iterationRuns).toBe(2);
 });

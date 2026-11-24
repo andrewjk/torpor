@@ -109,7 +109,7 @@ test("watched set object elements are reactive", () => {
 
 	// Storing a watched object keeps its identity, and has() works with
 	// both the proxy and the raw object
-	let $obj = $watch({ id: 1 });
+	let $obj = $watch({ count: 5 });
 	set.add($obj);
 	expect(set.has($obj)).toBe(true);
 	expect(set.has($unwrap($obj))).toBe(true);
@@ -142,4 +142,32 @@ test("watched collections can be chained", () => {
 
 	let set = $watch(new Set<string>());
 	expect(set.add("a").add("b").has("b")).toBe(true);
+});
+
+test("deleting a missing set element doesn't re-run effects", () => {
+	let set = $watch(new Set(["a"]));
+	let sizeRuns = 0;
+	let iterationRuns = 0;
+
+	$run(() => {
+		sizeRuns++;
+		void set.size;
+	});
+
+	$run(() => {
+		iterationRuns++;
+		void [...set.values()];
+	});
+
+	expect(sizeRuns).toBe(1);
+	expect(iterationRuns).toBe(1);
+
+	expect(set.delete("missing")).toBe(false);
+	expect(sizeRuns).toBe(1);
+	expect(iterationRuns).toBe(1);
+
+	// A real delete still notifies
+	expect(set.delete("a")).toBe(true);
+	expect(sizeRuns).toBe(2);
+	expect(iterationRuns).toBe(2);
 });

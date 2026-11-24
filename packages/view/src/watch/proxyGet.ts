@@ -622,7 +622,11 @@ const mapWrapper: Record<PropertyKey, any> = {
 		return function (key: any) {
 			key = $unwrap(key);
 			const result = target.delete(key);
-			propagateCollection(data, collectionKey(key));
+			// Deleting a missing key changes nothing, so don't re-run
+			// size/iteration readers for it
+			if (result) {
+				propagateCollection(data, collectionKey(key));
+			}
 			return result;
 		};
 	},
@@ -715,7 +719,11 @@ const setWrapper: Record<PropertyKey, any> = {
 		return function (value: any) {
 			value = $unwrap(value);
 			const result = target.delete(value);
-			propagateCollection(data, collectionKey(value));
+			// Deleting a missing element changes nothing, so don't re-run
+			// size/iteration readers for it
+			if (result) {
+				propagateCollection(data, collectionKey(value));
+			}
 			return result;
 		};
 	},
