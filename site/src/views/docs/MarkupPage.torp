@@ -41,6 +41,23 @@ export default function Component() {
 `}
 		/>
 		<p>
+			Quoted attribute values are static strings, so braces in them stay
+			literal. To combine text with values, use a backtick template literal or a
+			whole expression:
+		</p>
+		<CodePreview
+			code={`
+export default function Component() {
+	const size = "large"
+
+	@render {
+		<p class=\`greeting \${size}\`>Hello!</p>
+		<p id={\`item-\${size}\`}>Hello!</p>
+	}
+}
+`}
+		/>
+		<p>
 			Use this shortcut syntax to set the value of an attribute to a value of the same
 			name:
 		</p>

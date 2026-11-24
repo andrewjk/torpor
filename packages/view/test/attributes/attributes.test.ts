@@ -18,7 +18,7 @@ export default function Attributes() {
 		<div
 			thing={$props.thing}
 			data-thing={$props.dataThing}
-			caption="this attribute is for {$props.description}"
+			caption=\`this attribute is for \${$props.description}\`
 			{$props.attr}
 		>
 			Hello!

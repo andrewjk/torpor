@@ -1,7 +1,7 @@
 import type Attribute from "../types/nodes/Attribute";
 import type ElementNode from "../types/nodes/ElementNode";
+import { skipStringOrComment } from "../utils/codeScanner";
 import isFullyReactive from "../utils/isFullyReactive";
-import isReactive from "../utils/isReactive";
 import type ParseStatus from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
 import addError from "./utils/addError";
@@ -101,14 +101,23 @@ function parseAttribute(status: ParseStatus): Attribute {
 	if (accept("=", status)) {
 		consumeSpace(status);
 		valueStart = status.i;
-		value = parseAttributeValue(status);
-		valueEnd = status.i;
-		reactive = isReactive(value);
-		fullyReactive = isFullyReactive(value);
-		if (fullyReactive) {
-			value = value.substring(1, value.length - 1);
-			valueStart++;
-			valueEnd--;
+		if (status.source[valueStart] === "`") {
+			// A backtick value is a JavaScript template literal expression
+			value = parseTemplateLiteral(status);
+			valueEnd = status.i;
+			reactive = fullyReactive = true;
+		} else {
+			// Quoted and unquoted values are static strings: braces are
+			// literal. Only a whole `{expression}` value is reactive.
+			value = parseAttributeValue(status);
+			valueEnd = status.i;
+			fullyReactive = isFullyReactive(value);
+			reactive = fullyReactive;
+			if (fullyReactive) {
+				value = value.substring(1, value.length - 1);
+				valueStart++;
+				valueEnd--;
+			}
 		}
 	} else if (name.startsWith("{") && name.endsWith("}")) {
 		value = name.substring(1, name.length - 1);
@@ -143,6 +152,21 @@ function parseAttribute(status: ParseStatus): Attribute {
 		fullyReactive,
 		span: { start: valueStart, end: valueEnd },
 	};
+}
+
+/**
+ * Consumes a backtick-delimited JavaScript template literal, reusing the
+ * script scanner so `${...}` interpolations and nested strings/templates are
+ * skipped correctly.
+ */
+function parseTemplateLiteral(status: ParseStatus): string {
+	const start = status.i;
+	const end = skipStringOrComment(status.source, start);
+	status.i = end === -1 ? start + 1 : end;
+	if (status.source[status.i - 1] !== "`") {
+		addError(status, "Unclosed template literal in attribute", start, status.i);
+	}
+	return status.source.substring(start, status.i);
 }
 
 function parseAttributeValue(status: ParseStatus): string {

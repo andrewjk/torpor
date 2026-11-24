@@ -18,7 +18,7 @@ const source = `
 export default function StyleClear($props: { hidden: boolean; color: string | undefined }) {
 	@render {
 		<div class="object" style={{ display: $props.hidden ? "none" : undefined }}>Object</div>
-		<div class="string" style="color: {$props.color}">String</div>
+		<div class="string" style=\`color: \${$props.color}\`>String</div>
 	}
 }
 `;

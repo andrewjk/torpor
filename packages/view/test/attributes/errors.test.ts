@@ -18,6 +18,21 @@ export default function Test() {
 	expect(output.errors[0].message).toBe("Unclosed non-void element: a");
 });
 
+test("unclosed template literal attribute", () => {
+	const input = `
+export default function Test() {
+	@render {
+		<a title=\`hello />
+	}
+}
+`;
+	const output = trimParsed(parse(input));
+	expect(output.ok).toBe(false);
+	expect(output.errors.map((error) => error.message)).toContain(
+		"Unclosed template literal in attribute",
+	);
+});
+
 test("unfinished tag with attribute", () => {
 	const input = `
 export default function Test() {

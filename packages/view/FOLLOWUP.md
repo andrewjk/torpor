@@ -33,11 +33,6 @@ target. That would also fix frozen objects.
 
 ## Compiler
 
-- **Static quoted attributes interpolate braces**: `data-x='{"a":1}'`
-  becomes `${t_attr("a":1)}`, which is a syntax error in the generated code
-  rather than a parse error with a location. If interpolation inside quoted
-  attributes is intended, point the error at the attribute and mention the
-  `&#123;` escape.
 - **`isReactive` / `isFullyReactive` / `createText`** decide reactivity by
   `text.includes("{") && text.includes("}")` (TODOs in each), so they're
   fooled by braces in strings and comments.

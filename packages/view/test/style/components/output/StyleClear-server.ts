@@ -1,4 +1,3 @@
-import t_attr from "../../../../src/render/formatAttributeText";
 import t_style from "../../../../src/ssr/buildStyles";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
@@ -11,7 +10,7 @@ export default async function StyleClear(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<div class="object" ${t_style({ display: $props.hidden ? "none" : undefined })}>Object</div> <div class="string" style="color: ${t_attr($props.color)}">String</div>`;
+	t_body += `<div class="object" ${t_style({ display: $props.hidden ? "none" : undefined })}>Object</div> <div class="string" ${t_style(`color: ${$props.color}`)}>String</div>`;
 
 	return { body: t_body, head: t_head };
 }

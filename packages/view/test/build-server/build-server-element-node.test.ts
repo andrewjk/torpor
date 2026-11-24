@@ -38,14 +38,15 @@ export default function Component() {
 			<input &value={value}>
 			<input {value}>
 			<input value={value + " extra"}>
-			<input value="{value} extra">
+			<input value=\`\${value} extra\`>
+			<input data-json='{"a":1}'>
 		</p>
 	}
 }`;
 
 	const html = await buildHtml(source);
 	const expected =
-		'<p><input value="some &quot;text&quot;"> <input value="some &quot;text&quot;"> <input value="some &quot;text&quot;"> <input value="some &quot;text&quot;"> <input value="some &quot;text&quot; extra"> <input value="some &quot;text&quot; extra"></p>';
+		'<p><input value="some &quot;text&quot;"> <input value="some &quot;text&quot;"> <input value="some &quot;text&quot;"> <input value="some &quot;text&quot;"> <input value="some &quot;text&quot; extra"> <input value="some &quot;text&quot; extra"> <input data-json="{&quot;a&quot;:1}"></p>';
 
 	expect(html).toBe(expected);
 });

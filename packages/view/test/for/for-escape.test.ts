@@ -13,10 +13,10 @@ export default function ForEscape() {
 		<section>
 			@for (let i = 0; i < $state.things.length; i++) {
 				<p>{$state.things[i]}</p>
-				<div data-testid="input1-{i}" name={i} />
-				<div data-testid="input2-{i}" name="{i}" />
-				<div data-testid="input3-{i}" name={$state.things[i]} />
-				<input &value={$state.things[i]} name="{i}" />
+				<div data-testid=\`input1-\${i}\` name={i} />
+				<div data-testid=\`input2-\${i}\` name=\`\${i}\` />
+				<div data-testid=\`input3-\${i}\` name={$state.things[i]} />
+				<input &value={$state.things[i]} name=\`\${i}\` />
 			}
 		</section>
 	}

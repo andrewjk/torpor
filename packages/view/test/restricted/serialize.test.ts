@@ -259,14 +259,6 @@ test("rejects unsupported constructs with positioned errors", () => {
 			/Form bindings/,
 		],
 		[
-			`export default function F() {
-	@render {
-		<div class="a {$props.x}">x</div>
-	}
-}`,
-			/Mixed static\/dynamic attribute values/,
-		],
-		[
 			`export default function G() {
 	@render {
 		@for (item of items.filter(i => i.ok)) {

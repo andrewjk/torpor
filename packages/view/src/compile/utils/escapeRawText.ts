@@ -16,8 +16,6 @@ export default function escapeRawText(text: string): string {
 			result += "\\\\";
 		} else if (char === "`") {
 			result += "\\x60";
-		} else if (char === "$" && text[i + 1] === "{") {
-			result += "\\x24";
 		} else if (char === " ") {
 			// A single space is already preserved by the collapse pass; runs
 			// need escaping so they don't collapse to one
@@ -31,6 +29,8 @@ export default function escapeRawText(text: string): string {
 			}
 		} else if (/\s/.test(char)) {
 			result += whitespaceEscape(char);
+		} else if (char === "$" && text[i + 1] === "{") {
+			result += "\\x24";
 		} else {
 			result += char;
 		}

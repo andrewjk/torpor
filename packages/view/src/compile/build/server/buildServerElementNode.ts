@@ -1,5 +1,6 @@
 import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
+import { escapeTemplateText } from "../../utils/escapeTemplateText";
 import isRawTextTag from "../../utils/rawTextTags";
 import trimQuotes from "../../utils/trimQuotes";
 import voidTags from "../../utils/voidTags";
@@ -131,12 +132,16 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 			value = value
 				? `"${trimQuotes(value)} torp-${status.styleHash}"`
 				: `"torp-${status.styleHash}"`;
-			attributes.push(`${name}="${trimQuotes(value).replaceAll('"', "&quot;")}"`);
+			attributes.push(
+				escapeTemplateText(`${name}="${trimQuotes(value).replaceAll('"', "&quot;")}"`),
+			);
 			needsClass = false;
 		} else if (value != null) {
 			// Just set the attribute
 			// TODO: Probably check if it's a boolean attribute e.g. disabled
-			attributes.push(`${name}="${trimQuotes(value).replaceAll('"', "&quot;")}"`);
+			attributes.push(
+				escapeTemplateText(`${name}="${trimQuotes(value).replaceAll('"', "&quot;")}"`),
+			);
 		} else {
 			attributes.push(`${name}`);
 		}

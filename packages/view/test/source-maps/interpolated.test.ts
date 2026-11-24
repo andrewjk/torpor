@@ -6,7 +6,7 @@ test("source maps with interpolated attributes in element", () => {
 	const input = `
 export default function Source() {
 	@render {
-		<div id="{a}-{bc}-{d}"></div>
+		<div id=\`\${a}-\${bc}-\${d}\`></div>
 	}
 }
 `.trim();
@@ -20,21 +20,17 @@ export default function Source() {
 	const matches = built.map.filter(
 		(m) => m.script === 't_attribute(t_div_1, "id", `${a}-${bc}-${d}`);',
 	);
-	expect(matches.length).toBe(3);
+	expect(matches.length).toBe(1);
 
-	expect(matches[0].source.start).toBe(input.indexOf("{a}") + 1);
-	expect(matches[0].compiled.start).toBe(built.code.indexOf("{a}") + 1);
-	expect(matches[1].source.start).toBe(input.indexOf("{bc}") + 1);
-	expect(matches[1].compiled.start).toBe(built.code.indexOf("{bc}") + 1);
-	expect(matches[2].source.start).toBe(input.indexOf("{d}") + 1);
-	expect(matches[2].compiled.start).toBe(built.code.indexOf("{d}") + 1);
+	expect(matches[0].source.start).toBe(input.indexOf("`${a}"));
+	expect(matches[0].compiled.start).toBe(built.code.indexOf("`${a}"));
 });
 
 test("source maps with interpolated attributes in component", () => {
 	const input = `
 export default function Source() {
 	@render {
-		<Child id="{a}-{bc}-{d}" />
+		<Child id=\`\${a}-\${bc}-\${d}\` />
 	}
 }
 `.trim();
@@ -45,15 +41,11 @@ export default function Source() {
 	//console.log(built.code);
 	//console.log(built.map);
 
-	const matches = built.map.filter((m) => m.script === "id: `${a}-${bc}-${d}`,");
-	expect(matches.length).toBe(3);
+	const matches = built.map.filter((m) => m.script === "`${a}-${bc}-${d}`");
+	expect(matches.length).toBe(1);
 
-	expect(matches[0].source.start).toBe(input.indexOf("{a}") + 1);
-	expect(matches[0].compiled.start).toBe(built.code.indexOf("{a}") + 1);
-	expect(matches[1].source.start).toBe(input.indexOf("{bc}") + 1);
-	expect(matches[1].compiled.start).toBe(built.code.indexOf("{bc}") + 1);
-	expect(matches[2].source.start).toBe(input.indexOf("{d}") + 1);
-	expect(matches[2].compiled.start).toBe(built.code.indexOf("{d}") + 1);
+	expect(matches[0].source.start).toBe(input.indexOf("`${a}"));
+	expect(matches[0].compiled.start).toBe(built.code.indexOf("`${a}"));
 });
 
 test("source maps with interpolated text", () => {

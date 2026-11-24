@@ -17,7 +17,7 @@ export default async function ForEscape(
 	/* User interface */
 	t_body += `<section><![>`;
 	for (let i = 0; i < $state.things.length; i++) {
-		t_body += `<!^><p>${t_fmt($state.things[i])}</p> <div data-testid="input1-${t_attr(i)}" ${t_attr_if("name", i)}></div> <div data-testid="input2-${t_attr(i)}" name="${t_attr(i)}"></div> <div data-testid="input3-${t_attr(i)}" ${t_attr_if("name", $state.things[i])}></div> <input value="${t_attr($state.things[i]) || ""}" name="${t_attr(i)}">`;
+		t_body += `<!^><p>${t_fmt($state.things[i])}</p> <div ${t_attr_if("data-testid", `input1-${i}`)} ${t_attr_if("name", i)}></div> <div ${t_attr_if("data-testid", `input2-${i}`)} ${t_attr_if("name", `${i}`)}></div> <div ${t_attr_if("data-testid", `input3-${i}`)} ${t_attr_if("name", $state.things[i])}></div> <input value="${t_attr($state.things[i]) || ""}" ${t_attr_if("name", `${i}`)}>`;
 	}
 	t_body += `<!]><!></section>`;
 

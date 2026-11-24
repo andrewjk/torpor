@@ -7,6 +7,7 @@ import type TemplateNode from "../../types/nodes/TemplateNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
 import escapeRawText from "../../utils/escapeRawText";
+import { escapeTemplateText } from "../../utils/escapeTemplateText";
 import getSingleElementRoot from "../../utils/getSingleElementRoot";
 import isReactive from "../../utils/isReactive";
 import { NON_RENDERING_OPERATIONS } from "../../utils/nonRenderingOperations";
@@ -214,11 +215,11 @@ function buildElementFragmentText(
 			} else if (a.name === "class" && node.scopeStyles) {
 				needsClass = false;
 				let value = a.value
-					? `"${trimQuotes(a.value)} torp-${status.styleHash}"`
+					? `"${escapeTemplateText(trimQuotes(a.value))} torp-${status.styleHash}"`
 					: `"torp-${status.styleHash}"`;
 				return `${a.name}=${value}`;
 			} else {
-				return `${a.name}${a.value != null ? `=${a.value}` : ""}`;
+				return `${a.name}${a.value != null ? `=${escapeTemplateText(a.value)}` : ""}`;
 			}
 		})
 		.filter(Boolean)
