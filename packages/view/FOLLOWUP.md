@@ -25,9 +25,6 @@ target. That would also fix frozen objects.
 
 ### Smaller reactivity issues
 
-- **`NaN` writes always notify** (confirmed): `proxySet` compares with
-  `!==`, so `s.a = NaN` re-runs effects every time while `a` is already
-  `NaN`. Use `Object.is`.
 - **`in` isn't tracked** (confirmed): there's no `has` trap, so
   `"k" in s` inside an effect doesn't re-run when `k` is added. Add a `has`
   trap that subscribes to the key (or to `proxyKeysSymbol`).
