@@ -1,8 +1,9 @@
-import { $page } from "@torpor/build/state";
 import { Field, Form, Label, Message, Switch } from "@torpor/ui/Form";
 import * as z from "zod";
 
 export default function ExampleToggle($props: any) {
+	let { $page } = $context;
+
 	const schema = z.object({
 		enabled: z.literal(true, { message: "Must be switched on" }),
 	});

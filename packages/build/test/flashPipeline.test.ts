@@ -4,17 +4,17 @@ import seeOther from "../src/response/seeOther";
 import ServerEvent from "../src/server/ServerEvent";
 import Router from "../src/site/Router";
 import { createServerLoad } from "../src/site/serverHandlers";
-import $page from "../src/state/$serverPage";
 import { PAGE_ROUTE, PAGE_SERVER_ROUTE } from "../src/types/RouteType";
 import type ManifestRoute from "../src/types/ManifestRoute";
 import type PageServerEndPoint from "../src/types/PageServerEndPoint";
+import type PageState from "../src/types/PageState";
 
 /**
  * A page component that renders the flash state, like a layout would. The
- * flash flows through $page (a module global), which loadView consumes.
+ * flash flows through `$context.$page`, which loadView consumes it into.
  */
-const component = () => {
-	const { flash } = $page;
+const component = (_: unknown, $context: { $page: PageState }) => {
+	const { flash } = $context.$page;
 	const message = typeof flash?.message === "string" ? flash.message : "";
 	return {
 		body: message ? `<p class="flash">${message}</p>` : `<p>no flash</p>`,

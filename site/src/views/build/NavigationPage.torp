@@ -82,12 +82,20 @@ route("/posts/[id]", { id: 5 }); // "/posts/5"
 
 		<h2>The $page state object</h2>
 		<p>
-			<code>$page</code> is a global reactive object describing the current page.
-			Import it from <code>&#64;torpor/build/state</code>:
+			<code>$page</code> is a reactive object describing the current page. The
+			framework puts it into the context of every page, layout and component as
+			<code>$context.$page</code>, so that each request rendered on the server
+			gets its own:
 		</p>
 		<CodePreview
 			code={`
-import { $page } from "@torpor/build/state";
+export default function Breadcrumb() {
+	let { $page } = $context;
+
+	@render {
+		<p>You are at {$page.url.pathname}</p>
+	}
+}
 `}
 		/>
 		<ul>

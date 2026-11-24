@@ -5,7 +5,7 @@ const COOKIE_NAME = "torpor-flash";
 /**
  * A one-time values store set in a form action and shown on the next page
  * render, which survives the redirect. Available as `event.flash`; the
- * framework reads it into `$page.flash` when a page is rendered, so
+ * framework reads it into `$context.$page.flash` when a page is rendered, so
  * components display it reactively:
  *
  * ```ts
@@ -20,6 +20,8 @@ const COOKIE_NAME = "torpor-flash";
  * ```
  *
  * ```torp
+ * let { $page } = $context;
+ *
  * @if ($page.flash?.message) {
  * 	<p class="flash">{$page.flash.message}</p>
  * }

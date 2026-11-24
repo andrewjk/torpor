@@ -20,20 +20,6 @@ const site: Site = new Site();
 site.adapter = cloudflare;
 ```
 
-## Compatibility flags
-
-Torpor keeps each request's page state (`$page`) separate with
-`AsyncLocalStorage`, which Workers provide behind the `nodejs_als` (or
-`nodejs_compat`) compatibility flag. The generated `dist/wrangler.toml` sets it;
-if you deploy with your own wrangler config, add it there too:
-
-```toml
-compatibility_flags = ["nodejs_als"]
-```
-
-Without it, the server logs a warning and concurrent requests share one page
-state, so one request can see another's url, flash message or form result.
-
 ## Request context
 
 The worker puts Cloudflare's `env` and execution context on `globalThis.adapter`,

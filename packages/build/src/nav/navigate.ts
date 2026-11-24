@@ -218,8 +218,11 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 	// (above), or added via onformsubmit (below)
 	$props.form = $page.form;
 
-	// Add some special context for submitting Forms client-side
+	// The root context: the page state, read in components as
+	// `$context.$page`, and some special context for submitting Forms
+	// client-side
 	const $context = {
+		$page,
 		TorporBuildContext: { onformsubmit: formSubmit },
 	};
 
@@ -327,9 +330,11 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 				}
 				app = slotRegion.startNode.parentNode as HTMLElement;
 				clearLayoutSlot(slotRegion);
-				component(app, null);
+				// The reused layout's own context additions are gone, but the
+				// root context is passed down again
+				component(app, null, undefined, $context);
 			} else if (withHydration) {
-				hydrate(app, component, $props, slots);
+				hydrate(app, component, $props, slots, $context);
 			} else {
 				// The layout chain changed (or there was no previous layout to
 				// reuse): tear down the previous UI entirely — disposing its
@@ -338,7 +343,7 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 				// previous render's children, and it would reuse a stale root
 				// region.
 				unmount(app);
-				mount(app, component, $props, slots);
+				mount(app, component, $props, slots, $context);
 			}
 		} catch (error) {
 			// TODO: Show a proper Error component

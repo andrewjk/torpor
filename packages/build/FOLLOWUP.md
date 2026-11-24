@@ -46,7 +46,7 @@ the not-found path.
 
 ### `/_error?status=` trusts the query string (confirmed)
 
-`$page.status = parseInt(query.get("status") ?? "404")` is used as the
+`page.status = parseInt(query.get("status") ?? "404")` is used as the
 response status. `?status=abc` and `?status=999` throw (500),
 `?status=200` serves the error page as a success, and `?status=302`
 returns a redirect with no `Location`. Clamp to valid 4xx/5xx codes and
@@ -79,7 +79,14 @@ ignore the result of) superseded navigations and let the newest one win.
 - **Module-global base path**: `createServerLoad` calls `setBasePath`, a
   module global, so two sites with different bases in one process (tests,
   multi-tenant servers) overwrite each other. It could be scoped per site
-  the way `$page` is now scoped per request (`site/pageScope.ts`).
+  the way the page state is now kept per request (`site/requestPage.ts`).
+- **A reused layout's context additions don't reach the new page**: when
+  client navigation keeps a layout and refills its slot (`nav/navigate.ts`),
+  the slot function is called with the root context (`$page`,
+  `TorporBuildContext`), not the context the layout built up, so anything a
+  layout puts into `$context` for its pages is missing after a navigation
+  that reuses it. The layout's own `$context` would need to be kept with its
+  slot region in `client.layoutStack`.
 - **`rewriteBaseInHtml` rewrites by regex over the whole document**, so
   `href="/…"` / `src="/…"` text inside `<pre>`/`<code>` samples or inline
   scripts is rewritten too.
@@ -110,7 +117,7 @@ navigations into running inside `document.startViewTransition`; scroll is
 always reset across pages, kept for same-page navigations, and restored from
 history state on back/forward),
 flash messages (`event.flash.set(...)` riding a one-read cookie, consumed
-into `$page.flash` by the render pipeline), route middleware (`site.middleware`
+into `$context.$page.flash` by the render pipeline), route middleware (`site.middleware`
 runs globally for every request -- unmatched ones too -- and server endpoints
 take `middleware: [...]` for route-scoped guards, both before folder hooks),
 and ETag/Cache-Control support via `notModified`. Discovery helpers exist
@@ -163,8 +170,8 @@ virtually every real project.
   pages that are linked from prerendered pages but not prerendered
   themselves (SvelteKit-style completeness check).
 - **Concurrent prerendering** — render pages concurrently (or in a worker
-  pool); today it is sequential, which is slow for large sites. `$page` is
-  now scoped per request (`site/pageScope.ts`), so it no longer forces this,
+  pool); today it is sequential, which is slow for large sites. The page
+  state is now kept per request (`site/requestPage.ts`), so it no longer forces this,
   but the module-global base path still would.
 - **`adapter-github-pages`** — a thin adapter adding `.nojekyll` and
   `404.html` conventions on top of the prerendered output.

@@ -8,7 +8,6 @@ import { readResponseBody } from "../response/read.ts";
 import ServerEvent from "../server/ServerEvent.ts";
 import runHooks from "../server/runHooks.ts";
 import type MiddlewareFunction from "../server/types/MiddlewareFunction";
-import $page from "../state/$serverPage.ts";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type { HeadElement } from "../types/PageEndPoint.ts";
 import type PageLoadEvent from "../types/PageLoadEvent.ts";
@@ -40,7 +39,7 @@ import { findMissingSlotLayout, warnMissingSlotContent } from "./layoutSlots.ts"
 import { getBasePath, rewriteBaseInHtml, setBasePath, stripBaseFromUrl } from "./basePath.ts";
 import findErrorRoute from "./findErrorRoute.ts";
 import mergeHead from "./mergeHead.ts";
-import runWithPageState from "./pageScope.ts";
+import pageOf from "./requestPage.ts";
 import type Router from "./Router.ts";
 
 /**
@@ -154,7 +153,7 @@ export function createServerLoad(
 		if (!url) {
 			// Like any other error, the error page is rendered at the
 			// requested url rather than redirecting into the site
-			$page.url = ev.url;
+			pageOf(ev).url = ev.url;
 			const response = await renderErrorPage(ev, ev.url, template, router, 404, "Not found");
 			return response ?? notFound();
 		}
@@ -175,7 +174,7 @@ export function createServerLoad(
 			const pageUrl = new URL(pagePath + url.search, url);
 			const pageRoute = router.match(pagePath, query);
 			if (pageRoute) {
-				$page.url = pageUrl;
+				pageOf(ev).url = pageUrl;
 				return await loadPageData(
 					ev,
 					pageUrl,
@@ -188,15 +187,16 @@ export function createServerLoad(
 
 		//console.log(`handling ${ev.request.method} for '${path}'${query.size ? ` with ${query}` : ""}`);
 
-		// Update $page before routing, so that a request that doesn't match
+		// Update the page state before routing, so that a request that doesn't match
 		// any route (and gets the error page) still sees this url
-		$page.url = url;
+		const page = pageOf(ev);
+		page.url = url;
 		if (path.endsWith("/_error")) {
-			$page.status = parseInt(query.get("status") ?? "404");
-			$page.error = { message: query.get("message") ?? "" };
+			page.status = parseInt(query.get("status") ?? "404");
+			page.error = { message: query.get("message") ?? "" };
 		} else {
-			$page.status = 200;
-			$page.error = { message: "" };
+			page.status = 200;
+			page.error = { message: "" };
 		}
 
 		let route = router.match(path, query);
@@ -293,7 +293,7 @@ export function createServerLoad(
 						// the url it used to be redirected to, or the prerender
 						// writing 404.html). It responds with the requested status
 						// rather than 200
-						return await loadView(ev, url, handler, params, template, $page.status);
+						return await loadView(ev, url, handler, params, template, page.status);
 					}
 				}
 				return undefined;
@@ -307,20 +307,7 @@ export function createServerLoad(
 		return routeResponse ?? notFound();
 	};
 
-	return function load(ev: ServerEvent, template?: string): Promise<Response> {
-		// Each request gets its own `$page` state, so concurrent requests can't
-		// see each other's url, flash message or form result
-		return runWithPageState(() => loadInPageScope(ev, template));
-	};
-
-	async function loadInPageScope(ev: ServerEvent, template?: string): Promise<Response> {
-		// The form result and flash message belong to this request only. A
-		// fresh page state starts without them; the reset matters when the
-		// state is shared (no AsyncLocalStorage), so that a request can't
-		// render a previous request's form result
-		$page.form = undefined;
-		$page.flash = undefined;
-
+	return async function load(ev: ServerEvent, template?: string): Promise<Response> {
 		// Global middleware, from `site.middleware`: runs for every request
 		// before routing, including ones that won't match a route
 		// (maintenance mode, legacy url redirects, etc)
@@ -341,7 +328,7 @@ export function createServerLoad(
 						const url = stripBaseFromUrl(ev.url, basePath) ?? ev.url;
 						const match = router.match(url.pathname, url.searchParams);
 						if (match?.handler.type !== SERVER_ROUTE) {
-							$page.url = url;
+							pageOf(ev).url = url;
 							const message = error instanceof Error ? error.message : String(error);
 							return await renderErrorPage(ev, url, template, router, 500, message);
 						}
@@ -357,7 +344,7 @@ export function createServerLoad(
 		}
 		// handle() always returns a Response (notFound() on a fall-through)
 		return response as Response;
-	}
+	};
 }
 
 /**
@@ -441,8 +428,9 @@ async function renderErrorPage(
 		return undefined;
 	}
 
-	$page.status = status;
-	$page.error = { message };
+	const page = pageOf(ev);
+	page.status = status;
+	page.error = { message };
 
 	try {
 		const response = await loadView(ev, url, errorRoute.handler, {}, template, status);
@@ -758,7 +746,7 @@ async function loadView(
 	// requests), so that the following page -- and only that page -- can show
 	// it. For a form action that re-renders instead of redirecting, the
 	// message is set and read within this request
-	$page.flash = ev.flash.get();
+	pageOf(ev).flash = ev.flash.get();
 
 	// The template comes from site.html, which endpoints-only sites don't have
 	if (!template) {
@@ -919,7 +907,9 @@ async function loadView(
 
 			let html;
 			try {
-				let { body, head } = await component($props, undefined, slots);
+				// Each request has its own page state, which reaches every
+				// component through the root context, as `$context.$page`
+				let { body, head } = await component($props, { $page: pageOf(ev) }, slots);
 
 				// Render the page's (and its layouts') head element data, if the
 				// endpoint declared any. Layouts lose to the page (the nearest
@@ -1200,19 +1190,20 @@ async function runAction(
 				const newUrl = new URL(url.pathname + url.search, url);
 				const formStatus = result?.status;
 				let formMessage = await result?.text();
+				const page = pageOf(ev);
 				if (formMessage && result?.headers.get("Content-Type")?.includes("application/json")) {
-					$page.form = JSON.parse(formMessage);
+					page.form = JSON.parse(formMessage);
 					formMessage = undefined;
 				} else {
-					$page.form = {};
+					page.form = {};
 				}
 				// Set status and message if they haven't already been set,
 				// which means that you can just return e.g. forbidden() or
 				// forbidden("no!") and there will be something you can work
 				// with in your component, or you can set a completely custom
 				// object with whatever info you need
-				$page.form!.status ??= formStatus ?? 0;
-				$page.form!.message ??= formMessage ?? "";
+				page.form!.status ??= formStatus ?? 0;
+				page.form!.message ??= formMessage ?? "";
 				return await loadView(
 					ev,
 					newUrl,
@@ -1220,7 +1211,7 @@ async function runAction(
 					params,
 					template,
 					formStatus,
-					$page.form,
+					page.form,
 					true,
 					serverParams?.appData,
 				);

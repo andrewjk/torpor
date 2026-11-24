@@ -33,7 +33,7 @@ npm run dev
 - Schema validation for endpoints (`@torpor/build/schema`)
 - Form helpers (`@torpor/build/form`) and client side navigation helpers
   (`@torpor/build/nav`)
-- `$page` state for pages (`@torpor/build/state`) and response helpers
+- `$page` state for pages (`let { $page } = $context`) and response helpers
   (`@torpor/build/response`)
 
 ## Folder structure

@@ -1,6 +1,6 @@
-import { $page } from "@torpor/build/state";
-
 export default function ErrorPage() {
+	let { $page } = $context;
+
 	@head {
 		<title>Error | Torpor</title>
 	}

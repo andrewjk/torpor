@@ -1,4 +1,3 @@
-import { $page } from "@torpor/build/state";
 import { Disclosure, DisclosureContent, DisclosureHeader, DisclosureTrigger } from "@torpor/ui/Disclosure";
 import { Drawer, DrawerContent, DrawerOverlay, DrawerTrigger } from "@torpor/ui/Drawer";
 import { slide } from "@torpor/ui/motion";
@@ -14,6 +13,8 @@ import { NAV_SECTIONS } from "../utils/nav.ts";
 import { navStore } from "../utils/navStore.ts";
 
 export default function Header() {
+	let { $page } = $context;
+
 	let $state = $watch({
 		theme: "light",
 	});

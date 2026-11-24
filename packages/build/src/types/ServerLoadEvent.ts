@@ -90,7 +90,7 @@ export default interface ServerLoadEvent<
 	session: SessionHelper;
 	/**
 	 * A helper for setting one-time flash messages, shown on the next page
-	 * render as `$page.flash = { type, message }`.
+	 * render as `$context.$page.flash = { type, message }`.
 	 */
 	flash: FlashHelper;
 	/**

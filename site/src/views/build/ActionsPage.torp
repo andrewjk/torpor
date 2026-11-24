@@ -130,8 +130,8 @@ export default {
 			When an action returns a response with a JSON body &mdash; from
 			<code>ok(&#123; ... &#125;)</code>, <code>unprocessable(&#123; ... &#125;)</code>,
 			etc &mdash; the page is re-rendered and the body becomes
-			<code>$props.form</code> (also available as <code>$page.form</code> from
-			<code>&#64;torpor/build/state</code>):
+			<code>$props.form</code> (also available as <code>$page.form</code>, from
+			<code>$context</code>):
 		</p>
 		<CodePreview
 			code={`
@@ -207,6 +207,8 @@ actions: {
 		<CodePreview
 			code={`
 // Anywhere on the redirected page
+let { $page } = $context;
+
 @if ($page.flash?.message) {
 	<p class="message">{$page.flash.message}</p>
 }

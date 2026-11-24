@@ -4,9 +4,8 @@ import unprocessable from "../src/response/unprocessable";
 import ServerEvent from "../src/server/ServerEvent";
 import Router from "../src/site/Router";
 import { createServerLoad } from "../src/site/serverHandlers";
-import $page from "../src/state/$serverPage";
-import { createScopedPage } from "../src/state/scopedPage";
 import type ManifestRoute from "../src/types/ManifestRoute";
+import type PageState from "../src/types/PageState";
 import { PAGE_ROUTE, PAGE_SERVER_ROUTE } from "../src/types/RouteType";
 
 const template = "<html><head>%COMPONENT_HEAD%</head><body>%COMPONENT_BODY%</body></html>";
@@ -14,10 +13,10 @@ const template = "<html><head>%COMPONENT_HEAD%</head><body>%COMPONENT_BODY%</bod
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * A component that renders what it sees in `$page`, after an await, so a
- * concurrent request has the chance to change it in between.
+ * A component that renders what it sees in `$context.$page`, after an
+ * await, so a concurrent request has the chance to change it in between.
  */
-const component = async () => {
+const component = async (_: unknown, { $page }: { $page: PageState }) => {
 	await wait(5);
 	return {
 		body: `<p>url=${$page.url.pathname}${$page.url.search} form=${JSON.stringify($page.form ?? null)}</p>`,
@@ -112,16 +111,4 @@ test("a form result isn't rendered into later requests", async () => {
 	// ...but not for the next request, from anyone
 	const next = await (await load(get("/fast"), template)).text();
 	expect(rendered(next)).toBe("url=/fast form=null");
-});
-
-test("the scoped $page behaves like a plain object outside a request", () => {
-	const page = createScopedPage();
-	page.status = 500;
-	page.error = { message: "boom" };
-
-	expect(page.status).toBe(500);
-	expect("status" in page).toBe(true);
-	expect(Object.keys(page)).toEqual(["status", "url", "form", "flash", "error"]);
-	expect({ ...page }.error).toEqual({ message: "boom" });
-	expect(JSON.parse(JSON.stringify(page)).status).toBe(500);
 });

@@ -621,6 +621,8 @@ describe("navigate", () => {
 		expect(navigated.type).toBe("rendered");
 		expect(mountMock.mock.calls[0][1]).toBe(pageComponent);
 		expect($page.status).toBe(200);
+		// Components read the page state from the root context
+		expect(mountMock.mock.calls[0][4]?.$page).toBe($page);
 	});
 
 	test("overlapping navigations are serialized", async () => {

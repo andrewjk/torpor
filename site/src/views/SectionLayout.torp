@@ -1,4 +1,3 @@
-import { $page } from "@torpor/build/state";
 import Sidebar from "./Sidebar.torp";
 
 interface SidebarLink {
@@ -17,6 +16,8 @@ interface SectionLayoutProps {
  * it slides in via the navigation drawer in the site header.
  */
 export default function SectionLayout($props?: SectionLayoutProps) {
+	let { $page } = $context;
+
 	let content: HTMLElement;
 
 	$run(() => {

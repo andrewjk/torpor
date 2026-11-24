@@ -4,11 +4,11 @@ import ok from "../src/response/ok";
 import seeOther from "../src/response/seeOther";
 import serverError from "../src/response/serverError";
 import ServerEvent from "../src/server/ServerEvent";
-import $page from "../src/state/$serverPage";
 import Router from "../src/site/Router";
 import { createServerLoad } from "../src/site/serverHandlers";
 import type ManifestRoute from "../src/types/ManifestRoute";
 import type PageServerEndPoint from "../src/types/PageServerEndPoint";
+import type PageState from "../src/types/PageState";
 import type ServerEndPoint from "../src/types/ServerEndPoint";
 import { ERROR_ROUTE, PAGE_ROUTE, PAGE_SERVER_ROUTE, SERVER_ROUTE } from "../src/types/RouteType";
 
@@ -16,7 +16,7 @@ import { ERROR_ROUTE, PAGE_ROUTE, PAGE_SERVER_ROUTE, SERVER_ROUTE } from "../src
  * The root error page, rendering the $page state that was set for it, so
  * the tests can check the status, message and url it was rendered with.
  */
-const errorComponent = () => ({
+const errorComponent = (_: unknown, { $page }: { $page: PageState }) => ({
 	body:
 		`<p>error status=${$page.status}</p>` +
 		`<p>error message=${$page.error?.message}</p>` +
@@ -37,7 +37,7 @@ const adminErrorComponent = () => ({
  * A page component, which also renders $page's error message so the tests
  * can check that it was reset after an error.
  */
-const pageComponent = ($props: { data: any }) => ({
+const pageComponent = ($props: { data: any }, { $page }: { $page: PageState }) => ({
 	body:
 		`<p>page data=${JSON.stringify($props.data)}</p>` +
 		`<p>page errmsg=${$page.error?.message}</p>`,
