@@ -5,12 +5,6 @@ with throwaway tests (since deleted); the rest come from reading the source.
 
 ## Bugs
 
-### `$peek` loses tracking if its callback throws (confirmed)
-
-`watch/$peek.ts` restores `context.activeTarget` without `try/finally`. If
-`fn` throws and the caller catches, the rest of the running effect is
-untracked, so later reads in it never re-run it. Use `try/finally`.
-
 ### Deep-wrapping breaks built-ins and class instances (confirmed)
 
 `deepWrap` wraps every non-promise, non-DOM object, but only Date/Map/Set

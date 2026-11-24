@@ -12,9 +12,12 @@ export default function $peek<T>(fn: () => T): T {
 	const oldActiveTarget = context.activeTarget;
 	context.activeTarget = null;
 
-	const result = fn();
-
-	context.activeTarget = oldActiveTarget;
-
-	return result;
+	try {
+		return fn();
+	} finally {
+		// Restore even if `fn` throws: otherwise the rest of the running
+		// effect (if the caller catches) would stay untracked, so its later
+		// reads would never re-run it
+		context.activeTarget = oldActiveTarget;
+	}
 }

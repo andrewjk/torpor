@@ -77,3 +77,26 @@ test("$peek can be called outside of reactive context", () => {
 
 	expect(result).toBe("test");
 });
+
+test("$peek restores tracking when its callback throws", () => {
+	const $state = $watch({ a: 1 });
+
+	let runs = 0;
+	$run(() => {
+		runs++;
+		try {
+			$peek(() => {
+				throw new Error("boom");
+			});
+		} catch {
+			// swallowed
+		}
+		// This read must still be tracked after the throwing peek
+		void $state.a;
+	});
+
+	expect(runs).toBe(1);
+
+	$state.a = 2;
+	expect(runs).toBe(2);
+});
