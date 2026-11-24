@@ -1,11 +1,13 @@
+import { hasInterpolation } from "./interpolation";
+
 /**
- * Checks whether the supplied string is fully or partially reactive (i.e. contains braces)
+ * Checks whether the supplied text contains a `{...}` interpolation. Braces
+ * inside the expression's strings and comments don't count as delimiters.
  *
- * @param text The string to check
+ * @param text The text to check
  *
- * @returns True if the supplied string is fully or partially reactive
+ * @returns True if the supplied text is fully or partially reactive
  */
 export default function isReactive(text: string): boolean {
-	// TODO: Need to be more fancy (check that braces match, ignore comments and strings etc)
-	return text.includes("{") && text.includes("}");
+	return hasInterpolation(text);
 }

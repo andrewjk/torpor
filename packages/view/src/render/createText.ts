@@ -1,8 +1,5 @@
-export default function createText(content: string): Text {
-	return document.createTextNode(isReactiveText(content) ? " " : content);
-}
+import isReactive from "../compile/utils/isReactive";
 
-function isReactiveText(content: string) {
-	// TODO: Need to be more fancy (check that braces match, ignore comments and strings etc)
-	return content.includes("{") && content.includes("}");
+export default function createText(content: string): Text {
+	return document.createTextNode(isReactive(content) ? " " : content);
 }

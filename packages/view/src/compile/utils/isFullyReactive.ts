@@ -1,11 +1,14 @@
+import { isSingleInterpolation } from "./interpolation";
+
 /**
- * Checks whether the supplied string is fully reactive (i.e. starts and ends with braces)
+ * Checks whether the supplied text is exactly one `{...}` interpolation,
+ * ignoring surrounding whitespace. Braces inside the expression's strings and
+ * comments don't count as delimiters.
  *
- * @param text The string to check
+ * @param text The text to check
  *
- * @returns True if the supplied string is fully reactive
+ * @returns True if the supplied text is fully reactive
  */
 export default function isFullyReactive(text: string): boolean {
-	// TODO: Need to be more fancy (check that braces match, ignore comments and strings etc)
-	return text.trim().startsWith("{") && text.trim().endsWith("}");
+	return isSingleInterpolation(text);
 }

@@ -33,9 +33,6 @@ target. That would also fix frozen objects.
 
 ## Compiler
 
-- **`isReactive` / `isFullyReactive` / `createText`** decide reactivity by
-  `text.includes("{") && text.includes("}")` (TODOs in each), so they're
-  fooled by braces in strings and comments.
 - **`parseImports`** is a hand-rolled line scanner (`HACK: Really need to
   properly parse imports`). It stops at the first line that isn't an import
   or a `//` comment, so imports after a `/* */` block or a directive are
