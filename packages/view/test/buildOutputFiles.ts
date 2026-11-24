@@ -242,6 +242,8 @@ const importsMap: Record<string, string> = {
 		'import t_await_server from "../../../../src/ssr/runServerAwait";',
 	'import { t_fmt } from "@torpor/view/ssr";':
 		'import t_fmt from "../../../../src/ssr/formatText";',
+	'import { t_fmt_raw } from "@torpor/view/ssr";':
+		'import t_fmt_raw from "../../../../src/render/formatText";',
 	'import { t_attr } from "@torpor/view/ssr";':
 		'import t_attr from "../../../../src/render/formatAttributeText";',
 	'import { t_attr_if } from "@torpor/view/ssr";':

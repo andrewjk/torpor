@@ -2,6 +2,13 @@ import type TextNode from "../../types/nodes/TextNode";
 import { skipStringOrComment } from "../../utils/codeScanner";
 import type BuildServerStatus from "./BuildServerStatus";
 
+// HTML raw-text elements: their contents aren't parsed as markup and character
+// references aren't decoded, so interpolation must stay unescaped (`<` must
+// arrive as `<`, not `&lt;`) — matching the client, which assigns `textContent`.
+// `textarea` and `title` are *escapable* raw text (entities are decoded), so
+// they keep the escaping formatter.
+const RAW_TEXT_ELEMENTS = new Set(["script", "style", "xmp", "iframe", "noembed", "noframes"]);
+
 export default function buildServerTextNode(node: TextNode, status: BuildServerStatus): void {
 	let content = node.content || "";
 
@@ -11,6 +18,14 @@ export default function buildServerTextNode(node: TextNode, status: BuildServerS
 		content = content.replaceAll(/\s+/g, " ");
 	}
 
+	// Text inside a raw-text element is emitted unescaped; everywhere else it
+	// is HTML-escaped by the server's `t_fmt`.
+	const parentTag = status.elementStack[status.elementStack.length - 1];
+	const formatter =
+		parentTag !== undefined && RAW_TEXT_ELEMENTS.has(parentTag.toLowerCase())
+			? "t_fmt_raw"
+			: "t_fmt";
+
 	// TODO: Move all of this logic into parse, for text nodes and attribute values
 	let level = 0;
 	for (let i = 0; i < content.length; i++) {
@@ -18,8 +33,8 @@ export default function buildServerTextNode(node: TextNode, status: BuildServerS
 		if (char === "{") {
 			level++;
 			if (level === 1) {
-				status.imports.add("t_fmt");
-				status.output += "${t_fmt(";
+				status.imports.add(formatter);
+				status.output += "${" + formatter + "(";
 				continue;
 			}
 		} else if (char === "}") {

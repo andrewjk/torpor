@@ -5,6 +5,12 @@ import { expect } from "vite-plus/test";
 import build from "../src/compile/build";
 import parse from "../src/compile/parse";
 import type BuildResult from "../src/compile/types/BuildResult";
+import formatAttributeText from "../src/render/formatAttributeText";
+import formatRawText from "../src/render/formatText";
+import buildServerAttribute from "../src/ssr/buildAttribute";
+import buildServerClasses from "../src/ssr/buildClasses";
+import buildServerStyles from "../src/ssr/buildStyles";
+import formatServerText from "../src/ssr/formatText";
 
 const debugPrint = false;
 
@@ -39,15 +45,18 @@ export default async function buildHtml(
 
 	const template = parsed.template!;
 	const server = build(template, { server: true });
-	let code = `
+	const componentName = template.components.find((t) => t.default)!.name;
+
+	// The helpers are function parameters rather than references: the code is
+	// evaluated with `eval`, and the bundler rewrites module imports (so the
+	// original names aren't in scope inside the evaluated string). Passing the
+	// real SSR escaping helpers means these tests exercise the same escaping
+	// the server build does, end to end.
+	let code = `(function (t_fmt, t_fmt_raw, t_attr, t_attr_if, t_class, t_style) {
 const $watch = (obj: Record<PropertyKey, any>) => obj;
 const $unwrap = (obj: Record<PropertyKey, any>) => obj;
 const $run = (fn: Function) => null;
 const $onmount = (fn: Function) => null;
-const t_fmt = (value: any) => (value ?? "").toString();
-const t_attr = (value: any) => (value ?? "").toString().replaceAll('"', "&quot;");
-const t_attr_if = (name: string, value: any) =>
-	value == null || value === false ? "" : name + '="' + t_attr(value) + '"';
 ${
 	imports
 		?.map((imp) =>
@@ -56,8 +65,8 @@ ${
 		.join("\n") || ""
 }
 ${server.code.replace("export default ", "").replace(/^import.+\n/gm, "")}
-${template.components.find((t) => t.default)!.name};
-`;
+return ${componentName};
+})`;
 	// Strip TypeScript
 	code = transform(code, { transforms: ["typescript"] }).code;
 
@@ -67,8 +76,17 @@ ${template.components.find((t) => t.default)!.name};
 		console.log("===");
 	}
 
-	// eslint-disable-next-line
-	const html = (await eval(code)(state)).body.replaceAll(/\s+/g, " ");
+	const html = // eslint-disable-next-line no-eval
+		(
+			await eval(code)(
+				formatServerText,
+				formatRawText,
+				formatAttributeText,
+				buildServerAttribute,
+				buildServerClasses,
+				buildServerStyles,
+			)(state)
+		).body.replaceAll(/\s+/g, " ");
 	if (debugPrint) {
 		console.log("=== server html");
 		console.log(html);

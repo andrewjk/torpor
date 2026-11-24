@@ -5,19 +5,6 @@ with throwaway tests (since deleted); the rest come from reading the source.
 
 ## Bugs
 
-### SSR escaping: remaining gaps
-
-Server-rendered `class`, `style`, attribute and bound values are now escaped
-(`&` and `"`). Still open:
-
-- `test/buildHtml.ts` stubs `t_fmt` / `t_attr` / `t_attr_if` with its own
-  non-escaping versions, so the HTML-level SSR tests never exercise the real
-  escaping helpers (`test/attr/ssr-escaping.test.ts` covers them directly).
-  Importing the real helpers there would catch regressions end to end.
-- `t_fmt` HTML-escapes text inside `<script>` / `<style>` on the server, but
-  those are raw-text elements, so `<` arrives as a literal `&lt;` (the client
-  sets `textContent` unescaped, so it differs).
-
 ### Delegated events: remaining edge cases
 
 Delegated handlers now bubble through nested elements and respect
