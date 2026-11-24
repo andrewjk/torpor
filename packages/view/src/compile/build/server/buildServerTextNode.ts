@@ -1,16 +1,18 @@
 import type TextNode from "../../types/nodes/TextNode";
 import { skipStringOrComment } from "../../utils/codeScanner";
+import escapeRawText from "../../utils/escapeRawText";
+import isRawTextTag from "../../utils/rawTextTags";
 import type BuildServerStatus from "./BuildServerStatus";
-
-// HTML raw-text elements: their contents aren't parsed as markup and character
-// references aren't decoded, so interpolation must stay unescaped (`<` must
-// arrive as `<`, not `&lt;`) — matching the client, which assigns `textContent`.
-// `textarea` and `title` are *escapable* raw text (entities are decoded), so
-// they keep the escaping formatter.
-const RAW_TEXT_ELEMENTS = new Set(["script", "style", "xmp", "iframe", "noembed", "noframes"]);
 
 export default function buildServerTextNode(node: TextNode, status: BuildServerStatus): void {
 	let content = node.content || "";
+
+	// Raw-text content (inline `<script>` / `<style>`) is emitted verbatim:
+	// no interpolation, escaping or whitespace collapsing
+	if (node.raw) {
+		status.output += escapeRawText(content);
+		return;
+	}
 
 	if (!status.preserveWhitespace) {
 		// Replace all spaces with a single space, both to save space and to remove
@@ -21,10 +23,7 @@ export default function buildServerTextNode(node: TextNode, status: BuildServerS
 	// Text inside a raw-text element is emitted unescaped; everywhere else it
 	// is HTML-escaped by the server's `t_fmt`.
 	const parentTag = status.elementStack[status.elementStack.length - 1];
-	const formatter =
-		parentTag !== undefined && RAW_TEXT_ELEMENTS.has(parentTag.toLowerCase())
-			? "t_fmt_raw"
-			: "t_fmt";
+	const formatter = parentTag !== undefined && isRawTextTag(parentTag) ? "t_fmt_raw" : "t_fmt";
 
 	// TODO: Move all of this logic into parse, for text nodes and attribute values
 	let level = 0;

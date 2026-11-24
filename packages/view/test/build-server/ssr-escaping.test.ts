@@ -18,25 +18,26 @@ export default function Component() {
 	expect(html).toBe('<p title="<b> &amp; &quot;quoted&quot;">&lt;b&gt; &amp; "quoted"</p>');
 });
 
-test("server text inside raw-text elements is not escaped", async () => {
+test("server raw-text element contents are emitted literally", async () => {
 	const source = `
 export default function Component() {
-	let code = 'if (a < b && c) alert("&lt;");';
+	let value = '<b> & "quoted"';
 	@render {
 		<div>
-			<script>{code}</script>
-			<style>{code}</style>
-			<p>{code}</p>
+			<script>const a = { b: 1 }; if (a < b) alert("&lt;");</script>
+			<style>@media (min-width: 1px) { p { color: red } }</style>
+			<p>{value}</p>
 		</div>
 	}
 }`;
 
 	const html = await buildHtml(source);
 
-	// `<script>` / `<style>` are raw-text elements: the browser doesn't decode
-	// character references inside them, so the value must arrive unescaped
-	expect(html).toContain(`<script>if (a < b && c) alert("&lt;");</script>`);
-	expect(html).toContain(`<style>if (a < b && c) alert("&lt;");</style>`);
-	// ...unlike ordinary text, which stays escaped
-	expect(html).toContain(`<p>if (a &lt; b &amp;&amp; c) alert("&amp;lt;");</p>`);
+	// `<script>` / `<style>` are raw-text elements: they are not parsed as
+	// templates, and the browser doesn't decode character references inside
+	// them, so both braces and entities arrive literally
+	expect(html).toContain(`<script>const a = { b: 1 }; if (a < b) alert("&lt;");</script>`);
+	expect(html).toContain(`<style>@media (min-width: 1px) { p { color: red } }</style>`);
+	// ...unlike ordinary text, which stays interpolated and escaped
+	expect(html).toContain(`<p>&lt;b&gt; &amp; "quoted"</p>`);
 });

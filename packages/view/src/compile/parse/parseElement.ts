@@ -1,6 +1,8 @@
 import type CommentNode from "../types/nodes/CommentNode";
 import type ControlNode from "../types/nodes/ControlNode";
 import type ElementNode from "../types/nodes/ElementNode";
+import type TextNode from "../types/nodes/TextNode";
+import isRawTextTag from "../utils/rawTextTags";
 import isSpecialNode from "../utils/isSpecialNode";
 import voidTags from "../utils/voidTags";
 import type ParseStatus from "./ParseStatus";
@@ -39,6 +41,12 @@ export default function parseElement(status: ParseStatus): ElementNode {
 
 	if (!element.selfClosed && !voidTags.includes(element.tagName)) {
 		status.stack.push(element);
+
+		// Raw-text elements aren't parsed as markup at all: everything up to
+		// the closing tag is literal content
+		if (isRawTextTag(element.tagName)) {
+			parseRawText(status, element);
+		}
 
 		// Get the children
 		while (status.i < status.source.length) {
@@ -162,6 +170,36 @@ export default function parseElement(status: ParseStatus): ElementNode {
 	}
 
 	return element;
+}
+
+/**
+ * Consumes a raw-text element's content as a single literal text node. The
+ * content ends at the first matching close tag (which the caller's child loop
+ * then handles), or at the end of the source when the element is unclosed.
+ */
+function parseRawText(status: ParseStatus, element: ElementNode): void {
+	const start = status.i;
+	const end = findRawTextEnd(status.source, element.tagName, start);
+	if (end > start) {
+		const text: TextNode = {
+			type: "text",
+			content: status.source.substring(start, end),
+			start,
+			spans: [],
+			raw: true,
+		};
+		element.children.push(text);
+	}
+	status.i = end;
+}
+
+function findRawTextEnd(source: string, tagName: string, start: number): number {
+	// HTML's raw-text end state: any case of `</tagname` followed by
+	// whitespace, `/` or `>` ends the element
+	const pattern = new RegExp(`</${tagName}(?=[\\s/>])`, "gi");
+	pattern.lastIndex = start;
+	const match = pattern.exec(source);
+	return match ? match.index : source.length;
 }
 
 function checkVoidElement(status: ParseStatus, element: ElementNode) {

@@ -6,6 +6,7 @@ import type RootNode from "../../types/nodes/RootNode";
 import type TemplateNode from "../../types/nodes/TemplateNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
+import escapeRawText from "../../utils/escapeRawText";
 import getSingleElementRoot from "../../utils/getSingleElementRoot";
 import isReactive from "../../utils/isReactive";
 import { NON_RENDERING_OPERATIONS } from "../../utils/nonRenderingOperations";
@@ -70,9 +71,15 @@ function buildNodeFragmentText(
 			break;
 		}
 		case "text": {
-			const content = (node as TextNode).content;
+			const textNode = node as TextNode;
 			if (currentFragment) {
-				currentFragment.text += isReactive(content) ? "#" : content;
+				if (textNode.raw) {
+					// Escape whitespace too, so the content survives the
+					// whitespace collapsing applied to fragment text
+					currentFragment.text += escapeRawText(textNode.content);
+				} else {
+					currentFragment.text += isReactive(textNode.content) ? "#" : textNode.content;
+				}
 			}
 			break;
 		}

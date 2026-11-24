@@ -4,6 +4,9 @@ import type BuildStatus from "./BuildStatus";
 import stashRunWithOffsets from "./stashRunWithOffsets";
 
 export default function buildTextNode(node: TextNode, status: BuildStatus): void {
+	// Raw-text content is emitted verbatim in the fragment's template text
+	if (node.raw) return;
+
 	let fragment = status.fragmentStack.at(-1)?.fragment;
 	if (!fragment) return; // probably in @head...
 

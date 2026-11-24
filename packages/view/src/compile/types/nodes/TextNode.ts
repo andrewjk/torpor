@@ -8,4 +8,9 @@ export default interface TextNode extends TemplateNode {
 	start?: number;
 	//reactive: boolean;
 	spans: SourceSpan[];
+	/**
+	 * Raw-text content (e.g. inside `<script>` / `<style>`). It is emitted
+	 * verbatim: no interpolation, whitespace collapsing or HTML escaping.
+	 */
+	raw?: boolean;
 }

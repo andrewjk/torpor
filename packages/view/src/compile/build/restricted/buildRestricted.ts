@@ -10,6 +10,7 @@ import { skipStringOrComment } from "../../utils/codeScanner";
 import { AUTO_CLOSEABLE, autoCloseMessage, closesAncestor } from "../../utils/slotAutoClose";
 import isControlNode from "../../utils/isControlNode";
 import isComponentNode from "../../utils/isComponentNode";
+import isRawTextTag from "../../utils/rawTextTags";
 import isSpecialNode from "../../utils/isSpecialNode";
 import trimWhitespace from "../../utils/trimWhitespace";
 import isTextNode from "../../utils/isTextNode";
@@ -454,7 +455,7 @@ function serializeElement(node: ElementNode, context: Context): RestrictedNode |
 	}
 
 	const childContext =
-		node.tagName === "pre" || node.tagName === "code"
+		node.tagName === "pre" || node.tagName === "code" || isRawTextTag(node.tagName)
 			? { ...context, preserveWhitespace: true }
 			: context;
 

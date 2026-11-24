@@ -559,7 +559,11 @@ function declareTextFragmentVars(
 		return;
 	}
 
-	let textPath = { parent: path, type: isSpace(node.content) ? "space" : "text", children: [] };
+	let textPath = {
+		parent: path,
+		type: !node.raw && isSpace(node.content) ? "space" : "text",
+		children: [],
+	};
 	path.children.push(textPath);
 
 	const topLevel = !path.parent;
@@ -583,6 +587,10 @@ function declareTextFragmentVars(
 		status.imports.add("t_txt");
 		if (declareVariable) {
 			b.append(`(${node.varName} = t_txt(" ")),`);
+		} else if (node.raw) {
+			// Raw content can contain quotes, braces and line breaks, so
+			// quote it properly instead of dropping it into a string literal
+			b.append(`t_txt(${JSON.stringify(node.content)}),`);
 		} else {
 			b.append(`t_txt("${node.content}"),`);
 		}
@@ -590,7 +598,7 @@ function declareTextFragmentVars(
 }
 
 function textNodeNeedsDeclaration(node: TextNode, topLevel: boolean, lastChild: boolean) {
-	return isReactive(node.content) || (topLevel && lastChild);
+	return (!node.raw && isReactive(node.content)) || (topLevel && lastChild);
 }
 
 function declareSpecialFragmentVars(

@@ -33,13 +33,6 @@ target. That would also fix frozen objects.
 
 ## Compiler
 
-- **Inline `<script>` / `<style>` contents are parsed as template**
-  (confirmed): `<script>const a = { b: 1 };</script>` compiles to
-  `${t_fmt( b: 1 )}`, and `<style>@media …</style>` fails with "Unknown
-  operation: @media". The documented escapes (`&#123;`, `&#64;`) don't help
-  here because entities aren't decoded inside raw-text elements. Treat
-  `<script>` / `<style>` (and maybe `<pre><code>`) contents as raw, or
-  document that they must be set via `@html` or the `@style` block.
 - **Static quoted attributes interpolate braces**: `data-x='{"a":1}'`
   becomes `${t_attr("a":1)}`, which is a syntax error in the generated code
   rather than a parse error with a location. If interpolation inside quoted

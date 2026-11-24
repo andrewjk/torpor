@@ -2,6 +2,7 @@ import type SourceSpan from "../../types/SourceSpan";
 import type ElementNode from "../../types/nodes/ElementNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
+import isRawTextTag from "../../utils/rawTextTags";
 import trimEnd from "../../utils/trimEnd";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
@@ -47,7 +48,8 @@ export default function buildElementNode(
 	}
 
 	const oldPreserveWhitespace = status.preserveWhitespace;
-	status.preserveWhitespace = node.tagName === "code" || node.tagName === "pre";
+	status.preserveWhitespace =
+		node.tagName === "code" || node.tagName === "pre" || isRawTextTag(node.tagName);
 	for (let child of node.children) {
 		buildNode(child, status, b, parentName, "null");
 	}

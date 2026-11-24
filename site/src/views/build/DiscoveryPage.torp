@@ -38,16 +38,19 @@ export default {
 		<p>
 			Plain <code>&commat;head</code> markup is fine too, and you can use it (or a
 			<code>link rel="canonical"</code> tag, or JSON-LD in a
-			<code>script</code> tag) for anything <code>seo()</code> doesn't cover:
+			<code>script</code> tag) for anything <code>seo()</code> doesn't cover.
+			Since <code>&lt;script&gt;</code> and <code>&lt;style&gt;</code> contents are
+			raw text, build a dynamic script tag with <code>&commat;html</code>:
 		</p>
 		<CodePreview
 			code={`
 @head {
 	<title>My page</title>
 	<link rel="canonical" href="https://example.com/posts/1" />
-	<script type="application/ld+json">
-		{JSON.stringify({"@type": "BlogPosting", headline: post.title})}
-	</script>
+	@html(\`<script type="application/ld+json">\${JSON.stringify({
+		"@type": "BlogPosting",
+		headline: post.title,
+	})}</script>\`)
 }
 `}
 		/>

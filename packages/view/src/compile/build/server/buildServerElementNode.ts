@@ -1,5 +1,6 @@
 import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
+import isRawTextTag from "../../utils/rawTextTags";
 import trimQuotes from "../../utils/trimQuotes";
 import voidTags from "../../utils/voidTags";
 import type BuildServerStatus from "./BuildServerStatus";
@@ -28,7 +29,7 @@ export default function buildServerElementNode(
 	status.output += `<${tagName}${attributes}>`;
 	if (!voidTags.includes(tagName)) {
 		const oldPreserveWhitespace = status.preserveWhitespace;
-		status.preserveWhitespace = ["pre", "code"].includes(tagName);
+		status.preserveWhitespace = ["pre", "code"].includes(tagName) || isRawTextTag(tagName);
 		// `@element` has a runtime tag expression, which we can't analyze
 		if (!tagName.startsWith("@")) status.elementStack.push(tagName);
 		for (let child of node.children) {

@@ -44,7 +44,7 @@ export default function AppPage($props: { data: AppPageData }) {
 			@html($props.data.html)
 		</div>
 		@for (let style of $props.data.styles) {
-			<style>{style.style}</style>
+			@html("<style>" + style.style + "</style>")
 		}
 	}
 }

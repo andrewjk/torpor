@@ -5,13 +5,15 @@ import type RootNode from "../types/nodes/RootNode";
 import type TemplateNode from "../types/nodes/TemplateNode";
 import type TextNode from "../types/nodes/TextNode";
 import isControlNode from "./isControlNode";
+import isRawTextTag from "./rawTextTags";
 import isTextNode from "./isTextNode";
 import { NON_RENDERING_OPERATIONS } from "./nonRenderingOperations";
 
 /**
  * Tag names whose contents should keep all whitespace untouched, matching
  * native HTML rendering of `pre`/`textarea` and the existing build-time
- * `preserveWhitespace` behavior for `code`.
+ * `preserveWhitespace` behavior for `code`. Raw-text elements (including
+ * inline `<script>` / `<style>`) keep their contents exactly as written.
  */
 const PRESERVE_TAGS = new Set(["pre", "textarea", "code"]);
 
@@ -71,7 +73,8 @@ function trimChildren(
 		const grandChildren = getChildren(child);
 		if (grandChildren) {
 			const childTag = getTagName(child);
-			const childPreserve = preserveAll || PRESERVE_TAGS.has(childTag ?? "");
+			const childPreserve =
+				preserveAll || PRESERVE_TAGS.has(childTag ?? "") || isRawTextTag(childTag ?? "");
 			trimChildren(grandChildren, childPreserve, childTag);
 		}
 	}
