@@ -1,35 +1,24 @@
 # Follow-ups
 
-Findings from a review of `packages/view`. "Confirmed" items were reproduced
-with throwaway tests (since deleted); the rest come from reading the source.
+Findings from a review of `packages/view`.
 
-## Bugs
+## Limitations
 
-### Deep-wrapping breaks built-ins and class instances (confirmed)
+### Non-plain objects are opaque to `$watch`
 
-`deepWrap` wraps every non-promise, non-DOM object, but only Date/Map/Set
-get method forwarding. Methods that need internal slots or private fields
-throw once the object is stored in watched state:
+`$watch`/`deepWrap` only proxy plain objects, plain arrays, and exact `Date`,
+`Map` and `Set` instances. Class instances, array/collection subclasses,
+`RegExp`, typed arrays, frozen / non-extensible objects and other exotic
+objects are returned unchanged.
+Replacing the property that holds one still triggers effects, but mutating it
+in place is not reactive.
 
-- `RegExp` -- `s.re.test("a")` throws "incompatible receiver".
-- Typed arrays -- `s.u.subarray(0, 1)` throws.
-- Class instances with `#private` fields -- methods throw "Cannot read
-  private member".
-- Frozen / non-extensible objects -- `$watch` itself throws, because
-  `Object.defineProperty(object, proxyDataSymbol, …)` fails.
-
-Either only deep-wrap plain objects and arrays (prototype is
-`Object.prototype`, `null` or `Array.prototype`) plus the supported
-collections, or keep per-object metadata in a `WeakMap` instead of on the
-target. That would also fix frozen objects.
-
-### Smaller reactivity issues
-
-- **`$cache` / `$async` don't work in class getters** (confirmed): a
-  prototype getter has no own property descriptor, so `registerComputed`
-  is never set up and `$cache` throws "$cache must be used in a getter".
-  Either support prototype accessors or document that reactive state must
-  be an object literal.
+Proxying arbitrary instances isn't transparent: methods that need internal
+slots or `#private` fields throw when called with the proxy as `this`. Those
+objects therefore stay opaque, which also means prototype getters/methods
+aren't tracked and `$cache`/`$async` can't be used in class getters. Keep
+reactive state in plain objects/arrays; class getters can still read a watched
+plain object and track those reads.
 
 ## Compiler
 

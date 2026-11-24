@@ -1,6 +1,7 @@
 import devContext from "../dev/devContext";
 import type ProxyData from "../types/ProxyData";
 import type WatchOptions from "../types/WatchOptions";
+import isWrappable from "./isWrappable";
 import propagateSignal from "./propagateSignal";
 import proxyGet from "./proxyGet";
 import proxySet from "./proxySet";
@@ -56,7 +57,13 @@ const sharedHandler: ProxyHandler<Record<PropertyKey, any>> = {
 /**
  * Watches an object and runs effects when its properties are changed.
  *
- * Dates, Maps and Sets are supported too: their methods are reactive (reads
+ * Only plain objects, plain arrays, and exact Date/Map/Set instances are
+ * deep-watched. Other values -- class instances, subclasses, RegExp, typed
+ * arrays, frozen/non-extensible objects, promises, DOM nodes, ... -- are
+ * returned unchanged. Effects still track the property that holds them, so
+ * replacing the value is reactive even though mutating it in place isn't.
+ *
+ * Dates, Maps and Sets are supported: their methods are reactive (reads
  * track, writes notify), so `new Date()`, `new Map()` and `new Set()` can be
  * used in watched state directly.
  *
@@ -65,6 +72,15 @@ const sharedHandler: ProxyHandler<Record<PropertyKey, any>> = {
 export default function $watch<T extends object>(object: T, options?: WatchOptions): T {
 	// Return the object itself if it is undefined or null, or if it is already a proxy
 	if (object === undefined || object === null || (object as any)[proxyDataSymbol] !== undefined) {
+		return object;
+	}
+
+	if (!isWrappable(object)) {
+		if (devContext.enabled) {
+			console.warn(
+				"$watch() only deep-watches plain objects, arrays and exact Date/Map/Set instances; returning this value unchanged.",
+			);
+		}
 		return object;
 	}
 

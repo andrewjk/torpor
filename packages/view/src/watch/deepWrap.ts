@@ -1,10 +1,12 @@
 import $watch from "./$watch";
+import isWrappable from "./isWrappable";
 import { proxyDataSymbol } from "./symbols";
 
 /**
- * Wraps a value with `$watch` if it is a plain object (or Date/Map/Set) that
- * is not already watched and is not a promise. Returns the value unchanged
- * otherwise.
+ * Wraps a value with `$watch` if it is a plain object, plain array, or exact
+ * Date/Map/Set instance that is not already watched. Returns the value
+ * unchanged otherwise (class instances, subclasses, RegExp, typed arrays,
+ * frozen objects, promises, DOM nodes, ... stay opaque).
  *
  * Used by the `get` trap (wrap values on read) and the `set` trap (wrap
  * values on write), so a value stored in watched state is reactive whether
@@ -41,16 +43,16 @@ export default function deepWrap(value: any): any {
 		// signal for a property nothing ever sets
 		return proxyCache.get(value) ?? value;
 	}
-	// But not if it's a Promise (i.e. has a `then` method)
-	if (value.then !== undefined) {
+	// Class instances, RegExp, typed arrays, frozen/non-extensible objects,
+	// DOM nodes and other exotic objects can't be proxied transparently (or
+	// would throw when the metadata is added), so they stay opaque. Effects
+	// still track the key they're stored under, so replacing the value is
+	// reactive even though mutating it in place isn't.
+	if (!isWrappable(value)) {
 		return value;
 	}
-	// And not DOM nodes / other host objects -- they have internal state and
-	// accessor-only prototype properties, so wrapping them breaks (e.g.
-	// writing a wrapped `parentElement` back onto a node throws, because the
-	// property has only a getter). They're not reactive state either; effects
-	// still track the key they're stored under
-	if (value.nodeType !== undefined) {
+	// Plain thenables are treated like promises
+	if (value.then !== undefined) {
 		return value;
 	}
 	const cached = proxyCache.get(value);
