@@ -40,6 +40,7 @@ import { findMissingSlotLayout, warnMissingSlotContent } from "./layoutSlots.ts"
 import { getBasePath, rewriteBaseInHtml, setBasePath, stripBaseFromUrl } from "./basePath.ts";
 import findErrorRoute from "./findErrorRoute.ts";
 import mergeHead from "./mergeHead.ts";
+import runWithPageState from "./pageScope.ts";
 import type Router from "./Router.ts";
 
 /**
@@ -306,7 +307,20 @@ export function createServerLoad(
 		return routeResponse ?? notFound();
 	};
 
-	return async function load(ev: ServerEvent, template?: string): Promise<Response> {
+	return function load(ev: ServerEvent, template?: string): Promise<Response> {
+		// Each request gets its own `$page` state, so concurrent requests can't
+		// see each other's url, flash message or form result
+		return runWithPageState(() => loadInPageScope(ev, template));
+	};
+
+	async function loadInPageScope(ev: ServerEvent, template?: string): Promise<Response> {
+		// The form result and flash message belong to this request only. A
+		// fresh page state starts without them; the reset matters when the
+		// state is shared (no AsyncLocalStorage), so that a request can't
+		// render a previous request's form result
+		$page.form = undefined;
+		$page.flash = undefined;
+
 		// Global middleware, from `site.middleware`: runs for every request
 		// before routing, including ones that won't match a route
 		// (maintenance mode, legacy url redirects, etc)
@@ -343,7 +357,7 @@ export function createServerLoad(
 		}
 		// handle() always returns a Response (notFound() on a fall-through)
 		return response as Response;
-	};
+	}
 }
 
 /**

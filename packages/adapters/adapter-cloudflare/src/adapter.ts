@@ -119,6 +119,8 @@ async function postbuild(site: Site): Promise<void> {
 name = "torpor-miniflare"
 main = "./cloudflare/_worker.js"
 compatibility_date = "2025-01-01"
+# AsyncLocalStorage, which keeps each request's $page state separate
+compatibility_flags = ["nodejs_als"]
 
 [assets]
 directory = "./cloudflare"

@@ -1,23 +1,16 @@
-import { $watch } from "@torpor/view/ssr";
 import type PageState from "../types/PageState";
+import { createScopedPage } from "./scopedPage";
 
 const PAGE_SYMBOL: unique symbol = Symbol.for("torp.Page");
 
-// The server request path has no reactive subscribers, so the state is
-// stored plainly ($watch from `@torpor/view/ssr` is a no-op that returns
-// the object itself) instead of through a reactive proxy. Shares the same
-// `globalThis` slot as the client `$page`, so both variants always see the
-// same state object whichever loads first.
+// The server's `$page` is scoped to the request being handled (see
+// `createScopedPage` and `site/pageScope.ts`), and has no reactive
+// subscribers, so it isn't a `$watch` proxy. It shares the same `globalThis`
+// slot as the client `$page`, which creates the same scoped proxy when it
+// is evaluated on the server first, so both variants always see the same
+// state whichever loads first.
 const $page: PageState =
 	// @ts-ignore
-	(globalThis[PAGE_SYMBOL] ??= $watch({
-		status: 404,
-		url: new URL("http://localhost"),
-		form: undefined,
-		flash: undefined,
-		error: {
-			message: "",
-		},
-	}));
+	(globalThis[PAGE_SYMBOL] ??= createScopedPage());
 
 export default $page;

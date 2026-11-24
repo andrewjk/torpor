@@ -6,33 +6,6 @@ Findings from a review of `packages/build` (2026-11-24). "Confirmed" items
 were reproduced with throwaway tests through `createServerLoad` (since
 deleted); the rest come from reading the source.
 
-### `$page` is one global object shared by every request (confirmed)
-
-`state/$serverPage.ts` stores the server `$page` on `globalThis`, and
-`site/serverHandlers.ts` writes `url`, `status`, `error`, `flash` and `form`
-on it per request, then awaits loads before rendering. Concurrent requests
-overwrite each other's state mid-render: with a slow page request for Alice
-and a fast one for Bob arriving 5ms later, Alice's page rendered
-`url=/fast?user=bob`. The same applies to `$page.flash` (one user's flash
-message shown to another, and the intended recipient's lost) and
-`$page.form`.
-
-This is a cross-user data leak under normal load on the node adapter.
-Give each request its own page state: `AsyncLocalStorage` on node (and
-workerd, with `nodejs_compat`), or pass the state through the render
-context instead of a module global. The prerender note under "Follow-ups
-from prerendering" ("keeps the module-global `$page` state safe") is the
-same issue.
-
-### `$page.form` leaks into later requests (confirmed)
-
-Separately from the concurrency problem, nothing on the server resets
-`$page.form`: it is set by a no-JS form action re-render
-(`runAction`, ~line 1185) and only cleared on the client. After one user's
-POST to `/form` returned `{ values: { name: … } }`, the next plain GET of an
-unrelated page by anyone rendered with that `form` object. Reset `form`
-(and `flash`) at the start of every request; per-request state fixes both.
-
 ### Middleware on `_layout.server.ts` is silently ignored (confirmed)
 
 Layout server endpoints share the `PageServerEndPoint` type, which accepts
@@ -105,7 +78,8 @@ ignore the result of) superseded navigations and let the newest one win.
   be cheap defense in depth.
 - **Module-global base path**: `createServerLoad` calls `setBasePath`, a
   module global, so two sites with different bases in one process (tests,
-  multi-tenant servers) overwrite each other. Same root cause as `$page`.
+  multi-tenant servers) overwrite each other. It could be scoped per site
+  the way `$page` is now scoped per request (`site/pageScope.ts`).
 - **`rewriteBaseInHtml` rewrites by regex over the whole document**, so
   `href="/…"` / `src="/…"` text inside `<pre>`/`<code>` samples or inline
   scripts is rewritten too.
@@ -188,8 +162,9 @@ virtually every real project.
 - **Crawling** — follow `<a href>` links in prerendered output to warn about
   pages that are linked from prerendered pages but not prerendered
   themselves (SvelteKit-style completeness check).
-- **Concurrent prerendering** — render pages in a worker pool; today it is
-  sequential, which keeps the module-global `$page` state safe but is slow
-  for large sites.
+- **Concurrent prerendering** — render pages concurrently (or in a worker
+  pool); today it is sequential, which is slow for large sites. `$page` is
+  now scoped per request (`site/pageScope.ts`), so it no longer forces this,
+  but the module-global base path still would.
 - **`adapter-github-pages`** — a thin adapter adding `.nojekyll` and
   `404.html` conventions on top of the prerendered output.
