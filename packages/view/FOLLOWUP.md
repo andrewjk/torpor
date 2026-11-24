@@ -61,11 +61,6 @@ target. That would also fix frozen objects.
 
 ## Duplication and inconsistencies
 
-- Client and server helpers exist in pairs (`render/formatText` vs
-  `ssr/formatText`, `render/buildClasses` vs `ssr/buildClasses`, …), and the
-  escaping rules are split between `ssr/formatText.ts` and
-  `render/formatAttributeText.ts`. A single `ssr/escape.ts` used by all
-  server helpers would make the rules harder to miss.
 - Every `$x` primitive has a `ssr/$serverX.ts` twin. Fine by design, but
   nothing checks that the two export identical signatures. A type-level test
   (`satisfies typeof $bind`, etc.) would catch drift.

@@ -1,4 +1,4 @@
-import formatAttributeText from "../render/formatAttributeText";
+import { escapeAttribute } from "./escape";
 
 /**
  * Builds a `name="value"` attribute for server-compiled code, dropping the
@@ -12,5 +12,5 @@ export default function buildServerAttribute(name: string, value: any): string {
 	if (value == null || value === false) {
 		return "";
 	}
-	return `${name}="${formatAttributeText(value)}"`;
+	return `${name}="${escapeAttribute(value)}"`;
 }

@@ -1,6 +1,6 @@
 import type StyleValue from "../types/StyleValue";
 import buildStyles from "../render/buildStyles";
-import formatAttributeText from "../render/formatAttributeText";
+import { escapeAttribute } from "./escape";
 
 /**
  * Server counterpart of `render/buildStyles`: builds the style string and
@@ -12,5 +12,5 @@ import formatAttributeText from "../render/formatAttributeText";
  */
 export default function buildServerStyles(value: StyleValue): string {
 	const styles = buildStyles(value);
-	return styles === "" ? "" : `style="${formatAttributeText(styles)}"`;
+	return styles === "" ? "" : `style="${escapeAttribute(styles)}"`;
 }

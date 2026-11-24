@@ -1,6 +1,6 @@
 import type ClassValue from "../types/ClassValue";
 import buildClasses from "../render/buildClasses";
-import formatAttributeText from "../render/formatAttributeText";
+import { escapeAttribute } from "./escape";
 
 /**
  * Server counterpart of `render/buildClasses`: builds the class string and
@@ -12,5 +12,5 @@ import formatAttributeText from "../render/formatAttributeText";
  */
 export default function buildServerClasses(value: ClassValue, styleHash?: string): string {
 	const classes = buildClasses(value, styleHash);
-	return classes === "" ? "" : `class="${formatAttributeText(classes)}"`;
+	return classes === "" ? "" : `class="${escapeAttribute(classes)}"`;
 }
