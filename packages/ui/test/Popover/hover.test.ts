@@ -1,7 +1,7 @@
 import { fireEvent, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { mount } from "@torpor/view";
+import { mount, unmount } from "@torpor/view";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import PopoverHoverButtonTest from "./components/PopoverHoverButtonTest.torp";
 import PopoverHoverPress from "./components/PopoverHoverTest.torp";
@@ -14,15 +14,25 @@ function getTrigger(container: HTMLElement): HTMLElement {
 	return container.querySelector(".torp-popover-hover")!;
 }
 
+const mounted: HTMLElement[] = [];
+
+function mountPopover(container: HTMLElement, component: any, props?: Record<string, any>): void {
+	mount(container, component, props);
+	mounted.push(container);
+}
+
 describe("Popover - hover trigger", () => {
 	afterEach(() => {
+		for (const container of mounted.splice(0)) {
+			unmount(container);
+		}
 		document.body.innerHTML = "";
 	});
 
 	it("opens after the intent delay and stays open while hovered", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverPress as any, { hoverDelay: 20, exitGrace: 20 });
+		mountPopover(container, PopoverHoverPress as any, { hoverDelay: 20, exitGrace: 20 });
 
 		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
 
@@ -39,7 +49,7 @@ describe("Popover - hover trigger", () => {
 	it("a quick pass-over does not open", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverPress as any, { hoverDelay: 50, exitGrace: 20 });
+		mountPopover(container, PopoverHoverPress as any, { hoverDelay: 50, exitGrace: 20 });
 
 		const trigger = getTrigger(container);
 		trigger.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
@@ -52,7 +62,7 @@ describe("Popover - hover trigger", () => {
 	it("stays open when the pointer moves into the content", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 40 });
+		mountPopover(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 40 });
 
 		const trigger = getTrigger(container);
 		trigger.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
@@ -73,7 +83,7 @@ describe("Popover - hover trigger", () => {
 	it("closes after the exit grace period", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 20 });
+		mountPopover(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 20 });
 
 		const trigger = getTrigger(container);
 		trigger.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
@@ -89,7 +99,7 @@ describe("Popover - hover trigger", () => {
 	it("does not focus the trigger when a hover popover closes", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 20 });
+		mountPopover(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 20 });
 
 		const trigger = getTrigger(container);
 		// A mouse-opened popover never takes focus
@@ -108,7 +118,7 @@ describe("Popover - hover trigger", () => {
 	it("closes after the pointer leaves the content", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 20 });
+		mountPopover(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 20 });
 
 		const trigger = getTrigger(container);
 		trigger.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
@@ -133,7 +143,7 @@ describe("Popover - hover trigger", () => {
 	it("closes when the pointer leaves the content without a trigger leave", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 20 });
+		mountPopover(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 20 });
 
 		const trigger = getTrigger(container);
 		await userEvent.hover(trigger);
@@ -156,7 +166,7 @@ describe("Popover - hover trigger", () => {
 	it("focus opens immediately and blur closes after the grace period", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverPress as any, { hoverDelay: 500, exitGrace: 20 });
+		mountPopover(container, PopoverHoverPress as any, { hoverDelay: 500, exitGrace: 20 });
 
 		const trigger = getTrigger(container);
 		await userEvent.click(trigger); // focus
@@ -171,7 +181,7 @@ describe("Popover - hover trigger", () => {
 	it("closes after focus leaves the content", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverContentTest as any, { hoverDelay: 0, exitGrace: 20 });
+		mountPopover(container, PopoverHoverContentTest as any, { hoverDelay: 0, exitGrace: 20 });
 
 		const trigger = getTrigger(container);
 		trigger.focus(); // opens immediately
@@ -192,7 +202,7 @@ describe("Popover - hover trigger", () => {
 	it("a scripted refocus on hide does not re-open the popout", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverContentTest as any, { hoverDelay: 0, exitGrace: 20 });
+		mountPopover(container, PopoverHoverContentTest as any, { hoverDelay: 0, exitGrace: 20 });
 
 		const trigger = getTrigger(container);
 		await userEvent.click(trigger); // opens and focuses the trigger
@@ -216,7 +226,7 @@ describe("Popover - hover trigger", () => {
 	it("the press trigger still works alongside", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverPress as any, {});
+		mountPopover(container, PopoverHoverPress as any, {});
 
 		await userEvent.click(container.querySelector("button.torp-popout-trigger")!);
 		expect(queryByText(document.body, "Popover content")).toBeInTheDocument();
@@ -237,7 +247,7 @@ describe("Popover - hover trigger", () => {
 	it("a touch tap on the trigger's inert surface opens the popout", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverPress as any, { hoverDelay: 50, exitGrace: 20 });
+		mountPopover(container, PopoverHoverPress as any, { hoverDelay: 50, exitGrace: 20 });
 
 		const trigger = getTrigger(container);
 		touchPointerDown(trigger);
@@ -250,7 +260,11 @@ describe("Popover - hover trigger", () => {
 		const onclick = vi.fn();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverButtonTest as any, { hoverDelay: 20, exitGrace: 20, onclick });
+		mountPopover(container, PopoverHoverButtonTest as any, {
+			hoverDelay: 20,
+			exitGrace: 20,
+			onclick,
+		});
 
 		const button = container.querySelector("button")!;
 		const trigger = container.querySelector(".torp-popover-hover")!;
@@ -271,7 +285,7 @@ describe("Popover - hover trigger", () => {
 		const onclick = vi.fn();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverButtonTest as any, {
+		mountPopover(container, PopoverHoverButtonTest as any, {
 			hoverDelay: 20,
 			exitGrace: 20,
 			touchBehavior: "open",
@@ -290,7 +304,7 @@ describe("Popover - hover trigger", () => {
 	it("touchBehavior ignore never opens from a tap, even on the inert surface", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverPress as any, {
+		mountPopover(container, PopoverHoverPress as any, {
 			hoverDelay: 20,
 			exitGrace: 20,
 			touchBehavior: "ignore",
@@ -308,7 +322,11 @@ describe("Popover - hover trigger", () => {
 		const onclick = vi.fn();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PopoverHoverButtonTest as any, { hoverDelay: 20, exitGrace: 20, onclick });
+		mountPopover(container, PopoverHoverButtonTest as any, {
+			hoverDelay: 20,
+			exitGrace: 20,
+			onclick,
+		});
 
 		// Tap the control (suppresses the synthesized mouseenter)...
 		touchPointerDown(container.querySelector("button")!);
