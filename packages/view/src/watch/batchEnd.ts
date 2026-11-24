@@ -13,7 +13,6 @@ export default function batchEnd(): void {
 		triggerEffects();
 	} finally {
 		context.batch = 0;
-		context.batchOperation = 0;
 		context.previousEffect = null;
 	}
 }

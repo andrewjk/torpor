@@ -1,5 +1,4 @@
 import devContext from "../dev/devContext";
-import context from "../render/context";
 import deepWrap from "./deepWrap";
 import propagateSignal from "./propagateSignal";
 import { proxyDataSymbol, proxyKeysSymbol } from "./symbols";
@@ -16,10 +15,6 @@ export default function proxySet(
 	// Only do things if the value has changed
 	const oldValue = target[key];
 	if (value !== oldValue) {
-		if (context.batchOperation > 100) {
-			throw new Error("Cycle detected");
-		}
-
 		let data = target[proxyDataSymbol];
 
 		// DEV:

@@ -65,6 +65,14 @@ export default interface Effect {
 	queued: boolean;
 
 	/**
+	 * How many times this effect has run in the current flush. Used by
+	 * `triggerEffects` to detect runaway cycles (effects that keep re-queuing
+	 * each other) without limiting the size of a legitimate flush. Reset at
+	 * the end of each flush.
+	 */
+	flushRuns?: number;
+
+	/**
 	 * True if the effect encountered an exception in its last run.
 	 */
 	didError: boolean;

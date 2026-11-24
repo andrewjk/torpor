@@ -10,7 +10,6 @@ const context: Context =
 		previousEffect: null,
 		extent: 0,
 		batch: 0,
-		batchOperation: 0,
 		registerComputed: null,
 
 		effectsToRun: [],

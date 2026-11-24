@@ -5,25 +5,6 @@ with throwaway tests (since deleted); the rest come from reading the source.
 
 ## Bugs
 
-### "Cycle detected" fires for large, non-cyclic flushes (confirmed)
-
-`proxySet` throws when `context.batchOperation > 100`, and
-`batchOperation` counts every effect run in the flush. Any write made after
-100 effects have run in one flush throws, cycle or not:
-
-```ts
-for (let i = 0; i < 150; i++) $run(() => s.a);
-$run(() => {
-	s.out = s.a * 2;
-});
-s.a = 1; // throws "Cycle detected"
-```
-
-A page with 100+ effects reacting to one change (a long list) plus any
-effect that writes state (`$bind`'s backward sync, derived writes) will hit
-this. Count re-runs per effect instead (e.g. the same effect running more
-than N times in a flush).
-
 ### `$peek` loses tracking if its callback throws (confirmed)
 
 `watch/$peek.ts` restores `context.activeTarget` without `try/finally`. If

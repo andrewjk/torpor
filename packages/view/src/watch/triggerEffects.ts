@@ -25,6 +25,14 @@ function resubscribeSuspendSources(effect: Effect): void {
 }
 
 /**
+ * How many times a single effect may run in one flush before it's treated as
+ * a cycle. Deliberately generous: the limit is per effect, so a large flush
+ * (hundreds of effects reacting to one change) is fine — only an effect that
+ * keeps re-queuing itself hits it.
+ */
+const MAX_EFFECT_RUNS_PER_FLUSH = 100;
+
+/**
  * Runs the effects that have been collected during the batch.
  */
 export default function triggerEffects(): void {
@@ -36,6 +44,10 @@ export default function triggerEffects(): void {
 	// Errors routed to a boundary are consumed by it; unhandled ones are
 	// rethrown after the batch, as before boundaries existed.
 	let unhandledError: { error: any } | null = null;
+
+	// Whether a runaway cycle stopped the flush (thrown after the queue has
+	// been cleaned up, so the context isn't left dirty)
+	let cycle = false;
 
 	// Run the queued effects. Appends made while running (by signal writes
 	// within an effect) land in the same array and are picked up by the
@@ -54,7 +66,6 @@ export default function triggerEffects(): void {
 	queue.sort((a, b) => a.seq - b.seq);
 	for (let i = 0; i < queue.length; i++) {
 		const effect = queue[i];
-		context.batchOperation++;
 
 		// Mark as not-queued BEFORE running, so that a signal write made
 		// during this run — or during a later effect's run in the same
@@ -67,6 +78,17 @@ export default function triggerEffects(): void {
 		// running it again would read state the branch no longer owns
 		if (effect.destroyed) {
 			continue;
+		}
+
+		// Detect runaway cycles per effect (not per flush): an effect that
+		// keeps being re-queued — e.g. two effects writing each other's
+		// sources — is a cycle. A large flush on its own (a long list plus
+		// effects that write state) is legitimate and no longer throws
+		const runs = (effect.flushRuns ?? 0) + 1;
+		effect.flushRuns = runs;
+		if (runs > MAX_EFFECT_RUNS_PER_FLUSH) {
+			cycle = true;
+			break;
 		}
 
 		try {
@@ -98,10 +120,13 @@ export default function triggerEffects(): void {
 		}
 	}
 
-	// Clear the queue and reset the queued flag defensively (every processed
-	// effect already reset its own, but an error may have skipped a run)
+	// Clear the queue and reset the queued/run-count flags defensively (every
+	// processed effect already reset its own `queued`, but an error or a cycle
+	// may have skipped a run). Also resets the per-effect counters that bound
+	// the next flush.
 	for (let effect of queue) {
 		effect.queued = false;
+		effect.flushRuns = 0;
 	}
 	context.effectsToRun = [];
 
@@ -116,6 +141,10 @@ export default function triggerEffects(): void {
 		const nextSignal = signal.nextSignalToUpdate;
 		signal.nextSignalToUpdate = null;
 		signal = nextSignal;
+	}
+
+	if (cycle) {
+		throw new Error("Cycle detected");
 	}
 
 	if (unhandledError !== null) {

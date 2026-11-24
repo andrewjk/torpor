@@ -31,12 +31,6 @@ export default interface Context {
 	batch: number;
 
 	/**
-	 * Used to check for cycles if the number of operations in a single batch
-	 * goes past a threshold.
-	 */
-	batchOperation: number;
-
-	/**
 	 * A function to store a Computed when `$cache` is called in a property getter.
 	 */
 	registerComputed: ((computed: Computed) => void) | null;
