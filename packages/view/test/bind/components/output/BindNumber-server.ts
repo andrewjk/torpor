@@ -1,3 +1,4 @@
+import t_attr from "../../../../src/render/formatAttributeText";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
@@ -10,7 +11,7 @@ export default async function NumberInput(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<input type="number" value="${($props.value) || 0}"> <p>Value: ${t_fmt($props.value)}</p>`;
+	t_body += `<input type="number" value="${t_attr($props.value) || 0}"> <p>Value: ${t_fmt($props.value)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

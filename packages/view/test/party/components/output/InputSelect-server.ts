@@ -24,7 +24,7 @@ export default async function ColorSelect(
 	];
 
 	/* User interface */
-	t_body += `<div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${(t_attr($state.selectedColorId)) || ""}"><![>`;
+	t_body += `<div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${t_attr($state.selectedColorId) || ""}"><![>`;
 	for (let color of colors) {
 		t_body += `<!^><option ${t_attr_if("value", color.id)} ${t_attr_if("disabled", color.isDisabled)}> ${t_fmt(color.text)} </option>`;
 	}

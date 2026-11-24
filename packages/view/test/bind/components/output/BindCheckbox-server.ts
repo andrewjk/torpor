@@ -1,4 +1,5 @@
 import $watch from "../../../../src/ssr/$serverWatch";
+import t_attr from "../../../../src/render/formatAttributeText";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
@@ -13,7 +14,7 @@ export default async function BindCheckbox(
 	let $state = $watch({ agreed: false });
 
 	/* User interface */
-	t_body += `<label><input type="checkbox" value="${($state.agreed) || false}"> I agree </label> <p>Agreed: ${t_fmt($state.agreed)}</p>`;
+	t_body += `<label><input type="checkbox" value="${t_attr($state.agreed) || false}"> I agree </label> <p>Agreed: ${t_fmt($state.agreed)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

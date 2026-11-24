@@ -33,8 +33,13 @@ test("formatAttributeText does not escape angle brackets", () => {
 	expect(formatAttributeText("<div>")).toBe("<div>");
 });
 
-test("formatAttributeText does not escape ampersand", () => {
-	expect(formatAttributeText("a & b")).toBe("a & b");
+test("formatAttributeText escapes ampersand", () => {
+	expect(formatAttributeText("a & b")).toBe("a &amp; b");
+});
+
+test("formatAttributeText keeps literal entity text intact", () => {
+	// Without escaping `&`, the browser would decode this into `a"b`
+	expect(formatAttributeText("a&quot;b")).toBe("a&amp;quot;b");
 });
 
 test("formatAttributeText with 0", () => {

@@ -1,3 +1,4 @@
+import t_attr from "../../../../src/render/formatAttributeText";
 import t_attr_if from "../../../../src/ssr/buildAttribute";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
@@ -13,7 +14,7 @@ export default async function ForWrite(
 	/* User interface */
 	t_body += `<ul><![>`;
 	for (let row of $props.rows) {
-		t_body += `<!^><li ${t_attr_if("data-testid", row.label)}><input type="checkbox" checked="${(row.done) || false}"> ${t_fmt(row.done ? "done" : "todo")}:${t_fmt(row.label)} </li>`;
+		t_body += `<!^><li ${t_attr_if("data-testid", row.label)}><input type="checkbox" checked="${t_attr(row.done) || false}"> ${t_fmt(row.done ? "done" : "todo")}:${t_fmt(row.label)} </li>`;
 	}
 	t_body += `<!]><!></ul>`;
 

@@ -14,7 +14,7 @@ export default async function BindEventHandler(
 	let $state = $watch({ name: "Alice", typed: false });
 
 	/* User interface */
-	t_body += `<input value="${(t_attr($state.name)) || ""}"> <p>Hello, ${t_fmt($state.name)}</p> <![>`;
+	t_body += `<input value="${t_attr($state.name) || ""}"> <p>Hello, ${t_fmt($state.name)}</p> <![>`;
 	if ($state.typed) {
 		t_body += `<!^0><p>Handler ran</p>`;
 	}

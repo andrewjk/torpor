@@ -90,11 +90,12 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 					}
 				}
 				if (!defaultValue) {
-					status.imports.add("t_attr");
-					value = `t_attr(${value})`;
 					defaultValue = '""';
 				}
-				let valueOrDefault = `(${value}) || ${defaultValue}`;
+				// Always escape the bound value: a number or checkbox input
+				// can still be bound to a string at runtime
+				status.imports.add("t_attr");
+				let valueOrDefault = `t_attr(${value}) || ${defaultValue}`;
 				const propName = name.substring(1);
 				attributes.push(`${propName}="\${${valueOrDefault}}"`);
 			} else if (name === "class") {
