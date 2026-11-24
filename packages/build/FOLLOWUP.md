@@ -1,5 +1,139 @@
 # Follow-ups
 
+## Bugs
+
+Findings from a review of `packages/build` (2026-11-24). "Confirmed" items
+were reproduced with throwaway tests through `createServerLoad` (since
+deleted); the rest come from reading the source.
+
+### `$page` is one global object shared by every request (confirmed)
+
+`state/$serverPage.ts` stores the server `$page` on `globalThis`, and
+`site/serverHandlers.ts` writes `url`, `status`, `error`, `flash` and `form`
+on it per request, then awaits loads before rendering. Concurrent requests
+overwrite each other's state mid-render: with a slow page request for Alice
+and a fast one for Bob arriving 5ms later, Alice's page rendered
+`url=/fast?user=bob`. The same applies to `$page.flash` (one user's flash
+message shown to another, and the intended recipient's lost) and
+`$page.form`.
+
+This is a cross-user data leak under normal load on the node adapter.
+Give each request its own page state: `AsyncLocalStorage` on node (and
+workerd, with `nodejs_compat`), or pass the state through the render
+context instead of a module global. The prerender note under "Follow-ups
+from prerendering" ("keeps the module-global `$page` state safe") is the
+same issue.
+
+### `$page.form` leaks into later requests (confirmed)
+
+Separately from the concurrency problem, nothing on the server resets
+`$page.form`: it is set by a no-JS form action re-render
+(`runAction`, ~line 1185) and only cleared on the client. After one user's
+POST to `/form` returned `{ values: { name: … } }`, the next plain GET of an
+unrelated page by anyone rendered with that `form` object. Reset `form`
+(and `flash`) at the start of every request; per-request state fixes both.
+
+### XSS: no-JS form results embedded with a broken escape (confirmed)
+
+`loadView` embeds the form result as
+`<input type="hidden" id="t-form-data" value='${JSON.stringify(form).replaceAll("'", "\\'")}' />`.
+HTML has no backslash escapes, so a `'` in the data closes the attribute,
+and `<` isn't escaped at all. Form results commonly echo the submitted
+values back, so a field value like `'/><script>…</script>` is reflected
+into the page. Embed it the way the server data already is: a
+`<script type="application/json">` with `jsonForScript`, or HTML-escape the
+attribute value (`&`, `'`, `"`, `<`).
+
+### XSS: rejected deferred values aren't escaped for `<script>` (confirmed)
+
+`deferredScript` escapes resolved values with `jsonForScript`, but uses
+plain `JSON.stringify(String(value))` for rejections. A deferred load that
+rejects with `new Error("no user </script><script>alert(1)</script>")`
+writes that markup straight into the streamed page. Use `jsonForScript` for
+both. Also consider not sending raw server error messages to the client in
+production (they can include internal details); send a generic message
+unless the error is marked as safe to show.
+
+### Middleware on `_layout.server.ts` is silently ignored (confirmed)
+
+Layout server endpoints share the `PageServerEndPoint` type, which accepts
+`middleware`, but `createServerLoad` and `loadPageData` only collect
+middleware from the page's own endpoint. A guard on
+`/admin/_layout.server.ts` (`middleware: [{ enter: () => unauthorized() }]`)
+let `GET /admin/secret` through with a 200. Either run layout middleware
+for every page under the layout (outermost first), or reject `middleware`
+on layout endpoints at type and runtime level so it can't be mistaken for a
+guard. Folder hooks (`_hook.server.ts`) do guard subtrees; the docs should
+point people there.
+
+### Session cookies: malformed values throw, `set` drops the id (confirmed)
+
+`server/SessionHelper.ts`:
+
+- `verifyValue` decodes the signature with `atob` outside any `try`, so a
+  cookie like `abc.!!!` (tampered, truncated, or from an older format) makes
+  `session.get()` throw `InvalidCharacterError`. Called from a root hook,
+  that's a 500 on every request until the user clears their cookies.
+  Treat any decode failure as "no session".
+- `set()` keeps `#id` only if `get()` was called earlier in the request;
+  otherwise it mints a new id, contrary to its docs ("Keeps the current
+  session id"). Anything keyed on `session.id` (a db row, revocation) is
+  orphaned. `set` should read and verify the existing cookie when `#id`
+  isn't known yet.
+- Nothing checks the cookie size: a 5KB payload produced a 6.9KB
+  `Set-Cookie`, which browsers silently drop, so the session vanishes with
+  no error. Throw (or warn in dev) above ~4KB.
+
+### Form actions resolve `Object.prototype` names (confirmed)
+
+`runAction` looks up `serverEndPoint.actions[actionName]` with a plain
+property read, so `POST ?/toString`, `?/constructor`, `?/__proto__` and
+`?/hasOwnProperty` find prototype members and crash with a 500 (with or
+without JS). Use `Object.hasOwn(actions, actionName)` and fall through to
+the not-found path.
+
+### `/_error?status=` trusts the query string (confirmed)
+
+`$page.status = parseInt(query.get("status") ?? "404")` is used as the
+response status. `?status=abc` and `?status=999` throw (500),
+`?status=200` serves the error page as a success, and `?status=302`
+returns a redirect with no `Location`. Clamp to valid 4xx/5xx codes and
+fall back to 404.
+
+### Client navigations queue instead of the latest winning
+
+`nav/navigate.ts` chains every navigation onto `pendingNavigation`, and the
+data fetch in `nav/loadData.ts` has no `AbortSignal` or timeout. Clicking a
+slow link and then a fast one renders the slow page first, then the fast
+one; clicking several links renders each in turn; and a hung `/~server`
+request blocks all further client navigation until it settles. Abort (or
+ignore the result of) superseded navigations and let the newest one win.
+
+### Smaller issues
+
+- **Form and query fields named like `Object.prototype` members are
+  dropped**: `formDataToRecord` and `searchParamsToRecord` skip a key when
+  `key in result`, which is already true for `constructor`, `toString`,
+  `valueOf` etc. (It does stop `__proto__` pollution, but by losing the
+  data.) Use `Object.hasOwn`, or build the record on `Object.create(null)`.
+- **Validation runs before hooks in actions**: `runAction` parses and
+  validates the form against the action's schema before the folder hooks
+  (e.g. an auth hook) run, so unauthenticated users get schema validation
+  errors back. Run hooks first, as loads do.
+- **No origin check on form actions**: CSRF protection relies entirely on
+  the `SameSite=lax` default in `CookieHelper`. Checking `Origin` against
+  the request host for non-GET form posts (SvelteKit's `checkOrigin`) would
+  be cheap defense in depth.
+- **Module-global base path**: `createServerLoad` calls `setBasePath`, a
+  module global, so two sites with different bases in one process (tests,
+  multi-tenant servers) overwrite each other. Same root cause as `$page`.
+- **`rewriteBaseInHtml` rewrites by regex over the whole document**, so
+  `href="/…"` / `src="/…"` text inside `<pre>`/`<code>` samples or inline
+  scripts is rewritten too.
+- **`secure: true` by default** in `CookieHelper` means sessions and flash
+  messages don't stick in browsers that refuse `Secure` cookies over plain
+  `http://localhost` (older Safari), with no warning in dev.
+
 ## Missing framework features
 
 A gap analysis of `packages/build` against commonly needed features in peer
