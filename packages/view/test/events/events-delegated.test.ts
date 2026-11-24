@@ -28,7 +28,7 @@ export default function DelegatedClick() {
 // Walk-up test: clicking a child element inside a parent with a delegated
 // handler must fire the parent's handler. This is the structural property
 // delegation introduces — the document-level listener walks up from
-// event.target to find the closest ancestor with a stashed handler.
+// event.target, running each ancestor's stashed handler.
 const walkUpSource = `
 export default function WalkUp() {
 	let $state = $watch({ clicked: false });
@@ -203,4 +203,82 @@ test("delegated handlers need a connected container", async () => {
 	document.body.appendChild(container);
 	btn.click();
 	expect(queryByText(container, "Fired!")).not.toBeNull();
+});
+
+test("delegated handlers bubble through nested elements", async () => {
+	// Every ancestor's handler runs, innermost first, like native listeners
+	const source = `
+		export default function NestedHandlers($props: { calls: string[] }) {
+			@render {
+				<div id="outer" onclick={() => $props.calls.push("outer")}>
+					<div id="middle" onclick={() => $props.calls.push("middle")}>
+						<button id="inner" onclick={() => $props.calls.push("inner")}>
+							<span>click</span>
+						</button>
+					</div>
+				</div>
+			}
+		}
+	`;
+
+	const calls: string[] = [];
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, source, "client");
+	mountComponent(container, component, { calls });
+
+	await userEvent.click(container.querySelector("#inner span")!);
+
+	expect(calls).toEqual(["inner", "middle", "outer"]);
+});
+
+test("stopPropagation in a delegated handler stops outer handlers", async () => {
+	const source = `
+		export default function StoppedHandlers($props: { calls: string[] }) {
+			@render {
+				<div id="outer" onclick={() => $props.calls.push("outer")}>
+					<div
+						id="middle"
+						onclick={(e) => {
+							e.stopPropagation();
+							$props.calls.push("middle");
+						}}
+					>
+						<button id="inner" onclick={() => $props.calls.push("inner")}>click</button>
+					</div>
+				</div>
+			}
+		}
+	`;
+
+	const calls: string[] = [];
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, source, "client");
+	mountComponent(container, component, { calls });
+
+	await userEvent.click(container.querySelector("#inner")!);
+
+	expect(calls).toEqual(["inner", "middle"]);
+});
+
+test("delegated handlers keep each element's currentTarget while bubbling", async () => {
+	const source = `
+		export default function BubbleTargets($props: { targets: string[] }) {
+			@render {
+				<div id="outer" onclick={(e) => $props.targets.push((e.currentTarget as HTMLElement).id)}>
+					<button id="inner" onclick={(e) => $props.targets.push((e.currentTarget as HTMLElement).id)}>
+						click
+					</button>
+				</div>
+			}
+		}
+	`;
+
+	const targets: string[] = [];
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, source, "client");
+	mountComponent(container, component, { targets });
+
+	await userEvent.click(container.querySelector("#inner")!);
+
+	expect(targets).toEqual(["inner", "outer"]);
 });

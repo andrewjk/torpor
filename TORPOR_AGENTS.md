@@ -611,7 +611,9 @@ use one document-level listener per type; anything else falls back to a direct
 ```
 
 `e.currentTarget` is correctly re-synthesized to the handler element even for
-delegated events (including when the click lands on a child).
+delegated events (including when the click lands on a child). Delegated
+events bubble through nested handlers, innermost first, and
+`e.stopPropagation()` stops the outer ones from running.
 
 ### Bindings (`&` prefix)
 

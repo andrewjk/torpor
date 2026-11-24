@@ -1,10 +1,10 @@
 import type SlotRender from "../../../../src/types/SlotRender";
 
-declare function DetachedClick(
+declare function BubbleTargets(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props?: Record<PropertyKey, any>,
+	$props: { targets: string[] },
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>,
 ): void;
-export default DetachedClick;
+export default BubbleTargets;

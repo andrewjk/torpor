@@ -3,7 +3,8 @@
  *
  * For event types in `DELEGATED_EVENT_TYPES` (all natively bubbling), we
  * register a single listener on `document` per type and dispatch by walking
- * up from `event.target` to find the closest ancestor with a stashed handler.
+ * up from `event.target`, running each ancestor's stashed handler in turn
+ * until one calls `stopPropagation()`.
  * This replaces per-element `addEventListener` for delegated types.
  *
  * Why: in the js-framework-bench row template, every `<tr>` clones two `<a>`
@@ -86,7 +87,10 @@ function delegatedHandler(event: Event): void {
 	const stopAt: Node | null = event.currentTarget as Node | null;
 	const key = DELEGATE_PREFIX + event.type;
 	// Walk from the deepest target up to (but not including) the listener
-	// node (document). First ancestor with a stashed handler wins.
+	// node (document), running every stashed handler on the way, so nested
+	// handlers bubble like native listeners. `stopPropagation()` (or
+	// `stopImmediatePropagation()`) in a handler sets `cancelBubble`, which
+	// ends the walk
 	while (node != null && node !== stopAt) {
 		const handler = (node as any)[key];
 		if (handler !== undefined) {
@@ -106,7 +110,9 @@ function delegatedHandler(event: Event): void {
 				// again (returns `null` once dispatch completes).
 				delete (event as any).currentTarget;
 			}
-			return;
+			if (event.cancelBubble) {
+				return;
+			}
 		}
 		node = node.parentNode;
 	}
