@@ -23,14 +23,6 @@ Either only deep-wrap plain objects and arrays (prototype is
 collections, or keep per-object metadata in a `WeakMap` instead of on the
 target. That would also fix frozen objects.
 
-### A mount that throws leaves the render context dirty (confirmed)
-
-`render/mount.ts` sets `context.rootRegion` and pushes the root region, then
-calls the component without `try/finally`. If rendering throws,
-`rootRegion` stays set and a nested mount's `saved` context is never
-restored, so the next `mount` is treated as nested. Restore the context
-(and unregister the half-built tree) in a `finally`.
-
 ### Smaller reactivity issues
 
 - **`NaN` writes always notify** (confirmed): `proxySet` compares with

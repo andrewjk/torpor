@@ -1,11 +1,13 @@
 import devContext from "../dev/devContext";
 import type Component from "../types/Component";
+import type Region from "../types/Region";
 import type SlotRender from "../types/SlotRender";
 import isServerComponent from "./isServerComponent";
+import clearRegion from "./clearRegion";
 import context from "./context";
 import newRegion from "./newRegion";
 import pushRegion from "./pushRegion";
-import { registerRegionTree } from "./regionTreeRegistry";
+import { registerRegionTree, unregisterRegionTree } from "./regionTreeRegistry";
 
 /**
  * Mounts a component into a DOM node
@@ -66,16 +68,39 @@ export default function mount(
 	context.previousRegion = root;
 	pushRegion(root);
 
-	// Call the component's render function
-	component(parent, null, props, undefined, slots);
-
-	if (saved !== null) {
-		// Pop back to the host's render context; the embed keeps living in
-		// its own tree, to be torn down by `unmount(parent)`.
-		context.rootRegion = saved.rootRegion;
-		context.previousRegion = saved.previousRegion;
-		context.activeRegion = saved.activeRegion;
+	// Call the component's render function. A throwing render must not leave
+	// the render context (or the region registry) pointing at a half-built
+	// tree: restore the pre-mount context and dispose the partial tree.
+	let mounted = false;
+	try {
+		component(parent, null, props, undefined, slots);
+		mounted = true;
+	} finally {
+		if (mounted) {
+			if (saved !== null) {
+				// Pop back to the host's render context; the embed keeps living in
+				// its own tree, to be torn down by `unmount(parent)`.
+				context.rootRegion = saved.rootRegion;
+				context.previousRegion = saved.previousRegion;
+				context.activeRegion = saved.activeRegion;
+			}
+		} else {
+			unregisterRegionTree(parent);
+			// Dispose effects the partial render created. Guarded: a render can
+			// throw from anywhere, so the tree may be in an odd state — the
+			// context restore below must still happen.
+			try {
+				clearRegion(root);
+			} catch {
+				// Nothing useful to do while unwinding the original error
+			}
+			context.rootRegion = (saved !== null ? saved.rootRegion : null) as unknown as Region;
+			context.previousRegion = (saved !== null ? saved.previousRegion : null) as unknown as Region;
+			context.activeRegion = (saved !== null ? saved.activeRegion : null) as unknown as Region;
+		}
 	}
 
-	registerRegionTree(parent, root);
+	if (mounted) {
+		registerRegionTree(parent, root);
+	}
 }
