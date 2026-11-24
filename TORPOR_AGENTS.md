@@ -801,7 +801,7 @@ function Self($props: { level: number }) {
 
 ## Mounting & layout
 
-### `mount(parent, Component, props?, slots?)`
+### `mount(parent, Component, props?, slots?, rootContext?)`
 
 Creates the root region and renders the component into `parent` (must be empty
 — throws if it has child elements). `main.js` entry:
@@ -812,9 +812,15 @@ import App from "./Main.torp";
 mount(document.getElementById("main"), App);
 ```
 
-### `hydrate(parent, Component, props?, slots?)`
+`rootContext` seeds the root `$context`, so the component and every descendant
+can read it (e.g. `mount(el, App, undefined, undefined, { $app })`, then
+`let { $app } = $context` in any component).
+
+### `hydrate(parent, Component, props?, slots?, rootContext?)`
 
 Attaches to server-rendered DOM in place (no re-render of existing nodes).
+`rootContext` works as for `mount`; pass the same context the server render
+was given.
 
 ### `unmount(parent)`
 

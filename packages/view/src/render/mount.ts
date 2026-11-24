@@ -27,12 +27,17 @@ import { registerRegionTree, unregisterRegionTree } from "./regionTreeRegistry";
  * child elements
  * @param component The component to mount
  * @param props An object containing component props
+ * @param slots Slot render functions for the component
+ * @param rootContext The root `$context`, which the component and all of its
+ *   descendants inherit (e.g. app-wide state that a framework provides to
+ *   every page)
  */
 export default function mount(
 	parent: ParentNode,
 	component: Component,
 	props?: Record<string, any>,
 	slots?: Record<string, SlotRender>,
+	rootContext?: Record<PropertyKey, any>,
 ): void {
 	if (isServerComponent(component)) {
 		throw new Error(
@@ -73,7 +78,7 @@ export default function mount(
 	// tree: restore the pre-mount context and dispose the partial tree.
 	let mounted = false;
 	try {
-		component(parent, null, props, undefined, slots);
+		component(parent, null, props, rootContext, slots);
 		mounted = true;
 	} finally {
 		if (mounted) {

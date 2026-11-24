@@ -21,12 +21,17 @@ import { registerRegionTree } from "./regionTreeRegistry";
  * @param parent The parent node
  * @param component The component to mount
  * @param props An object containing component props
+ * @param slots Slot render functions for the component
+ * @param rootContext The root `$context`, which the component and all of its
+ *   descendants inherit (e.g. app-wide state that a framework provides to
+ *   every page)
  */
 export default function hydrate(
 	parent: ParentNode,
 	component: Component,
 	props?: Record<string, any>,
 	slots?: Record<string, SlotRender>,
+	rootContext?: Record<PropertyKey, any>,
 ): void {
 	if (isServerComponent(component)) {
 		throw new Error(
@@ -58,7 +63,7 @@ export default function hydrate(
 	pushRegion(root);
 
 	// Call the component's render function
-	component(parent, null, props, undefined, slots);
+	component(parent, null, props, rootContext, slots);
 
 	context.hydrationNode = null;
 
