@@ -201,14 +201,16 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 			data = errorResult.data;
 		}
 	}
-	// We may have form data in a hidden input -- not sure if this is the best
-	// way to do it
-	let formInput = document.getElementById("t-form-data") as HTMLInputElement;
+	// We may have form data from a no-JS form action re-render, in a JSON
+	// script (or, in a page rendered by an older server, a hidden input)
+	let formElement = document.getElementById("t-form-data");
 	let form: Record<string, string> | undefined;
-	if (formInput) {
-		form = JSON.parse(formInput.value);
+	if (formElement) {
+		form = JSON.parse(
+			formElement instanceof HTMLInputElement ? formElement.value : (formElement.textContent ?? ""),
+		);
 		$page.form = form;
-		formInput.remove();
+		formElement.remove();
 	}
 	let $props: Record<string, any> = { data };
 

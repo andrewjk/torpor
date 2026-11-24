@@ -925,9 +925,12 @@ async function loadView(
 					}
 				}
 
-				// Put the form info in a hidden input so that it can be accessed on the client
+				// Put the form info in a JSON script so that it can be accessed on
+				// the client. Form results often echo the submitted values back,
+				// so they go through `jsonForScript` (like the server data
+				// payload) rather than into an attribute
 				if (form) {
-					body += `\n<input type="hidden" id="t-form-data" value='${JSON.stringify(form).replaceAll("'", "\\'")}' />`;
+					body += `\n<script type="application/json" id="t-form-data">${jsonForScript(form)}</script>`;
 				}
 
 				// Embed the routes' server-only data as json so the client's first
@@ -1065,8 +1068,10 @@ function deferredBootstrapScript(): string {
 
 /** A script that settles one deferred entry in the hydration store. */
 function deferredScript(id: string, value: unknown, rejected: boolean): string {
-	const payload = rejected ? JSON.stringify(String(value)) : jsonForScript(value);
-	return `<script>__torporDeferred.${rejected ? "reject" : "resolve"}(${JSON.stringify(id)},${payload})</script>`;
+	// Both payloads go through `jsonForScript`: a rejection message can
+	// contain `</script>` (e.g. one built from user input) just as a value can
+	const payload = jsonForScript(rejected ? String(value) : value);
+	return `<script>__torporDeferred.${rejected ? "reject" : "resolve"}(${jsonForScript(id)},${payload})</script>`;
 }
 
 async function runAction(

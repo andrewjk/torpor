@@ -33,27 +33,6 @@ POST to `/form` returned `{ values: { name: … } }`, the next plain GET of an
 unrelated page by anyone rendered with that `form` object. Reset `form`
 (and `flash`) at the start of every request; per-request state fixes both.
 
-### XSS: no-JS form results embedded with a broken escape (confirmed)
-
-`loadView` embeds the form result as
-`<input type="hidden" id="t-form-data" value='${JSON.stringify(form).replaceAll("'", "\\'")}' />`.
-HTML has no backslash escapes, so a `'` in the data closes the attribute,
-and `<` isn't escaped at all. Form results commonly echo the submitted
-values back, so a field value like `'/><script>…</script>` is reflected
-into the page. Embed it the way the server data already is: a
-`<script type="application/json">` with `jsonForScript`, or HTML-escape the
-attribute value (`&`, `'`, `"`, `<`).
-
-### XSS: rejected deferred values aren't escaped for `<script>` (confirmed)
-
-`deferredScript` escapes resolved values with `jsonForScript`, but uses
-plain `JSON.stringify(String(value))` for rejections. A deferred load that
-rejects with `new Error("no user </script><script>alert(1)</script>")`
-writes that markup straight into the streamed page. Use `jsonForScript` for
-both. Also consider not sending raw server error messages to the client in
-production (they can include internal details); send a generic message
-unless the error is marked as safe to show.
-
 ### Middleware on `_layout.server.ts` is silently ignored (confirmed)
 
 Layout server endpoints share the `PageServerEndPoint` type, which accepts
