@@ -10,4 +10,14 @@ const proxyDataSymbol: unique symbol = Symbol.for("torp.ProxyData");
  */
 const proxyKeysSymbol: unique symbol = Symbol.for("torp.ProxyKeys");
 
-export { proxyDataSymbol, proxyKeysSymbol };
+/**
+ * Signal key for a watched array's contents (element identity). Tracked by
+ * anything whose result depends on which elements are at which indexes —
+ * iteration, `slice`/`map`/`filter`/`find`/`indexOf`/`at`/`join`/… — and
+ * propagated by direct index writes, which replace an element without
+ * changing `length`. Kept separate from `length` so `items.length` readers
+ * don't re-run (e.g. every list) just because one element was replaced.
+ */
+const proxyArrayContentSymbol: unique symbol = Symbol.for("torp.ProxyArrayContent");
+
+export { proxyDataSymbol, proxyKeysSymbol, proxyArrayContentSymbol };

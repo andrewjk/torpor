@@ -10,7 +10,7 @@ import checkComputed from "./checkComputed";
 import deepWrap, { isWrappedProxy } from "./deepWrap";
 import $unwrap from "./$unwrap";
 import propagateSignal from "./propagateSignal";
-import { proxyDataSymbol, proxyKeysSymbol } from "./symbols";
+import { proxyArrayContentSymbol, proxyDataSymbol, proxyKeysSymbol } from "./symbols";
 import trackProxySignal, { ensureProxySignal } from "./trackProxySignal";
 import trackSignal from "./trackSignal";
 
@@ -282,14 +282,15 @@ const arrayWrapper: Record<PropertyKey, any> = {
 	// the per-element trap entirely. `data.shallow` arrays are left unwrapped,
 	// matching the `get` trap's deep-only behaviour.
 	//
-	// The iteration subscribes the reading effect to `length` only — every
-	// array mutation notifies `length` (push/splice via `arrayHandle`, direct
-	// index assignment via the `set` trap), so that is all a `for…of` depends
-	// on. Reads made in the loop body (and everything after the iteration)
-	// stay tracked like any other effect read; the list's own item-building
-	// key reads are untracked by the compiler instead (see `buildForNode`).
+	// The iteration subscribes the reading effect to `length` and the content
+	// signal: every structural mutation notifies `length` (push/splice via
+	// `arrayHandle`), while a direct index assignment that keeps the length
+	// notifies the content signal. Reads made in the loop body (and everything
+	// after the iteration) stay tracked like any other effect read; the list's
+	// own item-building key reads are untracked by the compiler instead (see
+	// `buildForNode`).
 	[Symbol.iterator]: function (data: ProxyData, target: any, _key: PropertyKey) {
-		trackProxySignal(data, "length");
+		trackArrayReads(data);
 		return function arrayIterator() {
 			let index = 0;
 			return {
@@ -378,15 +379,25 @@ function wrapArrayElements(data: ProxyData, target: any[]): void {
 	data.elementsWrapped = true;
 }
 
+/**
+ * Subscribes the active effect to everything a read of the array's contents
+ * depends on: `length` (rows added/removed) and the content signal (an
+ * element replaced at an existing index, which keeps the length). When no
+ * effect is active both are cheap no-ops.
+ */
+function trackArrayReads(data: ProxyData): void {
+	trackProxySignal(data, "length");
+	trackProxySignal(data, proxyArrayContentSymbol);
+}
+
 function readHandle(data: ProxyData, target: any, key: PropertyKey): Function {
 	// Call the function on the target (so proxy properties don't get
-	// intercepted). Read-only, so no `length` propagation — but an effect that
-	// READS the array through one of these (`items.join("")`, `items.slice(1)`)
-	// must still subscribe to `length` so it re-runs on push/splice/index-set
-	// (every array mutation propagates `length`). When no effect is active this
-	// is a cheap no-op.
+	// intercepted). Read-only, so no signal propagation — but an effect that
+	// READS the array through one of these (`items.join("")`, `items.slice(1)`,
+	// `items.filter(…)`) must re-run when rows are added/removed or an element
+	// is replaced, hence `trackArrayReads`.
 	return function (...args: any[]) {
-		trackProxySignal(data, "length");
+		trackArrayReads(data);
 		wrapArrayElements(data, target);
 		const func = target[key];
 		return func.apply(target, args);
@@ -397,7 +408,7 @@ function joinHandle(data: ProxyData, target: any, key: PropertyKey): Function {
 	// Like `readHandle`, but without wrapping: `join` only produces a string,
 	// so the elements never need proxies.
 	return function (...args: any[]) {
-		trackProxySignal(data, "length");
+		trackArrayReads(data);
 		const func = target[key];
 		return func.apply(target, args);
 	};
@@ -413,7 +424,7 @@ function joinHandle(data: ProxyData, target: any, key: PropertyKey): Function {
  */
 function searchHandle(data: ProxyData, target: any, key: PropertyKey): Function {
 	return function (...args: any[]) {
-		trackProxySignal(data, "length");
+		trackArrayReads(data);
 		const search = args[0];
 		const func = target[key];
 		const found = func.apply(target, args);
@@ -434,7 +445,7 @@ function searchHandle(data: ProxyData, target: any, key: PropertyKey): Function 
  */
 function atHandle(data: ProxyData, target: any, _key: PropertyKey): Function {
 	return function (index?: number) {
-		trackProxySignal(data, "length");
+		trackArrayReads(data);
 		const length = target.length;
 		let i = Math.trunc(Number(index ?? 0)) || 0;
 		if (i < 0) i += length;

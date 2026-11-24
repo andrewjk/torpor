@@ -55,9 +55,9 @@ function check(_: HTMLElement, state: any) {
 	expect(proxyData(state).signals.size).toBe(1);
 	//expect(Object.keys(proxyData(state).signals).length).toBe(1);
 
-	// `iterator`, `length`, `0`, `1`, `2`
-	expect(proxyData(state.items).signals.size).toBe(4);
-	//expect(Object.keys(proxyData(state.items).signals).length).toBe(4);
+	// `length`, the array-content signal, `0`, `1`, `2`
+	expect(proxyData(state.items).signals.size).toBe(5);
+	//expect(Object.keys(proxyData(state.items).signals).length).toBe(5);
 
 	// `text`
 	expect(proxyData(state.items[0]).signals.size).toBe(1);

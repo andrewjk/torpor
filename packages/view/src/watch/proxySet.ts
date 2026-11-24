@@ -1,7 +1,7 @@
 import devContext from "../dev/devContext";
 import deepWrap from "./deepWrap";
 import propagateSignal from "./propagateSignal";
-import { proxyDataSymbol, proxyKeysSymbol } from "./symbols";
+import { proxyArrayContentSymbol, proxyDataSymbol, proxyKeysSymbol } from "./symbols";
 
 export default function proxySet(
 	target: Record<PropertyKey, any>,
@@ -40,6 +40,11 @@ export default function proxySet(
 		// `ownKeys`-visible membership is what changed, value or not.)
 		const isNewKey = !Object.prototype.hasOwnProperty.call(target, key);
 
+		// A direct array index write replaces an element. Capture the length
+		// first: only a write that extends the array changes it.
+		const isArrayIndex = data.isArray && typeof key !== "symbol" && !isNaN(+key);
+		const oldLength = isArrayIndex ? (target as any).length : 0;
+
 		// Set the property value on the target
 		Reflect.set(target, key, value, receiver);
 
@@ -49,11 +54,15 @@ export default function proxySet(
 			propagateSignal(data, proxyKeysSymbol);
 		}
 
-		// If an item in an array is being set directly, trigger the length to
-		// cause any lists to be re-run and data re-bound
-		// TODO: Can we update the single item's data directly somehow?
-		if (data.isArray && typeof key !== "symbol" && !isNaN(+key)) {
-			propagateSignal(data, "length");
+		if (isArrayIndex) {
+			// Iteration and read methods re-run because an element changed...
+			propagateSignal(data, proxyArrayContentSymbol);
+			// ...but `length` readers (e.g. `items.length`, and lists that
+			// only care about adding/removing rows) only when the write
+			// actually changed the length
+			if ((target as any).length !== oldLength) {
+				propagateSignal(data, "length");
+			}
 		}
 	}
 

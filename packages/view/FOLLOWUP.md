@@ -25,9 +25,6 @@ target. That would also fix frozen objects.
 
 ### Smaller reactivity issues
 
-- **Index writes always notify `length`** (confirmed, known TODO in
-  `proxySet`): `arr[0] = 9` re-runs every `length` reader, including whole
-  `@for` lists.
 - **`$cache` / `$async` don't work in class getters** (confirmed): a
   prototype getter has no own property descriptor, so `registerComputed`
   is never set up and `$cache` throws "$cache must be used in a getter".
