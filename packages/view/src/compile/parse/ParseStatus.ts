@@ -1,6 +1,5 @@
 import type TemplateComponent from "../../types/TemplateComponent";
 import type CompileError from "../types/CompileError";
-import type Import from "../types/Import";
 import type ScriptChunk from "../types/ScriptChunk";
 import ElementNode from "../types/nodes/ElementNode";
 
@@ -19,7 +18,6 @@ export default interface ParseStatus {
 	 */
 	braces: boolean[];
 
-	imports: Import[];
 	script: ScriptChunk[];
 
 	components: TemplateComponent[];

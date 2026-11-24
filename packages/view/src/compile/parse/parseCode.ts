@@ -25,7 +25,6 @@ export default function parseCode(source: string): ParseResult {
 		marker: 0,
 		level: 0,
 		braces: [],
-		imports: [],
 		script: [],
 		components: [],
 		stack: [],
@@ -140,7 +139,6 @@ export default function parseCode(source: string): ParseResult {
 		errors: status.errors,
 		template: ok
 			? {
-					imports: status.imports,
 					script: status.script,
 					components: status.components,
 				}
@@ -255,7 +253,6 @@ function parseComponentStart(status: ParseStatus) {
 					marker: 0,
 					level: 0,
 					braces: [],
-					imports: [],
 					script: [],
 					components: [],
 					stack: [],

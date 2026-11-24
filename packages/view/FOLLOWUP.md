@@ -33,12 +33,6 @@ target. That would also fix frozen objects.
 
 ## Compiler
 
-- **`parseImports`** is a hand-rolled line scanner (`HACK: Really need to
-  properly parse imports`). It stops at the first line that isn't an import
-  or a `//` comment, so imports after a `/* */` block or a directive are
-  missed. Its result (`template.imports`) is only lightly used today
-  (`bindingTarget`), but anything building on it should use a real parser
-  (the oxc parser is already in the toolchain).
 - There are 89 `TODO` / `HACK` / `FIXME` markers under `src/`, and 23
   commented-out `console.log`s (plus a commented-out debug `printPath` block
   at the end of `compile/build/client/buildFragment.ts`). Worth a pruning

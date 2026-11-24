@@ -11,7 +11,6 @@ export default function Test() {
 	expect(output.ok).toBe(true);
 	expect(output.errors).toEqual([]);
 	assert(output.template);
-	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(`
 export default function Test(/* @params */) /* @return_type */ {/* @start */
 	const x = 5;

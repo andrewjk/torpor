@@ -9,7 +9,6 @@ test("basic file with export default function", () => {
 	expect(output.ok).toBe(true);
 	expect(output.errors).toEqual([]);
 	assert(output.template);
-	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(
 		"export default function Test(/* @params */) /* @return_type */ {/* @start *//* @end */}",
 	);
@@ -25,7 +24,6 @@ test("basic file with export function", () => {
 	expect(output.ok).toBe(true);
 	expect(output.errors).toEqual([]);
 	assert(output.template);
-	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(
 		"export function Test(/* @params */) /* @return_type */ {/* @start *//* @end */}",
 	);
@@ -41,7 +39,6 @@ test("basic file with function", () => {
 	expect(output.ok).toBe(true);
 	expect(output.errors).toEqual([]);
 	assert(output.template);
-	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(
 		"function Test(/* @params */) /* @return_type */ {/* @start *//* @end */}",
 	);
@@ -57,7 +54,6 @@ test("basic file with export default unnamed function", () => {
 	expect(output.ok).toBe(true);
 	expect(output.errors).toEqual([]);
 	assert(output.template);
-	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(
 		"export default (/* @params */) => {/* @start *//* @end */}",
 	);
@@ -73,7 +69,6 @@ test("basic file with const", () => {
 	expect(output.ok).toBe(true);
 	expect(output.errors).toEqual([]);
 	assert(output.template);
-	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(
 		"const Test = (/* @params */) => {/* @start *//* @end */}",
 	);
