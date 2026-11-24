@@ -12,8 +12,25 @@ import { proxyDataSymbol } from "./symbols";
  */
 const proxyCache = new WeakMap<object, object>();
 
+// Proxies this module created, so bulk callers (e.g. wrapping array elements)
+// can tell "already wrapped" without reading `proxyDataSymbol` through the
+// proxy's `get` trap — a WeakSet hit is much cheaper.
+const wrappedProxies = new WeakSet<object>();
+
+/**
+ * Whether `value` is a proxy created by `deepWrap` — checked without going
+ * through the proxy's `get` trap.
+ */
+export function isWrappedProxy(value: any): boolean {
+	return value !== null && typeof value === "object" && wrappedProxies.has(value);
+}
+
 export default function deepWrap(value: any): any {
 	if (value === undefined || value === null || typeof value !== "object") {
+		return value;
+	}
+	if (wrappedProxies.has(value)) {
+		// A proxy we created — already wrapped
 		return value;
 	}
 	if (value[proxyDataSymbol] !== undefined) {
@@ -42,5 +59,6 @@ export default function deepWrap(value: any): any {
 	}
 	const proxy = $watch(value);
 	proxyCache.set(value, proxy);
+	wrappedProxies.add(proxy);
 	return proxy;
 }

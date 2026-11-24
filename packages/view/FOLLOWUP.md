@@ -5,33 +5,6 @@ with throwaway tests (since deleted); the rest come from reading the source.
 
 ## Bugs
 
-### Array read methods run on raw elements, so reads aren't tracked (confirmed)
-
-`watch/proxyGet.ts` routes `filter`, `map`, `find`, `some`, `every`,
-`reduce`, `forEach`, `at`, … through `readHandle`, which calls them on the
-raw target. Elements that haven't been wrapped yet (no earlier
-iteration or `arr[i]` read) are passed to callbacks and returned raw:
-
-```ts
-const s = $watch({ todos: [{ done: false }, { done: false }] });
-$run(() => (n = s.todos.filter((t) => !t.done).length));
-s.todos[0].done = true; // n stays 2
-```
-
-```ts
-const t = s.todos.find((x) => x.id === 1); // raw object
-t.done = true; // nothing re-runs
-```
-
-The `remaining` / `find-then-mutate` patterns are common, and whether they
-work depends on whether something happened to read the array through the
-proxy first. Wrap elements lazily in `readHandle` (as the iterator already
-does), or pass proxies to the callbacks.
-
-Related: once elements are wrapped and written back, the target holds
-proxies, so `indexOf(rawObj)` / `includes(rawObj)` return `-1` / `false`
-for objects that are in the array.
-
 ### "Cycle detected" fires for large, non-cyclic flushes (confirmed)
 
 `proxySet` throws when `context.batchOperation > 100`, and

@@ -7,7 +7,7 @@ import { AwaitSuspend } from "../render/AwaitSuspend";
 import batchEnd from "./batchEnd";
 import batchStart from "./batchStart";
 import checkComputed from "./checkComputed";
-import deepWrap from "./deepWrap";
+import deepWrap, { isWrappedProxy } from "./deepWrap";
 import $unwrap from "./$unwrap";
 import propagateSignal from "./propagateSignal";
 import { proxyDataSymbol, proxyKeysSymbol } from "./symbols";
@@ -325,11 +325,12 @@ const arrayWrapper: Record<PropertyKey, any> = {
 	unshift: arrayHandle,
 	// Read-only methods must also run on the raw target. `slice`/`filter`/`concat`
 	// etc. called on the proxy walk every element through the `get` trap — the
-	// same ~100x penalty — for nothing, since their results are either assigned
-	// back into `$state.data` (re-wrapped by `$watch` in the `set` trap) or read
-	// transiently. Running them on the raw array keeps the elements' proxy
-	// identity unchanged (wrapped elements stay wrapped; raw elements stay raw
-	// until the next iteration wraps them).
+	// same ~100x penalty. Running them on the raw array avoids that, but the
+	// elements handed to callbacks and returned to the caller must still be
+	// proxies (otherwise reads inside a callback aren't tracked, and mutating a
+	// returned element doesn't notify): `readHandle` wraps each element lazily
+	// before calling the method, writing the proxy back exactly like the
+	// iterator does.
 	slice: readHandle,
 	concat: readHandle,
 	filter: readHandle,
@@ -337,21 +338,45 @@ const arrayWrapper: Record<PropertyKey, any> = {
 	toReversed: readHandle,
 	toSorted: readHandle,
 	toSpliced: readHandle,
-	indexOf: readHandle,
-	lastIndexOf: readHandle,
-	includes: readHandle,
+	indexOf: searchHandle,
+	lastIndexOf: searchHandle,
+	includes: searchHandle,
 	find: readHandle,
 	findIndex: readHandle,
 	some: readHandle,
 	every: readHandle,
-	join: readHandle,
+	join: joinHandle,
 	forEach: readHandle,
 	reduce: readHandle,
 	reduceRight: readHandle,
 	flat: readHandle,
 	flatMap: readHandle,
-	at: readHandle,
+	at: atHandle,
 };
+
+/**
+ * Wraps (and writes back) every object element of a raw array, so callback
+ * parameters and returned values are reactive proxies — the same lazy wrapping
+ * the iterator does. Skipped entirely once every element is wrapped (the
+ * `elementsWrapped` flag, reset by mutations that can insert raw elements);
+ * `isWrappedProxy` skips elements that are already proxies without reading
+ * through their `get` trap. Shallow arrays are left unwrapped to match the
+ * `get` trap's deep-only behaviour.
+ */
+function wrapArrayElements(data: ProxyData, target: any[]): void {
+	if (data.shallow === true || data.elementsWrapped === true) return;
+	const length = target.length;
+	for (let i = 0; i < length; i++) {
+		const value = target[i];
+		if (value !== null && typeof value === "object" && !isWrappedProxy(value)) {
+			const wrapped = deepWrap(value);
+			if (wrapped !== value) {
+				target[i] = wrapped;
+			}
+		}
+	}
+	data.elementsWrapped = true;
+}
 
 function readHandle(data: ProxyData, target: any, key: PropertyKey): Function {
 	// Call the function on the target (so proxy properties don't get
@@ -362,8 +387,67 @@ function readHandle(data: ProxyData, target: any, key: PropertyKey): Function {
 	// is a cheap no-op.
 	return function (...args: any[]) {
 		trackProxySignal(data, "length");
+		wrapArrayElements(data, target);
 		const func = target[key];
 		return func.apply(target, args);
+	};
+}
+
+function joinHandle(data: ProxyData, target: any, key: PropertyKey): Function {
+	// Like `readHandle`, but without wrapping: `join` only produces a string,
+	// so the elements never need proxies.
+	return function (...args: any[]) {
+		trackProxySignal(data, "length");
+		const func = target[key];
+		return func.apply(target, args);
+	};
+}
+
+/**
+ * `indexOf` / `lastIndexOf` / `includes`.
+ *
+ * Elements are wrapped lazily, so the array can hold raw objects or their
+ * proxies — and a raw search value can miss the proxy that replaced it (or a
+ * proxy can miss the raw object it wraps). On a miss with an object argument,
+ * retry with the unwrapped and wrapped forms.
+ */
+function searchHandle(data: ProxyData, target: any, key: PropertyKey): Function {
+	return function (...args: any[]) {
+		trackProxySignal(data, "length");
+		const search = args[0];
+		const func = target[key];
+		const found = func.apply(target, args);
+		if ((found === -1 || found === false) && search !== null && typeof search === "object") {
+			for (const candidate of [$unwrap(search), deepWrap(search)]) {
+				if (candidate === search) continue;
+				const result = func.apply(target, [candidate, ...args.slice(1)]);
+				if (result !== -1 && result !== false) return result;
+			}
+		}
+		return found;
+	};
+}
+
+/**
+ * `at`: like a direct `arr[i]` read, but it wraps just the element it returns
+ * (a whole-array wrap would turn the O(1) lookup into O(n)).
+ */
+function atHandle(data: ProxyData, target: any, _key: PropertyKey): Function {
+	return function (index?: number) {
+		trackProxySignal(data, "length");
+		const length = target.length;
+		let i = Math.trunc(Number(index ?? 0)) || 0;
+		if (i < 0) i += length;
+		if (i < 0 || i >= length) return undefined;
+		let value = target[i];
+		if (data.shallow !== true) {
+			const wrapped = deepWrap(value);
+			if (wrapped !== value) {
+				value = wrapped;
+				target[i] = value;
+			}
+		}
+		return value;
 	};
 }
 
@@ -371,6 +455,12 @@ function arrayHandle(data: ProxyData, target: any, key: PropertyKey): Function {
 	// Call the function on the target (so proxy properties don't get
 	// intercepted) and trigger effects that depend on `length`
 	return function (...args: any[]) {
+		// These can insert raw elements (`push(…)`, `unshift(…)`, `splice(…,
+		// …, item)`), so the array must be re-scanned before read methods hand
+		// its elements to callbacks again
+		if (key === "push" || key === "unshift" || key === "splice") {
+			data.elementsWrapped = false;
+		}
 		const func = target[key];
 		const result = func.apply(target, args);
 		propagateSignal(data, "length");

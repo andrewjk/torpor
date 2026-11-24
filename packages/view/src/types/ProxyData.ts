@@ -13,4 +13,11 @@ export default interface ProxyData {
 	isSet: boolean;
 	shallow: boolean;
 	signals: Map<PropertyKey, ProxySignal | Computed>;
+	/**
+	 * True when every object element of this watched array has already been
+	 * replaced by its proxy (see `wrapArrayElements` in proxyGet), so read
+	 * methods can skip re-scanning the array. Reset whenever a mutation can
+	 * insert a raw element (index assignment, push/unshift/splice).
+	 */
+	elementsWrapped?: boolean;
 }
