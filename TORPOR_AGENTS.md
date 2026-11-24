@@ -68,11 +68,11 @@ $state.count++;                    // notifies subscribers
   });
   ```
 - `{ shallow: true }` skips deep-wrapping (used internally for list rows).
-- Only plain objects, plain arrays, and exact `Date`/`Map`/`Set` instances are
-  deep-watched. Class instances, `RegExp`, typed arrays, subclasses,
-  frozen/non-extensible objects, promises and DOM nodes are stored as-is:
-  replacing the property that holds one is reactive, but mutating it in place
-  isn't.
+- Only plain objects, plain arrays, and exact `Date`/`Map`/`Set`/`URL`/
+  `URLSearchParams` instances are deep-watched. Class instances, `RegExp`,
+  typed arrays, subclasses, frozen/non-extensible objects, promises and DOM
+  nodes are stored as-is: replacing the property that holds one is reactive,
+  but mutating it in place isn't.
 - Symbol keys and `Object.keys/values/entries` work through the proxy.
 
 ### `$run(fn, name?)`
@@ -389,13 +389,14 @@ $bind($state, $props, "name", "age");
 Returns the raw target object behind a proxy (or the value itself if not a
 proxy). Useful when passing a proxied object to code that must not be proxied.
 
-### Dates, Maps and Sets
+### Dates, Maps, Sets and URLs
 
-`$watch` supports exact `Date`, `Map` and `Set` instances directly -- no
-wrapper classes needed. Their methods are reactive: reads track signals and
-writes notify, so effects re-run when they change. Assigning a plain value to
-watched state wraps it automatically, so there's usually no need to call
-`$watch(new Date(...))` yourself. Subclasses are opaque (see `$watch` above).
+`$watch` supports exact `Date`, `Map`, `Set`, `URL` and `URLSearchParams`
+instances directly -- no wrapper classes needed. Their methods are reactive:
+reads track signals and writes notify, so effects re-run when they change.
+Assigning a plain value to watched state wraps it automatically, so there's
+usually no need to call `$watch(new Date(...))` yourself. Subclasses are opaque
+(see `$watch` above).
 
 ```torp
 let $state = $watch({ date: new Date(2024, 0, 15) });
@@ -420,10 +421,20 @@ Details:
 - **Sets** work the same, keyed by element (`has`/`add`/`delete`).
 - Objects stored in a Map/Set are wrapped on read, so their properties are
   reactive like any other nested object.
+- **URLs** use a single signal: property reads and `toString`/`toJSON` track
+  it, and property writes notify when they change the `href`.
+  `url.searchParams` is a stable reactive view linked to the URL: mutating it
+  re-runs URL readers, and changing the URL re-runs params readers.
+- **URLSearchParams** also uses a single signal: `get`/`has`/`size`/iteration
+  and `toString` track it, and `append`/`delete`/`set`/`sort` notify when the
+  query string actually changes.
 
 ```torp
 let $state = $watch({ selected: new Set<string>() });
 $state.selected.add("a"); // effects reading `selected.has("a")` re-run
+
+const url = $watch(new URL("https://example.com/?q=1"));
+url.searchParams.set("q", "2"); // effects reading `url.href` re-run
 ```
 
 ---

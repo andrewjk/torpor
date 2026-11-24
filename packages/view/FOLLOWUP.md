@@ -4,12 +4,12 @@ Findings from a review of `packages/view`.
 
 ## Limitations
 
-### Non-plain objects are opaque to `$watch`
+### Exotic objects are opaque to `$watch`
 
 `$watch`/`deepWrap` only proxy plain objects, plain arrays, and exact `Date`,
-`Map` and `Set` instances. Class instances, array/collection subclasses,
-`RegExp`, typed arrays, frozen / non-extensible objects and other exotic
-objects are returned unchanged.
+`Map`, `Set`, `URL` and `URLSearchParams` instances. Class instances,
+array/collection subclasses, `RegExp`, typed arrays, frozen / non-extensible
+objects and other exotic objects are returned unchanged.
 Replacing the property that holds one still triggers effects, but mutating it
 in place is not reactive.
 

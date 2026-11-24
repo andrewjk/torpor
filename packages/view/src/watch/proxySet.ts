@@ -2,6 +2,7 @@ import devContext from "../dev/devContext";
 import deepWrap from "./deepWrap";
 import propagateSignal from "./propagateSignal";
 import { proxyArrayContentSymbol, proxyDataSymbol, proxyKeysSymbol } from "./symbols";
+import { urlSet } from "./urlHandlers";
 
 export default function proxySet(
 	target: Record<PropertyKey, any>,
@@ -20,6 +21,13 @@ export default function proxySet(
 
 		// DEV:
 		devContext.signalSet(data, key);
+
+		// URL setters need the raw target as `this`; the generic Reflect.set
+		// below would pass the proxy and throw on the internal slots. Own
+		// properties set by user code still take the generic path.
+		if (data.isUrl && !Object.prototype.hasOwnProperty.call(target, key)) {
+			return urlSet(data, target as URL, key, value);
+		}
 
 		// Wrap the new value if it's an object (plain objects, arrays, Dates,
 		// Maps, Sets), so storing it and mutating it through the proxy is

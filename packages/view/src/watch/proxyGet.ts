@@ -13,6 +13,7 @@ import propagateSignal from "./propagateSignal";
 import { proxyArrayContentSymbol, proxyDataSymbol, proxyKeysSymbol } from "./symbols";
 import trackProxySignal, { ensureProxySignal } from "./trackProxySignal";
 import trackSignal from "./trackSignal";
+import { URL_MEMBERS, URL_PARAMS_METHODS, urlGet, urlParamsGet } from "./urlHandlers";
 
 /**
  * Called when a read hits a `didSuspend` computed. Subscribes the reader (so
@@ -109,6 +110,26 @@ export default function proxyGet(
 		!Object.prototype.hasOwnProperty.call(target, key)
 	) {
 		return collectionGet(data, target, key, receiver);
+	}
+
+	// URLs and URLSearchParams have the same internal-slot problem, but their
+	// reactive surface is a fixed set of prototype properties/methods.
+	if (
+		data.isUrl &&
+		typeof key === "string" &&
+		URL_MEMBERS.has(key) &&
+		!Object.prototype.hasOwnProperty.call(target, key)
+	) {
+		return urlGet(data, target as URL, key, deepWrap);
+	}
+	if (
+		data.isUrlParams &&
+		(key === "size" ||
+			key === Symbol.iterator ||
+			(typeof key === "string" && URL_PARAMS_METHODS.has(key))) &&
+		!Object.prototype.hasOwnProperty.call(target, key)
+	) {
+		return urlParamsGet(data, target as URLSearchParams, key);
 	}
 
 	//console.log(`object get '${String(key)}' on`, target);

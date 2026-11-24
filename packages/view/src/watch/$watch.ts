@@ -57,15 +57,16 @@ const sharedHandler: ProxyHandler<Record<PropertyKey, any>> = {
 /**
  * Watches an object and runs effects when its properties are changed.
  *
- * Only plain objects, plain arrays, and exact Date/Map/Set instances are
- * deep-watched. Other values -- class instances, subclasses, RegExp, typed
- * arrays, frozen/non-extensible objects, promises, DOM nodes, ... -- are
- * returned unchanged. Effects still track the property that holds them, so
- * replacing the value is reactive even though mutating it in place isn't.
+ * Only plain objects, plain arrays, and exact Date/Map/Set/URL/
+ * URLSearchParams instances are deep-watched. Other values -- class instances,
+ * subclasses, RegExp, typed arrays, frozen/non-extensible objects, promises,
+ * DOM nodes, ... -- are returned unchanged. Effects still track the property
+ * that holds them, so replacing the value is reactive even though mutating it
+ * in place isn't.
  *
- * Dates, Maps and Sets are supported: their methods are reactive (reads
- * track, writes notify), so `new Date()`, `new Map()` and `new Set()` can be
- * used in watched state directly.
+ * Dates, Maps, Sets, URLs and URLSearchParams are supported: their methods are
+ * reactive (reads track, writes notify), so they can be used in watched state
+ * directly.
  *
  * @param object The object to watch
  */
@@ -78,7 +79,7 @@ export default function $watch<T extends object>(object: T, options?: WatchOptio
 	if (!isWrappable(object)) {
 		if (devContext.enabled) {
 			console.warn(
-				"$watch() only deep-watches plain objects, arrays and exact Date/Map/Set instances; returning this value unchanged.",
+				"$watch() only deep-watches plain objects, arrays and exact Date/Map/Set/URL/URLSearchParams instances; returning this value unchanged.",
 			);
 		}
 		return object;
@@ -91,6 +92,8 @@ export default function $watch<T extends object>(object: T, options?: WatchOptio
 		isDate: object instanceof Date,
 		isMap: object instanceof Map,
 		isSet: object instanceof Set,
+		isUrl: typeof URL !== "undefined" && object instanceof URL,
+		isUrlParams: typeof URLSearchParams !== "undefined" && object instanceof URLSearchParams,
 		shallow: options?.shallow === true,
 		signals: new Map(),
 	};

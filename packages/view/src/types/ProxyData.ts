@@ -11,8 +11,14 @@ export default interface ProxyData {
 	isDate: boolean;
 	isMap: boolean;
 	isSet: boolean;
+	isUrl: boolean;
+	isUrlParams: boolean;
 	shallow: boolean;
 	signals: Map<PropertyKey, ProxySignal | Computed>;
+	/** For a watched URL: the watched proxy data of its live `searchParams` */
+	urlParamsData?: ProxyData;
+	/** For a watched URLSearchParams: the URL whose `searchParams` it is */
+	linkedUrlData?: ProxyData;
 	/**
 	 * True when every object element of this watched array has already been
 	 * replaced by its proxy (see `wrapArrayElements` in proxyGet), so read
