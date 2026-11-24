@@ -28,6 +28,18 @@ const sharedHandler: ProxyHandler<Record<PropertyKey, any>> = {
 		}
 		return Reflect.ownKeys(target);
 	},
+	has: (target, key) => {
+		// `key in obj` depends on the key's *presence*, not its value: adding
+		// or deleting any key propagates the key-set membership signal (see
+		// `proxySet`/`deleteProperty`), while changing an existing value does
+		// not. Without this, an effect doing `"k" in $state` never re-ran when
+		// `k` was added.
+		const data = target[proxyDataSymbol];
+		if (data !== undefined) {
+			trackProxySignal(data, proxyKeysSymbol);
+		}
+		return Reflect.has(target, key);
+	},
 	deleteProperty: (target, key) => {
 		const deleted = Reflect.deleteProperty(target, key);
 		const data = target[proxyDataSymbol];
