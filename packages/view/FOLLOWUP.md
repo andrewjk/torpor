@@ -5,19 +5,6 @@ with throwaway tests (since deleted); the rest come from reading the source.
 
 ## Bugs
 
-### Delegated events: remaining edge cases
-
-Delegated handlers now bubble through nested elements and respect
-`stopPropagation()`. Still worth documenting or handling:
-
-- A native `stopPropagation()` on an inner element (third-party code, or a
-  listener added in `$onmount`) stops the event before it reaches
-  `document`, so every Torpor handler above it silently never fires.
-- Shadow DOM: at `document`, `event.target` is retargeted to the shadow host,
-  so handlers inside a shadow root are never found (use `composedPath()`).
-- The listener is always on the global `document`, so components mounted
-  into another document (iframe, popup window) get no delegated events.
-
 ### Array read methods run on raw elements, so reads aren't tracked (confirmed)
 
 `watch/proxyGet.ts` routes `filter`, `map`, `find`, `some`, `every`,

@@ -49,9 +49,13 @@ export default function Component() {
 			Common events like <code>click</code>, <code>input</code>, <code>keydown</code>
 			and <code>change</code> are handled with a single delegated listener per event
 			type. Other events fall back to a standard <code>addEventListener</code>.
-			Because the delegated listeners live on <code>document</code>, mounting a
-			component into a node that isn't connected to the document (e.g. in a test)
-			needs the node attached before delegated events will fire.
+			Because the delegated listeners live on the element's
+			<code>document</code> (including inside shadow roots and iframes), mounting a
+			component into a node that isn't connected to that document (e.g. in a test)
+			needs the node attached before delegated events will fire. A native
+			<code>stopPropagation()</code> from code outside Torpor — for example a
+			listener added in <code>$onmount</code> — stops the event before it reaches
+			the document, so delegated handlers won't run.
 		</p>
 	}
 }

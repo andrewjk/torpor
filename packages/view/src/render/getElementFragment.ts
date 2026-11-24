@@ -43,5 +43,12 @@ export default function getElementFragment(
 		}
 	}
 
-	return array[index]!.cloneNode(true) as Element;
+	// Import (rather than plain-clone) so the new element belongs to
+	// `document` straight away. Nodes cloned from `template.content` are owned
+	// by the template's inert contents document until they are inserted into a
+	// live tree — but mount-time side effects run on elements that may still be
+	// detached (e.g. list rows rendered into a `<ul>` that is inserted later),
+	// and they resolve things like the delegated-event listener's document via
+	// `ownerDocument`.
+	return document.importNode(array[index]!, true) as Element;
 }

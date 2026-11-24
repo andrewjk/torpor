@@ -282,3 +282,61 @@ test("delegated handlers keep each element's currentTarget while bubbling", asyn
 
 	expect(targets).toEqual(["inner", "outer"]);
 });
+
+test("delegated handlers fire inside a shadow root", async () => {
+	// Inside a shadow root, `event.target` is retargeted to the host by the
+	// time the document listener runs; the dispatch walks `composedPath()`,
+	// so handlers inside the shadow tree are still found.
+	const source = `
+		export default function ShadowHandlers($props: { calls: string[] }) {
+			@render {
+				<div id="outer" onclick={() => $props.calls.push("outer")}>
+					<button id="inner" onclick={() => $props.calls.push("inner")}>click</button>
+				</div>
+			}
+		}
+	`;
+
+	const calls: string[] = [];
+	const container = document.createElement("div");
+	document.body.appendChild(container);
+	const shadow = container.attachShadow({ mode: "open" });
+
+	const component = await importComponent(import.meta.filename, source, "client");
+	mount(shadow, component, { calls });
+
+	shadow
+		.querySelector("#inner")!
+		.dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true }));
+
+	expect(calls).toEqual(["inner", "outer"]);
+});
+
+test("delegated handlers fire in another document", async () => {
+	// The delegated listener is registered on the element's own document, so
+	// components mounted into an iframe / popup document get events too.
+	const source = `
+		export default function OtherDocument() {
+			let $state = $watch({ fired: false });
+
+			@render {
+				<button id="btn" onclick={() => { $state.fired = true; }}>Click</button>
+				@if ($state.fired) {
+					<p>Fired!</p>
+				}
+			}
+		}
+	`;
+
+	const otherDoc = document.implementation.createHTMLDocument("other");
+	const container = otherDoc.createElement("div");
+	otherDoc.body.appendChild(container);
+
+	const component = await importComponent(import.meta.filename, source, "client");
+	mount(container, component);
+
+	const btn = container.querySelector("#btn")!;
+	btn.dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true }));
+
+	expect(queryByText(container, "Fired!")).not.toBeNull();
+});

@@ -76,17 +76,18 @@ return ${componentName};
 		console.log("===");
 	}
 
-	const html = // eslint-disable-next-line no-eval
-		(
-			await eval(code)(
-				formatServerText,
-				formatRawText,
-				formatAttributeText,
-				buildServerAttribute,
-				buildServerClasses,
-				buildServerStyles,
-			)(state)
-		).body.replaceAll(/\s+/g, " ");
+	// eslint-disable-next-line no-eval
+	const factory = eval(code) as (...helpers: any[]) => (props?: any) => Promise<{ body: string }>;
+	const html = (
+		await factory(
+			formatServerText,
+			formatRawText,
+			formatAttributeText,
+			buildServerAttribute,
+			buildServerClasses,
+			buildServerStyles,
+		)(state)
+	).body.replaceAll(/\s+/g, " ");
 	if (debugPrint) {
 		console.log("=== server html");
 		console.log(html);

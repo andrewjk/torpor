@@ -2,9 +2,9 @@
  * Event delegation.
  *
  * For event types in `DELEGATED_EVENT_TYPES` (all natively bubbling), we
- * register a single listener on `document` per type and dispatch by walking
- * up from `event.target`, running each ancestor's stashed handler in turn
- * until one calls `stopPropagation()`.
+ * register a single listener on each element's `ownerDocument` per type and
+ * dispatch by walking up from the event target, running each ancestor's
+ * stashed handler in turn until one calls `stopPropagation()`.
  * This replaces per-element `addEventListener` for delegated types.
  *
  * Why: in the js-framework-bench row template, every `<tr>` clones two `<a>`
@@ -24,6 +24,22 @@
  * Non-bubbling events (`focus`, `blur`, `scroll`, `load`, `error`, `abort`,
  * `unload`, `resize`, etc.) bypass delegation and use direct
  * `addEventListener` on the element, preserving native semantics.
+ *
+ * Limitations (inherent to delegating to the document, same trade-off as
+ * React and Solid):
+ *
+ * - A native `stopPropagation()` — third-party code, or a listener added in
+ *   `$onmount` — stops the event before it reaches the document, so the
+ *   delegated handlers won't run. Torpor handlers can still call
+ *   `stopPropagation()` among themselves (that's what ends the walk below).
+ * - `stopPropagation()` in a delegated handler runs after the native event
+ *   has finished bubbling, so it only affects other delegated handlers, not
+ *   native listeners.
+ *
+ * Shadow DOM and multiple documents are supported: the listener lives on the
+ * element's `ownerDocument` (so components mounted into an iframe or popup
+ * document work), and the path comes from `composedPath()` (so the listener
+ * sees the real target inside a shadow root, not the retargeted host).
  */
 
 const DELEGATED_EVENT_TYPES: ReadonlySet<string> = new Set([
@@ -83,19 +99,28 @@ const DELEGATE_PREFIX = "torp.$$";
 const DELEGATE_REGISTERED = Symbol.for("torp.delegated.registered");
 
 function delegatedHandler(event: Event): void {
-	let node: Node | null = event.target as Node | null;
 	const stopAt: Node | null = event.currentTarget as Node | null;
 	const key = DELEGATE_PREFIX + event.type;
-	// Walk from the deepest target up to (but not including) the listener
-	// node (document), running every stashed handler on the way, so nested
-	// handlers bubble like native listeners. `stopPropagation()` (or
-	// `stopImmediatePropagation()`) in a handler sets `cancelBubble`, which
-	// ends the walk
-	while (node != null && node !== stopAt) {
+	// Walk the composed path from the deepest target up to (but not
+	// including) the listener node (the element's document), running every
+	// stashed handler on the way, so nested handlers bubble like native
+	// listeners. `stopPropagation()` (or `stopImmediatePropagation()`) in a
+	// handler sets `cancelBubble`, which ends the walk.
+	//
+	// `composedPath()` rather than `event.target` + `parentNode`: at the
+	// document, an event from inside a shadow root is retargeted to the
+	// shadow host, so the real target and the elements between it and the
+	// host are only visible in the composed path.
+	const path = event.composedPath();
+	for (let i = 0; i < path.length; i++) {
+		const node = path[i];
+		if (node === stopAt) {
+			break;
+		}
 		const handler = (node as any)[key];
 		if (handler !== undefined) {
 			// Override `currentTarget` so the user's handler sees the element
-			// the handler was attached to, not `document`. `currentTarget`
+			// the handler was attached to, not the document. `currentTarget`
 			// is otherwise read-only. Configurable so the override can be
 			// removed below.
 			Object.defineProperty(event, "currentTarget", {
@@ -104,7 +129,7 @@ function delegatedHandler(event: Event): void {
 				writable: false,
 			});
 			try {
-				(handler as (this: Node, ev: Event) => any).call(node, event);
+				(handler as (this: Node, ev: Event) => any).call(node as Node, event);
 			} finally {
 				// Remove the override so the prototype getter takes over
 				// again (returns `null` once dispatch completes).
@@ -114,33 +139,32 @@ function delegatedHandler(event: Event): void {
 				return;
 			}
 		}
-		node = node.parentNode;
 	}
 }
 
-function ensureDelegatedListener(type: string): void {
-	if (typeof document === "undefined") return;
-	let registered = (document as any)[DELEGATE_REGISTERED] as Set<string> | undefined;
+function ensureDelegatedListener(doc: Document, type: string): void {
+	let registered = (doc as any)[DELEGATE_REGISTERED] as Set<string> | undefined;
 	if (!registered) {
 		registered = new Set();
-		(document as any)[DELEGATE_REGISTERED] = registered;
+		(doc as any)[DELEGATE_REGISTERED] = registered;
 	}
 	if (registered.has(type)) return;
 	registered.add(type);
 	// Bubble phase (default). All events in DELEGATED_EVENT_TYPES bubble, so
-	// the listener at `document` fires after the event has traversed the
-	// target and any intermediary elements — matching the natural event flow
-	// the user expects from `addEventListener` on the element itself.
-	document.addEventListener(type, delegatedHandler);
+	// the listener fires after the event has traversed the target and any
+	// intermediary elements — matching the natural event flow the user
+	// expects from `addEventListener` on the element itself.
+	doc.addEventListener(type, delegatedHandler);
 }
 
 /**
  * Attach a delegated event handler to an element.
  *
  * Stores the handler as a property on the element and ensures a single
- * document-level listener exists for the type. Idempotent for the
- * document-level listener: the first call for a given type registers it,
- * subsequent calls are a Set-has check.
+ * listener exists for the type on the element's own document (so components
+ * mounted into another document — an iframe or popup — get delegated events
+ * too). Idempotent for the document-level listener: the first call for a
+ * given type registers it, subsequent calls are a Set-has check.
  *
  * Passing `null` or `undefined` as the listener clears any previously-set
  * handler for that type on the element (mirroring `addEvent`'s existing
@@ -156,7 +180,16 @@ export function attachDelegatedEvent(
 		(el as any)[key] = undefined;
 		return;
 	}
-	ensureDelegatedListener(type);
+	const doc = el.ownerDocument;
+	if (
+		doc === null ||
+		// Guard against non-DOM documents (e.g. a template document) that
+		// don't implement event listeners
+		typeof doc.addEventListener !== "function"
+	) {
+		return;
+	}
+	ensureDelegatedListener(doc, type);
 	(el as any)[key] = listener;
 }
 

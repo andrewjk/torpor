@@ -1,10 +1,10 @@
 import type SlotRender from "../../../../src/types/SlotRender";
 
-declare function BubbleTargets(
+declare function OtherDocument(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: { targets: string[] },
+	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>,
 ): void;
-export default BubbleTargets;
+export default OtherDocument;

@@ -600,9 +600,9 @@ Static strings pass through; dynamic values are `{expr}`:
 
 `on<event>` attributes. Events in the delegated set (click, input, keydown,
 change, mousedown/move, pointer*, touch*, focusin/out, submit, wheel, etc.)
-use one document-level listener per type; anything else falls back to a direct
-`addEventListener`. Handlers receive the native event as the first argument;
-`this` is the element.
+use one listener per type on the element's document; anything else falls back
+to a direct `addEventListener`. Handlers receive the native event as the first
+argument; `this` is the element.
 
 ```torp
 <button onclick={increment}>+1</button>
@@ -614,6 +614,13 @@ use one document-level listener per type; anything else falls back to a direct
 delegated events (including when the click lands on a child). Delegated
 events bubble through nested handlers, innermost first, and
 `e.stopPropagation()` stops the outer ones from running.
+
+The delegated listener lives on the element's own `document` (so components
+mounted into an iframe or popup document work) and dispatches using
+`composedPath()` (so handlers inside shadow roots fire). A native
+`stopPropagation()` outside Torpor (e.g. a listener added in `$onmount`)
+prevents the event reaching the document, so delegated handlers won't run —
+the usual trade-off of delegation.
 
 ### Bindings (`&` prefix)
 

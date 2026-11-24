@@ -24,7 +24,12 @@ export default function getFragment(
 	// Get the fragment from the array
 	// TODO: If we're hydrating we probably don't want to create and return a
 	// fragment unless we really need to
-	let fragment = array[index].cloneNode(true) as DocumentFragment;
+	// Import (rather than plain-clone) so the fragment's nodes belong to
+	// `document` straight away — `template.content` nodes are owned by the
+	// template's inert contents document until inserted into a live tree, and
+	// mount-time side effects (delegated event hookup) may run while the
+	// fragment is still detached.
+	let fragment = document.importNode(array[index], true) as DocumentFragment;
 
 	return fragment;
 }
