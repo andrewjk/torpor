@@ -58,9 +58,3 @@ target. That would also fix frozen objects.
   commented-out `console.log`s (plus a commented-out debug `printPath` block
   at the end of `compile/build/client/buildFragment.ts`). Worth a pruning
   pass: turn the real ones into entries here and delete the rest.
-
-## Duplication and inconsistencies
-
-- Every `$x` primitive has a `ssr/$serverX.ts` twin. Fine by design, but
-  nothing checks that the two export identical signatures. A type-level test
-  (`satisfies typeof $bind`, etc.) would catch drift.

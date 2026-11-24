@@ -1,3 +1,5 @@
+import type WatchOptions from "../types/WatchOptions";
+
 /**
  * The identity of a `source: "server"` getter read: the watched object and the
  * property key being read. The server await state records reads by identity
@@ -28,7 +30,7 @@ export function currentServerReadSite(): ServerReadSite | null {
  * untouched — proxying them would break internal slots or private fields, and
  * they rarely carry async getters.
  */
-export default function $serverWatch<T extends Record<PropertyKey, any>>(object: T): T {
+export default function $serverWatch<T extends object>(object: T, _options?: WatchOptions): T {
 	if (object === null || object === undefined) {
 		return object;
 	}
