@@ -57,6 +57,7 @@ export default function DatePicker($props: DatePickerProps | undefined) {
 
 	let content: HTMLDivElement | undefined;
 	let closeOnClick = false;
+	let focusTimer: ReturnType<typeof setTimeout> | undefined;
 
 	// Wire up the enclosing Form and Field, if any
 	const form = createFormField(
@@ -138,20 +139,40 @@ export default function DatePicker($props: DatePickerProps | undefined) {
 			addDocumentEvent("click", handleDocumentClick);
 			focusCalendar();
 		} else {
+			clearFocusTimer();
 			removeDocumentEvent("mousedown", handleDocumentMouseDown);
 			removeDocumentEvent("click", handleDocumentClick);
 		}
 	}
 
+	function clearFocusTimer() {
+		if (focusTimer !== undefined) {
+			clearTimeout(focusTimer);
+			focusTimer = undefined;
+		}
+	}
+
 	function focusCalendar() {
 		// Wait for the popout to be shown before focusing it
-		setTimeout(() => {
+		clearFocusTimer();
+		focusTimer = setTimeout(() => {
+			focusTimer = undefined;
+			// The popout may have closed before this ran (e.g. a fast click)
+			if (!$state.visible || getDisabled()) return;
 			const grid = content?.querySelector(".torp-calendar-grid");
-			if (grid instanceof HTMLElement && !getDisabled()) {
+			if (grid instanceof HTMLElement) {
 				grid.focus();
 			}
 		});
 	}
+
+	// A popout that unmounts while open must not leave document listeners or
+	// a pending focus timer behind
+	$run(() => () => {
+		clearFocusTimer();
+		removeDocumentEvent("mousedown", handleDocumentMouseDown);
+		removeDocumentEvent("click", handleDocumentClick);
+	});
 
 	function handleDate(date: Date) {
 		$state.value = new Date(date);

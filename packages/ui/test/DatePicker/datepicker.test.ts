@@ -95,6 +95,19 @@ describe("DatePicker", () => {
 			`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-15`,
 		);
 	});
+
+	it("keeps focus on the trigger when a date is selected before the calendar focus timer", async () => {
+		const { container, trigger } = setup();
+
+		// Select synchronously, before the deferred calendar focus
+		fireEvent.click(trigger);
+		fireEvent.click(dayButton(container, 15));
+
+		// Let the deferred focus run; it must not steal focus back into the
+		// now-hidden calendar
+		await new Promise((r) => setTimeout(r, 5));
+		expect(trigger).toHaveFocus();
+	});
 });
 
 describe("DatePicker (subcomponents)", () => {

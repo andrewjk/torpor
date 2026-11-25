@@ -147,6 +147,20 @@ describe("DateRangePicker", () => {
 		const start = container.querySelector('[data-range="start"]') as HTMLElement;
 		expect(start).toHaveTextContent("3");
 	});
+
+	it("keeps focus on the trigger when a range completes before the calendar focus timer", async () => {
+		const { day, trigger } = setup();
+
+		// Select both ends synchronously, before the deferred calendar focus
+		fireEvent.click(trigger());
+		fireEvent.click(day(10));
+		fireEvent.click(day(20));
+
+		// Let the deferred focus run; it must not steal focus back into the
+		// now-hidden calendar
+		await new Promise((r) => setTimeout(r, 5));
+		expect(trigger()).toHaveFocus();
+	});
 });
 
 describe("DateRangePicker (subcomponents)", () => {
