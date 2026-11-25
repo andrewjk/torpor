@@ -49,6 +49,17 @@ describe("CookieHelper", () => {
 		expect(serialized).toMatch(/SameSite=Lax/i);
 	});
 
+	test("set only defaults Secure on over HTTPS", () => {
+		// Plain http://localhost must not get Secure, or older browsers refuse
+		// to store the cookie and sessions/flash silently vanish
+		const req = new Request("http://localhost:5173/");
+		const c = new CookieHelper(req);
+		c.set("token", "v");
+		const serialized = c.cookies.get("token")!;
+		expect(serialized).not.toMatch(/Secure/i);
+		expect(serialized).toMatch(/HttpOnly/i);
+	});
+
 	test("set allows overriding the defaults", () => {
 		const req = new Request("https://example.com/");
 		const c = new CookieHelper(req);

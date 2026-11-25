@@ -18,12 +18,6 @@ on layout endpoints at type and runtime level so it can't be mistaken for a
 guard. Folder hooks (`_hook.server.ts`) do guard subtrees; the docs should
 point people there.
 
-### Smaller issues
-
-- **`secure: true` by default** in `CookieHelper` means sessions and flash
-  messages don't stick in browsers that refuse `Secure` cookies over plain
-  `http://localhost` (older Safari), with no warning in dev.
-
 ## Missing framework features
 
 A gap analysis of `packages/build` against commonly needed features in peer

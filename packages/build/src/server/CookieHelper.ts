@@ -33,7 +33,7 @@ export default class CookieHelper {
 		// Set a cookie header with some default values for security
 		options ??= {};
 		options.httpOnly ??= true;
-		options.secure ??= true;
+		options.secure ??= isHttps(this.request);
 		options.sameSite ??= "lax";
 
 		this.cookies.set(name, serializeCookie(name, value, options));
@@ -45,12 +45,21 @@ export default class CookieHelper {
 		// cookie is actually overridden by the deletion.
 		options ??= {};
 		options.httpOnly ??= true;
-		options.secure ??= true;
+		options.secure ??= isHttps(this.request);
 		options.sameSite ??= "lax";
 		options.expires = new Date(0);
 
 		this.cookies.set(name, serializeCookie(name, "", options));
 	}
+}
+
+/**
+ * Whether the request itself was served over HTTPS, so `Secure` can default to
+ * on without breaking plain-`http://localhost` development (browsers --
+ * notably older Safari -- refuse `Secure` cookies set over http).
+ */
+function isHttps(request: Request): boolean {
+	return new URL(request.url).protocol === "https:";
 }
 
 function serializeCookie(name: string, value: string, options: SerializeOptions): string {

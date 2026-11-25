@@ -13,13 +13,16 @@ afterEach(() => {
 	delete globalRef.adapter;
 });
 
-function makeSession(cookie: string | undefined): {
+function makeSession(
+	cookie: string | undefined,
+	origin = "http://localhost",
+): {
 	session: SessionHelper;
 	cookies: CookieHelper;
 } {
 	const headers = new Headers();
 	if (cookie) headers.set("Cookie", cookie);
-	const cookies = new CookieHelper(new Request("http://localhost/", { headers }));
+	const cookies = new CookieHelper(new Request(`${origin}/`, { headers }));
 	return { session: new SessionHelper(cookies), cookies };
 }
 
@@ -49,13 +52,22 @@ describe("SessionHelper", () => {
 	});
 
 	test("set-cookie attributes are secure by default", async () => {
-		const { session, cookies } = makeSession(undefined);
+		const { session, cookies } = makeSession(undefined, "https://example.com");
 		await session.set({ userId: 1 });
 		const header = [...cookies.cookies.values()].find((c) => c.startsWith("torpor-session="))!;
 		expect(header).toContain("Max-Age=2592000");
 		expect(header).toContain("Path=/");
 		expect(header).toContain("HttpOnly");
 		expect(header).toContain("Secure");
+		expect(header).toContain("SameSite=Lax");
+	});
+
+	test("plain http requests get a non-Secure cookie, so localhost dev works", async () => {
+		const { session, cookies } = makeSession(undefined, "http://localhost:5173");
+		await session.set({ userId: 1 });
+		const header = [...cookies.cookies.values()].find((c) => c.startsWith("torpor-session="))!;
+		expect(header).not.toContain("Secure");
+		expect(header).toContain("HttpOnly");
 		expect(header).toContain("SameSite=Lax");
 	});
 
