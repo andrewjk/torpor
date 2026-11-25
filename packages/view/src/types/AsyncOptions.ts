@@ -12,7 +12,9 @@ export default interface AsyncOptions {
 	/**
 	 * With `source: "server"`, how long (ms) the server waits for this
 	 * getter's promise before the enclosing `@await` boundary degrades to its
-	 * `with` branch and the client fetches instead. Defaults to 5000.
+	 * `with` branch and the client fetches instead. Counted from the start of
+	 * the server render, so nested boundaries share it rather than each
+	 * adding their own wait. Defaults to 5000.
 	 */
 	timeout?: number;
 }

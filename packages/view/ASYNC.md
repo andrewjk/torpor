@@ -248,7 +248,9 @@ not an oversight:
    speculatively purely to invoke its getters — every `source: "server"` read
    calls its thunk and records the promise, so siblings start in one wave; the
    pass's output is discarded. After a settle (per-getter `timeout`, default
-   5000ms), a render pass re-renders content looking the settled values up by
+   5000ms, counted from the start of the server render, which the root
+   component stamps into `$context` so nested boundaries share one time
+   limit), a render pass re-renders content looking the settled values up by
    getter identity, without re-calling the thunks. The render pass may read a
    getter any number of times, so markup can branch on the resolved value.
 2. **Detached lifecycle.** The boundary helper returns a sentinel comment

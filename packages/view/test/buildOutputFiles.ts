@@ -240,6 +240,8 @@ const importsMap: Record<string, string> = {
 		'import { serverFlush as t_server_flush } from "../../../../src/ssr/serverSentinels";',
 	'import { t_await_server } from "@torpor/view/ssr";':
 		'import t_await_server from "../../../../src/ssr/runServerAwait";',
+	'import { t_render_context } from "@torpor/view/ssr";':
+		'import { renderContext as t_render_context } from "../../../../src/ssr/renderContext";',
 	'import { t_fmt } from "@torpor/view/ssr";':
 		'import t_fmt from "../../../../src/ssr/formatText";',
 	'import { t_fmt_raw } from "@torpor/view/ssr";':

@@ -232,7 +232,8 @@ if (newIndexToOld[i] === 0) {           // no matching old item → mount
 - **States:** `collect` (speculative render; output discarded; getters record
   promises) → (short-circuit) `empty-collect` (`promises.length === 0` → ship
   `with` branch immediately) → `settling` (the `Promise.race` window vs
-  `SERVER_ASYNC_TIMEOUT`) → `render` (entered only if the race returned true;
+  the longest read timeout, `SERVER_ASYNC_TIMEOUT` by default, less the time
+  since the render started — `ssr/renderContext.ts`) → `render` (entered only if the race returned true;
   counters reset so both passes derive identical key sequences) →
   `shipped-resolved` (terminal) | `degraded` (one-way latch; ships `with`
   branch). Per-read-site dispatch inside `$serverAsync`:

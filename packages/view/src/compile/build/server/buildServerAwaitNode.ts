@@ -59,7 +59,9 @@ export default function buildServerAwaitNode(
 	}
 	flushOutput(status, b);
 	b.append(`return { body: t_body, head: t_head };`);
-	b.append(`});`);
+	// The context carries the render's start time, which the boundary's time
+	// limit counts from
+	b.append(`}, $context);`);
 
 	b.append(`${status.inHead ? "t_head" : "t_body"} += ${resultName}.body;`);
 	b.append(`t_head += ${resultName}.head;`);

@@ -272,7 +272,11 @@ get user() {
 
 - The boundary's content ships resolved when every server read settles
   within the timeout (`timeout: 5000` default, per getter) — the client
-  adopts the HTML directly, with no fallback flash. The thunk still runs
+  adopts the HTML directly, with no fallback flash. The timeout counts from
+  the start of the server render, not from when the boundary started, so a
+  nested boundary (which only starts once the one around it resolves) gets
+  what's left rather than adding its own wait; a read that times out logs a
+  warning once. The thunk still runs
   once on the client in the background so dependency changes re-fetch; that
   first in-flight result is discarded, and the server's value wins.
 - The client's first (hydration) run of the thunk **receives the

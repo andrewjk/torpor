@@ -6,6 +6,7 @@ import {
 	withServerAwait,
 } from "./serverAwaitState";
 import type ServerAwaitState from "./serverAwaitState";
+import { renderStarted } from "./renderContext";
 import { renderWithBranch } from "./serverSentinels";
 
 let sentinelCount = 0;
@@ -34,7 +35,8 @@ function nextSentinel(): string {
  *   or by the component flush (which replaces top-level sentinels directly).
  *
  * The lifecycle: render content once to start the `source: "server"` fetches
- * (discarding the output), wait for them with a per-getter timeout, then
+ * (discarding the output), wait for them until each getter's timeout (counted
+ * from the start of the server render, so nested boundaries share it), then
  * render again with the settled values. Reads are matched by getter identity,
  * so the render pass may read a getter more than once (e.g. branch on it).
  * The second pass ships wrapped in hydration markers plus a
@@ -46,11 +48,14 @@ function nextSentinel(): string {
  * @param id The boundary's site id (unique per `@await` in the component)
  * @param renderContent Renders the content branch (may read `$async` getters)
  * @param renderWith Renders the `with` branch, or null for empty
+ * @param context The rendering component's context, carrying the render's
+ * start time
  */
 export default function runServerAwait(
 	id: string,
 	renderContent: () => Promise<{ body: string; head: string }>,
 	renderWith: (() => Promise<{ body: string; head: string }>) | null,
+	context?: Record<PropertyKey, any>,
 ): { body: string; head: string } | Promise<{ body: string; head: string }> {
 	const parent = currentServerAwait();
 
@@ -65,6 +70,7 @@ export default function runServerAwait(
 	}
 
 	const state = newServerAwaitState();
+	state.startedAt = renderStarted(context);
 	const final = renderBoundary(state, renderContent, renderWith);
 
 	const sentinel = nextSentinel();
@@ -110,10 +116,17 @@ async function renderBoundary(
 		return renderWithBranch(renderWith);
 	}
 
-	// Settle the recorded fetches. Each getter carries its own timeout; the
-	// boundary waits for the longest, and a miss degrades the whole boundary
-	// (content ships only when every read resolved)
-	const timeout = Math.max(...state.promises.map((entry) => entry.timeout));
+	// Settle the recorded fetches. Each getter carries its own timeout,
+	// counted from the start of the render: a boundary that only started once
+	// the boundary around it resolved gets what's left, rather than adding its
+	// whole wait to the response. The boundary waits for the longest, and a
+	// miss degrades the whole boundary (content ships only when every read
+	// resolved). Reads that have already settled still win over a timeout of
+	// zero, since they resolve in microtasks before the timer fires
+	const timeout = Math.max(
+		0,
+		Math.max(...state.promises.map((entry) => entry.timeout)) - (Date.now() - state.startedAt),
+	);
 	const settled = await Promise.race([
 		Promise.all(
 			state.promises.map((entry) =>
@@ -143,6 +156,9 @@ async function renderBoundary(
 	// client re-runs the getter, rejects there, and its `@try` renders the
 	// catch branch — the same path a client-fetch error takes.
 	let degraded = settled === false;
+	if (degraded) {
+		warnTimedOut(state);
+	}
 	let content: { body: string; head: string } | undefined;
 	if (!degraded) {
 		state.phase = "render";
@@ -191,6 +207,30 @@ async function renderBoundary(
 		body: `${"<![>"}${content.body}${"<!]><!>"}${payloadComment(values)}`,
 		head: content.head,
 	};
+}
+
+// The reads already warned about, so a slow getter warns once per process
+// rather than on every request
+const warned = new Set<string>();
+
+/**
+ * Warns (once per read) that a boundary gave up waiting for its server reads,
+ * so the slow read shows up somewhere other than the response time.
+ */
+function warnTimedOut(state: ServerAwaitState): void {
+	for (const entry of state.promises) {
+		if (entry.result !== undefined) continue;
+		const name = typeof entry.key === "string" && entry.key.length < 50 ? entry.key : "(getter)";
+		if (warned.has(name)) continue;
+		warned.add(name);
+		console.warn(
+			`[torpor] The source: "server" $async read "${name}" didn't settle within its ` +
+				`${entry.timeout}ms timeout (counted from the start of the render), so its @await ` +
+				"boundary rendered its `with` branch and the client will fetch it. Raise the " +
+				"read's `timeout`, or load slow data without blocking the render (in " +
+				"@torpor/build, return a promise from the route's load).",
+		);
+	}
 }
 
 /**

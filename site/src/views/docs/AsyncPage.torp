@@ -136,7 +136,7 @@ export default function Component($props: { id: number }) {
 		get user() {
 			return $async(() => fetchUser($props.id), {
 				source: "server",
-				timeout: 2000, // ms before the server gives up (default 5000)
+				timeout: 2000, // ms into the render before the server gives up (default 5000)
 			})
 		}
 	})
@@ -156,7 +156,10 @@ export default function Component($props: { id: number }) {
 		<p>
 			On a timeout (or a rejection, or a client-fetch getter inside the same
 			boundary) the server ships the <code>with</code> branch and the client
-			fetches, exactly like the default. Server-side values must be JSON-safe,
+			fetches, exactly like the default. The timeout counts from the start of the
+			server render, so a nested boundary gets whatever time is left rather than
+			adding its own wait to the response. For data that's often slow, return a
+			promise from the route's load instead, which doesn't hold up the page. Server-side values must be JSON-safe,
 			and the thunk still runs once on the client in the background so that
 			dependency changes re-fetch — its first result is discarded, so you never
 			see it.

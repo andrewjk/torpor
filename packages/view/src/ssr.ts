@@ -24,6 +24,7 @@ import $stream from "./ssr/$serverStream";
 import $unwrap from "./ssr/$serverUnwrap";
 import $watch from "./ssr/$serverWatch";
 import runServerAwait from "./ssr/runServerAwait";
+import { renderContext } from "./ssr/renderContext";
 import { serverFlush } from "./ssr/serverSentinels";
 import fromElement from "./stream/fromElement";
 import fromServer from "./stream/fromServer";
@@ -48,6 +49,7 @@ export {
 	$refresh,
 	serverFlush as t_server_flush,
 	runServerAwait as t_await_server,
+	renderContext as t_render_context,
 	fromElement,
 	fromServer,
 	fromWebSocket,

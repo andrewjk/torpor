@@ -1,4 +1,5 @@
 import t_fmt from "../../../../src/ssr/formatText";
+import { renderContext as t_render_context } from "../../../../src/ssr/renderContext";
 import t_slot_guard from "../../../../src/ssr/slotGuard";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
@@ -7,6 +8,7 @@ export default async function Let(
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
 ): Promise<{ body: string; head: string }> {
+	$context = t_render_context($context);
 	let t_body = "";
 	let t_head = "";
 
@@ -38,6 +40,7 @@ async function List(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>,
 ): Promise<{ body: string; head: string }> {
+	$context = t_render_context($context);
 	let t_body = "";
 	let t_head = "";
 

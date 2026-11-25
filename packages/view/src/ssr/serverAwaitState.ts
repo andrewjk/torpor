@@ -59,6 +59,12 @@ export default interface ServerAwaitState {
 	/** Per-site occurrence counters, reset at the start of each pass. */
 	counters: Map<string, number>;
 
+	/**
+	 * When the server render started (from `Date.now()`). Read timeouts count
+	 * from it, so a boundary that starts late gets only what's left.
+	 */
+	startedAt: number;
+
 	/** Set when the boundary degrades to its `with` branch. */
 	degraded: boolean;
 
@@ -88,6 +94,7 @@ export interface ServerPromiseEntry {
 	/** The property key on `owner` (or the thunk source when untracked). */
 	key: PropertyKey | string;
 	promise: Promise<any>;
+	/** How long (ms) after the render started the read may settle. */
 	timeout: number;
 	/** Set by the settle handler: `{ ok: true, value }` or `{ ok: false, error }`. */
 	result?: { ok: true; value: any } | { ok: false; error: any };
@@ -140,6 +147,7 @@ export function newServerAwaitState(): ServerAwaitState {
 		clientReads: 0,
 		children: new Map(),
 		counters: new Map(),
+		startedAt: Date.now(),
 		degraded: false,
 		isRoot: false,
 		sentinels: new Map(),

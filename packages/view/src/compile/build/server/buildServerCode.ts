@@ -1,11 +1,9 @@
 import type Template from "../../../types/Template";
 import type BuildOptions from "../../types/BuildOptions";
-import type ParentNode from "../../types/nodes/ParentNode";
-import type TemplateNode from "../../types/nodes/TemplateNode";
 import Builder from "../../utils/Builder";
 import { codeRanges } from "../../utils/codeScanner";
 import collectMarkupExpressions from "../../utils/collectMarkupExpressions";
-import isControlNode from "../../utils/isControlNode";
+import containsAwaitGroup from "../../utils/containsAwaitGroup";
 import markupRendersComponent from "../../utils/markupRendersComponent";
 import buildStyles from "../client/buildStyles";
 import type BuildServerStatus from "./BuildServerStatus";
@@ -29,6 +27,7 @@ const importsMap: Record<string, string> = {
 	$peek: 'import { $peek } from "${folder}";',
 	$batch: 'import { $batch } from "${folder}";',
 	t_server_flush: 'import { t_server_flush } from "${folder}";',
+	t_render_context: 'import { t_render_context } from "${folder}";',
 	t_await_server: 'import { t_await_server } from "${folder}";',
 	t_fmt: 'import { t_fmt } from "${folder}";',
 	t_fmt_raw: 'import { t_fmt_raw } from "${folder}";',
@@ -123,17 +122,28 @@ function buildServerTemplate(
 	let current = template.components[0];
 
 	for (let [chunkIndex, chunk] of template.script.entries()) {
+		// A component with an `@await` boundary renders inside a flush, and
+		// passes the render's start time (carried in `$context`) to its
+		// boundaries, so that their time limits count from the start of the
+		// server render
+		// (`current` is undefined for the chunks after the last component)
+		const hasAwait =
+			current !== undefined &&
+			(containsAwaitGroup(current.markup) ||
+				containsAwaitGroup(current.error) ||
+				containsAwaitGroup(current.head));
+		const rendersComponent =
+			current !== undefined &&
+			((current.markup && markupRendersComponent(current.markup)) ||
+				(current.error && markupRendersComponent(current.error)));
+
 		if (chunk.script === "/* @params */") {
 			// TODO: Support other params, like the user setting $context
 			let params = [
 				current.params ??
 					`${current.props?.length ? "$props: Record<PropertyKey, any>" : "_$props?: Record<PropertyKey, any>"}`,
 				`${
-					current.contextProps?.length ||
-					(current.markup && markupRendersComponent(current.markup)) ||
-					(current.error && markupRendersComponent(current.error))
-						? "$context"
-						: "_$context"
+					current.contextProps?.length || rendersComponent || hasAwait ? "$context" : "_$context"
 				}?: Record<PropertyKey, any>`,
 				`${current.slotProps?.length ? "$slots" : "_$slots"}?: Record<string, ServerSlotRender>`,
 			];
@@ -141,6 +151,15 @@ function buildServerTemplate(
 		} else if (chunk.script === ") /* @return_type */ {") {
 			b.append("): Promise<{ body: string; head: string }> {");
 		} else if (chunk.script === "/* @start */") {
+			// Stamp the render's start time into the context at the root of the
+			// render (it is copied, not set on the caller's object, so it
+			// doesn't carry over to a later render with the same context).
+			// Children inherit it, so every boundary in the render shares it
+			if (rendersComponent || hasAwait) {
+				imports.add("t_render_context");
+				b.append(`$context = t_render_context($context);`);
+			}
+
 			// Redefine $context so that any newly added properties will only be passed to children
 			if (current.contextProps?.length) {
 				b.append(`$context = Object.assign({}, $context);`);
@@ -149,10 +168,6 @@ function buildServerTemplate(
 			// A component with an `@await` boundary renders inside a flush,
 			// which starts its server fetches without blocking the render and
 			// substitutes the resolved boundaries at the end
-			const hasAwait =
-				containsAwaitGroup(current.markup) ||
-				containsAwaitGroup(current.error) ||
-				containsAwaitGroup(current.head);
 			if (hasAwait) {
 				imports.add("t_server_flush");
 				b.append(`return t_server_flush(async () => {`);
@@ -266,11 +281,7 @@ function buildServerTemplate(
 			b.append(`return { body: t_body, head: t_head };`);
 
 			// Close the flush opened in @start
-			if (
-				containsAwaitGroup(current.markup) ||
-				containsAwaitGroup(current.error) ||
-				containsAwaitGroup(current.head)
-			) {
+			if (hasAwait) {
 				b.append(`});`);
 			}
 
@@ -293,26 +304,4 @@ function buildServerTemplate(
 			}
 		}
 	}
-}
-
-/**
- * Whether a markup tree contains an `@await` boundary, so the component's
- * render must be wrapped in a flush.
- */
-function containsAwaitGroup(node: TemplateNode | undefined | null): boolean {
-	if (node === undefined || node === null) {
-		return false;
-	}
-	if (isControlNode(node) && node.operation === "@await group") {
-		return true;
-	}
-	// Text and comment nodes have no children; everything else is a ParentNode
-	if (node.type !== "text" && node.type !== "comment") {
-		for (let child of (node as ParentNode).children) {
-			if (containsAwaitGroup(child)) {
-				return true;
-			}
-		}
-	}
-	return false;
 }

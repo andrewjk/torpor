@@ -39,29 +39,33 @@ serves one at runtime from a `{ get }` config (needing `site.origin`); and
 robots.txt stays a plain host file (with `src/public` files served in dev
 and copied into the build output).
 
-### High impact (table stakes in peers)
-
-1. **Streaming SSR** — responses are piped at the transport level, but page
-   rendering buffers: `$async { source: "server" }` blocks the render up to
-   its timeout rather than flushing the `with` branch and streaming content
-   in later (no suspense-style out-of-order streaming).
-
 ### Medium
 
-2. **WebSockets (server-side)** — SSE exists client-side, but no WS endpoint
+1. **WebSockets (server-side)** — SSE exists client-side, but no WS endpoint
    support (adapter-node could do this).
-3. **i18n / locale routing** — nothing.
+2. **i18n / locale routing** — nothing.
 
 ### Lower / nice-to-have
 
-4. Image optimization / asset pipeline beyond Vite defaults
-5. Pagination helpers
-6. Rate-limiting primitives (now buildable as a middleware package)
-7. Cron / queues / background jobs (adapter-dependent)
+3. Image optimization / asset pipeline beyond Vite defaults
+4. Pagination helpers
+5. Rate-limiting primitives (now buildable as a middleware package)
+6. Cron / queues / background jobs (adapter-dependent)
+7. **Out-of-order HTML streaming** — only if someone needs it. Deferred
+   loads (promise values returned from `load`) already stream: the page
+   ships with its `with` branches and the values follow as scripts, which is
+   the SvelteKit-style approach. What's missing is the React/Solid-style
+   variant, where a slow `$async { source: "server" }` boundary flushes its
+   `with` branch and its server-rendered HTML is swapped in later; today
+   such a boundary holds the response up to its timeout (counted from the
+   start of the render). It would mean rebuilding view's server renderer
+   around chunks, and streamed pages lose late status codes and redirects,
+   head data from inside boundaries, `event.cache()` from the render, and
+   ETags/304s, so it should be opt-in per boundary or route if it's done.
 8. Dev toolbar / route inspector
 
-Top one if forced to choose: **streaming SSR** — it comes up in virtually
-every real project.
+Nothing here is table stakes any more; server-side WebSockets is the most
+likely to come up.
 
 ## Follow-ups from prerendering
 

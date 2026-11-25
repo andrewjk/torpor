@@ -5,6 +5,7 @@ import {
 } from "../../types/comments";
 import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
+import containsAwaitGroup from "../../utils/containsAwaitGroup";
 import fillUsesContext from "../../utils/fillUsesContext";
 import isSpecialNode from "../../utils/isSpecialNode";
 import propKey from "../../utils/propKey";
@@ -97,7 +98,8 @@ export default function buildServerComponentNode(
 					// real name when the fill forwards it (renders a component
 					// or slot) or reads it directly, otherwise it would be
 					// reported as unused
-					fillUsesContext(slot)
+					// An @await boundary in the fill reads it too
+					fillUsesContext(slot) || containsAwaitGroup(slot)
 						? "$context?: Record<PropertyKey, any>"
 						: "_$context?: Record<PropertyKey, any>",
 				];

@@ -1,13 +1,15 @@
 import t_await_server from "../../../../src/ssr/runServerAwait";
 import t_fmt from "../../../../src/ssr/formatText";
+import { renderContext as t_render_context } from "../../../../src/ssr/renderContext";
 import { serverFlush as t_server_flush } from "../../../../src/ssr/serverSentinels";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default async function ForAwaitReactive(
 	$props: { ids: number[]; loaded: string },
-	_$context?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
 ): Promise<{ body: string; head: string }> {
+	$context = t_render_context($context);
 	return t_server_flush(async () => {
 		let t_body = "";
 		let t_head = "";
@@ -26,7 +28,7 @@ export default async function ForAwaitReactive(
 				let t_head = "";
 				t_body += `<li class="loading">${t_fmt(id)} loading</li>`;
 				return { body: t_body, head: t_head };
-			});
+			}, $context);
 			t_body += t_await_1.body;
 			t_head += t_await_1.head;
 		}

@@ -1,4 +1,5 @@
 import t_fmt from "../../../../src/ssr/formatText";
+import { renderContext as t_render_context } from "../../../../src/ssr/renderContext";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 async function Styled2(
@@ -23,6 +24,7 @@ export default async function ErrorHeadDiscard(
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
 ): Promise<{ body: string; head: string }> {
+	$context = t_render_context($context);
 	let t_body = "";
 	let t_head = "";
 
