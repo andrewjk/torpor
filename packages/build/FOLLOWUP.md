@@ -91,9 +91,11 @@ prefetch. In rough order of value:
    hydrates its whole component tree, even pure content (blog posts, docs).
    A route/layout flag (like SvelteKit's `csr = false`) that leaves out the
    client scripts would make static pages zero-JS, at the cost of client
-   navigation from them. Islands (hydrating only interactive components,
-   Astro-style) are the bigger version and would need view's hydration to
-   start from component boundaries rather than the root.
+   navigation from them. For pages that are mostly static with a few heavy
+   interactive parts, a deferred block (`@defer (on: "visible") { ... }`,
+   designed in `packages/view/FOLLOWUP.md` under "Features") fits torpor
+   better than Astro-style islands, which would need hydration to start
+   from component boundaries rather than the root.
 3. **Images.** No helper for responsive sizes (`srcset`/`sizes` from one
    source image at build time), for loading the largest above-the-fold
    image eagerly with `fetchpriority="high"`, or for lazy-loading the rest
