@@ -2,6 +2,7 @@ import { type ServerComponent, type ServerSlotRender } from "@torpor/view/ssr";
 import { DATA_REUSE_HEADER, DATA_REQUEST_HEADER } from "../dataRequest.ts";
 import { type DeferredMeta, jsonForScript, splitDeferred } from "../deferred.ts";
 import formDataToRecord from "../form/formDataToRecord.ts";
+import forbidden from "../response/forbidden.ts";
 import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";
 import { readResponseBody } from "../response/read.ts";
@@ -1108,6 +1109,22 @@ async function runAction(
 	if (serverEndPoint !== undefined && actions !== undefined && Object.hasOwn(actions, actionName)) {
 		const action = actions[actionName];
 		if (action) {
+			// CSRF defense in depth: form actions are state-changing POSTs, so
+			// reject a browser-sent Origin that doesn't match this site. A
+			// missing Origin (non-browser clients, some privacy modes) is
+			// allowed, like SvelteKit's checkOrigin.
+			const origin = ev.request.headers.get("Origin");
+			if (origin !== null) {
+				let sameOrigin = false;
+				try {
+					sameOrigin = new URL(origin).origin === url.origin;
+				} catch {
+					// A malformed Origin can't be trusted
+				}
+				if (!sameOrigin) {
+					return forbidden("Cross-site form submissions are forbidden");
+				}
+			}
 			if (actionName === "load" || actionName === "params") {
 				// These names are reserved in the endpoint's schema map: `load`
 				// validates the query string and `params` the route params, so

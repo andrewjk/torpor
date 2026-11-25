@@ -20,10 +20,6 @@ point people there.
 
 ### Smaller issues
 
-- **No origin check on form actions**: CSRF protection relies entirely on
-  the `SameSite=lax` default in `CookieHelper`. Checking `Origin` against
-  the request host for non-GET form posts (SvelteKit's `checkOrigin`) would
-  be cheap defense in depth.
 - **Module-global base path**: `createServerLoad` calls `setBasePath`, a
   module global, so two sites with different bases in one process (tests,
   multi-tenant servers) overwrite each other. It could be scoped per site

@@ -99,10 +99,14 @@ const load = createServerLoad(new Router().addPages(routes));
  * A form post to the page's url, which drops the `?page=` param that the
  * load schema requires (as a plain form action does).
  */
-function postEvent(path: string, title?: string): ServerEvent {
+function postEvent(path: string, title?: string, origin?: string): ServerEvent {
 	const formData = new FormData();
 	if (title !== undefined) formData.append("title", title);
-	const req = new Request(`http://localhost${path}`, { method: "POST", body: formData });
+	const req = new Request(`http://localhost${path}`, {
+		method: "POST",
+		body: formData,
+		headers: origin !== undefined ? { Origin: origin } : undefined,
+	});
 	return new ServerEvent(req);
 }
 
@@ -144,6 +148,36 @@ test("a named action post that drops the load query re-renders with the form err
 	expect(html).toContain("title is required");
 	// The load still ran, falling back to the raw (unvalidated) query values
 	expect(loadQueries.at(-1)).toEqual({ "/save": "" });
+});
+
+test("a cross-origin form action is rejected", async () => {
+	const res = await load(
+		postEvent("/posts?/save&page=3", "hello", "https://evil.example"),
+		template,
+	);
+
+	expect(res.status).toBe(403);
+	expect(await res.text()).toContain("Cross-site form submissions");
+});
+
+test("a malformed Origin header is rejected", async () => {
+	const res = await load(postEvent("/posts?/save&page=3", "hello", "not a url"), template);
+
+	expect(res.status).toBe(403);
+});
+
+test("a same-origin form action still runs", async () => {
+	const res = await load(postEvent("/posts?/save&page=3", "hello", "http://localhost"), template);
+
+	expect(res.status).toBe(200);
+	expect(await res.text()).toContain("t-form-data");
+});
+
+test("a form post with no Origin header still runs", async () => {
+	// Non-browser clients don't send Origin; SameSite still protects browsers
+	const res = await load(postEvent("/posts?/save&page=3", "hello"), template);
+
+	expect(res.status).toBe(200);
 });
 
 test("a form post that drops the load query entirely re-renders with the form errors", async () => {
