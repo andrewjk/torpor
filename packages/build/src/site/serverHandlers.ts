@@ -169,6 +169,9 @@ export function createServerLoad(
 		}
 		const path = url.pathname;
 		const query = url.searchParams;
+		// A HEAD request is routed like a GET, so it gets the same status and
+		// headers; `load` drops the body
+		const method = ev.request.method === "HEAD" ? "GET" : ev.request.method;
 
 		// A client data request: one GET to `<page url>/~server` returns the
 		// server data for the page and all of its layouts, with hooks running
@@ -176,7 +179,7 @@ export function createServerLoad(
 		// route (a page may have no `+page.server.ts` but still have layouts
 		// with server loads)
 		if (
-			ev.request.method === "GET" &&
+			method === "GET" &&
 			ev.request.headers.has(DATA_REQUEST_HEADER) &&
 			path.endsWith("/~server")
 		) {
@@ -254,7 +257,7 @@ export function createServerLoad(
 					case PAGE_ROUTE:
 					case LAYOUT_ROUTE: {
 						// It's a /+page.ts or /_layout.ts endpoint
-						if (ev.request.method === "GET") {
+						if (method === "GET") {
 							return handleResponse(
 								ev,
 								url,
@@ -278,7 +281,7 @@ export function createServerLoad(
 					case PAGE_SERVER_ROUTE:
 					case LAYOUT_SERVER_ROUTE: {
 						// It's a /+page.server.ts or /_layout.server.ts endpoint
-						if (ev.request.method === "GET") {
+						if (method === "GET") {
 							return await loadData(ev, url, handler, "load", params);
 						} else if (ev.request.method === "POST") {
 							const serverEndPoint: PageServerEndPoint | undefined = (await resolveModule(handler))
@@ -295,7 +298,12 @@ export function createServerLoad(
 					}
 					case SERVER_ROUTE: {
 						// It's a /+server.ts endpoint
-						const functionName = ev.request.method.toLowerCase().replace("delete", "del");
+						let functionName = ev.request.method.toLowerCase().replace("delete", "del");
+						// An endpoint without its own head handler answers HEAD
+						// with get, minus the body
+						if (functionName === "head" && typeof endPointModule?.head !== "function") {
+							functionName = "get";
+						}
 						return await loadData(ev, url, handler, functionName, params);
 					}
 					case HOOK_ROUTE:
@@ -357,8 +365,25 @@ export function createServerLoad(
 			throw error;
 		}
 		// handle() always returns a Response (notFound() on a fall-through)
-		return finishCaching(ev, response as Response, devMode);
+		const finished = finishCaching(ev, response as Response, devMode);
+		return ev.request.method === "HEAD" ? withoutBody(finished) : finished;
 	};
+}
+
+/**
+ * The response to a HEAD request: the same status and headers, with the body
+ * dropped (and cancelled, so a streamed body stops producing).
+ */
+function withoutBody(response: Response): Response {
+	if (response.body === null) return response;
+	void response.body.cancel().catch(() => {
+		// Already closed or errored
+	});
+	return new Response(null, {
+		status: response.status,
+		statusText: response.statusText,
+		headers: response.headers,
+	});
 }
 
 /**

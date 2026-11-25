@@ -67,14 +67,6 @@ and copied into the build output).
 Nothing here is table stakes any more; server-side WebSockets is the most
 likely to come up.
 
-## Bugs
-
-- **HEAD requests for pages return 404.** Seen running the built site under
-  `wrangler dev`: `GET /build/caching` is a 200, but `HEAD /build/caching`
-  is a 404. `responseCaching.ts` already treats HEAD like GET, so it's the
-  routing to page handlers that skips HEAD. Link checkers, uptime monitors
-  and `curl -I` hit this. Check the Node server too.
-
 ## Follow-ups from prerendering
 
 - **ISR** (opt-in, for sites happy to serve slightly old pages; separate
