@@ -20,11 +20,6 @@ point people there.
 
 ### Smaller issues
 
-- **Form and query fields named like `Object.prototype` members are
-  dropped**: `formDataToRecord` and `searchParamsToRecord` skip a key when
-  `key in result`, which is already true for `constructor`, `toString`,
-  `valueOf` etc. (It does stop `__proto__` pollution, but by losing the
-  data.) Use `Object.hasOwn`, or build the record on `Object.create(null)`.
 - **Validation runs before hooks in actions**: `runAction` parses and
   validates the form against the action's schema before the folder hooks
   (e.g. an auth hook) run, so unauthenticated users get schema validation

@@ -13,9 +13,12 @@ export default async function formDataToRecord(
 	request: Request | FormData,
 ): Promise<FormDataRecord> {
 	const formData = request instanceof FormData ? request : await request.formData();
-	const result: FormDataRecord = {};
+	// A null-prototype record so field names like `__proto__`, `constructor`
+	// or `toString` are stored as data (and `__proto__` can't pollute the
+	// prototype) instead of being skipped by an inherited-property check
+	const result = Object.create(null) as FormDataRecord;
 	for (const key of formData.keys()) {
-		if (key in result) continue;
+		if (Object.hasOwn(result, key)) continue;
 		const values = formData.getAll(key);
 		result[key] = values.length > 1 ? values : values[0];
 	}
