@@ -143,6 +143,13 @@ export default interface Context {
 		out?: Animation;
 	}[];
 
+	/**
+	 * Plays and clears `stashedAnimations`. Installed by `addAnimation` on
+	 * first use (null until then), so that apps which never use transitions
+	 * tree-shake the animation runtime out entirely.
+	 */
+	runAnimations: (() => void) | null;
+
 	/** The node that is actively being hydrated. */
 	hydrationNode: ChildNode | null;
 	////hn: ChildNode | null;

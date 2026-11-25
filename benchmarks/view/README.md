@@ -86,6 +86,24 @@ Although it is a dev server, every framework runs its **production** variant
 Requires the Playwright chromium browser (`npx playwright install chromium`
 if missing).
 
+## Bundle size
+
+`size.mjs` builds every fixture in production mode (esbuild-minified) and
+reports the JS payload, so the same keyed 1,000-row app can be compared across
+frameworks. Torpor's brotli size is gated against `size-baseline.json`: a
+growth of more than 2% (and more than 128 bytes) fails the run.
+
+```sh
+pnpm --filter @torpor/view build   # size.mjs measures the built package
+pnpm size                          # from this folder, or use --filter below
+pnpm --filter @torpor/benchmarks-view size
+pnpm size:update                   # rewrite the baseline after an intentional change
+```
+
+Only Torpor is gated — the other fixtures move with their framework versions
+and are printed for context. Wire `pnpm --filter @torpor/benchmarks-view size`
+into CI after the package build.
+
 ## Fixtures
 
 | Fixture | Notes |

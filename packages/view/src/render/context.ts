@@ -32,6 +32,7 @@ const context: Context =
 		mountEffects: [],
 		stashedEvents: [],
 		stashedAnimations: [],
+		runAnimations: null,
 
 		hydrationNode: null,
 

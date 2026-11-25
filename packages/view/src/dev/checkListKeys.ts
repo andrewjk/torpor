@@ -11,8 +11,10 @@ const warnedByRegion = new WeakMap<Region, Set<unknown>>();
  *
  * `runListItems` matches old and new rows by key (first match wins), so
  * duplicate keys make updates and removals hit the wrong rows, desyncing the
- * DOM from the data. Called from `runList` only when `devContext.enabled`, so
- * it never runs in a production build.
+ * DOM from the data. `setDevMode` installs this as
+ * `devContext.checkListKeys`; `runList` calls it only when
+ * `devContext.enabled`, so it is never bundled into a production app (this
+ * module is only reachable through the `@torpor/view/dev` entry point).
  *
  * `undefined`/`null` keys are the "unkeyed" case (rows are matched
  * positionally) and are ignored.

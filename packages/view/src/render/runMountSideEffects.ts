@@ -1,7 +1,5 @@
 import type Region from "../types/Region";
-import $run from "../watch/$run";
 import flushMountEffects from "../watch/flushMountEffects";
-import animate from "./animate";
 import context from "./context";
 import {
 	attachDelegatedEvent,
@@ -57,25 +55,13 @@ export default function runMountSideEffects(
 		context.stashedEvents.length = 0;
 	}
 
-	// Set the active region for each animation so it will get attached to
-	// the right one and set it back afterwards
-	// Don't await animations
-	for (let animation of context.stashedAnimations) {
-		context.activeRegion = animation.region;
-		$run(function runMountSideEffectsAnimation() {
-			if (animation.in !== undefined) {
-				// eslint-disable-next-line no-floating-promises
-				animate(animation.el, true, animation.in.keyframes, animation.in.options);
-			}
-			if (animation.out !== undefined) {
-				return () => {
-					// eslint-disable-next-line no-floating-promises
-					animate(animation.el, false, animation.out!.keyframes, animation.out!.options);
-				};
-			}
-		});
+	// Play stashed animations. The runner is installed by `addAnimation` on
+	// first use (only when a component uses transitions); when it is null there
+	// can be no stashed animations, and the whole animation runtime has been
+	// tree-shaken out.
+	if (context.stashedAnimations.length > 0) {
+		context.runAnimations?.();
 	}
-	context.stashedAnimations.length = 0;
 
 	// Set the active region back
 	context.activeRegion = activeRegion;

@@ -3,7 +3,6 @@ import type ListItem from "../types/ListItem";
 import type ListItemSpec from "../types/ListItemSpec";
 import type Region from "../types/Region";
 import $run from "../watch/$run";
-import checkListKeys from "./checkListKeys";
 import context from "./context";
 import popRegion from "./popRegion";
 import pushRegion from "./pushRegion";
@@ -47,9 +46,11 @@ export default function runList(
 		const newSpecs = buildItems();
 
 		// DEV: surface duplicate keys, which the reconciler matches
-		// first-match-wins and would otherwise silently desync the DOM.
+		// first-match-wins and would otherwise silently desync the DOM. The
+		// implementation lives in the dev entry point (setDevMode installs it),
+		// so production bundles only carry this no-op call.
 		if (devContext.enabled) {
-			checkListKeys(region, newSpecs);
+			devContext.checkListKeys(region, newSpecs);
 		}
 
 		// Do NOT re-run the list for properties accessed while updating its

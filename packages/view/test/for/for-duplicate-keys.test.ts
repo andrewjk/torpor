@@ -1,6 +1,7 @@
 import { expect, test, vi } from "vite-plus/test";
+import checkListKeys from "../../src/dev/checkListKeys";
 import devContext from "../../src/dev/devContext";
-import checkListKeys from "../../src/render/checkListKeys";
+import setDevMode from "../../src/dev/setDevMode";
 import type Region from "../../src/types/Region";
 import $watch from "../../src/watch/$watch";
 import importComponent from "../importComponent";
@@ -29,11 +30,17 @@ async function mountWithDev(
 	const container = document.createElement("div");
 	const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 	const prev = devContext.enabled;
+	const prevCheckListKeys = devContext.checkListKeys;
 	devContext.enabled = true;
+	// `runList` reaches the check through the dev hook (setDevMode installs
+	// it in a real dev build); install it here without pulling in the rest of
+	// setDevMode's tooling.
+	devContext.checkListKeys = checkListKeys;
 	try {
 		mountComponent(container, component, $state);
 	} finally {
 		devContext.enabled = prev;
+		devContext.checkListKeys = prevCheckListKeys;
 	}
 	return { container, warn };
 }
@@ -83,6 +90,18 @@ test("no duplicate-key warning when dev mode is off", async () => {
 
 	expect(warn).not.toHaveBeenCalled();
 	warn.mockRestore();
+});
+
+test("setDevMode installs the duplicate-key check", () => {
+	const prevEnabled = devContext.enabled;
+	const prevCheckListKeys = devContext.checkListKeys;
+	try {
+		setDevMode();
+		expect(devContext.checkListKeys).toBe(checkListKeys);
+	} finally {
+		devContext.enabled = prevEnabled;
+		devContext.checkListKeys = prevCheckListKeys;
+	}
 });
 
 // --- checkListKeys unit tests ---

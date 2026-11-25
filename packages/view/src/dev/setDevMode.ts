@@ -1,11 +1,17 @@
 import type Effect from "../types/Effect";
 import type ProxyData from "../types/ProxyData";
 import type Region from "../types/Region";
+import checkListKeys from "./checkListKeys";
 import devContext from "./devContext";
 import type DevBoundary from "./types/DevBoundary";
 
 export default function setDevMode(): void {
 	devContext.enabled = true;
+
+	// Install the dev-only implementation of the duplicate-@key warning. It
+	// lives in this entry point (not in the runtime) so production apps never
+	// bundle it; `runList` calls the no-op default when dev mode is off.
+	devContext.checkListKeys = checkListKeys;
 
 	// Format devContext for passing to DevTools by stripping out nodes etc
 	devContext.format = () => {

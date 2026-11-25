@@ -32,6 +32,11 @@ see [TORPOR_AGENTS.md](TORPOR_AGENTS.md).
 - `vitest run -t "test name"` - Run tests matching a pattern
 - In individual packages: `pnpm test` runs vitest
 
+### Git commits
+
+- Subject only: **< 50 characters**, starting with a type prefix (`Fix:` or `Feat:`, e.g. `!Fix:` for breaking changes)
+- No commit body/description
+
 ## Code Style
 
 ### Formatting

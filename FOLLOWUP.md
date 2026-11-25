@@ -309,3 +309,17 @@ the expression contains nothing reactive and the effect can never re-run
 wants real static analysis (the "TODO: Need to be more fancy" in isReactive:
 matching braces, skipping strings/comments) to avoid silently changing
 reactivity. Same heuristic gap drives `as const` on static string props.
+
+### `$watch` exotic-target support is always bundled
+
+`proxyGet` statically contains the Date/Map/Set wrappers and `urlHandlers`
+(URL/URLSearchParams), so every app pays for them even when it never watches
+one of those objects: ~3.5 kB minified / ~0.8 kB brotli of the 1k-row
+benchmark app (measured by `benchmarks/view/size.mjs`). It can't be
+tree-shaken today because the proxy `get` trap needs the handlers
+synchronously. Making exotic support opt-in (a `@torpor/view/collections`
+side-effect import, a `$watch` option, or a lean default plus a
+`@torpor/view/full` escape hatch) would recover it, but that changes the
+default reactivity surface for anyone relying on `$watch(new Map())` /
+`$watch(new URL())`, so it needs a major-version decision rather than a
+drive-by change. URL/URLSearchParams alone are ~1.3 kB minified.

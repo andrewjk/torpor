@@ -27,6 +27,8 @@ const devContext: DevContext =
 
 		signalSet: noop,
 		effectRun: noop,
+
+		checkListKeys: noop,
 	} satisfies DevContext);
 
 export default devContext;
