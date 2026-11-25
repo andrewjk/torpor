@@ -266,27 +266,38 @@ if (!degraded) {
 
 ### 8. Navigation pipeline (client router)
 
-- **Where:** `packages/build/src/nav/navigate.ts:13-50, 52-126, 203-310`,
-  `nav/loadData.ts:43-99`
-- **States:** idle → queued (promise-chain mutex) → rendering → outcome
-  (`reused | withHydration | remounted`; failure → error-route substitution or
-  rollback snapshot). Per-stack-layout slot: `new → rendered → reuse`
-  (guarded by the liveness predicate
+- **Where:** `packages/build/src/nav/navigate.ts`, `nav/loadData.ts`
+- **States:** idle → loading (in flight, cancellable) → commit (synchronous) →
+  outcome (`reused | withHydration | remounted`; superseded → dropped; failure
+  → error-route substitution or rollback snapshot). Per-stack-layout slot:
+  `new → rendered → reuse` (guarded by the liveness predicate
   `stackLayout.slotRegion?.startNode?.parentNode != null`).
-- **Enforcement:** `pendingNavigation` serializes navigations ("two in flight
-  at once can have one clear a layout's slot region that the other is about to
-  reuse"); the chain is kept alive across failures. `navigateNow` restores
-  `$page.url/status/error` on throw (error-rollback). A region can die
-  mid-navigation — the render closure re-checks and falls back to
-  `window.location.reload()`.
+- **Enforcement:** the newest navigation wins. Each `navigate` bumps
+  `latestNavigation` and aborts the previous navigation's `AbortController`,
+  so a slow or hung `/~server` request can't delay the one that follows.
+  Loading is concurrent; commits are not: after every `await`, the navigation
+  checks `id !== latestNavigation || signal.aborted` and returns the
+  `superseded` outcome before touching `$page`, `client.layoutStack` or the
+  DOM. The layout stack is assigned inside the synchronous render closure, so
+  an in-flight navigation can't disturb the stack the winner is reading.
+  `navigateNow` restores `$page.url/status/error` on throw (error-rollback,
+  only while still current). A region can die mid-navigation — the render
+  closure re-checks and falls back to `window.location.reload()`.
 
 ```ts
-// navigate.ts:21-30
-let pendingNavigation: Promise<unknown> = Promise.resolve();
-const result = pendingNavigation.then(() => navigateNow(rawUrl, withHydration));
-// Keep the chain alive even when a navigation fails, so one bad navigation can't wedge every later one
-pendingNavigation = result.catch(() => {});
+// navigate.ts
+let latestNavigation = 0;
+let activeController: AbortController | undefined;
+
+const id = ++latestNavigation;
+activeController?.abort(); // supersede the previous request
+const controller = new AbortController();
+activeController = controller;
 ```
+
+Callers treat `{ type: "superseded" }` as "do nothing": the click handler
+doesn't push a history entry or fall back to a document load, and `popstate`
+leaves the page and scroll to the newer navigation.
 
 ### 9. Middleware/hook enter–exit
 

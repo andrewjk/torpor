@@ -643,7 +643,7 @@ describe("navigate", () => {
 		expect(mountMock.mock.calls[0][4]?.$page).toBe($page);
 	});
 
-	test("overlapping navigations are serialized", async () => {
+	test("the latest navigation wins over an earlier one still loading", async () => {
 		const events: string[] = [];
 		let releaseFirst!: () => void;
 		const firstGate = new Promise<void>((resolve) => (releaseFirst = resolve));
@@ -657,33 +657,107 @@ describe("navigate", () => {
 			events.push("second:start");
 			return Response.json({});
 		};
+		const firstComponent = () => ({ body: "<p>first</p>", head: "" });
+		const secondComponent = () => ({ body: "<p>second</p>", head: "" });
 		client.router.addPages([
 			{
 				path: "/first",
 				type: PAGE_ROUTE,
-				endPoint: () => Promise.resolve({ default: { component: pageComponent, load: firstLoad } }),
+				endPoint: () =>
+					Promise.resolve({ default: { component: firstComponent, load: firstLoad } }),
 				subFolder: undefined,
 			},
 			{
 				path: "/second",
 				type: PAGE_ROUTE,
 				endPoint: () =>
-					Promise.resolve({ default: { component: pageComponent, load: secondLoad } }),
+					Promise.resolve({ default: { component: secondComponent, load: secondLoad } }),
 				subFolder: undefined,
 			},
 		]);
 
 		const first = navigate(new URL("http://localhost/first"));
-		const second = navigate(new URL("http://localhost/second"));
-
-		// Give the second navigation time to run if it were not serialized; it
-		// must still be waiting on the first (whose load is gated)
+		// Let the slow navigation start its load before the second supersedes it
 		await new Promise((resolve) => setTimeout(resolve, 0));
 		expect(events).toEqual(["first:start"]);
 
+		const second = navigate(new URL("http://localhost/second"));
+
+		// The newest navigation no longer waits for the slow one to finish
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		expect(events).toEqual(["first:start", "second:start"]);
+
+		expect(await second).toEqual({ type: "rendered" });
+		expect(mountMock.mock.calls.at(-1)![1]).toBe(secondComponent);
+		expect($page.url.pathname).toBe("/second");
+
+		// The superseded navigation settles without painting over the winner
 		releaseFirst();
-		await Promise.all([first, second]);
-		expect(events).toEqual(["first:start", "first:end", "second:start"]);
+		expect(await first).toEqual({ type: "superseded" });
+		expect(mountMock.mock.calls.at(-1)![1]).toBe(secondComponent);
+		expect($page.url.pathname).toBe("/second");
+	});
+
+	test("a hung data request is aborted by the next navigation", async () => {
+		let slowSignal: AbortSignal | undefined;
+		const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+			const href =
+				input instanceof URL ? input.href : typeof input === "string" ? input : input.url;
+			if (href.includes("/slow/~server")) {
+				slowSignal = init?.signal ?? undefined;
+				return new Promise<Response>((_, reject) => {
+					slowSignal?.addEventListener("abort", () =>
+						reject(new DOMException("The operation was aborted.", "AbortError")),
+					);
+				});
+			}
+			return Promise.resolve(Response.json({ loads: [{}] }));
+		});
+		vi.stubGlobal("fetch", fetchMock);
+		try {
+			const server = () => Promise.resolve({ default: { load: async () => {} } });
+			client.router.addPages([
+				{
+					path: "/slow",
+					type: PAGE_ROUTE,
+					endPoint: () => Promise.resolve({ default: { component: pageComponent } }),
+					subFolder: undefined,
+				},
+				{
+					path: "/slow/~server",
+					type: PAGE_SERVER_ROUTE,
+					endPoint: server,
+					subFolder: undefined,
+				},
+				{
+					path: "/fast",
+					type: PAGE_ROUTE,
+					endPoint: () => Promise.resolve({ default: { component: pageComponent } }),
+					subFolder: undefined,
+				},
+				{
+					path: "/fast/~server",
+					type: PAGE_SERVER_ROUTE,
+					endPoint: server,
+					subFolder: undefined,
+				},
+			]);
+
+			const slow = navigate(new URL("http://localhost/slow"));
+			// Let the slow request start before the next navigation supersedes it
+			await new Promise((resolve) => setTimeout(resolve, 0));
+			expect(slowSignal?.aborted).toBe(false);
+
+			const fast = navigate(new URL("http://localhost/fast"));
+			expect(slowSignal?.aborted).toBe(true);
+			expect(await fast).toEqual({ type: "rendered" });
+			expect(await slow).toEqual({ type: "superseded" });
+			// The fast navigation made its own request instead of reusing the
+			// hung one
+			expect(fetchMock).toHaveBeenCalledTimes(2);
+		} finally {
+			vi.unstubAllGlobals();
+		}
 	});
 });
 

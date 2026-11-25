@@ -18,15 +18,6 @@ on layout endpoints at type and runtime level so it can't be mistaken for a
 guard. Folder hooks (`_hook.server.ts`) do guard subtrees; the docs should
 point people there.
 
-### Client navigations queue instead of the latest winning
-
-`nav/navigate.ts` chains every navigation onto `pendingNavigation`, and the
-data fetch in `nav/loadData.ts` has no `AbortSignal` or timeout. Clicking a
-slow link and then a fast one renders the slow page first, then the fast
-one; clicking several links renders each in turn; and a hung `/~server`
-request blocks all further client navigation until it settles. Abort (or
-ignore the result of) superseded navigations and let the newest one win.
-
 ### Smaller issues
 
 - **Form and query fields named like `Object.prototype` members are

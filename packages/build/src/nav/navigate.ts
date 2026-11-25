@@ -21,32 +21,62 @@ import loadData, { errorLayoutStack } from "./loadData";
  * - `redirect`: a load redirected, which a fetch can't follow.
  * - `failed`: nothing rendered; the caller keeps the current page and decides
  *   between a document load and telling the app (see `handleNavigationFailure`).
+ * - `superseded`: a newer navigation started before this one finished and owns
+ *   the result, so the caller should do nothing (in particular, it must not
+ *   push a history entry or fall back to a document load).
  */
 export type NavigationResult =
 	| { type: "rendered" }
 	| { type: "server-only" }
 	| { type: "redirect" }
-	| { type: "failed"; error?: unknown };
+	| { type: "failed"; error?: unknown }
+	| { type: "superseded" };
 
 /**
- * Navigations run one at a time. Each mutates shared client state
- * (`client.layoutStack`) and the live DOM, so two in flight at once can have
- * one clear a layout's slot region that the other is about to reuse (the
- * `slotRegion.startNode!` in `render` then throws). Requests are chained, so a
- * rapid second click -- or a popstate while a form submit reloads -- waits for
- * the first to finish instead of interleaving.
+ * The newest navigation's id. Each `navigate` bumps it; anything older is
+ * superseded and must not commit `$page`, `client.layoutStack` or the DOM.
  */
-let pendingNavigation: Promise<unknown> = Promise.resolve();
+let latestNavigation = 0;
+
+/**
+ * Aborts the newest navigation's in-flight data request when a newer one
+ * starts. That's what keeps a slow (or hung) `/~server` request from delaying
+ * the navigation that follows it.
+ */
+let activeController: AbortController | undefined;
 
 export default function navigate(rawUrl: URL, withHydration = false): Promise<NavigationResult> {
-	const result = pendingNavigation.then(() => navigateNow(rawUrl, withHydration));
-	// Keep the chain alive even when a navigation fails, so one bad navigation
-	// can't wedge every later one
-	pendingNavigation = result.catch(() => {});
+	const id = ++latestNavigation;
+
+	// The newest navigation wins: abort the previous one's data request and
+	// let its commit checks drop it when it settles. Loading is no longer
+	// serialized, so the navigation that follows doesn't wait for a slow
+	// request; only the commit is (it runs synchronously after the checks).
+	activeController?.abort();
+	const controller = new AbortController();
+	activeController = controller;
+
+	const result = navigateNow(rawUrl, withHydration, id, controller.signal);
+	const clearController = () => {
+		if (activeController === controller) activeController = undefined;
+	};
+	// Clear the controller only if a newer navigation hasn't replaced it
+	void result.then(clearController, clearController);
 	return result;
 }
 
-async function navigateNow(rawUrl: URL, withHydration: boolean): Promise<NavigationResult> {
+function isSuperseded(id: number, signal: AbortSignal): boolean {
+	return id !== latestNavigation || signal.aborted;
+}
+
+const SUPERSEDED: NavigationResult = { type: "superseded" };
+
+async function navigateNow(
+	rawUrl: URL,
+	withHydration: boolean,
+	id: number,
+	signal: AbortSignal,
+): Promise<NavigationResult> {
 	// A failed route-module import (e.g. a stale dev dep hash), a throwing
 	// load or a failed render must not reject the click handler's promise: the
 	// caller's fallback would never run and the link would appear dead.
@@ -55,12 +85,16 @@ async function navigateNow(rawUrl: URL, withHydration: boolean): Promise<Navigat
 	const previousError = $page.error;
 	let result: NavigationResult;
 	try {
-		result = await renderNavigation(rawUrl, withHydration);
+		result = await renderNavigation(rawUrl, withHydration, id, signal);
 	} catch (error) {
+		// An aborted request (or a failure that lands after a newer navigation
+		// started) belongs to the newer navigation, not this one
+		if (isSuperseded(id, signal)) return SUPERSEDED;
 		console.error(error);
 		result = { type: "failed", error };
 	}
-	if (result.type === "failed" && !withHydration) {
+	if (result.type === "superseded") return result;
+	if (result.type === "failed" && !withHydration && !isSuperseded(id, signal)) {
 		// Nothing is on screen for this url: point the reactive state back at
 		// the page that is still there, in case the caller keeps it (e.g. a
 		// failed navigation while offline). The initial hydration already has
@@ -72,7 +106,15 @@ async function navigateNow(rawUrl: URL, withHydration: boolean): Promise<Navigat
 	return result;
 }
 
-async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<NavigationResult> {
+async function renderNavigation(
+	rawUrl: URL,
+	withHydration: boolean,
+	id: number,
+	signal: AbortSignal,
+): Promise<NavigationResult> {
+	// Another navigation started before this one got to run
+	if (isSuperseded(id, signal)) return SUPERSEDED;
+
 	let parent = document.getElementById("app");
 	if (!parent) {
 		// TODO: 500
@@ -131,6 +173,7 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 	let clientEndPoint: PageEndPoint | undefined = handler.endPoint
 		? (await handler.endPoint())?.default
 		: undefined;
+	if (isSuperseded(id, signal)) return SUPERSEDED;
 	if (!clientEndPoint?.component) {
 		return { type: "server-only" };
 	}
@@ -140,7 +183,17 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 	// Pass the data into $props
 	// TODO: Don't load if this is the first time -- it should have been passed
 	// to us, somehow...
-	const result = await loadData(handler, params, path, query, newLayoutStack, clientEndPoint);
+	const result = await loadData(
+		handler,
+		params,
+		path,
+		query,
+		newLayoutStack,
+		clientEndPoint,
+		false,
+		signal,
+	);
+	if (isSuperseded(id, signal)) return SUPERSEDED;
 	if (result === undefined) {
 		// A load redirected: the client can't follow it through fetch, so the
 		// caller falls back to a full page load, which does
@@ -167,6 +220,7 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 		handler = errorRoute.handler;
 		params = errorRoute.params || {};
 		clientEndPoint = handler.endPoint ? (await handler.endPoint())?.default : undefined;
+		if (isSuperseded(id, signal)) return SUPERSEDED;
 		if (!clientEndPoint?.component) {
 			return { type: "failed" };
 		}
@@ -185,7 +239,10 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 			query,
 			newLayoutStack,
 			clientEndPoint,
+			false,
+			signal,
 		);
+		if (isSuperseded(id, signal)) return SUPERSEDED;
 		if (errorResult === undefined) {
 			// The error page's own load redirected: only a document load can
 			// follow it
@@ -202,6 +259,11 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 			data = errorResult.data;
 		}
 	}
+	// From here on there are no awaits until the synchronous commit, so a
+	// newer navigation can no longer interleave. Drop out if one started
+	// while a module/load was in flight.
+	if (isSuperseded(id, signal)) return SUPERSEDED;
+
 	// We may have form data from a no-JS form action re-render, in a JSON
 	// script (or, in a page rendered by an older server, a hidden input)
 	let formElement = document.getElementById("t-form-data");
@@ -227,9 +289,10 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 		TorporBuildContext: { onformsubmit: formSubmit },
 	};
 
-	client.layoutStack.push({ path: route.handler.path, data: {}, reuse: false, slotRegion: null });
-	client.layoutStack = newLayoutStack;
-	let layoutStack = client.layoutStack;
+	// The layout stack is assigned at commit time (inside `render`) so an
+	// in-flight navigation the user supersedes can't disturb the stack the
+	// newest navigation is reading
+	let layoutStack = newLayoutStack;
 
 	// If there are layouts, work our way upwards, pushing each component into
 	// the default slot of its parent
@@ -300,11 +363,23 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 		}
 	}
 
+	// A newer navigation may have started while a layout module was imported
+	if (isSuperseded(id, signal)) return SUPERSEDED;
+
 	// A definite alias, so that the render closure's type checks hold
 	let app: HTMLElement = parent;
 	// The DOM update, wrapped by the view transitions API when navigating
 	// (but not on the initial hydration)
 	const render = () => {
+		// The view-transition callback runs after a tick, so a newer navigation
+		// can have claimed the page in the meantime
+		if (isSuperseded(id, signal)) return;
+
+		// Commit the layout stack and the DOM together: no newer navigation can
+		// interleave with this synchronous section, and an older one never gets
+		// here (its superseded check failed above).
+		client.layoutStack = layoutStack;
+
 		try {
 			if (reused) {
 				// The layout is being reused — clear the old slot content, then
@@ -353,6 +428,12 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 		}
 
 		if (!withHydration) {
+			// The navigation is committing: prefetches were for links that led
+			// here, so drop them. (Do this here, not when scheduling a view
+			// transition, so a superseded navigation doesn't clear the newer
+			// one's prefetches.)
+			client.prefetchedData = {};
+
 			// Scroll back to the top when moving to a different page; keep the
 			// scroll position for same-page navigations (query changes,
 			// re-renders after form actions)
@@ -372,9 +453,6 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 	} else {
 		render();
 	}
-
-	// Reset prefetched data on each navigation
-	client.prefetchedData = {};
 
 	return { type: "rendered" };
 }

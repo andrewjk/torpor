@@ -37,6 +37,7 @@ export default async function loadData(
 	newLayoutStack: LayoutPath[],
 	clientEndPoint: PageEndPoint | undefined,
 	prefetch = false,
+	signal?: AbortSignal,
 ): Promise<LoadDataResult | void> {
 	let data = {};
 
@@ -70,6 +71,7 @@ export default async function loadData(
 				query,
 				layouts.filter((l) => l.rendered).map((l) => l.layoutPath),
 				prefetch,
+				signal,
 			);
 	if (server === undefined) {
 		// A load redirected: the client can't follow it through fetch, so the
@@ -260,6 +262,7 @@ async function loadServerData(
 	query: URLSearchParams,
 	reusedLayouts: string[],
 	prefetch: boolean,
+	signal?: AbortSignal,
 ): Promise<ServerData | { error: { status: number; message: string } } | undefined> {
 	// The server embeds the first render's data in the HTML (see the render
 	// path in site/serverHandlers.ts), so the initial hydration can read it
@@ -300,7 +303,7 @@ async function loadServerData(
 		return prefetched;
 	}
 
-	return requestServerData(path, query, reusedLayouts);
+	return requestServerData(path, query, reusedLayouts, signal);
 }
 
 /** The `/~server` request cache key: the page path and its query. */
@@ -329,6 +332,7 @@ async function requestServerData(
 	path: string,
 	query: URLSearchParams,
 	reusedLayouts: string[],
+	signal?: AbortSignal,
 ): Promise<ServerData | { error: { status: number; message: string } } | undefined> {
 	const url = new URL(
 		document.location.origin + getBasePath() + path.replace(/\/$/, "") + "/~server",
@@ -350,6 +354,7 @@ async function requestServerData(
 		const response = await fetch(url, {
 			redirect: "manual",
 			headers,
+			signal,
 		});
 		if (isRedirect(response)) {
 			return undefined;
@@ -368,6 +373,9 @@ async function requestServerData(
 		}
 		return (await response.json()) as ServerData;
 	} catch (error) {
+		// A navigation the user superseded aborted this request; let it settle
+		// as superseded rather than painting an offline error over the page
+		if (signal?.aborted) throw error;
 		console.error("The server data request failed", error);
 		return { error: unreachableError() };
 	}

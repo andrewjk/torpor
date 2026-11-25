@@ -49,6 +49,10 @@ window.addEventListener("click", async (e) => {
 			// history entry, so that going (or coming) back can restore it
 			window.history.replaceState({ scroll: window.scrollY }, "", document.location.href);
 			window.history.pushState({ scroll: 0 }, "", url);
+		} else if (result.type === "superseded") {
+			// A newer navigation won; it owns the history entry and the page,
+			// so do nothing (in particular, don't fall back to a document load)
+			return;
 		} else if (handleNavigationFailure(href, result) === "document") {
 			window.location.href = href;
 		}
@@ -141,6 +145,11 @@ function ignoreAnchorMouseEvent(link: HTMLAnchorElement, e: Event) {
 // back or forward buttons
 window.addEventListener("popstate", async () => {
 	const result = await navigateToLocation(document.location);
+	if (result.type === "superseded") {
+		// A newer navigation (another popstate, or a click) owns the url; it
+		// handles the page and the scroll position
+		return;
+	}
 	if (result.type !== "rendered") {
 		// TODO: keep the page and notify the app when offline, like a click
 		// failure; the url has already moved here, so that needs a history fix
