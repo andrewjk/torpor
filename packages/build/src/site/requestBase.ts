@@ -1,4 +1,5 @@
 import type ServerEvent from "../server/ServerEvent";
+import type ModulePreloads from "../types/ModulePreloads";
 
 /**
  * The base path of the site handling a request.
@@ -21,4 +22,19 @@ export function setRequestBase(ev: ServerEvent, base: string): void {
 /** The base path of the site handling `ev` ("" when unset). */
 export function requestBase(ev: ServerEvent): string {
 	return bases.get(ev) ?? "";
+}
+
+const preloads = new WeakMap<ServerEvent, ModulePreloads>();
+
+/**
+ * Records the client chunks of the site handling `ev`, which page renders
+ * preload (kept per request for the same reason as the base path).
+ */
+export function setRequestPreloads(ev: ServerEvent, value: ModulePreloads | undefined): void {
+	if (value) preloads.set(ev, value);
+}
+
+/** The client chunks of the site handling `ev`, if it was built with them. */
+export function requestPreloads(ev: ServerEvent): ModulePreloads | undefined {
+	return preloads.get(ev);
 }

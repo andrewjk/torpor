@@ -28,6 +28,7 @@ import {
 	SERVER_ROUTE,
 } from "../types/RouteType";
 import type ServerEndPoint from "../types/ServerEndPoint.ts";
+import type ModulePreloads from "../types/ModulePreloads.ts";
 import type ServerHook from "../types/ServerHook.ts";
 import type ServerLoadEvent from "../types/ServerLoadEvent.ts";
 import searchParamsToRecord from "../utils/searchParamsToRecord.ts";
@@ -45,7 +46,7 @@ import findErrorRoute from "./findErrorRoute.ts";
 import mergeHead from "./mergeHead.ts";
 import pageOf from "./requestPage.ts";
 import { etagOf, finishCaching } from "./responseCaching.ts";
-import { requestBase, setRequestBase } from "./requestBase.ts";
+import { requestBase, requestPreloads, setRequestBase, setRequestPreloads } from "./requestBase.ts";
 import type Router from "./Router.ts";
 
 /**
@@ -101,6 +102,8 @@ export function createServerLoad(
 	basePath = "",
 	middleware: MiddlewareFunction[] = [],
 	dev = false,
+	// The client chunks each page needs, from the build (see clientPreloads)
+	preloads?: ModulePreloads,
 ): ServerLoad {
 	// The base path is carried by this handler's closure (and tagged onto each
 	// request for response finalization), not module state: several sites
@@ -155,6 +158,7 @@ export function createServerLoad(
 		// (`ServerEvent.addHeaders`) adds the right prefix even when another
 		// site's handler exists in the same process
 		setRequestBase(ev, basePath);
+		setRequestPreloads(ev, preloads);
 
 		// The base is stripped before routing, so that everything below (route
 		// matching, params, user code reading `event.url`) is base-free.
@@ -368,6 +372,28 @@ export function createServerLoad(
 		const finished = finishCaching(ev, response as Response, devMode);
 		return ev.request.method === "HEAD" ? withoutBody(finished) : finished;
 	};
+}
+
+/**
+ * `<link rel="modulepreload">` tags for the client chunks the page needs:
+ * the client entry's, then each layout's from the root down, then the
+ * page's. Without them the browser only finds the page's chunks after the
+ * entry script (at the end of the HTML) has downloaded and run. Empty in dev,
+ * where Vite serves modules unbundled.
+ */
+function preloadLinks(ev: ServerEvent, handler: RouteHandler): string {
+	const preloads = requestPreloads(ev);
+	if (!preloads) return "";
+	const files = new Set(preloads.entry);
+	for (const layout of handler.layouts ?? []) {
+		for (const file of preloads.routes[layout.path] ?? []) files.add(file);
+	}
+	for (const file of preloads.routes[handler.path] ?? []) files.add(file);
+	let links = "";
+	for (const file of files) {
+		links += `<link rel="modulepreload" href="${file}">`;
+	}
+	return links;
 }
 
 /**
@@ -1018,7 +1044,10 @@ async function loadView(
 
 		styles += head;
 		html = rewriteBaseInHtml(
-			mergeHead(template, styles + headData).replace("%COMPONENT_BODY%", body),
+			mergeHead(template, preloadLinks(ev, handler) + styles + headData).replace(
+				"%COMPONENT_BODY%",
+				body,
+			),
 			requestBase(ev),
 		);
 	} catch (error) {

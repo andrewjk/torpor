@@ -10,6 +10,7 @@ import manifest from "../site/manifest.ts";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
 import { siteEntryPaths } from "../utils/entryPaths";
+import clientPreloads, { type ViteManifestChunk } from "./clientPreloads";
 import runPrerender from "./runPrerender";
 
 // TODO: Don't cache index.html in dev?
@@ -73,7 +74,20 @@ export default async function runBuild(site: Site): Promise<void> {
 		...asAliasArray(clientConfig.resolve.alias),
 		...tsconfigAliases(site.root),
 	];
-	clientConfig.plugins = [manifest(site), torpor(), ...site.vitePlugins];
+	// The client build's resolved root, which its manifest's keys are
+	// relative to
+	let clientRoot = site.root;
+	clientConfig.plugins = [
+		manifest(site),
+		torpor(),
+		...site.vitePlugins,
+		{
+			name: "torpor-client-root",
+			configResolved(config) {
+				clientRoot = config.root;
+			},
+		},
+	];
 	clientConfig.build ??= {};
 	clientConfig.build.outDir = clientFolder;
 	// Root-level host files (robots.txt, favicon.ico, .well-known/*, etc) in
@@ -93,7 +107,26 @@ export default async function runBuild(site: Site): Promise<void> {
 		...site.inputs.filter((f) => !/server\.(ts|js)$/.test(f)),
 	];
 	clientConfig.build.ssrManifest = true;
+	// The build manifest says which chunks each route needs, so pages can
+	// preload them (see clientPreloads)
+	clientConfig.build.manifest ??= true;
 	await build(defineConfig(clientConfig));
+
+	const manifestFile = path.join(
+		clientFolder,
+		typeof clientConfig.build.manifest === "string"
+			? clientConfig.build.manifest
+			: ".vite/manifest.json",
+	);
+	const preloads = existsSync(manifestFile)
+		? clientPreloads(
+				JSON.parse(await fs.readFile(manifestFile, "utf-8")) as Record<string, ViteManifestChunk>,
+				clientRoot,
+				site.routes
+					.filter((r) => r.file && !/server\.(ts|js)$/.test(r.file))
+					.map((r) => ({ path: r.path, file: path.resolve(site.root, r.file!) })),
+			)
+		: undefined;
 
 	// Build the server assets, including the server entry script and the route
 	// files
@@ -105,7 +138,7 @@ export default async function runBuild(site: Site): Promise<void> {
 		...asAliasArray(serverConfig.resolve.alias),
 		...tsconfigAliases(site.root),
 	];
-	serverConfig.plugins = [manifest(site, true), torpor(), ...site.vitePlugins];
+	serverConfig.plugins = [manifest(site, true, false, preloads), torpor(), ...site.vitePlugins];
 	serverConfig.build ??= {};
 	serverConfig.build.outDir = serverFolder;
 	// Bundle packages that ship `.torp` files into the server build, as they

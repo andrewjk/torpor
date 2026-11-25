@@ -5,6 +5,7 @@ import type { ResolvedOpenApiOptions } from "../openapi/types";
 import { OPEN_API_STATE_KEY } from "../openapi/plugin";
 import { normalizeBasePath, normalizeOrigin } from "./basePath";
 import Site from "./Site";
+import type ModulePreloads from "../types/ModulePreloads";
 import { SERVER_ROUTE } from "../types/RouteType";
 
 export const MANIFEST_MODULE_ID = "@torpor/build/manifest";
@@ -22,7 +23,14 @@ export function hasLoadExport(source: string): boolean {
  * A Vite plugin that provides information about the app to both clientEntry and
  * serverEntry.
  */
-export default function manifest(site: Site, server = false, dev = false): Plugin {
+export default function manifest(
+	site: Site,
+	server = false,
+	dev = false,
+	// The client chunks each page needs, from the client build (production
+	// server builds only)
+	preloads?: ModulePreloads,
+): Plugin {
 	return {
 		name: "torpor-manifest",
 		resolveId: {
@@ -143,6 +151,7 @@ export default {
   viewTransitions: ${!!site.viewTransitions},
   dev: ${!!dev},
   ${serverRequest && hasMiddleware ? "middleware: __site.middleware ?? []," : ""}
+  ${serverRequest && preloads ? `preloads: ${JSON.stringify(preloads)},` : ""}
   routes: [
     ${site.routes
 			.map((r) => {

@@ -16,4 +16,5 @@ export const load: ServerLoad = createServerLoad(
 	manifest.base,
 	manifest.middleware ?? [],
 	manifest.dev ?? false,
+	manifest.preloads,
 );
