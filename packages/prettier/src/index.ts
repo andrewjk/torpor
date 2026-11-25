@@ -168,7 +168,7 @@ function formatRenderChunk(type: "head" | "render", content: string, options: ob
 export default function C() {
 ${content}
 }`;
-	const parsed = parseTorp(source);
+	const parsed = parseTorp(source, { allowUnknownComponents: true });
 	if (!parsed.ok || !parsed.template) {
 		console.log(
 			`Failed to parse render section: ${parsed.errors.map((e) => e.message).join(", ")}`,
@@ -446,7 +446,7 @@ function formatStyleChunk(content: string, _options: object) {
 export default function C() {
 ${content}
 }`;
-	const parsed = parseTorp(source);
+	const parsed = parseTorp(source, { allowUnknownComponents: true });
 	if (!parsed.ok || !parsed.template) {
 		console.log(`Failed to parse style section: ${parsed.errors.map((e) => e.message).join(", ")}`);
 		return content;

@@ -1,5 +1,6 @@
 import type TemplateComponent from "../../types/TemplateComponent";
 import type ParseResult from "../types/ParseResult";
+import type ParseOptions from "../types/ParseOptions";
 import collectMarkupExpressions from "../utils/collectMarkupExpressions";
 import { codeRanges, skipStringOrComment } from "../utils/codeScanner";
 import endOfString from "../utils/endOfString";
@@ -9,6 +10,8 @@ import isElementNode from "../utils/isElementNode";
 import isSpaceNode from "../utils/isSpaceNode";
 import trimQuotes from "../utils/trimQuotes";
 import type ParseStatus from "./ParseStatus";
+import classifyComponents from "./classifyComponents";
+import collectImportNames from "./collectImportNames";
 import parseInlineScript from "./parseInlineScript";
 import parseMarkup, { parseMarkupInto } from "./parseMarkup";
 import parseStyleElement from "./parseStyles";
@@ -18,7 +21,7 @@ import addError from "./utils/addError";
 import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
 import consumeSpace from "./utils/consumeSpace";
 
-export default function parseCode(source: string): ParseResult {
+export default function parseCode(source: string, options?: ParseOptions): ParseResult {
 	const status: ParseStatus = {
 		source,
 		i: 0,
@@ -127,6 +130,7 @@ export default function parseCode(source: string): ParseResult {
 		span: { start: status.marker, end: source.length },
 	});
 
+	classifyComponents(status, collectImportNames(source), options);
 	scopeStyles(status);
 
 	const ok = !status.errors.length;

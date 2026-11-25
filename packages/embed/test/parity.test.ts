@@ -20,7 +20,7 @@ async function renderJsServer(
 	source: string,
 	props: Record<string, any>,
 ): Promise<{ body: string; styles: unknown[] }> {
-	const parsed = parse(source);
+	const parsed = parse(source, { allowUnknownComponents: true });
 	expect(parsed.errors).toEqual([]);
 	// The source reads `$data` from the injected bag; the JS build needs the
 	// same binding the manifest path installs

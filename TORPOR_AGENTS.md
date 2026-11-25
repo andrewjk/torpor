@@ -24,8 +24,11 @@ export default function Hello($props: { name: string }) {
 ```
 
 Components can be nested in the same file (non-default functions) or imported
-from other `.torp` files. Capitalized tags are treated as components:
-`<UserProfile name="x" />`.
+from other `.torp` files. A tag is treated as a component when its name is
+imported or declared in the same file: `<UserProfile name="x" />`. Native
+elements and custom elements (with a dash) stay elements. Any other
+capitalized tag is a compile error, so typos and missing imports are reported
+instead of silently becoming component calls.
 
 Block types inside a component:
 

@@ -6,8 +6,8 @@ import type ParseStatus from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
 import addError from "./utils/addError";
 import accept from "./utils/accept";
-import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
 import consumeSpace from "./utils/consumeSpace";
+import consumeTagName from "./utils/consumeTagName";
 import consumeUntil from "./utils/consumeUntil";
 
 export default function parseTag(status: ParseStatus): ElementNode {
@@ -19,7 +19,7 @@ export default function parseTag(status: ParseStatus): ElementNode {
 
 	let tagStart = status.i + 1;
 	let snailed = accept("@", status);
-	let tagName = consumeAlphaNumeric(status);
+	let tagName = consumeTagName(status);
 	let tagEnd = status.i;
 
 	if (snailed) {

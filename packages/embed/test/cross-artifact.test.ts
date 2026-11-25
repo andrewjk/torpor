@@ -174,7 +174,7 @@ export default function TicketList() {
 /** Compiles a torp source into a server component, with the SSR runtime
  * exports in scope (same harness as artifact-components.test.ts). */
 function compileServerComponent(source: string): unknown {
-	const parsed = parse(source);
+	const parsed = parse(source, { allowUnknownComponents: true });
 	// The source reads `$data` from the injected bag; the JS build needs the
 	// same binding the manifest path installs
 	bindDataTemplate(parsed.template!);
@@ -203,7 +203,7 @@ test("inner artifact styles flow through the boundary like the JS build", async 
 	// Reference: the same outer source through the real JS server build,
 	// with the JS-built inner component in scope (its style tag lands in
 	// head exactly the way the wrapper must emit it).
-	const parsedPage = parse(OUTER_SOURCE);
+	const parsedPage = parse(OUTER_SOURCE, { allowUnknownComponents: true });
 	const builtPage = build(parsedPage.template!, { server: true, source: OUTER_SOURCE });
 	const codePage = builtPage.code.replace("export default ", "").replace(/^import\s.+\n/gm, "");
 	const jsPage = transform(codePage, { transforms: ["typescript"] }).code;

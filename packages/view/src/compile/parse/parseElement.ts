@@ -13,8 +13,8 @@ import parseText from "./parseText";
 import slottifyChildNodes from "./slottifyChildNodes";
 import accept from "./utils/accept";
 import addError from "./utils/addError";
-import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
 import consumeSpace from "./utils/consumeSpace";
+import consumeTagName from "./utils/consumeTagName";
 import usesSlot from "./utils/usesSlot";
 
 export default function parseElement(status: ParseStatus): ElementNode {
@@ -105,13 +105,6 @@ export default function parseElement(status: ParseStatus): ElementNode {
 		}
 
 		status.stack.pop();
-	}
-
-	// If this is a component element, add a default <fill> node
-	// HACK: For now, we just treat all tags starting with a capital as components
-	if (/[A-Z]/.test(element.tagName[0])) {
-		element.type = "component";
-		slottifyChildNodes(element);
 	}
 
 	if (isSpecialNode(element)) {
@@ -230,7 +223,7 @@ function checkCloseTag(status: ParseStatus, element: ElementNode) {
 	accept("</", status);
 	consumeSpace(status);
 	let snailed = accept("@", status);
-	let closingTagName = consumeAlphaNumeric(status);
+	let closingTagName = consumeTagName(status);
 	if (snailed) {
 		closingTagName = "@" + closingTagName;
 	}

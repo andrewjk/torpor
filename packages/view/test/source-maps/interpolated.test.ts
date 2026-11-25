@@ -28,6 +28,7 @@ export default function Source() {
 
 test("source maps with interpolated attributes in component", () => {
 	const input = `
+import Child from "./Child.torp";
 export default function Source() {
 	@render {
 		<Child id=\`\${a}-\${bc}-\${d}\` />

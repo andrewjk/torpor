@@ -11,8 +11,6 @@ at the end of `compile/build/client/buildFragment.ts`), covering the following:
 - **Component props**: default values and proper parameter→prop mapping are
   missing; prop source maps are approximate; `Bindable<T>` could be surfaced
   in the `$props` interface so two-way bindings type-check.
-- **Component detection**: any capitalized tag is treated as a component
-  (`parseElement`), without checking imports or namespaces.
 - **Slot props**: defaults and slot-prop source maps are missing; a fill with
   only whitespace still takes the slot path.
 - **Control parsing**: error recovery stops at the current position instead of

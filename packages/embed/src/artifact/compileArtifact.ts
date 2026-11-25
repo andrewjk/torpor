@@ -84,7 +84,7 @@ export default function compileArtifact(
 ): EmbedArtifact {
 	checkMaxSourceBytes(source, options?.maxSourceBytes);
 
-	const parsed = parse(source);
+	const parsed = parse(source, { allowUnknownComponents: true });
 	if (!parsed.ok || !parsed.template) {
 		throw new EmbedCompileError(parsed.errors);
 	}

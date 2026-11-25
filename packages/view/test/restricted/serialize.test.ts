@@ -333,6 +333,8 @@ export default function A() {
 
 test("serializes scoped class props on component usages", () => {
 	const { program, errors } = compile(`
+import Card from "./Card.torp";
+
 export default function Dash($props: { wide: boolean }) {
 	@style {
 		.card { color: red; }

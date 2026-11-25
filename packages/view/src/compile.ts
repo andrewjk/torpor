@@ -8,6 +8,7 @@ import {
 	RestrictedSyntaxError,
 } from "./compile/build/restricted/parseExpression";
 import type CompileError from "./compile/types/CompileError";
+import type ParseOptions from "./compile/types/ParseOptions";
 import type Component from "./types/Component";
 import type Template from "./types/Template";
 
@@ -17,7 +18,7 @@ export { parse, build, buildType, buildRestricted, bindDataTemplate };
 // expression source (e.g. derive requirements in app manifests)
 export { parseExpressionPrefix, RestrictedSyntaxError };
 
-export type { Component, Template, CompileError };
+export type { Component, Template, CompileError, ParseOptions };
 export type { RestrictedBuildOptions } from "./compile/build/restricted/buildRestricted";
 export type {
 	RestrictedAttribute,

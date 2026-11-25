@@ -45,7 +45,7 @@ const ROWS = [
 /** Compiles a torp source into a client component function, with the view
  * runtime exports in scope (as the loader would provide them). */
 function compileClientComponent(source: string): unknown {
-	const parsed = parse(source);
+	const parsed = parse(source, { allowUnknownComponents: true });
 	const built = build(parsed.template!, { server: false });
 	const code = built.code.replace("export default ", "").replace(/^import\s.+\n/gm, "");
 	const js = transform(code, { transforms: ["typescript"] }).code;
@@ -57,7 +57,7 @@ function compileClientComponent(source: string): unknown {
 /** Compiles a torp source into a server component, with the SSR runtime
  * exports in scope. */
 function compileServerComponent(source: string): unknown {
-	const parsed = parse(source);
+	const parsed = parse(source, { allowUnknownComponents: true });
 	const built = build(parsed.template!, { server: true, source });
 	// Strip imports before the TS transform (sucrase hoists helpers above them)
 	const code = built.code.replace("export default ", "").replace(/^import\s.+\n/gm, "");
@@ -77,7 +77,7 @@ test("slot props flow from host server components through fills", async () => {
 
 	// Byte parity: the interpreter output equals the real JS server build
 	// composing the same components with the same fills.
-	const parsedPage = parse(PAGE_SOURCE);
+	const parsedPage = parse(PAGE_SOURCE, { allowUnknownComponents: true });
 	const builtPage = build(parsedPage.template!, { server: true, source: PAGE_SOURCE });
 	const codePage = builtPage.code.replace("export default ", "").replace(/^import\s.+\n/gm, "");
 	const jsPage = transform(codePage, { transforms: ["typescript"] }).code;
@@ -196,7 +196,7 @@ export default function ScopedPage($props: { wide: boolean }) {
 	});
 
 	// Byte parity with the real JS server composition
-	const parsedPage = parse(PAGE_SOURCE);
+	const parsedPage = parse(PAGE_SOURCE, { allowUnknownComponents: true });
 	const builtPage = build(parsedPage.template!, { server: true, source: PAGE_SOURCE });
 	const codePage = builtPage.code.replace("export default ", "").replace(/^import\s.+\n/gm, "");
 	const jsPage = transform(codePage, { transforms: ["typescript"] }).code;
