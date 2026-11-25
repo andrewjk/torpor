@@ -20,10 +20,6 @@ point people there.
 
 ### Smaller issues
 
-- **Validation runs before hooks in actions**: `runAction` parses and
-  validates the form against the action's schema before the folder hooks
-  (e.g. an auth hook) run, so unauthenticated users get schema validation
-  errors back. Run hooks first, as loads do.
 - **No origin check on form actions**: CSRF protection relies entirely on
   the `SameSite=lax` default in `CookieHelper`. Checking `Origin` against
   the request host for non-GET form posts (SvelteKit's `checkOrigin`) would

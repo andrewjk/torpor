@@ -1,5 +1,6 @@
 import { expect, test } from "vite-plus/test";
 import { runTest } from "../src/test";
+import unauthorized from "../src/response/unauthorized";
 import ServerEvent from "../src/server/ServerEvent";
 import Site from "../src/site/Site";
 import type PageServerEndPoint from "../src/types/PageServerEndPoint";
@@ -209,6 +210,20 @@ test("an invalid form submission is rejected with 422 before the action runs", a
 	const body = await res.json();
 	expect(body.message).toBe("Validation failed");
 	expect(body.issues).toEqual([{ message: "title is required", path: ["title"] }]);
+	expect(calls).toHaveLength(0);
+});
+
+test("hooks run before action schema validation", async () => {
+	const { site, calls } = siteWithSchemaAction();
+	// A root auth hook rejects the request before the action's schema can
+	// report its (irrelevant, unauthenticated) validation errors
+	site.addRoute("/", {
+		hookServer: { enter: async () => unauthorized() },
+	});
+
+	const res = await runTest(site, "/form/~server", formEvent("/form/~server"));
+
+	expect(res.status).toBe(401);
 	expect(calls).toHaveLength(0);
 });
 

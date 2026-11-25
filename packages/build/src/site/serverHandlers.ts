@@ -1133,24 +1133,29 @@ async function runAction(
 			// the hooks' enter functions) through to the loads
 			let serverParams: ServerLoadEvent | undefined = undefined;
 			try {
-				// If the endpoint declares a schema for this action, validate the
-				// submitted form data up front and reject with 422 if it fails.
-				// The form data is parsed on the event, so the action's
-				// `event.form()` / `event.formData()` share this read of the body
-				const schema = endpointSchema(serverEndPoint, actionName);
-				const form = schema
-					? await validate(schema, await formDataToRecord(await ev.formData()))
-					: undefined;
-
-				serverParams = buildServerParams(ev, url, params, form ? { form } : {});
+				// Build the event before validation so the hooks below can run
+				// first; the callback fills in the validated form afterwards.
+				const values: { form?: unknown } = {};
+				serverParams = buildServerParams(ev, url, params, values);
 
 				const serverHooks = await loadServerHooks(handler);
 				// Hooks run from the root down; a hook's enter can return a
-				// Response to short-circuit the action
+				// Response to short-circuit the action. They run before the
+				// action's schema validation, so an auth hook can reject an
+				// unauthenticated request instead of handing it schema errors.
 				const actionParams = serverParams;
 				const { response: hookResponse, error: hookError } = await runHooks(
 					[{ hooks: serverHooks, arg: actionParams }],
 					async () => {
+						// If the endpoint declares a schema for this action,
+						// validate the submitted form data and reject with 422 if
+						// it fails. The form data is parsed on the event, so the
+						// action's `event.form()` / `event.formData()` share this
+						// read of the body
+						const schema = endpointSchema(serverEndPoint, actionName);
+						if (schema) {
+							values.form = await validate(schema, await formDataToRecord(await ev.formData()));
+						}
 						return (await action(actionParams)) || undefined;
 					},
 				);
