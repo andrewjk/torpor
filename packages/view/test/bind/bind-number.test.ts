@@ -75,6 +75,22 @@ test("number input clears to empty -- mounted", async () => {
 
 	input.value = "";
 	input.dispatchEvent(new Event("input", { bubbles: true }));
+
+	// Clearing means "no value", not 0
+	expect($state.value).toBeUndefined();
+	expect(input.value).toBe("");
+});
+
+test("number input with no value stays empty -- hydrated", async () => {
+	let $state = $watch({ value: undefined });
+
+	const container = document.createElement("div");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
+
+	let input = container.querySelector("input") as HTMLInputElement;
+	expect(input.value).toBe("");
 });
 
 test("number input -- hydrated", async () => {

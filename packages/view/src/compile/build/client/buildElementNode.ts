@@ -358,13 +358,17 @@ function buildBindAttribute(
 	let eventName = bindEventName(node, name);
 	let defaultValue = '""';
 	let inputValue = "e.target.value";
+	let setJoin = "||";
 	if (node.tagName === "input") {
 		let typeAttribute = node.attributes.find((a) => a.name === "type");
 		if (typeAttribute && typeAttribute.value) {
 			switch (trimQuotes(typeAttribute.value)) {
 				case "number": {
-					defaultValue = "0";
-					inputValue = "Number(e.target.value)";
+					// An empty number input means "no value", not 0. Keep 0 (and
+					// other falsy numeric values) when writing back to the element.
+					defaultValue = '""';
+					inputValue = 'e.target.value === "" ? undefined : Number(e.target.value)';
+					setJoin = "??";
 					break;
 				}
 				case "checkbox": {
@@ -396,7 +400,7 @@ function buildBindAttribute(
 			return;
 		}
 	}
-	let set = `${value} || ${defaultValue}`;
+	let set = `${value} ${setJoin} ${defaultValue}`;
 	const propName = name.substring(1);
 	// NOTE: The DOM value property is always a string, while the bound state
 	// may be a number (e.g. with `<input type="number">`), so convert
@@ -405,7 +409,6 @@ function buildBindAttribute(
 			? `${varName}.${propName} = String(${set})`
 			: `${varName}.${propName} = ${set}`;
 	buildRun("setBinding", `${setAttribute};`, status, b);
-	// TODO: Add a parseInput method that handles NaN etc
 	emitBindEvent(
 		varName,
 		eventName,

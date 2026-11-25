@@ -81,7 +81,8 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 				if (typeAttribute && typeAttribute.value) {
 					switch (trimQuotes(typeAttribute.value)) {
 						case "number": {
-							defaultValue = "0";
+							// An empty number input means "no value", not 0
+							defaultValue = '""';
 							break;
 						}
 						case "checkbox": {

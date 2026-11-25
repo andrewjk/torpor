@@ -25,9 +25,9 @@ export default function NumberInput(
 	const t_p_1 = t_skip(t_input_1, 2, 1) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	$run(() => {
-		t_input_1.value = String($props.value || 0);
+		t_input_1.value = String($props.value ?? "");
 	});
-	t_event(t_input_1, "input", (e) => $props.value = Number(e.target.value));
+	t_event(t_input_1, "input", (e) => $props.value = e.target.value === "" ? undefined : Number(e.target.value));
 	$run(() => {
 		t_text_1.textContent = `Value: ${t_fmt($props.value)}`;
 	});

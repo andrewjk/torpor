@@ -36,8 +36,8 @@ at the end of `compile/build/client/buildFragment.ts`), covering the following:
 - **Server attributes**: transition attributes don't emit first-keyframe
   attributes; boolean attributes (`disabled`, ...) aren't detected; the
   partial-reactive attribute path still replaces braces without scanning code.
-- **Bindings**: `&value`/`&group` input parsing is basic (no NaN/empty-number
-  handling); `&group` is only exercised with radios.
+- **Bindings**: `&group` is only exercised with radios; input parsing for
+  exotic values (NaN, etc.) is still basic.
 - **Transitions**: only one entry/exit transition is supported; unknown
   transition attributes don't error; an await/cancel option on region removal
   is missing.
