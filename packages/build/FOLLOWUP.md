@@ -47,7 +47,8 @@ and copied into the build output).
 
 ### Lower / nice-to-have
 
-3. Image optimization / asset pipeline beyond Vite defaults
+3. Image optimization / asset pipeline beyond Vite defaults (see
+   **Performance** below)
 4. Pagination helpers
 5. Rate-limiting primitives (now buildable as a middleware package)
 6. Cron / queues / background jobs (adapter-dependent)
@@ -66,6 +67,53 @@ and copied into the build output).
 
 Nothing here is table stakes any more; server-side WebSockets is the most
 likely to come up.
+
+## Performance
+
+Gaps found by checking torpor against the practices in "Performance is
+design" (shannadige.com, Oct 2026): what a framework should make easy so that
+fast sites are the default. Already covered: SSR and prerendering by
+default, HTML caching with ETags/304s, year-long `immutable` caching of
+hashed assets (Node and Cloudflare), a small compiled runtime (the docs
+site's entry script is ~23 KB gzipped), deferred loads, and hover/focus
+prefetch. In rough order of value:
+
+1. **Preload the current page's chunks.** The rendered HTML only references
+   the client entry script (`run/prepareTemplate.ts`), so the browser
+   requests the route's own chunks (its `+page`/`_layout` components and
+   their imports) only after the entry has downloaded and run: a waterfall
+   of HTML → entry → route chunk → its imports. Emitting
+   `<link rel="modulepreload">` for the matched route's chunks (from the
+   client manifest, at render time) would fetch them in parallel with the
+   entry. Same for the route's CSS, which should arrive with the HTML rather
+   than after hydration starts.
+2. **A JavaScript-per-route report, with optional budgets.** Nothing shows
+   how much JS each route ships. A build-time table (entry + route chunks,
+   raw and gzipped, per route) would make regressions visible, and a
+   `site.budgets` setting (e.g. `{ js: 250_000 }`) could warn or fail the
+   build when a route goes over. Budgets written in config are also where
+   future changes (and coding agents) will see them.
+3. **Pending state for navigation and form submits.** `$page` has no
+   `navigating` or `submitting` flag, so showing immediate feedback on a
+   slow submit (a disabled or busy button, so it isn't tapped twice) or a
+   slow navigation means wiring it up by hand. Something like
+   `$page.navigating` (the target URL while a navigation's data loads) and a
+   per-form submitting state from `formSubmit.ts` would cover it; the
+   `@torpor/ui` button could use it.
+4. **Pages that ship no JavaScript.** Every page loads the client entry and
+   hydrates its whole component tree, even pure content (blog posts, docs).
+   A route/layout flag (like SvelteKit's `csr = false`) that leaves out the
+   client scripts would make static pages zero-JS, at the cost of client
+   navigation from them. Islands (hydrating only interactive components,
+   Astro-style) are the bigger version and would need view's hydration to
+   start from component boundaries rather than the root.
+5. **Images.** No helper for responsive sizes (`srcset`/`sizes` from one
+   source image at build time), for loading the largest above-the-fold
+   image eagerly with `fetchpriority="high"`, or for lazy-loading the rest
+   with reserved dimensions (no layout shift). A build-time image component
+   or Vite plugin integration would cover it.
+6. **Fonts.** No help preloading the fonts a page's CSS uses, or setting
+   `font-display`, so custom fonts can delay text or shift layout.
 
 ## Follow-ups from prerendering
 
