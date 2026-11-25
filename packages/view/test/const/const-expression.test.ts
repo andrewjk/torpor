@@ -11,9 +11,11 @@ export default function ConstExpression() {
 		@const x = 2 + 3
 		@const greeting = "Hello, " + "World"
 		@const isEven = 4 % 2 === 0
+		@const obj = { a: 1, b: 2 }
 		<p>x = {x}</p>
 		<p>greeting = {greeting}</p>
 		<p>isEven = {isEven}</p>
+		<p>obj = {obj.a + obj.b}</p>
 	}
 }
 `;
@@ -39,4 +41,5 @@ function check(container: HTMLElement) {
 	expect(queryByText(container, "x = 5")).not.toBeNull();
 	expect(queryByText(container, "greeting = Hello, World")).not.toBeNull();
 	expect(queryByText(container, "isEven = true")).not.toBeNull();
+	expect(queryByText(container, "obj = 3")).not.toBeNull();
 }

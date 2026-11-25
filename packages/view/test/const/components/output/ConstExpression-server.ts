@@ -13,7 +13,8 @@ export default async function ConstExpression(
 	const x = 2 + 3;
 	const greeting = "Hello, " + "World";
 	const isEven = 4 % 2 === 0;
-	t_body += `<p>x = ${t_fmt(x)}</p> <p>greeting = ${t_fmt(greeting)}</p> <p>isEven = ${t_fmt(isEven)}</p>`;
+	const obj = { a: 1, b: 2 };
+	t_body += `<p>x = ${t_fmt(x)}</p> <p>greeting = ${t_fmt(greeting)}</p> <p>isEven = ${t_fmt(isEven)}</p> <p>obj = ${t_fmt(obj.a + obj.b)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

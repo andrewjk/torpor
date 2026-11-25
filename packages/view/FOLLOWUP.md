@@ -18,8 +18,6 @@ at the end of `compile/build/client/buildFragment.ts`), covering the following:
 - **Control parsing**: error recovery stops at the current position instead of
   the enclosing boundary; branch grouping scans past elements and needs more
   checks; `@with`/`@try` duplicate handling is heuristic.
-- **`@for` headers**: `forLoopVarNames`/`buildForNode` flatten destructuring
-  and are confused by strings and comments.
 - **Style scoping**: `scopeStyles` splits selectors heuristically, so attribute
   selectors/combinators are approximate; selector scoping and attribute
   selectors should move into parse/buildStyles.

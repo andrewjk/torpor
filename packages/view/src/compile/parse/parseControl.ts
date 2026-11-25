@@ -185,6 +185,13 @@ function parseControlOpen(status: ParseStatus): ControlNode | null {
 }
 
 function parseControlStatement(start: number, operation: string, status: ParseStatus) {
+	const standalone = standaloneOperations.includes(operation);
+	// Standalone statements (`@const`, `@key`, …) are line-based: a brace in
+	// their expression (e.g. `@const obj = { a: 1 }`) is not a control body.
+	// Functions are the exception: their brace opens the body parsed below.
+	const braceStartsBody =
+		!standalone || operation === "@function" || operation === "@async function";
+
 	let parenCount = 0;
 	while (status.i < status.source.length) {
 		const skipped = skipStringOrComment(status.source, status.i);
@@ -196,10 +203,7 @@ function parseControlStatement(start: number, operation: string, status: ParseSt
 			parenCount += 1;
 		} else if (accept(")", status)) {
 			parenCount -= 1;
-		} else if (
-			accept("{", status) ||
-			(accept("\n", status) && standaloneOperations.includes(operation))
-		) {
+		} else if ((accept("{", status) && braceStartsBody) || (accept("\n", status) && standalone)) {
 			if (parenCount === 0) {
 				return trimStart(status.source.substring(start, status.i - 1).trim(), "@");
 			}
@@ -207,7 +211,7 @@ function parseControlStatement(start: number, operation: string, status: ParseSt
 			status.i += 1;
 		}
 	}
-	return "";
+	return trimStart(status.source.substring(start, status.i).trim(), "@");
 }
 
 /**

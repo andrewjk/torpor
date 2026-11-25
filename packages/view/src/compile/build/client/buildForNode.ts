@@ -23,8 +23,7 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 
 	node = node.children[0] as ControlNode;
 
-	// HACK: Need to wrangle the declaration(s) out of the for loop and put them in data
-	// TODO: Handle destructuring, quotes, comments etc
+	// Need to wrangle the declaration(s) out of the for loop and put them in data
 	const forVarNames: string[] = forLoopVarNames(node.statement);
 
 	const regionName = nextVarName("for_region", status);
