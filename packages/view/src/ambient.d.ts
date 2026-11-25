@@ -7,7 +7,6 @@
 // packages/create-build/template/src/ambient.d.ts.
 /*
 declare module "*.torp" {
-	// HACK:
 	//import { Component } from "./types/Component";
 	type Component = (
 		$parent: ParentNode,

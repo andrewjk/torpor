@@ -397,7 +397,8 @@ function declareComponentFragmentVars(
 }
 
 function elementTypeName(node: ElementNode) {
-	// TODO: Etc
+	// TODO: cover more tags with precise DOM types; everything else falls back
+	// to HTMLElement
 	switch (node.tagName.toLowerCase()) {
 		case "div":
 		case "span":
@@ -926,20 +927,3 @@ function printDebug(varName: string, status: BuildStatus, b: Builder) {
 		b.append(`console.log("${varName}:", t_print(${varName}));`);
 	}
 }
-
-/*
-function printPath(path: VariablePath) {
-	let parent = path;
-	while (parent.parent) {
-		parent = parent.parent;
-	}
-	printPathPart(parent);
-}
-
-function printPathPart(path: VariablePath, indent = 0) {
-	console.log(`${" ".repeat(indent * 2)}${path.type}`);
-	for (let child of path.children) {
-		printPathPart(child, indent + 1);
-	}
-}
-*/

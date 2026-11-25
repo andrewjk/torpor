@@ -36,10 +36,6 @@ const MAX_EFFECT_RUNS_PER_FLUSH = 100;
  * Runs the effects that have been collected during the batch.
  */
 export default function triggerEffects(): void {
-	//console.log(`triggering effects for '${String(key)}' on`, proxy);
-	//console.log("===");
-	//console.log(`triggering effects for '${String(key)}'`);
-
 	// The first error that was NOT handled by an error boundary (if any).
 	// Errors routed to a boundary are consumed by it; unhandled ones are
 	// rethrown after the batch, as before boundaries existed.

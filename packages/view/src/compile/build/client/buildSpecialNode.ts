@@ -19,7 +19,6 @@ export default function buildSpecialNode(
 		}
 		case "fill":
 		case "filldef": {
-			// HACK:
 			break;
 		}
 		case "@element": {

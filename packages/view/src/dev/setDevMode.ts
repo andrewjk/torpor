@@ -28,7 +28,6 @@ export default function setDevMode(): void {
 					return String(boundary.target.run);
 				}
 				default: {
-					// TODO:
 					return "I'm a " + boundary.type;
 				}
 			}
@@ -71,7 +70,7 @@ export default function setDevMode(): void {
 		}
 	};
 
-	// TODO: make this more robust
+	// TODO: make the dev-boundary depth tracking robust to unmatched pops
 	let oldDepths: number[] = [];
 
 	devContext.onWatch = (proxy: ProxyData) => {

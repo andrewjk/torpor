@@ -21,7 +21,6 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	const parentName = node.parentName!;
 	const anchorName = node.varName ?? "null";
 
-	// HACK:
 	node = node.children[0] as ControlNode;
 
 	// HACK: Need to wrangle the declaration(s) out of the for loop and put them in data

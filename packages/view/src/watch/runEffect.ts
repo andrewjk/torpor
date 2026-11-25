@@ -8,8 +8,6 @@ import batchStart from "./batchStart";
 import clearSources from "./clearSources";
 
 export default function runEffect(effect: Effect): void {
-	//console.log(`running effect '${effect.name}'`);
-
 	// DEV:
 	devContext.effectRun(effect);
 

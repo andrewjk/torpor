@@ -11,8 +11,6 @@ import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { appendForVarBindings } from "./forVars";
 
-// TODO: Are there too many branches for ifs etc?
-
 export default function buildIfNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const anchorName = node.varName ?? "null";
 	const parentName = node.parentName || anchorName + ".parentNode";

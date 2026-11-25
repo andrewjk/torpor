@@ -13,9 +13,6 @@ export default function clearSources(target: Computed | Effect): void {
 		clearSub = clearSub.nextSource
 	) {
 		if (target.didError || !clearSub.active) {
-			//console.log(
-			//	`clearing source sub ${clearSub.source.name} <-> ${clearSub.target.name} (${clearSub.name})`,
-			//);
 			if (previousSub === null) {
 				target.firstSource = clearSub.nextSource;
 			} else {
@@ -27,7 +24,6 @@ export default function clearSources(target: Computed | Effect): void {
 				if (clearSub.source.firstTarget === clearSub) {
 					clearSub.source.firstTarget = clearSub.nextTarget;
 				}
-				// TODO: else???
 			} else {
 				clearSub.previousTarget.nextTarget = clearSub.nextTarget;
 			}

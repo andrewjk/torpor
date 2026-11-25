@@ -71,7 +71,7 @@ const importsMap: Record<string, string> = {
 	ListItem: 'import { type ListItem } from "${folder}";',
 	ListItemSpec: 'import { type ListItemSpec } from "${folder}";',
 	SlotRender: 'import { type SlotRender } from "${folder}";',
-	// HACK: this one's a bit different
+	// devContext lives in the /dev subpath
 	devContext: 'import { devContext } from "${folder}/dev";',
 	t_push_dev_bound: 'import { t_push_dev_bound } from "${folder}/dev";',
 	t_pop_dev_bound: 'import { t_pop_dev_bound } from "${folder}/dev";',

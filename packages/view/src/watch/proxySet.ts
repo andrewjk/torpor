@@ -10,9 +10,6 @@ export default function proxySet(
 	value: any,
 	receiver: any,
 ): boolean {
-	//console.log(`object set '${String(key)}' to`, value, "on", target);
-	//console.log(`object set '${String(key)}'`);
-
 	// Only do things if the value has changed. `Object.is` rather than `!==`
 	// so writing the same `NaN` doesn't notify (NaN !== NaN)
 	const oldValue = target[key];

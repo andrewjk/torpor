@@ -6,13 +6,12 @@ import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
 import { appendForVarBindings } from "./forVars";
 
-// TODO: type checking
-
+// TODO: validate the @html control node's statement/children shape
 export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const htmlAnchorName = node.varName!;
 	const htmlParentName = node.parentName || htmlAnchorName + ".parentNode";
 
-	// HACK: I'm not actually sure we need this here (or in @replace, where I copied it from)
+	// The caller passes the @html group; its first child holds the statement
 	node = node.children[0] as ControlNode;
 
 	status.imports.add("t_region");

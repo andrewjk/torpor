@@ -2,8 +2,6 @@ import devContext from "../dev/devContext";
 import type Region from "../types/Region";
 
 export default function clearRegion(region: Region): void {
-	//console.log("clearing region", region.name, "from", region.startNode, "to", region.endNode);
-
 	// DEV:
 	devContext.onRegionCleared(region);
 

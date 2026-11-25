@@ -83,10 +83,6 @@ export function propagateFromSignal(signal: { firstTarget: Subscription | null }
  * - Gather dependent effects that will need to be re-run
  */
 export default function propagateSignal(proxy: ProxyData, key: PropertyKey): void {
-	//console.log(`triggering effects for '${String(key)}' on`, proxy);
-	//console.log("===");
-	//console.log(`triggering effects for '${String(key)}'`);
-
 	let signal = proxy.signals.get(key) as ProxySignal;
 	if (signal !== undefined && signal.firstTarget !== null) {
 		batchStart();

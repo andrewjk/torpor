@@ -10,7 +10,6 @@ export default function runCleanups(effect: Effect): void {
 	for (let i = 0; i < effect.extent; i++) {
 		if (effectToClean === null) break;
 		if (typeof effectToClean.cleanup === "function") {
-			//console.log(`cleaning effect '${effectToClean.name}'`);
 			const oldActiveTarget = context.activeTarget;
 			context.activeTarget = null;
 

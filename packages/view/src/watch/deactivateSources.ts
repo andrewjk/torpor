@@ -12,8 +12,5 @@ export default function deactivateSources(target: Computed | Effect): void {
 		sourceSub = sourceSub.nextSource
 	) {
 		sourceSub.active = false;
-		//console.log(
-		//	`deactivating ${sourceSub.source.name} <-> ${sourceSub.target.name} (${sourceSub.name})`,
-		//);
 	}
 }

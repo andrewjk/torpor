@@ -9,9 +9,6 @@ export default function addFragment(
 	endNode?: ChildNode,
 	startNode?: ChildNode,
 ): void {
-	//console.log(`adding fragment '${fragment.textContent}' to `, parent);
-	//console.log("before", before);
-
 	const activeRegion = context.activeRegion;
 	const hydrationNode = context.hydrationNode;
 

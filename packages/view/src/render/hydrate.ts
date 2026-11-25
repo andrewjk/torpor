@@ -56,7 +56,6 @@ export default function hydrate(
 	context.hydrationNode = parent.firstChild;
 
 	// Create and push the root region
-	// TODO: Does it need to be on context??
 	const root = newRegion(devContext.enabled ? "Root" : undefined);
 	context.rootRegion = root;
 	context.previousRegion = root;

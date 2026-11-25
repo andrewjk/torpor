@@ -3,8 +3,6 @@ import type Computed from "../types/Computed";
 import trackSignal from "./trackSignal";
 
 export default function runComputed<T>(computed: Computed<T>): T {
-	//console.log(`running computed '${computed.name}'`);
-
 	// Store the active target
 	const oldActiveTarget = context.activeTarget;
 

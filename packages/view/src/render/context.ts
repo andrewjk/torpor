@@ -34,14 +34,6 @@ const context: Context =
 		stashedAnimations: [],
 
 		hydrationNode: null,
-		//hn: null,
-		//get hydrationNode() {
-		//	return this.hn;
-		//},
-		//set hydrationNode(value) {
-		//	console.log(`set hydration ${printNode(value)}`);
-		//	this.hn = value;
-		//},
 
 		serverValues: null,
 	} satisfies Context);

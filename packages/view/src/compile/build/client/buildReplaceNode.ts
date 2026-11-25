@@ -7,14 +7,13 @@ import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { appendForVarBindings } from "./forVars";
 
-// TODO: type checking
-
+// TODO: validate the @replace control node's statement/children shape
 export default function buildReplaceNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const replaceAnchorName = node.varName!;
 	const replaceParentName = node.parentName || replaceAnchorName + ".parentNode";
 	const replaceRegionName = nextVarName("replace_region", status);
 
-	// HACK:
+	// The caller passes the @replace group; its first child holds the statement
 	node = node.children[0] as ControlNode;
 
 	status.imports.add("t_region");

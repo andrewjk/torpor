@@ -23,7 +23,6 @@ export default function checkSources(target: Computed | Effect): boolean {
 		sourceSub !== null;
 		sourceSub = sourceSub.nextSource
 	) {
-		//console.log(`checking source sub '${sourceSub.source.name}' (${sourceSub.name})`);
 		if (sourceSub.recalc) {
 			if (sourceSub.source.type === SIGNAL_TYPE) {
 				return true;
@@ -43,7 +42,6 @@ export default function checkSources(target: Computed | Effect): boolean {
 			sourceSub !== null;
 			sourceSub = sourceSub.nextSource
 		) {
-			//console.log(`checking source sub '${sourceSub.source.name}' (${sourceSub.name})`);
 			if (sourceSub.recalc && sourceSub.source.type === COMPUTED_TYPE && sourceSub.source.recalc) {
 				const oldActiveTarget = context.activeTarget;
 				context.activeTarget = target;

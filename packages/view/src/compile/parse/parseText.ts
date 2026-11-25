@@ -76,8 +76,7 @@ export default function parseText(status: ParseStatus, element: ElementNode): vo
 				}
 				previousNode.content += content + spaceContent;
 				previousNode.spans.push(...spans);
-				//previousNode.range.endIndex += content.length + spaceContent.length;
-				// TODO: end char etc
+				// TODO: track the merged node's end offset as well
 			} else {
 				const text: TextNode = {
 					type: "text",

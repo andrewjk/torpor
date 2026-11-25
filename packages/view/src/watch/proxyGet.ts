@@ -132,9 +132,6 @@ export default function proxyGet(
 		return urlParamsGet(data, target as URLSearchParams, key);
 	}
 
-	//console.log(`object get '${String(key)}' on`, target);
-	//console.log(`object get '${String(key)}'`);
-
 	let signal = data.signals.get(key);
 	if (signal === undefined) {
 		const propDescriptor = Object.getOwnPropertyDescriptor(target, key);

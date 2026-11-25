@@ -5,8 +5,6 @@ import { SIGNAL_TYPE } from "../types/constants";
 import trackSignal from "./trackSignal";
 
 export default function trackProxySignal(data: ProxyData, key: PropertyKey): void {
-	//console.log(`tracking effect '${context.activeTarget.name}' for '${String(key)}' prop`);
-
 	trackSignal(ensureProxySignal(data, key));
 }
 

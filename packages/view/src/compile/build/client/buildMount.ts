@@ -3,7 +3,6 @@ import type BuildStatus from "./BuildStatus";
 import forVarBindings from "./forVars";
 
 export default function buildMount(
-	// TODO: like in buildRun
 	_functionName: string,
 	functionBody: string,
 	status: BuildStatus,
