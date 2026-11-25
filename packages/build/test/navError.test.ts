@@ -584,6 +584,24 @@ describe("navigate", () => {
 		expect($page.error?.message).toBe("Not found");
 	});
 
+	test("a direct error-page navigation only accepts 4xx/5xx statuses", async () => {
+		client.router.addPages(routesWith(notFoundLoad));
+
+		const cases: [string, number][] = [
+			["status=403", 403],
+			["status=500", 500],
+			["status=abc", 404],
+			["status=999", 404],
+			["status=200", 404],
+			["status=302", 404],
+		];
+		for (const [query, expected] of cases) {
+			const navigated = await navigate(new URL(`/_error?${query}`, window.location.href));
+			expect(navigated.type).toBe("rendered");
+			expect($page.status, query).toBe(expected);
+		}
+	});
+
 	test("a server-only route falls back to a full page load", async () => {
 		// e.g. a `/logout` +server route: there's no client component, so the
 		// client can't render it -- navigate reports `server-only` (rather than

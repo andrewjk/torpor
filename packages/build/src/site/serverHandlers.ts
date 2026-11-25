@@ -28,6 +28,7 @@ import type ServerEndPoint from "../types/ServerEndPoint.ts";
 import type ServerHook from "../types/ServerHook.ts";
 import type ServerLoadEvent from "../types/ServerLoadEvent.ts";
 import searchParamsToRecord from "../utils/searchParamsToRecord.ts";
+import parseErrorStatus from "../utils/parseErrorStatus.ts";
 import validate from "../validation/validate.ts";
 import ValidationError from "../validation/ValidationError.ts";
 import {
@@ -192,7 +193,7 @@ export function createServerLoad(
 		const page = pageOf(ev);
 		page.url = url;
 		if (path.endsWith("/_error")) {
-			page.status = parseInt(query.get("status") ?? "404");
+			page.status = parseErrorStatus(query.get("status"));
 			page.error = { message: query.get("message") ?? "" };
 		} else {
 			page.status = 200;

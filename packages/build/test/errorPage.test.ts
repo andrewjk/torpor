@@ -253,6 +253,29 @@ test("the error page responds with its status when requested directly", async ()
 	expect(bare.status).toBe(404);
 });
 
+test("the status query only accepts 4xx/5xx codes", async () => {
+	const cases: [string, number][] = [
+		["status=403", 403],
+		["status=500", 500],
+		["status=abc", 404],
+		["status=999", 404],
+		["status=200", 404],
+		["status=302", 404],
+		["status=", 404],
+		["status", 404],
+	];
+	for (const [query, expected] of cases) {
+		const res = await load(
+			new ServerEvent(new Request(`http://localhost/_error?${query}`)),
+			template,
+		);
+		expect(res.status, query).toBe(expected);
+		// A hostile status must never turn the error page into a redirect
+		expect(res.headers.get("Location"), query).toBeNull();
+		expect(await res.text()).toContain(`error status=${expected}`);
+	}
+});
+
 test("an error response survives when the error page itself can't render", async () => {
 	// A matched route whose load fails, and an error page whose own load
 	// redirects (so it can't render html) -- the original 404 is passed

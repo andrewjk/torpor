@@ -7,6 +7,7 @@ import { getBasePath, stripBaseFromUrl } from "../site/basePath";
 import findErrorRoute from "../site/findErrorRoute";
 import type LayoutPath from "../types/LayoutPath";
 import type PageEndPoint from "../types/PageEndPoint";
+import parseErrorStatus from "../utils/parseErrorStatus";
 import formSubmit from "./formSubmit";
 import loadData, { errorLayoutStack } from "./loadData";
 
@@ -97,7 +98,7 @@ async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<Na
 			// A direct visit to the error page (e.g. a bookmark of the url it
 			// used to be redirected to). Make it look a bit classier by
 			// stripping the query, which carries the status and message
-			$page.status = parseInt(query.get("status") ?? "404");
+			$page.status = parseErrorStatus(query.get("status"));
 			$page.error = { message: query.get("message") ?? "" };
 			window.history.replaceState({}, "", rawUrl.toString().split("?")[0]);
 		} else {

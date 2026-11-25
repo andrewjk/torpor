@@ -18,14 +18,6 @@ on layout endpoints at type and runtime level so it can't be mistaken for a
 guard. Folder hooks (`_hook.server.ts`) do guard subtrees; the docs should
 point people there.
 
-### `/_error?status=` trusts the query string (confirmed)
-
-`page.status = parseInt(query.get("status") ?? "404")` is used as the
-response status. `?status=abc` and `?status=999` throw (500),
-`?status=200` serves the error page as a success, and `?status=302`
-returns a redirect with no `Location`. Clamp to valid 4xx/5xx codes and
-fall back to 404.
-
 ### Client navigations queue instead of the latest winning
 
 `nav/navigate.ts` chains every navigation onto `pendingNavigation`, and the
