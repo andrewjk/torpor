@@ -80,6 +80,21 @@ describe("SessionHelper", () => {
 		expect(await next.get()).toBeUndefined();
 	});
 
+	test("get returns undefined for a malformed signature without throwing", async () => {
+		// A tampered/truncated cookie contains characters `atob` rejects. That
+		// must read as "no session" instead of turning every request into a 500.
+		const next = makeSession("torpor-session=abc.!!!").session;
+		await expect(next.get()).resolves.toBeUndefined();
+		expect(next.id).toBeUndefined();
+	});
+
+	test("set recovers from a malformed existing cookie by minting a new id", async () => {
+		const { session, cookies } = makeSession("torpor-session=abc.!!!");
+		await session.set({ userId: 1 });
+		expect(session.id).toMatch(/^[0-9a-f-]{36}$/);
+		expect(cookies.cookies.has("torpor-session")).toBe(true);
+	});
+
 	test("get returns undefined for an expired session", async () => {
 		const { session, cookies } = makeSession(undefined);
 		await session.set({ userId: 5 }, { maxAge: -1 });
@@ -103,6 +118,30 @@ describe("SessionHelper", () => {
 		const first = session.id;
 		await session.set({ userId: 2 });
 		expect(session.id).toBe(first);
+	});
+
+	test("set keeps the existing id when get has not been called", async () => {
+		const { session, cookies } = makeSession(undefined);
+		await session.set({ userId: 1 });
+		const first = session.id;
+
+		// Next request: write without reading first (e.g. from a hook). The
+		// existing cookie's id must be kept, not replaced.
+		const next = makeSession(`torpor-session=${writtenCookie(cookies)}`);
+		expect(next.session.id).toBeUndefined();
+		await next.session.set({ userId: 2 });
+		expect(next.session.id).toBe(first);
+
+		const after = makeSession(`torpor-session=${writtenCookie(next.cookies)}`).session;
+		expect(await after.get()).toEqual({ userId: 2 });
+		expect(after.id).toBe(first);
+	});
+
+	test("set throws when the session exceeds the browser cookie limit", async () => {
+		const { session, cookies } = makeSession(undefined);
+		await expect(session.set({ blob: "x".repeat(5000) })).rejects.toThrow(/too large/);
+		expect(session.id).toBeUndefined();
+		expect(cookies.cookies.has("torpor-session")).toBe(false);
 	});
 
 	test("regenerate mints a new id and replaces the data", async () => {

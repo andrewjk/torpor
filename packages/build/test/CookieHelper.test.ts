@@ -59,6 +59,13 @@ describe("CookieHelper", () => {
 		expect(serialized).toMatch(/SameSite=Strict/i);
 	});
 
+	test("set throws instead of storing a cookie over the browser limit", () => {
+		const req = new Request("https://example.com/");
+		const c = new CookieHelper(req);
+		expect(() => c.set("big", "x".repeat(5000))).toThrow(/too large/);
+		expect(c.cookies.has("big")).toBe(false);
+	});
+
 	test("delete clears the value and sets an immediate expiry", () => {
 		const req = new Request("https://example.com/");
 		const c = new CookieHelper(req);

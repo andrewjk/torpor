@@ -18,24 +18,6 @@ on layout endpoints at type and runtime level so it can't be mistaken for a
 guard. Folder hooks (`_hook.server.ts`) do guard subtrees; the docs should
 point people there.
 
-### Session cookies: malformed values throw, `set` drops the id (confirmed)
-
-`server/SessionHelper.ts`:
-
-- `verifyValue` decodes the signature with `atob` outside any `try`, so a
-  cookie like `abc.!!!` (tampered, truncated, or from an older format) makes
-  `session.get()` throw `InvalidCharacterError`. Called from a root hook,
-  that's a 500 on every request until the user clears their cookies.
-  Treat any decode failure as "no session".
-- `set()` keeps `#id` only if `get()` was called earlier in the request;
-  otherwise it mints a new id, contrary to its docs ("Keeps the current
-  session id"). Anything keyed on `session.id` (a db row, revocation) is
-  orphaned. `set` should read and verify the existing cookie when `#id`
-  isn't known yet.
-- Nothing checks the cookie size: a 5KB payload produced a 6.9KB
-  `Set-Cookie`, which browsers silently drop, so the session vanishes with
-  no error. Throw (or warn in dev) above ~4KB.
-
 ### Form actions resolve `Object.prototype` names (confirmed)
 
 `runAction` looks up `serverEndPoint.actions[actionName]` with a plain

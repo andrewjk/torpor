@@ -64,28 +64,33 @@ export default class SessionHelper {
 
 	/**
 	 * Reads and verifies the session, returning its data, or undefined when
-	 * there is no cookie, the signature doesn't match, or the session has
-	 * expired.
+	 * there is no cookie, the signature doesn't match, the value is malformed,
+	 * or the session has expired.
 	 */
 	async get(): Promise<SessionData | undefined> {
-		const value = this.#cookies.get(COOKIE_NAME);
-		if (!value) return undefined;
-		const payload = await verifyValue(value);
-		if (!payload) return undefined;
-		this.#id = payload.id;
-		return payload.data;
+		const payload = await this.#readPayload();
+		return payload?.data;
 	}
 
 	/**
 	 * Writes the session, signing the data and setting the cookie. Keeps
-	 * the current session id, minting one when there isn't a valid session
-	 * yet. Call `regenerate` instead when the session's identity should
-	 * change (e.g. at login, to prevent session fixation).
+	 * the current session id, reading (and verifying) the existing cookie
+	 * when it hasn't been read yet in this request, and minting one when
+	 * there isn't a valid session. Call `regenerate` instead when the
+	 * session's identity should change (e.g. at login, to prevent session
+	 * fixation).
 	 */
 	async set(data: SessionData, options?: { maxAge?: number }): Promise<void> {
+		if (this.#id === undefined) {
+			// `id` is documented as stable, and callers may key a database row
+			// on it without calling `get()` first (e.g. writing from a hook).
+			// Read the existing cookie so `set` keeps its id instead of
+			// silently replacing it.
+			await this.#readPayload();
+		}
 		const id = this.#id ?? crypto.randomUUID();
-		this.#id = id;
 		await this.#write(id, data, options);
+		this.#id = id;
 	}
 
 	/**
@@ -95,8 +100,8 @@ export default class SessionHelper {
 	 */
 	async regenerate(data: SessionData = {}, options?: { maxAge?: number }): Promise<void> {
 		const id = crypto.randomUUID();
-		this.#id = id;
 		await this.#write(id, data, options);
+		this.#id = id;
 	}
 
 	/**
@@ -106,6 +111,16 @@ export default class SessionHelper {
 	async destroy(): Promise<void> {
 		this.#id = undefined;
 		this.#cookies.delete(COOKIE_NAME, { path: "/" });
+	}
+
+	/** Reads, verifies and caches the current session payload (and its id). */
+	async #readPayload(): Promise<SessionPayload | undefined> {
+		const value = this.#cookies.get(COOKIE_NAME);
+		if (!value) return undefined;
+		const payload = await verifyValue(value);
+		if (!payload) return undefined;
+		this.#id = payload.id;
+		return payload;
 	}
 
 	async #write(
@@ -161,12 +176,25 @@ async function verifyValue(value: string): Promise<SessionPayload | undefined> {
 	const dot = value.lastIndexOf(".");
 	if (dot === -1) return undefined;
 	const encoded = value.slice(0, dot);
-	const valid = await crypto.subtle.verify(
-		"HMAC",
-		await signingKey(),
-		decodeBase64Url(value.slice(dot + 1)),
-		new TextEncoder().encode(encoded),
-	);
+
+	// A tampered, truncated or older-format cookie can contain characters
+	// that aren't valid base64url. `atob` (and, for some inputs,
+	// `crypto.subtle.verify`) can throw on those; a bad cookie must read as
+	// "no session", not turn every request into a 500. Keep `signingKey()`
+	// outside the try so a missing/invalid secret still surfaces as the
+	// configuration error it is.
+	const key = await signingKey();
+	let valid: boolean;
+	try {
+		valid = await crypto.subtle.verify(
+			"HMAC",
+			key,
+			decodeBase64Url(value.slice(dot + 1)),
+			new TextEncoder().encode(encoded),
+		);
+	} catch {
+		return undefined;
+	}
 	if (!valid) return undefined;
 
 	let payload: SessionPayload;

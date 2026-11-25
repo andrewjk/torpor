@@ -1,5 +1,13 @@
 import { type SerializeOptions, parseCookie, stringifySetCookie } from "cookie";
 
+/**
+ * Browsers silently drop `Set-Cookie` headers above ~4096 bytes, so a cookie
+ * this large is a bug in the caller (the session helper, flash messages, or
+ * app code) rather than a header worth sending. Throwing here makes the
+ * failure visible instead of losing the cookie with no trace.
+ */
+const MAX_COOKIE_BYTES = 4096;
+
 export default class CookieHelper {
 	request: Request;
 	cookies: Map<string, string> = new Map();
@@ -28,7 +36,7 @@ export default class CookieHelper {
 		options.secure ??= true;
 		options.sameSite ??= "lax";
 
-		this.cookies.set(name, stringifySetCookie({ name, value, ...options }));
+		this.cookies.set(name, serializeCookie(name, value, options));
 	}
 
 	delete(name: string, options?: SerializeOptions): void {
@@ -41,6 +49,19 @@ export default class CookieHelper {
 		options.sameSite ??= "lax";
 		options.expires = new Date(0);
 
-		this.cookies.set(name, stringifySetCookie({ name, value: "", ...options }));
+		this.cookies.set(name, serializeCookie(name, "", options));
 	}
+}
+
+function serializeCookie(name: string, value: string, options: SerializeOptions): string {
+	const serialized = stringifySetCookie({ name, value, ...options });
+	const bytes = new TextEncoder().encode(serialized).length;
+	if (bytes > MAX_COOKIE_BYTES) {
+		throw new Error(
+			`The "${name}" cookie is too large (${bytes} bytes; browsers limit a cookie to ` +
+				`${MAX_COOKIE_BYTES} bytes) and would be silently dropped. No cookie was set; ` +
+				"store less data, or keep it server-side instead.",
+		);
+	}
+	return serialized;
 }
