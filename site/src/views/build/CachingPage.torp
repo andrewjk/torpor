@@ -1,0 +1,116 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function CachingPage() {
+	@head {
+		<title>Caching | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>Caching</h1>
+		<p>
+			Torpor doesn't cache your data between requests: your loads run on every
+			request, so pages never show stale data. Caching data is left to the layer
+			that knows when it changes &mdash; your database or ORM, or your own Redis or
+			KV store. What the framework does is the caching only it can do: HTTP
+			caching of the responses it renders, and running a call once per request.
+		</p>
+
+		<h2>Cache headers</h2>
+		<p>
+			Call <code>event.cache</code> in a load, hook or endpoint to set the
+			response's <code>Cache-Control</code> and <code>Vary</code> headers. Calls
+			from a page's layouts and the page itself are merged, and the most
+			restrictive setting wins: the smallest ages, <code>private</code> or
+			<code>noStore</code> if any call asks for it, and every <code>vary</code>
+			header:
+		</p>
+		<CodePreview
+			code={`
+// routes/blog/+page.server.ts
+export default {
+	load: async (event) => {
+		// CDNs may serve it for 10 minutes, browsers for 1, and either may
+		// serve it stale for an hour while they fetch a fresh copy
+		event.cache({ maxAge: 60, sMaxAge: 600, staleWhileRevalidate: 3600 });
+		return ok({ posts: await getPosts() });
+	},
+} satisfies PageServerEndPoint<"/blog">;
+`}
+		/>
+		<p>
+			The settings apply to successful GET responses: the page, its client data
+			requests and endpoints. A <code>Cache-Control</code> header set directly
+			with <code>event.headers.set</code> takes precedence.
+		</p>
+
+		<h2>Private by default</h2>
+		<p>
+			A response that read or set a cookie &mdash; through
+			<code>event.cookies</code>, <code>event.session</code> or a flash message
+			&mdash; depends on who asked for it, so it gets
+			<code>Cache-Control: private, no-cache</code> unless you say otherwise.
+			That stops a CDN from serving one user's page to another. With
+			<code>event.cache</code>, such a response stays <code>private</code> (the
+			CDN-only <code>sMaxAge</code> is dropped) unless you pass
+			<code>private: false</code>, which you should only do when its content
+			doesn't depend on the cookie. In dev, that logs a warning.
+		</p>
+
+		<h2>ETags</h2>
+		<p>
+			Rendered pages and client data responses get a weak
+			<code>ETag</code> from a hash of their content. When the browser asks again
+			with a matching <code>If-None-Match</code>, the response is a
+			<code>304</code> with no body. The loads still run every time, so the data is
+			always current; an unchanged page just isn't sent twice. Data responses are
+			marked <code>no-cache</code>, so the browser keeps them for their ETag but
+			always checks with the server first. (Pages that stream deferred data
+			don't get an ETag, since their content isn't known up front.)
+		</p>
+
+		<h2>Running a call once per request</h2>
+		<p>
+			<code>dedupe</code> wraps a function so that it runs once per request for
+			each set of arguments. A layout and its page can both get the current user,
+			and the database is only asked once. Nothing is kept after the request:
+		</p>
+		<CodePreview
+			code={`
+// lib/users.ts
+import { dedupe } from "@torpor/build/server";
+
+export const getUser = dedupe((event, id: string) => db.users.find(id));
+
+// In any load, hook or action
+const user = await getUser(event, event.appData.userId);
+`}
+		/>
+		<p>
+			Arguments are compared by their JSON. A call that throws, or returns a
+			promise that rejects, isn't kept, so a later call in the same request
+			retries.
+		</p>
+
+		<h2>Background work</h2>
+		<p>
+			If you keep your own cache, you'll often want to refresh it after the
+			response has gone. <code>event.waitUntil</code> keeps a promise running
+			after the response is sent. On Cloudflare it uses the worker's
+			<code>ctx.waitUntil</code>, without which the work would be cut off; on
+			Node the promise just runs on. A rejection is logged rather than left
+			unhandled:
+		</p>
+		<CodePreview
+			code={`
+load: async (event) => {
+	const cached = await kv.get("posts");
+	if (cached && isStale(cached)) {
+		// Serve the cached posts now, and refresh them for the next request
+		event.waitUntil(refreshPosts());
+	}
+	return ok({ posts: cached?.posts ?? (await refreshPosts()) });
+},
+`}
+		/>
+	}
+}

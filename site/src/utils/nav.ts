@@ -90,6 +90,7 @@ export const BUILD_LINKS: ReadonlyArray<SidebarLink> = [
 	{ label: "Hooks", href: "/build/hooks" },
 	{ label: "Environment", href: "/build/env" },
 	{ label: "Sessions", href: "/build/sessions" },
+	{ label: "Caching", href: "/build/caching" },
 	{ label: "Navigation", href: "/build/navigation" },
 	{ label: "Prerendering", href: "/build/prerendering" },
 	{ label: "Discovery", href: "/build/discovery" },

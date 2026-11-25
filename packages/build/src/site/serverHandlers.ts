@@ -44,6 +44,7 @@ import { rewriteBaseInHtml, stripBaseFromUrl } from "./basePath.ts";
 import findErrorRoute from "./findErrorRoute.ts";
 import mergeHead from "./mergeHead.ts";
 import pageOf from "./requestPage.ts";
+import { etagOf, finishCaching } from "./responseCaching.ts";
 import { requestBase, setRequestBase } from "./requestBase.ts";
 import type Router from "./Router.ts";
 
@@ -356,7 +357,7 @@ export function createServerLoad(
 			throw error;
 		}
 		// handle() always returns a Response (notFound() on a fall-through)
-		return response as Response;
+		return finishCaching(ev, response as Response, devMode);
 	};
 }
 
@@ -630,7 +631,7 @@ async function loadPageData(
 			if (pageResult instanceof Response) return pageResult;
 			loads.push(pageResult);
 
-			return serverDataResponse(loads);
+			return await serverDataResponse(loads);
 		},
 		{ event: ev },
 	);
@@ -678,12 +679,23 @@ function splitLoads(loads: (Record<string, any> | null)[]): {
  * announced in the same frame and then streamed as NDJSON frames, so a
  * navigation can mount as soon as the critical data arrives.
  */
-function serverDataResponse(loads: (Record<string, any> | null)[]): Response {
+async function serverDataResponse(loads: (Record<string, any> | null)[]): Promise<Response> {
 	const { criticalLoads, entries } = splitLoads(loads);
 
+	// The payload depends on these request headers as well as the url (the
+	// same url without them is the page's plain server endpoint)
+	const vary = `${DATA_REQUEST_HEADER}, ${DATA_REUSE_HEADER}`;
+
 	if (entries.length === 0) {
-		return new Response(JSON.stringify({ loads: criticalLoads }), {
-			headers: { "Content-Type": "application/json" },
+		const body = JSON.stringify({ loads: criticalLoads });
+		return new Response(body, {
+			headers: {
+				"Content-Type": "application/json",
+				// From the content, so the loads always run but an unchanged
+				// payload isn't sent again (the browser revalidates with it)
+				ETag: await etagOf(body),
+				Vary: vary,
+			},
 		});
 	}
 
@@ -728,7 +740,7 @@ function serverDataResponse(loads: (Record<string, any> | null)[]): Response {
 		},
 	});
 	return new Response(stream, {
-		headers: { "Content-Type": "application/x-ndjson" },
+		headers: { "Content-Type": "application/x-ndjson", Vary: vary },
 	});
 }
 
@@ -1008,6 +1020,8 @@ async function loadView(
 		status: status ?? 200,
 		headers: {
 			"Content-Type": "text/html",
+			// From the content, so a reload of an unchanged page can get a 304
+			ETag: await etagOf(html),
 		},
 	});
 }
@@ -1356,6 +1370,8 @@ function buildServerParams(
 		headers: ev.headers,
 		session: ev.session,
 		flash: ev.flash,
+		cache: (options) => ev.cache(options),
+		waitUntil: (promise) => ev.waitUntil(promise),
 		adapter: ev.adapter,
 	};
 }

@@ -51,7 +51,9 @@ export default class FlashHelper {
 	 * ever reaching the browser.)
 	 */
 	get(): Record<string, unknown> | undefined {
-		const cookie = this.#cookies.get(COOKIE_NAME);
+		// A flash that's found deletes its cookie, and that Set-Cookie makes
+		// the response private; one that isn't there leaves it cacheable
+		const cookie = this.#cookies.peek(COOKIE_NAME);
 		if (!cookie) return undefined;
 		this.#cookies.delete(COOKIE_NAME, { path: "/" });
 		try {

@@ -2,6 +2,7 @@ import CookieHelper from "../server/CookieHelper";
 import FlashHelper from "../server/FlashHelper";
 import HeaderHelper from "../server/HeaderHelper";
 import SessionHelper from "../server/SessionHelper";
+import type CacheOptions from "../server/types/CacheOptions";
 import type { RouteParamsOf } from "./ParseRouteParams";
 
 /**
@@ -98,6 +99,19 @@ export default interface ServerLoadEvent<
 	 * A helper for getting and setting headers.
 	 */
 	headers: HeaderHelper;
+	/**
+	 * Sets how the response may be cached (`Cache-Control` and `Vary`), e.g.
+	 * `event.cache({ maxAge: 60 })`. Calls from a request's layouts and page
+	 * are merged, with the most restrictive setting winning. See
+	 * [Caching](/build/caching).
+	 */
+	cache: (options: CacheOptions) => void;
+	/**
+	 * Keeps background work running after the response is sent (on
+	 * Cloudflare, through the worker's `ctx.waitUntil`). A rejection is
+	 * logged rather than left unhandled.
+	 */
+	waitUntil: (promise: Promise<unknown>) => void;
 	/**
 	 * An optional adapter object, containing adapter-specific functionality.
 	 */

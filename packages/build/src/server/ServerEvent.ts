@@ -4,6 +4,7 @@ import CookieHelper from "./CookieHelper";
 import FlashHelper from "./FlashHelper";
 import HeaderHelper from "./HeaderHelper";
 import SessionHelper from "./SessionHelper";
+import type CacheOptions from "./types/CacheOptions";
 
 export default class ServerEvent {
 	request: Request;
@@ -39,6 +40,9 @@ export default class ServerEvent {
 	// validation and the event's `form()`/`formData()` accessors share a
 	// single read, since a request body can't be read twice
 	#formData: Promise<FormData> | undefined;
+
+	// The merged `cache()` settings, if any
+	#cache: CacheOptions | undefined;
 
 	/** The request URL, parsed lazily. */
 	get url(): URL {
@@ -99,6 +103,50 @@ export default class ServerEvent {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Sets how the response may be cached (`Cache-Control` and `Vary`). Calls
+	 * are merged, with the most restrictive setting winning. See
+	 * `CacheOptions`.
+	 */
+	cache(options: CacheOptions): void {
+		const current = this.#cache;
+		if (!current) {
+			this.#cache = { ...options, vary: options.vary ? [...options.vary] : undefined };
+			return;
+		}
+		const min = (a?: number, b?: number) =>
+			a === undefined ? b : b === undefined ? a : Math.min(a, b);
+		current.maxAge = min(current.maxAge, options.maxAge);
+		current.sMaxAge = min(current.sMaxAge, options.sMaxAge);
+		current.staleWhileRevalidate = min(current.staleWhileRevalidate, options.staleWhileRevalidate);
+		if (options.private !== undefined) {
+			current.private = current.private === true || options.private;
+		}
+		current.noStore = current.noStore || options.noStore;
+		if (options.vary) {
+			current.vary = Array.from(new Set([...(current.vary ?? []), ...options.vary]));
+		}
+	}
+
+	/** The merged `cache()` settings, if any were set. */
+	get cacheOptions(): CacheOptions | undefined {
+		return this.#cache;
+	}
+
+	/**
+	 * Keeps background work running after the response is sent, e.g.
+	 * refreshing a cache or logging. On Cloudflare this is the worker's
+	 * `ctx.waitUntil`, without which the work would be cut off; elsewhere the
+	 * promise just runs on. Either way a rejection is logged rather than left
+	 * unhandled.
+	 */
+	waitUntil(promise: Promise<unknown>): void {
+		const handled = promise.catch((error) => {
+			console.error("[torpor] Background work failed:", error);
+		});
+		this.adapter?.ctx?.waitUntil?.(handled);
 	}
 
 	/**

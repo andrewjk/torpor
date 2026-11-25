@@ -11,12 +11,28 @@ const MAX_COOKIE_BYTES = 4096;
 export default class CookieHelper {
 	request: Request;
 	cookies: Map<string, string> = new Map();
+	/**
+	 * Whether anything read a cookie during the request, which makes the
+	 * response depend on who asked for it (see `CacheOptions`)
+	 */
+	read = false;
 
 	constructor(request: Request) {
 		this.request = request;
 	}
 
 	get(name: string): string | undefined {
+		this.read = true;
+		return this.peek(name);
+	}
+
+	/**
+	 * Gets a cookie's value without marking the response as depending on
+	 * cookies. For framework reads whose result only matters when the cookie
+	 * is there (the flash message, which deletes the cookie when it's found).
+	 * @internal
+	 */
+	peek(name: string): string | undefined {
 		// If it's been set, return the value from the map
 		if (this.cookies.has(name)) {
 			// The stored value is a serialized Set-Cookie header; pull the

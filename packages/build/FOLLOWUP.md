@@ -26,7 +26,11 @@ flash messages (`event.flash.set(...)` riding a one-read cookie, consumed
 into `$context.$page.flash` by the render pipeline), route middleware (`site.middleware`
 runs globally for every request -- unmatched ones too -- and server endpoints
 take `middleware: [...]` for route-scoped guards, run after folder hooks),
-and ETag/Cache-Control support via `notModified`. Discovery helpers exist
+and HTTP caching (`event.cache()` for `Cache-Control`/`Vary`, private by
+default for responses that read or set cookies, content ETags and 304s on
+pages and client data responses, `dedupe()` for once-per-request calls,
+and `event.waitUntil()` for background work; a cross-request data cache is
+deliberately left to the db/ORM or the app's own cache layer). Discovery helpers exist
 too: `seo()` (in `@torpor/build/discovery`) builds page head data (title,
 description, Open Graph/Twitter metas via a `{ property, content }` head
 variant), endpoint `head` data is now rendered at render time, and
@@ -37,50 +41,27 @@ and copied into the build output).
 
 ### High impact (table stakes in peers)
 
-1. **HTTP caching for pages and data requests, plus per-request dedupe** —
-   the caching only the framework can do, none of which serves stale data.
-   A cross-request data cache (`cache()`/`revalidate()`, SWR helpers) is
-   deliberately out of scope: it's where stale-data bugs come from (Next is
-   walking its defaults back), and the db/ORM or the app's own Redis/KV
-   layer knows far more about freshness than a load function. SvelteKit and
-   Remix make the same call.
-   - **Per-request dedupe**: a helper so that the same call made by several
-     loads in one request (e.g. `getUser(id)` in the root layout and the
-     page) runs once. Scoped to the request (keyed by its event, like the
-     page state in `site/requestPage.ts`), so nothing outlives it.
-   - **Cache headers on loads and endpoints**: a simple way to set
-     `Cache-Control`, `Vary` and `ETag` (today `notModified` is fully
-     manual).
-   - **Automatic ETags on `/~server` data responses**: hash the payload and
-     answer `If-None-Match` with a 304. The loads still run every time, so
-     data is always fresh, but repeat client navigations skip the transfer.
-   - **Safe defaults**: responses for pages that read the session or cookies
-     get `private`/`no-store` unless they opt out, so a CDN can't serve one
-     user's page to another.
-   - **Background work for user-owned caches**: a supported way for loads to
-     schedule work after the response (the adapter's `waitUntil`), so a
-     user's own stale-while-revalidate cache works on Workers.
-2. **Streaming SSR** — responses are piped at the transport level, but page
+1. **Streaming SSR** — responses are piped at the transport level, but page
    rendering buffers: `$async { source: "server" }` blocks the render up to
    its timeout rather than flushing the `with` branch and streaming content
    in later (no suspense-style out-of-order streaming).
 
 ### Medium
 
-3. **WebSockets (server-side)** — SSE exists client-side, but no WS endpoint
+2. **WebSockets (server-side)** — SSE exists client-side, but no WS endpoint
    support (adapter-node could do this).
-4. **i18n / locale routing** — nothing.
+3. **i18n / locale routing** — nothing.
 
 ### Lower / nice-to-have
 
-5. Image optimization / asset pipeline beyond Vite defaults
-6. Pagination helpers
-7. Rate-limiting primitives (now buildable as a middleware package)
-8. Cron / queues / background jobs (adapter-dependent)
-9. Dev toolbar / route inspector
+4. Image optimization / asset pipeline beyond Vite defaults
+5. Pagination helpers
+6. Rate-limiting primitives (now buildable as a middleware package)
+7. Cron / queues / background jobs (adapter-dependent)
+8. Dev toolbar / route inspector
 
-Top two if forced to choose: **HTTP caching and streaming SSR** — they come
-up in virtually every real project.
+Top one if forced to choose: **streaming SSR** — it comes up in virtually
+every real project.
 
 ## Follow-ups from prerendering
 
