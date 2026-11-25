@@ -38,10 +38,11 @@ import {
 	validationErrorResponse,
 } from "../validation/endpoint.ts";
 import { findMissingSlotLayout, warnMissingSlotContent } from "./layoutSlots.ts";
-import { getBasePath, rewriteBaseInHtml, setBasePath, stripBaseFromUrl } from "./basePath.ts";
+import { rewriteBaseInHtml, stripBaseFromUrl } from "./basePath.ts";
 import findErrorRoute from "./findErrorRoute.ts";
 import mergeHead from "./mergeHead.ts";
 import pageOf from "./requestPage.ts";
+import { requestBase, setRequestBase } from "./requestBase.ts";
 import type Router from "./Router.ts";
 
 /**
@@ -98,10 +99,9 @@ export function createServerLoad(
 	middleware: MiddlewareFunction[] = [],
 	dev = false,
 ): ServerLoad {
-	// The base path is shared through module state, so that everything that
-	// generates URLs (HTML attributes, redirect locations) sees the same
-	// value the router strips
-	setBasePath(basePath);
+	// The base path is carried by this handler's closure (and tagged onto each
+	// request for response finalization), not module state: several sites
+	// with different bases can share one process
 	devMode = dev;
 
 	/**
@@ -148,6 +148,11 @@ export function createServerLoad(
 	}
 
 	const handle = async (ev: ServerEvent, template?: string): Promise<Response> => {
+		// Tag the request with this site's base, so response finalization
+		// (`ServerEvent.addHeaders`) adds the right prefix even when another
+		// site's handler exists in the same process
+		setRequestBase(ev, basePath);
+
 		// The base is stripped before routing, so that everything below (route
 		// matching, params, user code reading `event.url`) is base-free.
 		// Requests that don't carry the base aren't ours
@@ -968,7 +973,7 @@ async function loadView(
 				styles += head;
 				html = rewriteBaseInHtml(
 					mergeHead(template, styles + headData).replace("%COMPONENT_BODY%", body),
-					getBasePath(),
+					requestBase(ev),
 				);
 			} catch (error) {
 				// TODO: Show a proper Error component

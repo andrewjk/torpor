@@ -87,6 +87,32 @@ test("requests under the base path route to the base-free routes", async () => {
 	expect(html).toContain('href="/app/posts"');
 });
 
+test("two sites with different base paths don't share module state", async () => {
+	// Both handlers are created before either request runs: with a module
+	// global, creating the second site would overwrite the first one's base
+	const siteA = createServerLoad(new Router().addPages(routes), "/app");
+	const siteB = createServerLoad(new Router().addPages(routes), "/sub");
+
+	const run = async (loadSite: typeof load, path: string, method = "GET") => {
+		const ev = new ServerEvent(new Request(path, { method }));
+		ev.response = await loadSite(ev, template);
+		ev.response ??= new Response(null, { status: 200 });
+		ev.addHeaders();
+		return ev.response;
+	};
+
+	const [a, b] = await Promise.all([
+		run(siteA, "http://localhost/app/posts"),
+		run(siteB, "http://localhost/sub/posts"),
+	]);
+	expect(await a.text()).toContain('href="/app/posts"');
+	expect(await b.text()).toContain('href="/sub/posts"');
+
+	// Response finalization (redirect locations) also uses the request's site
+	const redirect = await run(siteA, "http://localhost/app/api", "POST");
+	expect(redirect.headers.get("Location")).toBe("/app/done");
+});
+
 test("requests without the base path get the error page at the requested url", async () => {
 	// A request not under the mount point can't be routed; like any error it
 	// renders the site's error page, but at the requested url and with the

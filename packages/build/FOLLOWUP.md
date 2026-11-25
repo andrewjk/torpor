@@ -20,10 +20,6 @@ point people there.
 
 ### Smaller issues
 
-- **Module-global base path**: `createServerLoad` calls `setBasePath`, a
-  module global, so two sites with different bases in one process (tests,
-  multi-tenant servers) overwrite each other. It could be scoped per site
-  the way the page state is now kept per request (`site/requestPage.ts`).
 - **A reused layout's context additions don't reach the new page**: when
   client navigation keeps a layout and refills its slot (`nav/navigate.ts`),
   the slot function is called with the root context (`$page`,

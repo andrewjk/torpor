@@ -1,4 +1,5 @@
-import { addBaseToPath, getBasePath } from "../site/basePath";
+import { addBaseToPath } from "../site/basePath";
+import { requestBase } from "../site/requestBase";
 import CookieHelper from "./CookieHelper";
 import FlashHelper from "./FlashHelper";
 import HeaderHelper from "./HeaderHelper";
@@ -79,8 +80,9 @@ export default class ServerEvent {
 		}
 
 		// Redirect locations are written base-free, so that user code isn't
-		// aware of the base path
-		const base = getBasePath();
+		// aware of the base path. The base belongs to the site handling this
+		// request, not to module state (several sites can share a process)
+		const base = requestBase(this);
 		if (base) {
 			const location = this.response!.headers.get("Location");
 			if (location) {

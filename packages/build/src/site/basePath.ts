@@ -1,8 +1,12 @@
 /**
  * The site's base path, e.g. "/app" when the site is mounted under a
- * subpath. Inherited from `site.basePath` through the manifest at startup
- * (see serverEntry and clientEntry); default "" when the site is served
+ * subpath. On the client it's inherited from `site.basePath` through the
+ * manifest at startup (see clientEntry); default "" when the site is served
  * from the root.
+ *
+ * Server handlers don't use this module state: `createServerLoad` keeps its
+ * site's base in its closure and tags each request (`requestBase.ts`), so
+ * several sites with different bases can share a process.
  *
  * Server code and user markup are written base-free: the server strips the
  * base from incoming URLs before routing (requests that don't carry it get
