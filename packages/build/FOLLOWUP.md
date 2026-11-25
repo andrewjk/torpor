@@ -37,9 +37,29 @@ and copied into the build output).
 
 ### High impact (table stakes in peers)
 
-1. **Server-side data caching + revalidation** — no `cache()`/`revalidate()`
-   style API for load functions, no SWR helpers. (`$cache` in `@torpor/view`
-   is sync memoization only; `notModified` is fully manual.)
+1. **HTTP caching for pages and data requests, plus per-request dedupe** —
+   the caching only the framework can do, none of which serves stale data.
+   A cross-request data cache (`cache()`/`revalidate()`, SWR helpers) is
+   deliberately out of scope: it's where stale-data bugs come from (Next is
+   walking its defaults back), and the db/ORM or the app's own Redis/KV
+   layer knows far more about freshness than a load function. SvelteKit and
+   Remix make the same call.
+   - **Per-request dedupe**: a helper so that the same call made by several
+     loads in one request (e.g. `getUser(id)` in the root layout and the
+     page) runs once. Scoped to the request (keyed by its event, like the
+     page state in `site/requestPage.ts`), so nothing outlives it.
+   - **Cache headers on loads and endpoints**: a simple way to set
+     `Cache-Control`, `Vary` and `ETag` (today `notModified` is fully
+     manual).
+   - **Automatic ETags on `/~server` data responses**: hash the payload and
+     answer `If-None-Match` with a 304. The loads still run every time, so
+     data is always fresh, but repeat client navigations skip the transfer.
+   - **Safe defaults**: responses for pages that read the session or cookies
+     get `private`/`no-store` unless they opt out, so a CDN can't serve one
+     user's page to another.
+   - **Background work for user-owned caches**: a supported way for loads to
+     schedule work after the response (the adapter's `waitUntil`), so a
+     user's own stale-while-revalidate cache works on Workers.
 2. **Streaming SSR** — responses are piped at the transport level, but page
    rendering buffers: `$async { source: "server" }` blocks the render up to
    its timeout rather than flushing the `with` branch and streaming content
@@ -59,12 +79,13 @@ and copied into the build output).
 8. Cron / queues / background jobs (adapter-dependent)
 9. Dev toolbar / route inspector
 
-Top two if forced to choose: **caching and streaming SSR** — they come up in
-virtually every real project.
+Top two if forced to choose: **HTTP caching and streaming SSR** — they come
+up in virtually every real project.
 
 ## Follow-ups from prerendering
 
-- **ISR** — a `revalidate` seconds flag on `+page.server` endpoints, with
+- **ISR** (opt-in, for sites happy to serve slightly old pages; separate
+  from the HTTP caching above) — a `revalidate` seconds flag on `+page.server` endpoints, with
   per-adapter runtimes: a cache middleware/HTML cache with TTL for the node
   adapter (serve fresh cached HTML, regenerate stale in the background) and
   Cache API wiring for Cloudflare. Static hosts can't do it.
