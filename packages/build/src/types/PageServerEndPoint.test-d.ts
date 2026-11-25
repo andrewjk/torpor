@@ -5,6 +5,7 @@ import type {
 	LoadQuery,
 	PageServerActionSchemas,
 } from "./PageServerEndPoint";
+import type LayoutServerEndPoint from "./LayoutServerEndPoint";
 import type PageServerEndPoint from "./PageServerEndPoint";
 import type { StandardSchemaV1 } from "./StandardSchema";
 
@@ -103,3 +104,13 @@ export type A09 = Expect<Equals<DefaultReturn, Response | undefined | void>>;
 export type A10 = Expect<
 	Equals<PageServerEndPoint extends { schema?: unknown } ? true : false, true>
 >;
+
+// Layout endpoints can't declare middleware (it would only guard pages, not
+// the folder's endpoints), but otherwise take the same shape
+export const layoutEndPoint: LayoutServerEndPoint<"/admin"> = {
+	load: async ({ params }) => ok({ params }),
+};
+export const layoutWithMiddleware: LayoutServerEndPoint<"/admin"> = {
+	// @ts-expect-error middleware isn't allowed on layouts
+	middleware: [{ enter: () => undefined }],
+};

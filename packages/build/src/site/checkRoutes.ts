@@ -25,7 +25,13 @@ export interface RouteCheckIssue {
 	message: string;
 }
 
-const ENDPOINT_TYPES = ["PageServerEndPoint", "PageEndPoint", "ServerEndPoint", "ServerHook"];
+const ENDPOINT_TYPES = [
+	"PageServerEndPoint",
+	"LayoutServerEndPoint",
+	"PageEndPoint",
+	"ServerEndPoint",
+	"ServerHook",
+];
 
 const USAGE_RE = new RegExp(`\\b(satisfies|as|:)\\s*\\b(${ENDPOINT_TYPES.join("|")})\\b`, "g");
 
@@ -349,8 +355,9 @@ export function expectedAnnotationPath(route: Route): string {
 function typeNameFor(route: Route): string {
 	switch (route.type) {
 		case PAGE_SERVER_ROUTE:
-		case LAYOUT_SERVER_ROUTE:
 			return "PageServerEndPoint";
+		case LAYOUT_SERVER_ROUTE:
+			return "LayoutServerEndPoint";
 		case SERVER_ROUTE:
 			return "ServerEndPoint";
 		case HOOK_ROUTE:

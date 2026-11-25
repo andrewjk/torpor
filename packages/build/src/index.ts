@@ -15,6 +15,7 @@ import type {
 	RouteParamsOf,
 } from "./types/ParseRouteParams";
 import type PageServerAction from "./types/PageServerAction";
+import type LayoutServerEndPoint from "./types/LayoutServerEndPoint";
 import type PageServerEndPoint from "./types/PageServerEndPoint";
 import type {
 	ActionBody,
@@ -48,6 +49,7 @@ export type {
 	Adapter,
 	PageEndPoint,
 	PageServerEndPoint,
+	LayoutServerEndPoint,
 	PageServerActionSchemas,
 	ActionBody,
 	LoadQuery,

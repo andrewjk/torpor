@@ -1,23 +1,5 @@
 # Follow-ups
 
-## Bugs
-
-Findings from a review of `packages/build` (2026-11-24). "Confirmed" items
-were reproduced with throwaway tests through `createServerLoad` (since
-deleted); the rest come from reading the source.
-
-### Middleware on `_layout.server.ts` is silently ignored (confirmed)
-
-Layout server endpoints share the `PageServerEndPoint` type, which accepts
-`middleware`, but `createServerLoad` and `loadPageData` only collect
-middleware from the page's own endpoint. A guard on
-`/admin/_layout.server.ts` (`middleware: [{ enter: () => unauthorized() }]`)
-let `GET /admin/secret` through with a 200. Either run layout middleware
-for every page under the layout (outermost first), or reject `middleware`
-on layout endpoints at type and runtime level so it can't be mistaken for a
-guard. Folder hooks (`_hook.server.ts`) do guard subtrees; the docs should
-point people there.
-
 ## Missing framework features
 
 A gap analysis of `packages/build` against commonly needed features in peer

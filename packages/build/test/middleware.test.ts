@@ -6,6 +6,8 @@ import Router from "../src/site/Router";
 import { createServerLoad } from "../src/site/serverHandlers";
 import {
 	HOOK_SERVER_ROUTE,
+	LAYOUT_ROUTE,
+	LAYOUT_SERVER_ROUTE,
 	PAGE_ROUTE,
 	PAGE_SERVER_ROUTE,
 	SERVER_ROUTE,
@@ -242,5 +244,47 @@ describe("route middleware and folder hooks", () => {
 
 		expect(res.status).toBe(303);
 		expect(log).toEqual(["hook.enter"]);
+	});
+});
+
+describe("layout middleware", () => {
+	// A layout server endpoint with a (misplaced) guard. It's typed loosely,
+	// as LayoutServerEndPoint doesn't allow middleware
+	function layoutRoutes(): ManifestRoute[] {
+		const layoutServer: Record<string, unknown> = {
+			load: async () => ok({}),
+			middleware: [{ enter: () => new Response("no", { status: 401 }) }],
+		};
+		return [
+			{
+				path: "/_layout",
+				type: LAYOUT_ROUTE,
+				endPoint: () =>
+					Promise.resolve({ default: { component: (_: any, __: any, slots: any) => slots._() } }),
+				subFolder: undefined,
+			},
+			{
+				path: "/_layout/~server",
+				type: LAYOUT_SERVER_ROUTE,
+				endPoint: () => Promise.resolve({ default: layoutServer }),
+				subFolder: undefined,
+			},
+			...routes(),
+		];
+	}
+
+	test("is an error rather than silently ignored (page render)", async () => {
+		const load = createServerLoad(new Router().addPages(layoutRoutes()));
+		await expect(
+			load(new ServerEvent(new Request("http://localhost/posts")), template),
+		).rejects.toThrow(/_hook\.server\.ts/);
+	});
+
+	test("is an error rather than silently ignored (data request)", async () => {
+		const load = createServerLoad(new Router().addPages(layoutRoutes()));
+		const ev = new ServerEvent(
+			new Request("http://localhost/posts/~server", { headers: { [DATA_REQUEST_HEADER]: "1" } }),
+		);
+		await expect(load(ev, template)).rejects.toThrow(/_hook\.server\.ts/);
 	});
 });

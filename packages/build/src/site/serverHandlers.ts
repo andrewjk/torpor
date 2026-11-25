@@ -12,7 +12,9 @@ import type MiddlewareFunction from "../server/types/MiddlewareFunction";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type { HeadElement } from "../types/PageEndPoint.ts";
 import type PageLoadEvent from "../types/PageLoadEvent.ts";
+import type LayoutServerEndPoint from "../types/LayoutServerEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
+import type RouteLayoutHandler from "../types/RouteLayoutHandler.ts";
 import type RouteHandler from "../types/RouteHandler.ts";
 import type ServerRequest from "../types/ServerRequest.ts";
 import {
@@ -397,6 +399,27 @@ async function resolveServerModule(handler: RouteHandler): Promise<any> {
  * Resolves the route's folder hooks, caching the hook list on the handler as
  * a value (never the promise -- see `resolveModule`).
  */
+/**
+ * Loads a layout's server endpoint (_layout.server.ts), if it has one.
+ * Layouts can't declare `middleware`: it would run for the pages below the
+ * layout but not for the endpoints in the same folders, so a guard there
+ * would leave those open. Rather than ignore it, this throws.
+ */
+async function loadLayoutServerEndPoint(
+	layout: RouteLayoutHandler,
+): Promise<LayoutServerEndPoint | undefined> {
+	const endPoint: LayoutServerEndPoint | undefined =
+		layout.serverEndPoint && (await layout.serverEndPoint())?.default;
+	if (endPoint && "middleware" in endPoint && endPoint.middleware !== undefined) {
+		throw new Error(
+			`The layout server endpoint for "${layout.path}" declares \`middleware\`, which isn't ` +
+				"supported on layouts: it wouldn't guard the API endpoints in its folder. " +
+				"Move it into a _hook.server.ts in the same folder, which runs for every request below it.",
+		);
+	}
+	return endPoint;
+}
+
 async function loadServerHooks(handler: RouteHandler): Promise<ServerHook[]> {
 	if (!handler.serverHooks) return [];
 	if (devMode) {
@@ -592,12 +615,12 @@ async function loadPageData(
 			for (const layout of handler.layouts ?? []) {
 				// A reused layout keeps its cached data on the client, so skip its
 				// load (and any side effects) but keep the slot aligned
+				// Loaded even when reused, so that a misplaced guard is reported
+				const layoutServerEndPoint = await loadLayoutServerEndPoint(layout);
 				if (reusedLayouts.has(layout.path)) {
 					loads.push(null);
 					continue;
 				}
-				const layoutServerEndPoint: PageServerEndPoint | undefined =
-					layout.serverEndPoint && (await layout.serverEndPoint())?.default;
 				const result = await loadRouteServerData(layoutServerEndPoint, serverParams);
 				if (result instanceof Response) return result;
 				loads.push(result);
@@ -816,8 +839,7 @@ async function loadView(
 	if (handler.layouts) {
 		for (let layout of handler.layouts) {
 			const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
-			const layoutServerEndPoint: PageServerEndPoint | undefined =
-				layout.serverEndPoint && (await layout.serverEndPoint())?.default;
+			const layoutServerEndPoint = await loadLayoutServerEndPoint(layout);
 			const layoutResponse = await loadClientAndServerData(
 				url,
 				params,

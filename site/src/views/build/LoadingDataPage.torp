@@ -83,6 +83,13 @@ export default {
 			above it, may add to it, and the merged result is passed into the page as
 			<code>$props.data</code>.
 		</p>
+		<p>
+			Type a layout's server endpoint with <code>LayoutServerEndPoint</code>. It
+			takes the same <code>load</code> as a page's, but not <code>middleware</code>:
+			a layout doesn't wrap the API endpoints in its folder, so a guard there
+			would leave them open. Guard a folder with a
+			<a href="/build/hooks"><code>_hook.server.ts</code></a> instead.
+		</p>
 
 		<h2>Deferred data</h2>
 		<p>
