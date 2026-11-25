@@ -10,11 +10,22 @@ export function createHoverOpen(
 	handleMouseEnter: () => void;
 	handleMouseLeave: () => void;
 	handleMouseMove: () => void;
+	cancel: () => void;
 } {
 	let interval: ReturnType<typeof setTimeout> | undefined;
 
 	function schedule() {
-		interval = setTimeout(() => open(), delay);
+		interval = setTimeout(() => {
+			interval = undefined;
+			open();
+		}, delay);
+	}
+
+	function cancel() {
+		if (interval) {
+			clearTimeout(interval);
+			interval = undefined;
+		}
 	}
 
 	function handleMouseEnter() {
@@ -30,10 +41,7 @@ export function createHoverOpen(
 		if (disabled()) return;
 
 		// Prevent short hovers or touches from firing the event
-		if (interval) {
-			clearTimeout(interval);
-			interval = undefined;
-		}
+		cancel();
 	}
 
 	function handleMouseMove() {
@@ -46,5 +54,5 @@ export function createHoverOpen(
 		}
 	}
 
-	return { handleMouseEnter, handleMouseLeave, handleMouseMove };
+	return { handleMouseEnter, handleMouseLeave, handleMouseMove, cancel };
 }

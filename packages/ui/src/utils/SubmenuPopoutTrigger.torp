@@ -95,6 +95,9 @@ export default function SubmenuPopoutTrigger($props: SubmenuPopoutTriggerProps |
 	}
 
 	function handleClick() {
+		// A click is explicit intent; don't let the synthesized mouseenter's
+		// hover timer fire later and re-open the popout
+		hoverOpen.cancel();
 		if ($props?.onclick) {
 			$props.onclick();
 			return;
@@ -107,6 +110,7 @@ export default function SubmenuPopoutTrigger($props: SubmenuPopoutTriggerProps |
 		if (e.key === $props?.openKey) {
 			// TODO: This should be based on what side the menu shows on
 			e.preventDefault();
+			hoverOpen.cancel();
 			activate();
 			setVisible(true);
 		} else {
@@ -120,6 +124,8 @@ export default function SubmenuPopoutTrigger($props: SubmenuPopoutTriggerProps |
 		() => $props?.disabled === true,
 		hoverDelay,
 	);
+
+	$run(() => () => hoverOpen.cancel());
 
 	function handleMouseEnter() {
 		// Open immediately when there is no hover delay, as menubar items do
