@@ -31,7 +31,7 @@ interface CheckBoxProps {
  * A checkbox input in a form.
  */
 export default function CheckBox($props: CheckBoxProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	// Get stuff out of the FormContext and FieldContext
 	const formContext = $context[FormContextName] as FormContext | undefined;

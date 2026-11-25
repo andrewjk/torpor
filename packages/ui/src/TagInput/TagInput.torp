@@ -78,7 +78,7 @@ export default function TagInput($props: TagInputProps | undefined) {
 		return $props?.disabled === true;
 	}
 
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	let $state = $watch({
 		// Seed from the props so the initial tags render; $bind handles later

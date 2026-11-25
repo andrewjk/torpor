@@ -46,7 +46,7 @@ interface PinInputProps {
  * ```
  */
 export default function PinInput($props: PinInputProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 	const inputs: HTMLInputElement[] = [];
 
 	// Wire up the enclosing Form and Field, if any

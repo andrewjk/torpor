@@ -20,7 +20,7 @@ interface TooltipContentProps {
  * The hint displayed for a Tooltip while its trigger is hovered or focused.
  */
 export default function TooltipContent($props: TooltipContentProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 	let div: HTMLDivElement;
 
 	// Get stuff out of the TooltipContext

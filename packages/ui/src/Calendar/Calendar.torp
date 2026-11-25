@@ -70,7 +70,7 @@ interface CalendarProps {
  * as `$slot.day`.
  */
 export default function Calendar($props: CalendarProps) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	$props ??= $watch({});
 

@@ -118,7 +118,7 @@ interface DataGridProps {
  * no rows) and `header` isn't needed since headers come from the columns.
  */
 export default function DataGrid($props: DataGridProps) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	if (!$props.columns || $props.columns.length === 0) {
 		throw new Error("DataGrid: pass a non-empty `columns` array");

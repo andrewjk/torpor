@@ -41,7 +41,7 @@ interface InputProps {
  * A standard input in a form.
  */
 export default function Input($props: InputProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	function getType(): string {
 		return $props?.type ?? "text";

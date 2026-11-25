@@ -39,7 +39,7 @@ interface SwitchProps {
  * See [the WAI ARIA guidelines for Switches](https://www.w3.org/WAI/ARIA/apg/patterns/switch/).
  */
 export default function Switch($props: SwitchProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	// Get stuff out of the FormContext and FieldContext
 	const formContext = $context[FormContextName] as FormContext | undefined;

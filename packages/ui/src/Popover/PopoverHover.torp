@@ -43,7 +43,7 @@ interface PopoverHoverProps {
  * ```
  */
 export default function PopoverHover($props?: PopoverHoverProps) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	// Get stuff out of the PopoverContext
 	const context = $context[PopoverContextName] as PopoverContext;

@@ -15,7 +15,7 @@ interface NavMenuGroupHeaderProps {
  * The header for a NavMenuGroup.
  */
 export default function NavMenuGroupHeader($props: NavMenuGroupHeaderProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	const context = $context[NavMenuGroupContextName] as NavMenuGroupContext;
 	if (!context) {

@@ -41,7 +41,7 @@ interface TextAreaProps {
  * A standard input in a form.
  */
 export default function TextArea($props: TextAreaProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	// Get stuff out of the FormContext and FieldContext
 	const formContext = $context[FormContextName] as FormContext | undefined;

@@ -33,7 +33,7 @@ interface PopoutClickTriggerProps {
  * a press to warrant their own component.
  */
 export default function PopoutClickTrigger($props?: PopoutClickTriggerProps) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	const context = $props!.context;
 	const $state = context.state;

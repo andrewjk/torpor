@@ -26,7 +26,7 @@ interface ListBoxItemProps {
  * An item in an ListBox.
  */
 export default function ListBoxItem($props: ListBoxItemProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	let $state: ItemState = $watch({
 		id: $props?.id ?? defaultId,

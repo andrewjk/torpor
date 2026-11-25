@@ -53,7 +53,7 @@ interface DatePickerProps {
  * With no children, the trigger and content are rendered automatically.
  */
 export default function DatePicker($props: DatePickerProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	let content: HTMLDivElement | undefined;
 	let closeOnClick = false;

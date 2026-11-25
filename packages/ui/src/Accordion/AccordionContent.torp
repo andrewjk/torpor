@@ -17,7 +17,7 @@ interface AccordionContentProps {
  * Content for an AccordionItem, which can be revealed or hidden by an associated AccordionTrigger.
  */
 export default function AccordionContent($props: AccordionContentProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	const context = $context[AccordionItemContextName] as AccordionItemContext;
 	if (!context) {

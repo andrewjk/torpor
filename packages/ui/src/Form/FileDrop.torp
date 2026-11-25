@@ -36,7 +36,7 @@ interface FileDropProps {
  * See [the MDN docs for the Drag and Drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API).
  */
 export default function FileDrop($props: FileDropProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 	function getInputId(): string {
 		return `${$props?.id ?? defaultId}-input`;
 	}

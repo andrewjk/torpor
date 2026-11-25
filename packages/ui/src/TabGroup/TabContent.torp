@@ -19,7 +19,7 @@ interface TabContentProps {
  * Content for a TabGroup, which can be revealed or hidden by an associated TabTrigger.
  */
 export default function TabContent($props: TabContentProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	const context = $context[TabGroupContextName] as TabGroupContext;
 	if (!context) {

@@ -15,7 +15,7 @@ interface ComboBoxTriggerProps {
  * The button that causes a ComboBox to appear or disappear.
  */
 export default function ComboBoxTrigger($props: ComboBoxTriggerProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	// Get stuff out of the ComboBoxContext
 	const context = $context[ComboBoxContextName] as ComboBoxContext;

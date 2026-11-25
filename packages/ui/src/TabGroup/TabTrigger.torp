@@ -15,7 +15,7 @@ interface TabTriggerProps {
  * A header button for a tab item, which can be used to reveal an associated TabContent.
  */
 export default function TabTrigger($props: TabTriggerProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	let button: HTMLButtonElement;
 

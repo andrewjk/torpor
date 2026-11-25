@@ -54,7 +54,7 @@ interface CommandPaletteProps {
  * With no children, the input and list are rendered automatically.
  */
 export default function CommandPalette($props: CommandPaletteProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 	let input: HTMLInputElement | undefined;
 
 	function getDisabled(command: Command): boolean {

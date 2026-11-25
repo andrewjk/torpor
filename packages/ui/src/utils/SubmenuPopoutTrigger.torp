@@ -53,7 +53,7 @@ interface SubmenuPopoutTriggerProps {
  * open key, and renders the standard trigger attributes.
  */
 export default function SubmenuPopoutTrigger($props: SubmenuPopoutTriggerProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	let button: HTMLButtonElement;
 

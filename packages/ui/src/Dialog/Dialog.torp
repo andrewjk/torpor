@@ -42,7 +42,7 @@ interface DialogProps {
  *
  */
 export default function Dialog($props: DialogProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	//let div: HTMLDivElement;
 

@@ -19,7 +19,7 @@ interface TooltipTriggerProps {
  * so it is reachable by keyboard and works on touch screens.
  */
 export default function TooltipTrigger($props: TooltipTriggerProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	// Get stuff out of the TooltipContext
 	const context = $context[TooltipContextName] as TooltipContext;

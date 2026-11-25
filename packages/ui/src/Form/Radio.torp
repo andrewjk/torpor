@@ -19,7 +19,7 @@ interface RadioProps {
  * One option in a RadioGroup. Its content is the radio's label.
  */
 export default function Radio($props: RadioProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 	let button: HTMLButtonElement;
 
 	// Get stuff out of the RadioGroupContext

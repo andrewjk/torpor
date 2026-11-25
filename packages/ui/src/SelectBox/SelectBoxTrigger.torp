@@ -17,7 +17,7 @@ interface SelectBoxTriggerProps {
  * The input that causes a SelectBox to appear or disappear.
  */
 export default function SelectBoxTrigger($props: SelectBoxTriggerProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 	let button: HTMLButtonElement;
 
 	// Get stuff out of the SelectBoxContext

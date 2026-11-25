@@ -19,7 +19,7 @@ interface DialogHeaderProps {
  *
  */
 export default function DialogHeader($props: DialogHeaderProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	// Get stuff out of the DialogContext
 	const context = $context[DialogContextName] as DialogContext;

@@ -58,7 +58,7 @@ interface TreeItemProps {
  * ```
  */
 export default function TreeItem($props: TreeItemProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	const parentContext = $context[TreeItemContextName] as TreeItemContext;
 	const level = parentContext ? parentContext.state.level + 1 : 0;

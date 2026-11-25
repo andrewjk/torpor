@@ -75,7 +75,7 @@ interface ListBoxProps {
  * ```
  */
 export default function ListBox($props: ListBoxProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 	let root: HTMLElement;
 
 	// Wire up the enclosing Form and Field, if any

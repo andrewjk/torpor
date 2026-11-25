@@ -16,7 +16,7 @@ interface MessageProps {
  * problems that need to be fixed.
  */
 export default function Message($props: MessageProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	// Get stuff out of the FieldContext
 	const context = $context[FieldContextName] as FieldContext;

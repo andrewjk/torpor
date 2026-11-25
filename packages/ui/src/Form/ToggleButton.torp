@@ -31,7 +31,7 @@ interface ToggleButtonProps {
  * group owns the pressed state.
  */
 export default function ToggleButton($props: ToggleButtonProps | undefined) {
-	const defaultId = getId();
+	const defaultId = getId($context);
 
 	// A group is optional: standalone buttons manage their own `pressed`
 	const group = $context[ToggleGroupContextName] as ToggleGroupContext | undefined;

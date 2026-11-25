@@ -18,7 +18,7 @@ interface DialogBodyProps {
  * screen readers when the Dialog is opened, unless ariaAnnounce is false.
  */
 export default function DialogBody($props: DialogBodyProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	// Get stuff out of the DialogContext
 	const context = $context[DialogContextName] as DialogContext;

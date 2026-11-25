@@ -17,7 +17,7 @@ interface DisclosureContentProps {
  * Content for a Disclosure, which can be revealed or hidden by an associated DisclosureTrigger.
  */
 export default function DisclosureContent($props: DisclosureContentProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	const context = $context[DisclosureContextName] as DisclosureContext;
 	if (!context) {

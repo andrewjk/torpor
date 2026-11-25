@@ -16,7 +16,7 @@ interface ModalContentProps {
  * The content that is displayed for a Modal when it is open.
  */
 export default function ModalContent($props: ModalContentProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	// Get stuff out of the ModalContext
 	const context = $context[ModalContextName] as ModalContext;

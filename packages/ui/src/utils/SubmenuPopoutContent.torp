@@ -34,7 +34,7 @@ interface SubmenuPopoutContentProps {
  * the content when the popout is visible.
  */
 export default function SubmenuPopoutContent($props: SubmenuPopoutContentProps | undefined) {
-	const defaultId = getId();
+	const defaultId = getId($context);
 
 	// Get stuff out of the PopoutContext
 	const popoutContext = $context[PopoutContextName] as PopoutContext;

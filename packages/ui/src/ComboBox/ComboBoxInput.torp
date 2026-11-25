@@ -34,7 +34,7 @@ interface ComboBoxInputProps {
  * The input that causes a ComboBox to appear or disappear.
  */
 export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 	let input: HTMLInputElement;
 
 	// Get stuff out of the ComboBoxContext

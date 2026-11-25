@@ -62,7 +62,7 @@ interface DateRangePickerProps {
  * With no children, the trigger and content are rendered automatically.
  */
 export default function DateRangePicker($props: DateRangePickerProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	let content: HTMLDivElement | undefined;
 	let closeOnClick = false;

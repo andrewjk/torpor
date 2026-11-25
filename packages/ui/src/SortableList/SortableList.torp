@@ -47,7 +47,7 @@ interface SortableListProps {
  * With no children, the items are rendered automatically.
  */
 export default function SortableList($props: SortableListProps | undefined) {
-	let defaultId = getId();
+	let defaultId = getId($context);
 
 	let $state = $watch({
 		items: ($props?.items ?? []) as any[],

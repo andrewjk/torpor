@@ -20,7 +20,7 @@ interface DrawerContentProps {
  * The content that is displayed for a Drawer when it is open.
  */
 export default function DrawerContent($props: DrawerContentProps | undefined) {
-	const defaultId = getId();
+	const defaultId = getId($context);
 
 	let drawer: HTMLElement;
 	let shown = false;
