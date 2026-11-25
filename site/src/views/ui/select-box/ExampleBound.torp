@@ -9,7 +9,8 @@ export default function ExampleBound() {
 	];
 
 	let $state = $watch({
-		value: 0,
+		// A cleared number input sets the value to undefined
+		value: 0 as number | undefined,
 		get text() {
 			return items.find((i) => i.id === this.value)?.text;
 		},

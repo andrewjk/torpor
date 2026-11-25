@@ -645,13 +645,13 @@ the usual trade-off of delegation.
 
 Two-way bindings use a leading `&`:
 
-| Syntax                          | Purpose                                                                                                            |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `&value={$state.name}`          | Two-way value binding on `input`/`select`/`textarea` (number inputs coerce; text inputs map to string).            |
-| `&checked={$state.isAvailable}` | Two-way checkbox checked state.                                                                                    |
-| `&group={$state.picked}`        | Radio group: selecting a radio writes its `value` into `$state.picked`.                                            |
-| `&ref={var}`                    | DOM reference: assigns the element node to `var` on mount (usable in `$onmount`, `@render` after mount, handlers). |
-| `&name={$state.value}`          | Two-way component prop binding — the attribute name is the prop to bind (see `$bind` above).                       |
+| Syntax                          | Purpose                                                                                                                                                                              |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `&value={$state.name}`          | Two-way value binding on `input`/`select`/`textarea` (number inputs coerce, and a cleared one sets `undefined`, so type the state `number \| undefined`; text inputs map to string). |
+| `&checked={$state.isAvailable}` | Two-way checkbox checked state.                                                                                                                                                      |
+| `&group={$state.picked}`        | Radio group: selecting a radio writes its `value` into `$state.picked`.                                                                                                              |
+| `&ref={var}`                    | DOM reference: assigns the element node to `var` on mount (usable in `$onmount`, `@render` after mount, handlers).                                                                   |
+| `&name={$state.value}`          | Two-way component prop binding — the attribute name is the prop to bind (see `$bind` above).                                                                                         |
 
 ```torp
 <input &value={$state.text} />

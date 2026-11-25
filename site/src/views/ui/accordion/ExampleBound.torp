@@ -8,7 +8,8 @@ import {
 import { grow } from "@torpor/ui/motion";
 
 export default function ExampleBound() {
-	let $state = $watch({ value: 0 });
+	// A cleared number input sets the value to undefined
+	let $state = $watch({ value: 0 as number | undefined });
 
 	@render {
 		<p>Value: <input type="number" &value={$state.value} /></p>
