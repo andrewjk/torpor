@@ -191,9 +191,10 @@ type ServerEndPoint<
 	>;
 	/**
 	 * Route middleware, run for this endpoint's handlers after the global
-	 * middleware (see `site.middleware`). `enter` may return a Response to
-	 * short-circuit; `exit` hooks run in reverse. Middleware see the raw
-	 * request url.
+	 * middleware (see `site.middleware`) and the folder hooks, so it can
+	 * read what the hooks loaded from `ev.appData` (e.g. the user). `enter`
+	 * may return a Response to short-circuit; `exit` hooks run in reverse.
+	 * Middleware see the raw request url.
 	 */
 	middleware?: MiddlewareFunction[];
 };

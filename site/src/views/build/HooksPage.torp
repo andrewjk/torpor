@@ -56,5 +56,33 @@ enter: async (event) => {
 			endpoints in the same request, so a user loaded in a hook is available
 			everywhere else without fetching it again.
 		</p>
+
+		<h2>Hooks and middleware</h2>
+		<p>
+			A request runs the global middleware (<code>site.middleware</code>) first,
+			then the folder hooks from the root down, then the route's own
+			<code>middleware</code>, then the load, action or endpoint. Route
+			middleware can read what the hooks loaded from <code>ev.appData</code>,
+			so a route can add its own guard on top of a folder's auth hook:
+		</p>
+		<CodePreview
+			code={`
+// routes/admin/reports/+page.server.ts
+export default {
+	middleware: [
+		{
+			enter: (ev) => {
+				if (!ev.appData.user?.isAdmin) return forbidden();
+			},
+		},
+	],
+	load: async () => ok(await getReports()),
+} satisfies PageServerEndPoint;
+`}
+		/>
+		<p>
+			To guard a whole folder, use a <code>_hook.server.ts</code> in it rather
+			than middleware: hooks run for every page and endpoint below them.
+		</p>
 	}
 }

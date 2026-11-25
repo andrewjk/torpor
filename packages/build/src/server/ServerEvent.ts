@@ -16,6 +16,13 @@ export default class ServerEvent {
 	error: unknown;
 	// TODO: Should we cast types??
 	params?: Record<string, string>;
+	/**
+	 * Data shared by everything that handles this request: middleware, folder
+	 * hooks (as `event.appData`), and the loads and actions they run around.
+	 * Folder hooks run before route middleware, so a route's guard can read
+	 * e.g. the user that an auth hook loaded.
+	 */
+	appData: Record<string, any> = {};
 
 	adapter: any;
 

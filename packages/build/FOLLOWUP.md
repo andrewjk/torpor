@@ -43,7 +43,7 @@ history state on back/forward),
 flash messages (`event.flash.set(...)` riding a one-read cookie, consumed
 into `$context.$page.flash` by the render pipeline), route middleware (`site.middleware`
 runs globally for every request -- unmatched ones too -- and server endpoints
-take `middleware: [...]` for route-scoped guards, both before folder hooks),
+take `middleware: [...]` for route-scoped guards, run after folder hooks),
 and ETag/Cache-Control support via `notModified`. Discovery helpers exist
 too: `seo()` (in `@torpor/build/discovery`) builds page head data (title,
 description, Open Graph/Twitter metas via a `{ property, content }` head

@@ -1,13 +1,20 @@
 import { describe, expect, test } from "vite-plus/test";
+import { DATA_REQUEST_HEADER } from "../src/dataRequest";
 import ok from "../src/response/ok";
 import ServerEvent from "../src/server/ServerEvent";
 import Router from "../src/site/Router";
 import { createServerLoad } from "../src/site/serverHandlers";
-import { PAGE_ROUTE, PAGE_SERVER_ROUTE, SERVER_ROUTE } from "../src/types/RouteType";
+import {
+	HOOK_SERVER_ROUTE,
+	PAGE_ROUTE,
+	PAGE_SERVER_ROUTE,
+	SERVER_ROUTE,
+} from "../src/types/RouteType";
 import type MiddlewareFunction from "../src/server/types/MiddlewareFunction";
 import type ManifestRoute from "../src/types/ManifestRoute";
 import type PageServerEndPoint from "../src/types/PageServerEndPoint";
 import type ServerEndPoint from "../src/types/ServerEndPoint";
+import type ServerHook from "../src/types/ServerHook";
 
 const template = `<html><head></head><body><div id="app">%COMPONENT_BODY%</div></body></html>`;
 
@@ -159,5 +166,81 @@ describe("route middleware", () => {
 		// The page render (GET /posts uses the sibling +page.server's middleware)
 		await load(new ServerEvent(new Request("http://localhost/posts")), template);
 		expect(log).toEqual(["page.enter", "page.exit"]);
+	});
+});
+
+describe("route middleware and folder hooks", () => {
+	/** A root hook that loads the user, as an auth hook would. */
+	function authHook(log: string[]): ManifestRoute {
+		const hook: ServerHook = {
+			enter: (ev) => {
+				log.push("hook.enter");
+				ev.appData.user = "alice";
+			},
+			exit: () => {
+				log.push("hook.exit");
+			},
+		};
+		return {
+			path: "/_hook/~server",
+			type: HOOK_SERVER_ROUTE,
+			endPoint: () => Promise.resolve({ default: hook }),
+			subFolder: undefined,
+		};
+	}
+
+	/** Route middleware that only lets alice through. */
+	function aliceOnly(log: string[]): MiddlewareFunction {
+		return {
+			enter: (ev) => {
+				log.push(`route.enter user=${ev.appData.user}`);
+				if (ev.appData.user !== "alice") return new Response("no", { status: 403 });
+			},
+			exit: () => {
+				log.push("route.exit");
+			},
+		};
+	}
+
+	for (const [name, path, init] of [
+		["a page render", "/posts", undefined],
+		["an endpoint", "/api", undefined],
+		["a page server endpoint", "/posts/~server", undefined],
+		["a data request", "/posts/~server", { headers: { [DATA_REQUEST_HEADER]: "1" } }],
+	] as const) {
+		test(`hooks run first, so the middleware sees their appData (${name})`, async () => {
+			const log: string[] = [];
+			const load = createServerLoad(
+				new Router().addPages([authHook(log), ...routes([aliceOnly(log)])]),
+			);
+
+			const res = await load(
+				new ServerEvent(new Request(`http://localhost${path}`, init)),
+				template,
+			);
+
+			expect(res.status).toBe(200);
+			expect(log).toEqual(["hook.enter", "route.enter user=alice", "route.exit", "hook.exit"]);
+		});
+	}
+
+	test("a hook's short-circuit skips the route middleware", async () => {
+		const log: string[] = [];
+		const hookRoute = authHook(log);
+		hookRoute.endPoint = () =>
+			Promise.resolve({
+				default: {
+					enter: () => {
+						log.push("hook.enter");
+						return new Response(null, { status: 303, headers: { Location: "/login" } });
+					},
+				} satisfies ServerHook,
+			});
+		const load = createServerLoad(new Router().addPages([hookRoute, ...routes([aliceOnly(log)])]));
+
+		const res = await load(new ServerEvent(new Request("http://localhost/posts")), template);
+
+		expect(res.status).toBe(303);
+		expect(log).toEqual(["hook.enter"]);
 	});
 });

@@ -43,8 +43,9 @@ export default interface ServerLoadEvent<
 	// TODO: Maybe we should find a better name for the data that is set set in
 	// pages, and just call this data?
 	/**
-	 * Data that is available to functions in +server hooks, layouts, endpoints
-	 * and pages. It flows down in that order.
+	 * Data that is available to functions in +server hooks, route middleware
+	 * (as `ev.appData`), layouts, endpoints and pages. It flows down in that
+	 * order.
 	 */
 	appData: Record<string, any>;
 	/**

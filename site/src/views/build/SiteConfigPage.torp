@@ -91,7 +91,8 @@ site.addRoute("/api/time", {
 			<li>
 				<code>site.middleware</code> &mdash; global middleware, run for every
 				request before routing. Server endpoints also take
-				<code>middleware</code> arrays for route-scoped guards
+				<code>middleware</code> arrays for route-scoped guards, which run after
+				the folder hooks (see <a href="/build/hooks">Hooks</a>)
 			</li>
 			<li>
 				<code>site.plugins</code> &mdash; site plugins, which can add routes
