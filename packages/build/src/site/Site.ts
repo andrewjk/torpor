@@ -10,6 +10,7 @@ import type { InlineEndPoint } from "../types/Route";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
 import type Route from "../types/Route";
 import type ServerEndPoint from "../types/ServerEndPoint";
+import type Budgets from "../types/Budgets";
 import type ServerHook from "../types/ServerHook";
 import {
 	ERROR_ROUTE,
@@ -160,6 +161,15 @@ export default class Site {
 	 */
 	sitemap?: SitemapOptions | boolean | string;
 	/**
+	 * Limits on what each page may ship, checked by `tb --build`, which
+	 * also reports how much JavaScript the heaviest pages load before they
+	 * hydrate. `js` is the most gzipped JavaScript (in bytes) a page may load
+	 * that way, e.g. `{ js: 250_000 }`; a page over it is a warning, or a
+	 * build failure with `fail: true`. Chunks loaded later through dynamic
+	 * imports don't count.
+	 */
+	budgets?: Budgets;
+	/**
 	 * A Standard Schema (zod, valibot, arktype, etc) used to validate (and
 	 * parse) the server environment. When set, `env()` from
 	 * `@torpor/build/env` checks the environment on first use per request and
@@ -247,6 +257,7 @@ export default class Site {
 		this.prerender = other.prerender;
 		this.sitemap = other.sitemap;
 		this.origin = other.origin;
+		this.budgets = other.budgets;
 		return changed;
 	}
 

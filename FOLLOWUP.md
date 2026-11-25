@@ -3,6 +3,21 @@
 Items that were noticed and deliberately left out of scope of a previous change.
 Each entry should describe what was seen, where, and any relevant context.
 
+## Docs site
+
+### Docs pages load the REPL up front
+
+The build's page size report shows every `/docs` and `/playground` page
+loading ~130 kB of gzipped JavaScript before hydrating, ~87 kB of it the
+`Repl` chunk (the compiler and editor). `DocsPage.torp`, `MarkupPage.torp`,
+`ReactivityPage.torp` and the other docs pages import
+`../repl/Repl.torp` statically, so it's preloaded and loaded on every docs
+page, even before anyone touches an example. Loading it on demand (a
+dynamic import when an example scrolls into view or is clicked, with the
+highlighted code shown until then) would bring docs pages down to roughly
+the ~41 kB the blog pages load. Once that's done, `site.budgets` in
+`site/site.config.ts` could hold it there.
+
 ## Bugs
 
 ### Loop-var resolution in @for bodies: open points

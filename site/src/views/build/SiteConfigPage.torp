@@ -89,6 +89,14 @@ site.addRoute("/api/time", {
 				from <code>site.sitemap</code>. See <a href="/build/discovery">Discovery</a>
 			</li>
 			<li>
+				<code>site.budgets</code> &mdash; limits on what each page ships. The
+				build reports how much JavaScript the heaviest pages load before they
+				hydrate (gzipped, counting the chunks the page preloads but not later
+				dynamic imports); <code>&#123; js: 250_000 &#125;</code> warns about any
+				page over 250 kB, and adding <code>fail: true</code> fails the build
+				instead
+			</li>
+			<li>
 				<code>site.middleware</code> &mdash; global middleware, run for every
 				request before routing. Server endpoints also take
 				<code>middleware</code> arrays for route-scoped guards, which run after

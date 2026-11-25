@@ -15,6 +15,7 @@ import type {
 	RouteParamsOf,
 } from "./types/ParseRouteParams";
 import type PageServerAction from "./types/PageServerAction";
+import type Budgets from "./types/Budgets";
 import type LayoutServerEndPoint from "./types/LayoutServerEndPoint";
 import type PageServerEndPoint from "./types/PageServerEndPoint";
 import type {
@@ -47,6 +48,7 @@ export { Site, Router };
 
 export type {
 	Adapter,
+	Budgets,
 	PageEndPoint,
 	PageServerEndPoint,
 	LayoutServerEndPoint,

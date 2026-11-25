@@ -11,6 +11,7 @@ import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
 import { siteEntryPaths } from "../utils/entryPaths";
 import clientPreloads, { type ViteManifestChunk } from "./clientPreloads";
+import pageSizes, { formatPageSizes, overBudget } from "./pageSizes";
 import runPrerender from "./runPrerender";
 
 // TODO: Don't cache index.html in dev?
@@ -138,6 +139,24 @@ export default async function runBuild(site: Site): Promise<void> {
 		...asAliasArray(serverConfig.resolve.alias),
 		...tsconfigAliases(site.root),
 	];
+	// Report how much JavaScript the pages load, and check the budget, before
+	// spending time on the server build
+	if (preloads) {
+		const pages = pageSizes(preloads, site.routes, clientFolder);
+		const report = formatPageSizes(pages, site.budgets);
+		const over = overBudget(pages, site.budgets);
+		if (over.length > 0) {
+			console.warn(report);
+			if (site.budgets?.fail) {
+				throw new Error(
+					`${over.length} page${over.length === 1 ? " is" : "s are"} over the JavaScript budget (see above)`,
+				);
+			}
+		} else if (report) {
+			console.log(report);
+		}
+	}
+
 	serverConfig.plugins = [manifest(site, true, false, preloads), torpor(), ...site.vitePlugins];
 	serverConfig.build ??= {};
 	serverConfig.build.outDir = serverFolder;
