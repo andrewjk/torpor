@@ -16,7 +16,8 @@
 	"scripts": {
 		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
 		"build": "tsgo --noEmit && vp pack",
-		"build:watch": "vp pack --watch"
+		"build:watch": "vp pack --watch",
+		"test": "vp test"
 	},
 	"keywords": [],
 	"author": "",

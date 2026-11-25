@@ -3,8 +3,8 @@ import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { serverError } from "../response.ts";
 import Server from "../server/Server.ts";
-import contentType from "../server/contentType.ts";
 import Site from "../site/Site";
+import { assetHeaders } from "./assetHeaders.ts";
 import prepareTemplate from "./prepareTemplate.ts";
 import runBuild from "./runBuild";
 
@@ -38,19 +38,15 @@ export default async function runPreview(site: Site): Promise<void> {
 	// Configure the server
 	const server = new Server();
 
-	// Serve dist/client/assets statically
+	// Serve dist/client/assets statically. Hashed files are cached for a
+	// year, since a deploy that changes one gives it a new name
 	server.add("/assets/*", async (ev) => {
 		try {
 			const url = new URL(ev.request.url);
 			const file = path.join(clientFolder, url.pathname);
 			if (existsSync(file)) {
 				const body = await fs.readFile(file);
-				return new Response(body, {
-					status: 200,
-					headers: {
-						"Content-Type": contentType(path.extname(file)),
-					},
-				});
+				return new Response(body, { status: 200, headers: assetHeaders(file) });
 			}
 		} catch (e: any) {
 			return serverError(e);

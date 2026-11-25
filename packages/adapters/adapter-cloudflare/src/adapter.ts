@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { build, defineConfig } from "vite";
+import { writeAssetHeaders } from "./assetHeaders";
 import { detectSourceMode, serverClassPath } from "./entryPaths";
 import cloudflareDev from "./cloudflareDev";
 import prepareTemplate from "./prepareTemplate";
@@ -113,6 +114,9 @@ async function postbuild(site: Site): Promise<void> {
 	// `assets.directory` and Cloudflare serves assets before the worker.
 	// (`site.html` and Vite's `.vite` cache aren't needed at runtime.)
 	await copyClientOutput(clientFolder, cloudflareFolder);
+
+	// Let Cloudflare cache the hashed assets for a year
+	await writeAssetHeaders(cloudflareFolder);
 
 	// Build a wrangler.toml file for running with `wrangler dev`
 	const wranglerConfig = `
