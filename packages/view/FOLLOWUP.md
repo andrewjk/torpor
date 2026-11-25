@@ -18,9 +18,6 @@ at the end of `compile/build/client/buildFragment.ts`), covering the following:
 - **Control parsing**: error recovery stops at the current position instead of
   the enclosing boundary; branch grouping scans past elements and needs more
   checks; `@with`/`@try` duplicate handling is heuristic.
-- **Style scoping**: `scopeStyles` splits selectors heuristically, so attribute
-  selectors/combinators are approximate; selector scoping and attribute
-  selectors should move into parse/buildStyles.
 - **Interpolation/source maps**: text span extraction, title brace counting,
   and the server text/attribute scanners still duplicate interpolation logic;
   moving text/attribute interpolation into parse would unify them.

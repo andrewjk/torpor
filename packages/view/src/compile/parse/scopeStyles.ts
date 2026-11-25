@@ -1,59 +1,38 @@
 import type TemplateNode from "../types/nodes/TemplateNode";
-import type BlockNode from "../types/styles/BlockNode";
 import isComponentNode from "../utils/isComponentNode";
 import isElementNode from "../utils/isElementNode";
 import isParentNode from "../utils/isParentNode";
-import trimQuotes from "../utils/trimQuotes";
+import isSpecialNode from "../utils/isSpecialNode";
 import type ParseStatus from "./ParseStatus";
 
+/**
+ * Marks every element in a component that has scoped styles with the
+ * component's scope class. This is intentionally not selector-based: deciding
+ * which elements a CSS selector can match requires parsing selectors, and
+ * pseudo-classes, attribute selectors and `@media` rules make compile-time
+ * matching unreliable. Marking every element lets `buildStyles` append the
+ * scope class to selectors without needing to understand their shape.
+ */
 export default function scopeStyles(status: ParseStatus): void {
-	let selectors: string[] = [];
 	for (let component of status.components) {
-		if (component.style && component.markup) {
-			for (let block of component.style.children) {
-				if (block.type === "block") {
-					collectStyleSelectors(block as BlockNode, selectors);
-				}
-			}
-			scopeStylesOnNode(component.markup, selectors);
-		}
+		if (!component.style) continue;
+		if (component.markup) scopeStylesOnNode(component.markup);
+		if (component.error) scopeStylesOnNode(component.error);
 	}
 }
 
-function scopeStylesOnNode(node: TemplateNode, selectors: string[]) {
-	if (isElementNode(node) || isComponentNode(node)) {
-		node.scopeStyles =
-			selectors.includes(node.tagName) ||
-			node.attributes.find((a) => {
-				if (a.name === "class" && a.reactive) {
-					// Any reactivity in a class attribute makes it scoped,
-					// because we can't tell what's going on in there
-					return true;
-				} else if (a.name === "id" && a.value) {
-					if (selectors.includes(`#${trimQuotes(a.value)}`)) {
-						return true;
-					}
-				} else if (a.name === "class" && a.value) {
-					for (let classname of trimQuotes(a.value).split(/\s+/)) {
-						if (selectors.includes(`.${classname}`)) {
-							return true;
-						}
-					}
-				}
-			}) !== undefined;
+function scopeStylesOnNode(node: TemplateNode) {
+	if (
+		isElementNode(node) ||
+		isComponentNode(node) ||
+		(isSpecialNode(node) && (node.tagName === "@element" || node.tagName === "@component"))
+	) {
+		node.scopeStyles = true;
 	}
 
 	if (isParentNode(node)) {
 		for (let child of node.children) {
-			scopeStylesOnNode(child, selectors);
+			scopeStylesOnNode(child);
 		}
-	}
-}
-
-function collectStyleSelectors(block: BlockNode, selectors: string[]) {
-	// HACK: We should be collecting the actual selectors and then checking
-	// attributes, parents, children, siblings etc
-	for (let s of block.selector.split(/[\s*,>+~[\]]/)) {
-		selectors.push(s);
 	}
 }

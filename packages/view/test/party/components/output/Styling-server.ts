@@ -9,7 +9,7 @@ export default async function CssStyle(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<h1 class="title torp-1ew8jkr">I am red</h1> <button style="font-size: 160px;">I am a button</button>`;
+	t_body += `<h1 class="title torp-1ew8jkr">I am red</h1> <button style="font-size: 160px;" class="torp-1ew8jkr">I am a button</button>`;
 
 	/* Style */
 	t_head += "<style id='1ew8jkr'>.title.torp-1ew8jkr { color: red; } </style>";
