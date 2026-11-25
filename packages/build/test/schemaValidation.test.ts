@@ -6,6 +6,7 @@ import type PageServerEndPoint from "../src/types/PageServerEndPoint";
 import type ServerEndPoint from "../src/types/ServerEndPoint";
 import type ServerLoadEvent from "../src/types/ServerLoadEvent";
 import type { StandardSchemaV1 } from "../src/types/StandardSchema";
+import { endpointSchema } from "../src/validation/endpoint";
 
 /**
  * A minimal standard schema, as a schema library (zod, valibot, ...) would
@@ -405,4 +406,11 @@ test("an action named with a reserved schema key throws", async () => {
 	await expect(runTest(site, "/reserved/~server", new ServerEvent(req))).rejects.toThrowError(
 		/The action name "load" is reserved/,
 	);
+});
+
+test("endpointSchema ignores Object.prototype names", () => {
+	const endpoint = { schema: { post: postSchema } } as unknown as PageServerEndPoint;
+	expect(endpointSchema(endpoint, "post")).toBe(postSchema);
+	expect(endpointSchema(endpoint, "toString")).toBeUndefined();
+	expect(endpointSchema(endpoint, "constructor")).toBeUndefined();
 });

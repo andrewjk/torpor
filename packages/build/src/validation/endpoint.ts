@@ -19,9 +19,15 @@ type EndPoint = ServerEndPoint | PageServerEndPoint;
 /**
  * Gets the standard schema declared for a handler or action, if any. The
  * schemas map is keyed by name; the runtime treats it as a loose record.
+ *
+ * Only own keys are considered: a plain read would resolve names like
+ * `toString` or `constructor` to members of `Object.prototype`, handing that
+ * function to `validate()` as though it were a schema.
  */
 export function endpointSchema(endPoint: EndPoint, name: string): StandardSchemaV1 | undefined {
-	return (endPoint.schema as Schemas | undefined)?.[name];
+	const schemas = endPoint.schema as Schemas | undefined;
+	if (schemas === undefined || !Object.hasOwn(schemas, name)) return undefined;
+	return schemas[name];
 }
 
 /**

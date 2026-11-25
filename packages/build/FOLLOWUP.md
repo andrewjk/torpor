@@ -18,14 +18,6 @@ on layout endpoints at type and runtime level so it can't be mistaken for a
 guard. Folder hooks (`_hook.server.ts`) do guard subtrees; the docs should
 point people there.
 
-### Form actions resolve `Object.prototype` names (confirmed)
-
-`runAction` looks up `serverEndPoint.actions[actionName]` with a plain
-property read, so `POST ?/toString`, `?/constructor`, `?/__proto__` and
-`?/hasOwnProperty` find prototype members and crash with a 500 (with or
-without JS). Use `Object.hasOwn(actions, actionName)` and fall through to
-the not-found path.
-
 ### `/_error?status=` trusts the query string (confirmed)
 
 `page.status = parseInt(query.get("status") ?? "404")` is used as the

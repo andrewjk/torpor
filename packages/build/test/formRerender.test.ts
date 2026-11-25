@@ -158,6 +158,16 @@ test("a form post that drops the load query entirely re-renders with the form er
 	expect(loadQueries.at(-1)).toEqual({});
 });
 
+test("action names that exist on Object.prototype are not actions", async () => {
+	// `?/toString`, `?/constructor` etc. used to resolve Object.prototype
+	// members from the actions map and crash with a 500 (or run something that
+	// isn't an action). They must fall through to the not-found path.
+	for (const name of ["toString", "constructor", "__proto__", "hasOwnProperty"]) {
+		const res = await load(postEvent(`/posts?/${name}`, "hello"), template);
+		expect(res.status).toBe(404);
+	}
+});
+
 test("a get with an invalid load query is still rejected", async () => {
 	const res = await load(new ServerEvent(new Request("http://localhost/posts")), template);
 

@@ -1093,13 +1093,19 @@ async function runAction(
 	// url that already has a query). A key that names a declared action also
 	// matches (e.g. `?set`), and a form without an action attribute calls the
 	// `default` action
+	const actions = serverEndPoint?.actions;
+	// Own keys only: names like `toString`, `constructor` or `__proto__` are
+	// on Object.prototype, so a plain property read would resolve them and
+	// invoke (or crash on) a prototype member instead of returning 404.
+	const hasAction = (name: string): boolean =>
+		actions !== undefined && Object.hasOwn(actions, name);
 	const queryKeys = Array.from(query.keys());
 	const actionKey =
 		queryKeys.find((key) => key.startsWith("/")) ??
-		queryKeys.find((key) => !!serverEndPoint?.actions?.[key.replace(/^\//, "")]);
+		queryKeys.find((key) => hasAction(key.replace(/^\//, "")));
 	const actionName = (actionKey ?? "default").replace(/^\//, "");
-	if (serverEndPoint?.actions) {
-		const action = serverEndPoint.actions[actionName];
+	if (serverEndPoint !== undefined && actions !== undefined && Object.hasOwn(actions, actionName)) {
+		const action = actions[actionName];
 		if (action) {
 			if (actionName === "load" || actionName === "params") {
 				// These names are reserved in the endpoint's schema map: `load`
