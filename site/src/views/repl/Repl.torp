@@ -1,6 +1,4 @@
-import { build, parse } from "@torpor/view/compile";
-import { transform } from "sucrase";
-import runtime from "@torpor/view/runtime?raw";
+import type { ReplResult } from "./compileRepl";
 
 export default function Repl($props: { input?: string } | undefined) {
 	let input = $props?.input ?? "";
@@ -9,6 +7,8 @@ export default function Repl($props: { input?: string } | undefined) {
 		input,
 		output: "",
 		errors: [] as { message: string; startIndex: number }[],
+		// Whether the compiler has loaded (see `loadCompiler`)
+		loaded: false,
 	});
 
 	let timer: ReturnType<typeof setTimeout> | undefined;
@@ -21,53 +21,65 @@ export default function Repl($props: { input?: string } | undefined) {
 		}
 	}
 
+	// The compiler (with sucrase and the view runtime) is most of the REPL's
+	// weight, and most readers of a docs page never scroll down to its
+	// playground. So it's loaded with a dynamic import -- once the REPL comes
+	// within a screen or so of the viewport, or when the input is focused --
+	// rather than with the page. Kept outside $state, so the module isn't
+	// wrapped in a proxy
+	let compile: ((input: string) => ReplResult) | undefined;
+	let loading: Promise<void> | undefined;
+	function loadCompiler() {
+		loading ??= import("./compileRepl").then((module) => {
+			compile = module.default;
+			$state.loaded = true;
+		});
+	}
+
+	let repl: HTMLElement;
+	$onmount(() => {
+		if (typeof IntersectionObserver === "undefined") {
+			loadCompiler();
+			return;
+		}
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries.some((entry) => entry.isIntersecting)) {
+					observer.disconnect();
+					loadCompiler();
+				}
+			},
+			// The margin only reaches beyond the observer's root, so the root is
+			// the element that scrolls the REPL into view (the docs layout
+			// scrolls its content area, not the window)
+			{ root: scrollParent(repl), rootMargin: "100% 0px" },
+		);
+		observer.observe(repl);
+		return () => observer.disconnect();
+	});
+
 	$run(() => {
 		let input = $state.input;
+		if (!$state.loaded) {
+			return;
+		}
 		debounce(() => {
-			if (!input) {
+			if (!input || !compile) {
 				return;
 			}
 
-			let parsed = parse(input);
-			if (parsed.ok) {
+			let result = compile(input);
+			if (result.ok) {
 				$state.errors = [];
-				let component = build(parsed.template!);
-				$state.output = `
-<html>
-<head>
-${component.styles.map((s) => `<style>${s.style}</style>`).join("\n")}
-<script>${runtime};Object.assign(globalThis, TorporView);</script>
-<script>${
-					transform(
-						component.code
-							.replaceAll("export default function", "function")
-							.replaceAll("export function", "function")
-							.replace(/^import\s.+\n/gm, ""),
-						{ transforms: ["typescript"] },
-					).code
-				}</script>
-</head>
-<body>
-<div id="repl-target"></div>
-<script>
-const target = document.getElementById("repl-target");
-try {
-	mount(target, ${parsed.template!.components.find((c) => c.default)!.name});
-} catch (error) {
-	target.innerHTML = '<span style="color: red"><p>Script syntax error</p><p>' + error + '</p></span>';
-}
-</script>
-</body>
-</html>
-`.trimStart();
+				$state.output = result.output;
 			} else {
-				$state.errors = parsed.errors.sort((a, b) => a.startIndex - b.startIndex);
+				$state.errors = result.errors;
 			}
 		});
 	});
 
 	@render {
-		<div id="repl" class="hstack spaced full-width collapse">
+		<div id="repl" class="hstack spaced full-width collapse" &ref={repl}>
 			<div id="input-container" class="grow">
 				<h3>Input</h3>
 				<textarea
@@ -75,6 +87,7 @@ try {
 					class="code"
 					&value={$state.input}
 					onmount={textAreaMount}
+					onfocus={loadCompiler}
 					oninput={textAreaInput}
 					onkeydown={textAreaKeyDown}
 				/>
@@ -84,7 +97,11 @@ try {
 				<h3>Output</h3>
 				<div class="vstack spaced">
 					<div>
-						<iframe srcdoc={$state.output} onload={resizeIframe} />
+						@if ($state.output) {
+							<iframe srcdoc={$state.output} onload={resizeIframe} />
+						} else if ($state.errors.length === 0) {
+							<p class="pending" aria-live="polite">Loading the playground…</p>
+						}
 					</div>
 					@if ($state.errors.length) {
 						<div id="errors">
@@ -122,6 +139,19 @@ try {
 		#errors {
 			color: red;
 		}
+
+		/* The same box as the iframe, so it doesn't jump when the output arrives */
+		.pending {
+			box-sizing: border-box;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 150px;
+			margin: 0;
+			border: 1px dashed lightgray;
+			border-radius: var(--brad);
+			color: gray;
+		}
 	}
 
 	function textAreaMount(e: HTMLTextAreaElement) {
@@ -139,8 +169,10 @@ try {
 		}
 	}
 
-	function textAreaInput(this: Element) {
-		const area = this as HTMLTextAreaElement;
+	// Events are delegated, so the handlers get the textarea from the event
+	// rather than `this`
+	function textAreaInput(e: Event) {
+		const area = e.target as HTMLTextAreaElement;
 		let x = window.scrollX,
 			y = window.scrollY;
 		area.style.height = "";
@@ -150,8 +182,8 @@ try {
 
 	// From https://stackoverflow.com/a/45396754
 	let tabEnabled = true;
-	function textAreaKeyDown(this: Element, e: KeyboardEvent) {
-		const area = this as HTMLTextAreaElement;
+	function textAreaKeyDown(e: KeyboardEvent) {
+		const area = e.target as HTMLTextAreaElement;
 		// Escape key toggles tab on/off
 		if (e.keyCode === 27) {
 			tabEnabled = !tabEnabled;
@@ -248,6 +280,16 @@ try {
 
 		tabEnabled = true;
 		return true;
+	}
+
+	/** The nearest ancestor that scrolls, or null for the viewport. */
+	function scrollParent(el: HTMLElement): HTMLElement | null {
+		for (let parent = el.parentElement; parent; parent = parent.parentElement) {
+			if (/(auto|scroll)/.test(getComputedStyle(parent).overflowY)) {
+				return parent;
+			}
+		}
+		return null;
 	}
 
 	function resizeIframe(e: Event) {
