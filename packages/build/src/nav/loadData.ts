@@ -93,8 +93,13 @@ export default async function loadData(
 		if (rendered && previous) {
 			// The layout is already rendered: keep its data. Only a real
 			// navigation reuses its slot region; a prefetch must leave it alone
-			// (and not run its client load again)
-			if (reuse) stackLayout.slotRegion = previous.slotRegion;
+			// (and not run its client load again). The context the layout
+			// passed to its slot is kept too, so refilling the slot after reuse
+			// still sees the layout's `$context` additions
+			if (reuse) {
+				stackLayout.slotRegion = previous.slotRegion;
+				stackLayout.context = previous.context;
+			}
 			Object.assign(stackLayout.data, previous.data);
 		} else {
 			// A new layout: run its client load (its server data already
@@ -164,6 +169,7 @@ export function errorLayoutStack(
 			data: rendered && previous ? { ...previous.data } : {},
 			reuse: rendered,
 			slotRegion: rendered && previous ? previous.slotRegion : null,
+			context: rendered && previous ? previous.context : undefined,
 		});
 	});
 	return stack;

@@ -321,15 +321,23 @@ async function renderNavigation(
 	if (handler.layouts) {
 		let slotFunctions: SlotRender[] = [];
 		// The last slot function will render the client component
-		slotFunctions[handler.layouts.length] = function clientComponent(parent, anchor) {
+		slotFunctions[handler.layouts.length] = function clientComponent(
+			parent,
+			anchor,
+			_,
+			slotContext,
+		) {
 			let i = layoutStack.length - 1;
+			// Keep the context the innermost layout passed to its slot, for a
+			// later refill that reuses that layout
+			layoutStack[i].context = slotContext;
 			layoutStack[i].slotRegion = fillLayoutSlot(
 				clientEndPoint.component!,
 				slotFunctions[i + 1],
 				parent,
 				anchor,
 				$props,
-				$context,
+				slotContext,
 			);
 		};
 
@@ -348,14 +356,17 @@ async function renderNavigation(
 					component = layoutEndPoint.component as Component;
 					slots = { _: slotFunctions[i + 1] };
 				} else {
-					slotFunctions[i] = function layoutComponent(parent, anchor, _, $context) {
+					slotFunctions[i] = function layoutComponent(parent, anchor, _, slotContext) {
+						// This slot belongs to layout i-1: keep the context it
+						// passed down so a later refill can replay it
+						layoutStack[i - 1].context = slotContext;
 						layoutStack[i - 1].slotRegion = fillLayoutSlot(
 							layoutEndPoint.component!,
 							slotFunctions[i + 1],
 							parent,
 							anchor,
 							$props,
-							$context,
+							slotContext,
 						);
 					};
 				}
@@ -406,9 +417,10 @@ async function renderNavigation(
 				}
 				app = slotRegion.startNode.parentNode as HTMLElement;
 				clearLayoutSlot(slotRegion);
-				// The reused layout's own context additions are gone, but the
-				// root context is passed down again
-				component(app, null, undefined, $context);
+				// The layout itself isn't re-run, so replay the context it
+				// passed to its slot (kept with the stack entry); otherwise its
+				// `$context` additions would be missing from the new page
+				component(app, null, undefined, layoutStack[reusedIndex].context ?? $context);
 			} else if (withHydration) {
 				hydrate(app, component, $props, slots, $context);
 			} else {

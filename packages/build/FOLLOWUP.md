@@ -20,13 +20,6 @@ point people there.
 
 ### Smaller issues
 
-- **A reused layout's context additions don't reach the new page**: when
-  client navigation keeps a layout and refills its slot (`nav/navigate.ts`),
-  the slot function is called with the root context (`$page`,
-  `TorporBuildContext`), not the context the layout built up, so anything a
-  layout puts into `$context` for its pages is missing after a navigation
-  that reuses it. The layout's own `$context` would need to be kept with its
-  slot region in `client.layoutStack`.
 - **`rewriteBaseInHtml` rewrites by regex over the whole document**, so
   `href="/…"` / `src="/…"` text inside `<pre>`/`<code>` samples or inline
   scripts is rewritten too.
