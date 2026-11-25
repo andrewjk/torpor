@@ -87,6 +87,37 @@ describe("rewriteBaseInHtml", () => {
 		expect(rewriteBaseInHtml(html, "")).toBe(html);
 	});
 
+	test("leaves attribute-like text in text nodes, samples and scripts alone", () => {
+		const html = [
+			`<p>href="/docs" is how you link</p>`,
+			`<pre>src="/logo.svg"</pre>`,
+			`<code>action='/save'</code>`,
+			`<script>const t = '<a href="/x">';</script>`,
+			`<style>.x::after { content: 'href="/y"'; }</style>`,
+			`<textarea>href="/z"</textarea>`,
+			`<!-- <a href="/comment"> -->`,
+		].join("");
+		expect(rewriteBaseInHtml(html, "/app")).toBe(html);
+	});
+
+	test("rewrites tags around skipped content", () => {
+		const html = `<a href="/x">text href="/y"<script>"src=\\"/z\\""</script></a>`;
+		const rewritten = rewriteBaseInHtml(html, "/app");
+		expect(rewritten).toContain('href="/app/x"');
+		expect(rewritten).toContain(`text href="/y"`);
+		expect(rewritten).toContain(`"src=\\"/z\\""`);
+	});
+
+	test("finds the tag end past a quoted > character", () => {
+		const html = `<a title="a > b" href="/x">x</a>`;
+		expect(rewriteBaseInHtml(html, "/app")).toContain('href="/app/x"');
+	});
+
+	test("does not treat a stray < in text as a tag", () => {
+		const html = `<p>1 < 2 and href="/x"</p>`;
+		expect(rewriteBaseInHtml(html, "/app")).toBe(html);
+	});
+
 	test("getBasePath/setBasePath round-trips through the module state", () => {
 		expect(getBasePath()).toBe("");
 		setBasePath("/app");

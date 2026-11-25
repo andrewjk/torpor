@@ -20,9 +20,6 @@ point people there.
 
 ### Smaller issues
 
-- **`rewriteBaseInHtml` rewrites by regex over the whole document**, so
-  `href="/…"` / `src="/…"` text inside `<pre>`/`<code>` samples or inline
-  scripts is rewritten too.
 - **`secure: true` by default** in `CookieHelper` means sessions and flash
   messages don't stick in browsers that refuse `Secure` cookies over plain
   `http://localhost` (older Safari), with no warning in dev.
