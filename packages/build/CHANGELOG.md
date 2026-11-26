@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 1.12.0
+
+<sub>2026-11-26</sub>
+
+- _(minor)_ Feat: reused layouts' data follows navigation, plus `$page.meta` for page-to-layout flags
+
 ## 1.11.1
 
 <sub>2026-11-26</sub>
