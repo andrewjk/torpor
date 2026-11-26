@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.11
+
+<sub>2026-11-26</sub>
+
+- _(patch)_ Updated dependency `@torpor/build` v1.12.1
+
 ## 1.2.10
 
 <sub>2026-11-26</sub>

@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 1.12.1
+
+<sub>2026-11-26</sub>
+
+- _(patch)_ Fix: insert the next page at a layout's `<slot />`, not after its siblings
+
 ## 1.12.0
 
 <sub>2026-11-26</sub>
