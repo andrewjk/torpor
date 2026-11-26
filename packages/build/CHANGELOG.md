@@ -1,5 +1,45 @@
 # @torpor/build
 
+## 1.11.0
+
+<sub>2026-11-26</sub>
+
+- _(minor)_
+  !Fix: give each request its own $page state, via $context
+
+  BREAKING: `$page` is no longer exported from `@torpor/build/state`; read it from the context with `let { $page } = $context;`.
+
+- _(minor)_
+  !Feat: run folder hooks before route middleware
+
+  BREAKING: Route `middleware` now runs after the folder hooks (`_hook.server.ts`), not before; it can read their data from `ev.appData`. Hooks also now run before params and query validation for loads and endpoints.
+
+- _(minor)_
+  !Fix: reject middleware on layout server endpoints
+
+  BREAKING: A `_layout.server.ts` that exports `middleware` (which was silently ignored) now throws; move the guard into a `_hook.server.ts` in the same folder, and type layout endpoints with `LayoutServerEndPoint`.
+
+- _(minor)_ Feat: add HTTP caching for pages and data requests
+- _(minor)_ Feat: preload each page's client chunks
+- _(minor)_ Feat: report each page's JS size, with budgets
+- _(patch)_ Fix: escape no-JS form results and deferred rejections embedded in pages
+- _(patch)_ Fix: harden session cookies and reject oversized cookies
+- _(patch)_ Fix: ignore Object.prototype names in form actions
+- _(patch)_ Fix: validate the `/_error` status query
+- _(patch)_ Fix: let the newest client navigation win
+- _(patch)_ Fix: keep prototype-named form and query fields
+- _(patch)_ Fix: run hooks before action schema validation
+- _(patch)_ Fix: reject cross-origin form actions
+- _(patch)_ Fix: scope the base path to each site's handler
+- _(patch)_ Fix: pass the layout context into reused slots
+- _(patch)_ Fix: only rewrite real HTML attributes for the base path
+- _(patch)_ Fix: only set Secure cookies over HTTPS
+- _(patch)_ Fix: cache hashed build assets for a year
+- _(patch)_ Fix: answer HEAD requests for pages and data
+- _(patch)_ Fix: link component stylesheets, not inline
+- _(patch)_ Fix: serve base path sites' assets
+- _(patch)_ Fix: add the base path to client-set links
+
 ## 1.10.0
 
 <sub>2026-11-23</sub>

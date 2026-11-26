@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.19
+
+<sub>2026-11-26</sub>
+
+- _(patch)_ Fix: format render sections with unimported components
+
 ## 1.0.18
 
 <sub>2026-11-23</sub>

@@ -1,5 +1,55 @@
 # @torpor/view
 
+## 1.4.0
+
+<sub>2026-11-26</sub>
+
+- _(minor)_
+  !Fix: stop interpolating quoted attribute values
+
+  BREAKING: Quoted attribute values no longer interpolate `{...}`; use `{expression}` or a backtick template literal.
+
+- _(minor)_ Feat: pass a root context to mount and hydrate
+- _(minor)_
+  !Fix: only deep-wrap plain reactive objects
+
+  BREAKING: Class instances, RegExp, typed arrays and other non-plain or non-extensible objects are no longer deep-watched.
+
+- _(minor)_ Feat: support URL and URLSearchParams state
+- _(minor)_
+  !Fix: detect components from imports and local declarations
+
+  BREAKING: Components must be imported or declared in the same `.torp` file; unimported capitalized tags are now compile errors instead of being treated as components.
+
+- _(minor)_ Feat: warn in dev about competing page titles
+- _(patch)_ Fix: bubble delegated events through nested handlers
+- _(patch)_ Fix: escape class, style and bound values in server-rendered attributes
+- _(patch)_ Fix: don't escape SSR text in script/style
+- _(patch)_ Fix: delegated events in shadow roots/iframes
+- _(patch)_ Fix: track array read method elements
+- _(patch)_ Fix: detect cycles per effect, not per flush
+- _(patch)_ Fix: restore tracking when $peek throws
+- _(patch)_ Fix: don't tear down on unregistered unmount
+- _(patch)_ Fix: keep render context clean on mount error
+- _(patch)_ Fix: don't notify on unchanged NaN writes
+- _(patch)_ Fix: track in checks with a has trap
+- _(patch)_ Fix: don't notify on missing collection delete
+- _(patch)_ Fix: stop index writes notifying length
+- _(patch)_ Refactor: share SSR escaping rules
+- _(patch)_ Test: guard SSR twin signatures
+- _(patch)_
+  !Fix: treat inline script/style contents as raw
+
+  BREAKING: Inline `<script>` and `<style>` contents are literal now; use `@html` for dynamic script/style markup.
+
+- _(patch)_ Fix: ignore braces in strings and comments
+- _(patch)_ Fix: keep cleared number inputs empty
+- _(patch)_ Fix: parse @for and @const headers
+- _(patch)_ Fix: scope styles on every component element
+- _(patch)_ Fix: shrink production bundles by tree-shaking unused runtime code
+- _(patch)_ Fix: count server $async timeouts from the start of the render
+- _(patch)_ Fix: add the base path to client-set links
+
 ## 1.3.3
 
 <sub>2026-11-23</sub>

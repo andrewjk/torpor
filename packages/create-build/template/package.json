@@ -12,10 +12,10 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@torpor/adapter-node": "^1.1.15",
-		"@torpor/build": "^1.10.0",
-		"@torpor/unplugin": "^1.2.13",
-		"@torpor/view": "^1.3.3",
+		"@torpor/adapter-node": "^1.1.16",
+		"@torpor/build": "^1.11.0",
+		"@torpor/unplugin": "^1.2.14",
+		"@torpor/view": "^1.4.0",
 		"vite": "npm:@voidzero-dev/vite-plus-core@^1.2.0"
 	},
 	"devDependencies": {

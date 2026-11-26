@@ -1,5 +1,13 @@
 # @torpor/ui
 
+## 1.5.1
+
+<sub>2026-11-26</sub>
+
+- _(patch)_ Fix: cancel pending menu hover timers
+- _(patch)_ Fix: clear pending date picker focus timers
+- _(patch)_ Fix: count generated ids per server render
+
 ## 1.5.0
 
 <sub>2026-11-23</sub>

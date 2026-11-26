@@ -1,5 +1,12 @@
 # @torpor/adapter-cloudflare
 
+## 1.0.31
+
+<sub>2026-11-26</sub>
+
+- _(patch)_ Fix: cache hashed build assets for a year
+- _(patch)_ Fix: serve base path sites' assets
+
 ## 1.0.30
 
 <sub>2026-11-23</sub>

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+<sub>2026-11-26</sub>
+
+- _(patch)_ Fix: parse artifacts with host-supplied components
+
 ## 1.0.1
 
 <sub>2026-11-19</sub>
