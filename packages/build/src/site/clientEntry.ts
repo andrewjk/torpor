@@ -1,5 +1,6 @@
 import manifest from "@torpor/build/manifest";
 import { setUrlRewriter } from "@torpor/view";
+import isSamePageNavigation from "../nav/isSamePageNavigation.ts";
 import loadData from "../nav/loadData.ts";
 import navigate from "../nav/navigate.ts";
 import type { NavigationResult } from "../nav/navigate.ts";
@@ -153,6 +154,14 @@ function ignoreAnchorMouseEvent(link: HTMLAnchorElement, e: Event) {
 // Listen for changes to the URL that occur when the user navigates using the
 // back or forward buttons
 window.addEventListener("popstate", async () => {
+	// A fragment navigation within the page on screen (a `#hash` link click,
+	// or back/forward between two hash entries) fires popstate too, but the
+	// browser owns it: it has already moved the history entry and scrolled
+	// to the target anchor. Re-rendering would rebuild the page and restore
+	// the saved (or default) scroll position, undoing the jump
+	if (isSamePageNavigation(document.location)) {
+		return;
+	}
 	const result = await navigateToLocation(document.location);
 	if (result.type === "superseded") {
 		// A newer navigation (another popstate, or a click) owns the url; it
