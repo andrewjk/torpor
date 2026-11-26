@@ -100,6 +100,7 @@ export default async function loadData(
 			// point them at the new page's data
 			if (reuse) {
 				stackLayout.slotRegion = previous.slotRegion;
+				stackLayout.slotAnchor = previous.slotAnchor;
 				stackLayout.context = previous.context;
 				stackLayout.props = previous.props;
 			}
@@ -172,6 +173,7 @@ export function errorLayoutStack(
 			data: rendered && previous ? { ...previous.data } : {},
 			reuse: rendered,
 			slotRegion: rendered && previous ? previous.slotRegion : null,
+			slotAnchor: rendered && previous ? previous.slotAnchor : undefined,
 			context: rendered && previous ? previous.context : undefined,
 			// The props object stays with its component, so a later navigation
 			// that reuses this layout can still update it. It is NOT pointed at

@@ -429,6 +429,41 @@ describe("layout slot reuse", () => {
 		expect(sectionProps.data).toEqual({ pageLoad: true });
 	});
 
+	test("the refill inserts the next page at the slot's anchor", async () => {
+		client.router.addPages([layoutRoute(), pageRoute()]);
+
+		// The slot anchor the layout's `<slot />` rendered with (the compiler
+		// plants an empty comment at the slot's position, after its content),
+		// attached in the layout's parent between its siblings
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		const slotAnchor = document.createComment("");
+		container.appendChild(slotAnchor);
+		const startNode = document.createComment("");
+		container.appendChild(startNode);
+		container.appendChild(document.createElement("p"));
+
+		client.layoutStack = [
+			{
+				path: "/_layout",
+				data: {},
+				reuse: true,
+				slotRegion: { startNode, endNode: startNode },
+				slotAnchor,
+			},
+		];
+
+		const navigated = await navigate(new URL("http://localhost/dashboard"));
+
+		expect(navigated.type).toBe("rendered");
+		// The page is rendered into the slot's parent, anchored before the
+		// slot's comment -- not with a null anchor, which would append it
+		// after the layout's siblings
+		expect(fillLayoutSlotMock).toHaveBeenCalledTimes(1);
+		expect(fillLayoutSlotMock.mock.calls[0][2]).toBe(container);
+		expect(fillLayoutSlotMock.mock.calls[0][3]).toBe(slotAnchor);
+	});
+
 	test("an error page over live layouts leaves their props alone", async () => {
 		// Both the page's and the error page's own loads fail (offline, or the
 		// server is down), so the error page renders over the reused layout

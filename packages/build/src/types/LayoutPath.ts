@@ -8,6 +8,15 @@ export default interface LayoutPath {
 	/** The range of the UI in this layout's slot */
 	slotRegion: any;
 	/**
+	 * The anchor the layout's `<slot />` rendered its content with: the empty
+	 * comment the compiler plants at the slot's position, after the slot's
+	 * content. A navigation that reuses the layout inserts the next page
+	 * before it, so the page lands where the slot is -- without it, a slot
+	 * that sits between the layout's own siblings (header, slot, footer)
+	 * would get the next page appended after them (header, footer, page).
+	 */
+	slotAnchor?: Node | null;
+	/**
 	 * The `$props` object this layout's component was created with. Kept
 	 * reactive, so a navigation that reuses the layout can point its `data`
 	 * (and `form`) at the new page's values -- otherwise the layout would keep

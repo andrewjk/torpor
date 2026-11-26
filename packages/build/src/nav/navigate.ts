@@ -352,6 +352,9 @@ async function renderNavigation(
 			// Keep the context the innermost layout passed to its slot, for a
 			// later refill that reuses that layout
 			layoutStack[i].context = slotContext;
+			// Keep the slot's anchor too, so the refill can insert the new page
+			// at the slot's position (see the reused branch of the render below)
+			layoutStack[i].slotAnchor = anchor;
 			layoutStack[i].slotRegion = fillLayoutSlot(
 				clientEndPoint.component!,
 				slotFunctions[i + 1],
@@ -381,6 +384,11 @@ async function renderNavigation(
 						// This slot belongs to layout i-1: keep the context it
 						// passed down so a later refill can replay it
 						layoutStack[i - 1].context = slotContext;
+						// Keep the slot's anchor (the comment at the slot's
+						// position in the layout), so the refill can insert the
+						// new page before it rather than after the layout's
+						// other children
+						layoutStack[i - 1].slotAnchor = anchor;
 						// Remember this layout's props, so a later navigation
 						// that reuses it can point its data at the new page's
 						// (see the reused branch of the render below)
@@ -464,12 +472,20 @@ async function renderNavigation(
 						}
 					}
 				}
-				app = slotRegion.startNode.parentNode as HTMLElement;
+				// Insert the next page at the slot's position: the anchor the
+				// layout's `<slot />` rendered with (the comment at the slot's
+				// place, after its content). Refilling with no anchor would
+				// append to the slot's parent, so a slot that sits between the
+				// layout's own siblings (header, slot, footer) would get the
+				// page after them (header, footer, page)
+				const slotAnchor = layoutStack[reusedIndex].slotAnchor;
+				const anchor = slotAnchor?.parentNode != null ? slotAnchor : null;
+				app = (anchor?.parentNode ?? slotRegion.startNode.parentNode) as HTMLElement;
 				clearLayoutSlot(slotRegion);
 				// The layout itself isn't re-run, so replay the context it
 				// passed to its slot (kept with the stack entry); otherwise its
 				// `$context` additions would be missing from the new page
-				component(app, null, undefined, layoutStack[reusedIndex].context ?? $context);
+				component(app, anchor, undefined, layoutStack[reusedIndex].context ?? $context);
 			} else if (withHydration) {
 				hydrate(app, component, $props, slots, $context);
 			} else {
