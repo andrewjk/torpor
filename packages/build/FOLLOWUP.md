@@ -5,40 +5,6 @@
 A gap analysis of `packages/build` against commonly needed features in peer
 meta-frameworks (Next, Nuxt, SvelteKit, Astro, TanStack Start, Hono).
 
-What already exists: file + code routing, layouts, `_error` pages, per-folder
-hooks, global middleware (`Server.use()`), cookies (`CookieHelper`), form
-actions with Standard Schema validation and file upload support (`readForm`
-reads `File` values), client-side navigation with hover/focus prefetch, SSE
-client helper (`$stream(fromServer(...))`), OpenAPI generation + docs UI,
-test utilities, node/cloudflare adapters with auto-detection, typed env
-access (`env()` with optional `site.env` schema validation and adapter-level
-`TorporEnv` key merging), a signed-cookie session helper (`ev.session` with
-`get`/`set`/`regenerate`/`destroy`), prerendering (route/layout/site
-`prerender` flags rendered by `runPrerender` into `dist/client`, params
-entries for dynamic routes, error page as `404.html`), base path config
-(`site.basePath` strips the prefix from server requests, rewrites generated
-HTML attributes and redirect locations, and mirrors on the client router),
-view transitions with scroll restoration (`site.viewTransitions = true` opts
-navigations into running inside `document.startViewTransition`; scroll is
-always reset across pages, kept for same-page navigations, and restored from
-history state on back/forward),
-flash messages (`event.flash.set(...)` riding a one-read cookie, consumed
-into `$context.$page.flash` by the render pipeline), route middleware (`site.middleware`
-runs globally for every request -- unmatched ones too -- and server endpoints
-take `middleware: [...]` for route-scoped guards, run after folder hooks),
-and HTTP caching (`event.cache()` for `Cache-Control`/`Vary`, private by
-default for responses that read or set cookies, content ETags and 304s on
-pages and client data responses, `dedupe()` for once-per-request calls,
-and `event.waitUntil()` for background work; a cross-request data cache is
-deliberately left to the db/ORM or the app's own cache layer). Discovery helpers exist
-too: `seo()` (in `@torpor/build/discovery`) builds page head data (title,
-description, Open Graph/Twitter metas via a `{ property, content }` head
-variant), endpoint `head` data is now rendered at render time, and
-`site.sitemap` writes a build-time sitemap of the prerendered pages or
-serves one at runtime from a `{ get }` config (needing `site.origin`); and
-robots.txt stays a plain host file (with `src/public` files served in dev
-and copied into the build output).
-
 ### Medium
 
 1. **WebSockets (server-side)** — SSE exists client-side, but no WS endpoint
@@ -72,13 +38,7 @@ likely to come up.
 
 Gaps found by checking torpor against the practices in "Performance is
 design" (shannadige.com, Oct 2026): what a framework should make easy so that
-fast sites are the default. Already covered: SSR and prerendering by
-default, HTML caching with ETags/304s, year-long `immutable` caching of
-hashed assets (Node and Cloudflare), `modulepreload` and stylesheet links for each
-page's client chunks (component styles arrive once, as cached files), a build report of the JavaScript each page loads (with
-`site.budgets`), a small compiled runtime (the docs
-site's entry script is ~23 KB gzipped), deferred loads, and hover/focus
-prefetch. In rough order of value:
+fast sites are the default. In rough order of value:
 
 1. **Pending state for navigation and form submits.** `$page` has no
    `navigating` or `submitting` flag, so showing immediate feedback on a
