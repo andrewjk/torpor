@@ -10,12 +10,17 @@ const manifest = {
 		imports: ["_runtime-BBBBBBBB.js"],
 	},
 	"_runtime-BBBBBBBB.js": { file: "assets/runtime-BBBBBBBB.js" },
-	"_shared-CCCCCCCC.js": { file: "assets/shared-CCCCCCCC.js", imports: ["_runtime-BBBBBBBB.js"] },
+	"_shared-CCCCCCCC.js": {
+		file: "assets/shared-CCCCCCCC.js",
+		imports: ["_runtime-BBBBBBBB.js"],
+		css: ["assets/shared-CCCCCCCC.css"],
+	},
 	"src/routes/_layout.torp": {
 		file: "assets/_layout-DDDDDDDD.js",
 		src: "src/routes/_layout.torp",
 		isEntry: true,
 		imports: ["_shared-CCCCCCCC.js", "_runtime-BBBBBBBB.js"],
+		css: ["assets/_layout-DDDDDDDD.css"],
 	},
 	"src/routes/docs/+page.torp": {
 		file: "assets/_page-EEEEEEEE.js",
@@ -57,4 +62,23 @@ test("dynamic imports aren't preloaded, and unbuilt routes are skipped", () => {
 	const preloads = clientPreloads(manifest, "/site", routes);
 	expect(Object.values(preloads.routes).flat()).not.toContain("/assets/Repl-FFFFFFFF.js");
 	expect(preloads.routes["/missing"]).toBeUndefined();
+});
+
+const stylesheets: Record<string, string> = {
+	"assets/shared-CCCCCCCC.css":
+		"a.torp-abc123 { color: red; } b.torp-abc123:hover { color: blue; }",
+	"assets/_layout-DDDDDDDD.css": "nav.torp-def456 { margin: 0; } html { color: black; }",
+};
+
+test("each route lists the stylesheets its chunks import, and the styles in them", () => {
+	const preloads = clientPreloads(manifest, "/site", routes, (file) => stylesheets[file] ?? "");
+	expect(preloads.styles.routes["/_layout"]).toEqual([
+		"/assets/_layout-DDDDDDDD.css",
+		"/assets/shared-CCCCCCCC.css",
+	]);
+	expect(preloads.styles.routes["/docs"]).toEqual(["/assets/shared-CCCCCCCC.css"]);
+	expect(preloads.styles.hashes).toEqual({
+		"/assets/_layout-DDDDDDDD.css": ["def456"],
+		"/assets/shared-CCCCCCCC.css": ["abc123"],
+	});
 });

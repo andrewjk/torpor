@@ -375,26 +375,63 @@ export function createServerLoad(
 }
 
 /**
- * `<link rel="modulepreload">` tags for the client chunks the page needs:
- * the client entry's, then each layout's from the root down, then the
- * page's. Without them the browser only finds the page's chunks after the
- * entry script (at the end of the HTML) has downloaded and run. Empty in dev,
- * where Vite serves modules unbundled.
+ * The head tags for the page's client files and component styles.
+ *
+ * - `<link rel="modulepreload">` for the client chunks the page needs: the
+ *   client entry's, then each layout's from the root down, then the page's.
+ *   Without them the browser only finds the page's chunks after the entry
+ *   script (at the end of the HTML) has downloaded and run.
+ * - `<link rel="stylesheet">` for the stylesheets those chunks import, which
+ *   hold the components' scoped styles. The client loads the same files when
+ *   it hydrates (through Vite's preload helper, which skips a stylesheet
+ *   that's already linked), so linking them here means each component's
+ *   styles arrive once -- the inline `<style>` copies the components rendered
+ *   are left out for every style a linked stylesheet contains. Head
+ *   stylesheets block rendering, so there's no flash of unstyled content.
+ *
+ * In dev there's no build manifest: the inline styles stay, tagged with
+ * their Vite module id, so the dev client adopts them instead of adding
+ * another copy.
+ *
+ * @param styles The head content the components rendered (their styles)
  */
-function preloadLinks(ev: ServerEvent, handler: RouteHandler): string {
+function pageAssets(ev: ServerEvent, handler: RouteHandler, styles: string): string {
 	const preloads = requestPreloads(ev);
-	if (!preloads) return "";
-	const files = new Set(preloads.entry);
-	for (const layout of handler.layouts ?? []) {
-		for (const file of preloads.routes[layout.path] ?? []) files.add(file);
+	if (!preloads) {
+		return devMode
+			? styles.replace(INLINE_STYLE_RE, (tag, hash: string) =>
+					tag.replace(`<style id='${hash}'`, `<style id='${hash}' data-vite-dev-id='${hash}.css'`),
+				)
+			: styles;
 	}
-	for (const file of preloads.routes[handler.path] ?? []) files.add(file);
+
+	const routes = [...(handler.layouts ?? []).map((layout) => layout.path), handler.path];
+	const scripts = new Set(preloads.entry);
+	const stylesheets = new Set(preloads.styles.entry);
+	for (const route of routes) {
+		for (const file of preloads.routes[route] ?? []) scripts.add(file);
+		for (const file of preloads.styles.routes[route] ?? []) stylesheets.add(file);
+	}
+
+	const linked = new Set<string>();
 	let links = "";
-	for (const file of files) {
+	for (const file of stylesheets) {
+		links += `<link rel="stylesheet" href="${file}">`;
+		for (const hash of preloads.styles.hashes[file] ?? []) linked.add(hash);
+	}
+	for (const file of scripts) {
 		links += `<link rel="modulepreload" href="${file}">`;
 	}
-	return links;
+
+	// A style no linked stylesheet contains (e.g. one from a component that
+	// isn't in the client build) stays inline
+	return (
+		links + styles.replace(INLINE_STYLE_RE, (tag, hash: string) => (linked.has(hash) ? "" : tag))
+	);
 }
+
+/** A component's inline scoped style, as rendered by the server build. */
+const INLINE_STYLE_RE = /<style id='([a-z0-9]+)'>[\s\S]*?<\/style>/g;
 
 /**
  * The response to a HEAD request: the same status and headers, with the body
@@ -1044,7 +1081,7 @@ async function loadView(
 
 		styles += head;
 		html = rewriteBaseInHtml(
-			mergeHead(template, preloadLinks(ev, handler) + styles + headData).replace(
+			mergeHead(template, pageAssets(ev, handler, styles) + headData).replace(
 				"%COMPONENT_BODY%",
 				body,
 			),

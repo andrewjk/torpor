@@ -74,8 +74,8 @@ Gaps found by checking torpor against the practices in "Performance is
 design" (shannadige.com, Oct 2026): what a framework should make easy so that
 fast sites are the default. Already covered: SSR and prerendering by
 default, HTML caching with ETags/304s, year-long `immutable` caching of
-hashed assets (Node and Cloudflare), `modulepreload` links for each page's
-client chunks, a build report of the JavaScript each page loads (with
+hashed assets (Node and Cloudflare), `modulepreload` and stylesheet links for each
+page's client chunks (component styles arrive once, as cached files), a build report of the JavaScript each page loads (with
 `site.budgets`), a small compiled runtime (the docs
 site's entry script is ~23 KB gzipped), deferred loads, and hover/focus
 prefetch. In rough order of value:
@@ -103,6 +103,27 @@ prefetch. In rough order of value:
    or Vite plugin integration would cover it.
 4. **Fonts.** No help preloading the fonts a page's CSS uses, or setting
    `font-display`, so custom fonts can delay text or shift layout.
+5. **Inline small stylesheets.** Pages now link their component
+   stylesheets (`<link rel="stylesheet">` from the client manifest, see
+   `pageAssets` in `site/serverHandlers.ts`) rather than inlining each
+   component's `<style>`, so each style arrives once and later pages reuse
+   the cached files. The cost is a render-blocking request per stylesheet
+   on a cold first visit, where inline styles arrived with the HTML. If that
+   shows up in first paint, inline stylesheets under a size threshold
+   (SvelteKit's `inlineStyleThreshold`), and stop the client loading the
+   same file again: Vite's preload helper skips a stylesheet only when a
+   `<link>` for it exists, so an inlined one needs either a placeholder
+   (e.g. a disabled `<link>` with the same href) or a patched preload
+   helper.
+6. **Check base path sites' stylesheets.** Not verified: with
+   `site.basePath`, the server's stylesheet links get the base (via
+   `rewriteBaseInHtml`), but Vite's preload helper builds its URLs from
+   Vite's own `base`, which the build doesn't set. So on a client
+   navigation to a page with new stylesheets, the helper may request
+   `/assets/x.css` without the base (and not recognise the server's
+   `/app/assets/x.css` links as the same file). This predates the
+   stylesheet links (client navigation always relied on the helper); setting
+   Vite's `base` from `site.basePath` for the client build is the likely fix.
 
 ## Follow-ups from prerendering
 

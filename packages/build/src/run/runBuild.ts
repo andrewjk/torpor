@@ -1,6 +1,6 @@
 import torpor from "@torpor/unplugin/vite";
 import { configDotenv } from "dotenv";
-import { existsSync, promises as fs } from "node:fs";
+import { existsSync, promises as fs, readFileSync } from "node:fs";
 import path from "node:path";
 import { build, defineConfig, type AliasOptions } from "vite";
 import Site from "../site/Site";
@@ -126,6 +126,7 @@ export default async function runBuild(site: Site): Promise<void> {
 				site.routes
 					.filter((r) => r.file && !/server\.(ts|js)$/.test(r.file))
 					.map((r) => ({ path: r.path, file: path.resolve(site.root, r.file!) })),
+				(file) => readFileSync(path.join(clientFolder, file), "utf-8"),
 			)
 		: undefined;
 
