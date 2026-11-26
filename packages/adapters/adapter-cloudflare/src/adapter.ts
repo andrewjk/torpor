@@ -113,10 +113,15 @@ async function postbuild(site: Site): Promise<void> {
 	// copied to the matching root paths, since this folder doubles as
 	// `assets.directory` and Cloudflare serves assets before the worker.
 	// (`site.html` and Vite's `.vite` cache aren't needed at runtime.)
-	await copyClientOutput(clientFolder, cloudflareFolder);
+	//
+	// Cloudflare serves assets by their full request path, so with a base
+	// path (e.g. "/app") the client output goes in that subfolder, where the
+	// rendered pages' URLs (`/app/assets/...`) point
+	const base = normalizeBase(site.basePath);
+	await copyClientOutput(clientFolder, path.join(cloudflareFolder, base));
 
 	// Let Cloudflare cache the hashed assets for a year
-	await writeAssetHeaders(cloudflareFolder);
+	await writeAssetHeaders(cloudflareFolder, base);
 
 	// Build a wrangler.toml file for running with `wrangler dev`
 	const wranglerConfig = `
@@ -148,6 +153,16 @@ _server
 	await fs.writeFile(assetsIgnoreFile, assetsIgnore);
 
 	await fs.rm(tempFolder, { recursive: true });
+}
+
+/**
+ * The site's base path, without a trailing slash ("" for none), as
+ * `@torpor/build` normalizes it.
+ */
+function normalizeBase(value: string | undefined): string {
+	const trimmed = (value ?? "").trim();
+	if (trimmed === "" || trimmed === "/") return "";
+	return trimmed.replace(/\/+$/, "");
 }
 
 /** Client-output entries that aren't copied into the Cloudflare folder. */

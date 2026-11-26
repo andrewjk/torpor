@@ -1,3 +1,4 @@
+import { addBaseToPath, normalizeBasePath } from "../site/basePath.ts";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -130,6 +131,7 @@ export default async function runPrerender(site: Site): Promise<number> {
 	}
 
 	const entries = await resolvePrerenderPaths(routes, site.prerender);
+	const base = normalizeBasePath(site.basePath);
 
 	// Load functions may read the environment (env() uses globalThis.adapter)
 	// @ts-ignore
@@ -139,7 +141,8 @@ export default async function runPrerender(site: Site): Promise<number> {
 	const skipped: string[] = [];
 	let written = 0;
 	for (const entry of entries) {
-		const url = `http://torpor.build${entry.path}`;
+		// The server only answers requests under the site's base path
+		const url = `http://torpor.build${addBaseToPath(entry.path, base)}`;
 		const request = new Request(url);
 		const serverEvent = new ServerEvent(request, entry.params, new URL(url));
 		// A page render embeds its server data as a `t-server-data` script (see
@@ -175,7 +178,7 @@ export default async function runPrerender(site: Site): Promise<number> {
 	const errorRoute = routes.find((r) => r.type === ERROR_ROUTE);
 	if (errorRoute && template !== undefined) {
 		for (const status of [404, 500]) {
-			const url = `http://torpor.build/_error?status=${status}`;
+			const url = `http://torpor.build${addBaseToPath("/_error", base)}?status=${status}`;
 			const serverEvent = new ServerEvent(new Request(url), undefined, new URL(url));
 			const response = await serverEntry.load(serverEvent, template);
 			if (isRedirect(response)) {
@@ -215,7 +218,6 @@ export default async function runPrerender(site: Site): Promise<number> {
 	// the set of pages that are actually static, which is exactly what a
 	// build-time sitemap can honestly represent
 	if (site.sitemap && site.origin && entries.length > 0) {
-		const base = site.basePath;
 		const sitemap = sitemapXml(
 			site.origin,
 			base,

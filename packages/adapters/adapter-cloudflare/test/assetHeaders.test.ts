@@ -42,3 +42,27 @@ test("no _headers file is written without assets", async () => {
 		await fs.rm(folder, { recursive: true });
 	}
 });
+
+test("with a base path, the rules match the assets under it", () => {
+	const rules = assetHeadersRules(["clientEntry-BUKMQ_H9.js", "logo.png"], "/app");
+	expect(rules).toContain("/app/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n");
+	expect(rules).toContain("/app/assets/logo.png\n  ! Cache-Control\n");
+});
+
+test("with a base path, the assets are read from its subfolder and a site's _headers moves to the root", async () => {
+	const folder = await fs.mkdtemp(path.join(os.tmpdir(), "torp-cf-headers-"));
+	try {
+		await fs.mkdir(path.join(folder, "app", "assets"), { recursive: true });
+		await fs.writeFile(path.join(folder, "app", "assets", "clientEntry-BUKMQ_H9.js"), "");
+		await fs.writeFile(path.join(folder, "app", "_headers"), "/*\n  X-Frame-Options: DENY\n");
+
+		await writeAssetHeaders(folder, "/app");
+
+		const headers = await fs.readFile(path.join(folder, "_headers"), "utf-8");
+		expect(headers.indexOf("/app/assets/*")).toBe(0);
+		expect(headers).toContain("X-Frame-Options: DENY");
+		expect(existsSync(path.join(folder, "app", "_headers"))).toBe(false);
+	} finally {
+		await fs.rm(folder, { recursive: true });
+	}
+});

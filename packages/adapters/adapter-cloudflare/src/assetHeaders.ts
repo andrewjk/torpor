@@ -24,11 +24,11 @@ function isHashedAsset(name: string): boolean {
  * Unhashed files in `assets/` have the header detached again, so they keep
  * Cloudflare's default.
  */
-export function assetHeadersRules(assetNames: string[]): string {
-	let rules = `/assets/*\n  Cache-Control: ${IMMUTABLE_CACHE_CONTROL}\n`;
+export function assetHeadersRules(assetNames: string[], base = ""): string {
+	let rules = `${base}/assets/*\n  Cache-Control: ${IMMUTABLE_CACHE_CONTROL}\n`;
 	for (const name of assetNames) {
 		if (!isHashedAsset(name)) {
-			rules += `/assets/${name}\n  ! Cache-Control\n`;
+			rules += `${base}/assets/${name}\n  ! Cache-Control\n`;
 		}
 	}
 	return rules;
@@ -38,15 +38,24 @@ export function assetHeadersRules(assetNames: string[]): string {
  * Writes the asset caching rules to the Cloudflare folder's `_headers` file.
  * A `_headers` file the site provides (in `src/public`) is kept, after the
  * generated rules, so its own rules can still change the asset headers.
+ *
+ * @param base The site's base path ("" for none), whose subfolder holds the
+ * client output; `_headers` itself always sits at the folder root
  */
-export async function writeAssetHeaders(cloudflareFolder: string): Promise<void> {
-	const assetsFolder = path.join(cloudflareFolder, "assets");
+export async function writeAssetHeaders(cloudflareFolder: string, base = ""): Promise<void> {
+	const assetsFolder = path.join(cloudflareFolder, base, "assets");
 	const names = existsSync(assetsFolder) ? await listFiles(assetsFolder) : [];
 	if (names.length === 0) return;
 
 	const file = path.join(cloudflareFolder, "_headers");
+	// A site's own `_headers` was copied into the base subfolder with the
+	// rest of `src/public`, where Cloudflare won't read it
+	const siteFile = path.join(cloudflareFolder, base, "_headers");
+	if (base && existsSync(siteFile)) {
+		await fs.rename(siteFile, file);
+	}
 	const existing = existsSync(file) ? await fs.readFile(file, "utf-8") : "";
-	const rules = assetHeadersRules(names);
+	const rules = assetHeadersRules(names, base);
 	await fs.writeFile(file, existing ? `${rules}\n${existing}` : rules);
 }
 

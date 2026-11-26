@@ -6,6 +6,7 @@ import { build, defineConfig, type AliasOptions } from "vite";
 import Site from "../site/Site";
 import { checkApiCalls, checkRoutes, reportRouteIssues } from "../site/checkRoutes";
 import { checkLayoutSlots } from "../site/checkLayoutSlots";
+import { normalizeBasePath } from "../site/basePath.ts";
 import manifest from "../site/manifest.ts";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
@@ -91,6 +92,15 @@ export default async function runBuild(site: Site): Promise<void> {
 	];
 	clientConfig.build ??= {};
 	clientConfig.build.outDir = clientFolder;
+	// The client's own asset URLs -- the stylesheets and chunks Vite's
+	// preload helper loads on client navigation, and `url()`s in CSS -- carry
+	// the base path. The server rewrites the URLs in rendered HTML itself
+	// (see rewriteBaseInHtml), and leaves ones that already have the base
+	// alone
+	const base = normalizeBasePath(site.basePath);
+	if (base) {
+		clientConfig.base ??= base + "/";
+	}
 	// Root-level host files (robots.txt, favicon.ico, .well-known/*, etc) in
 	// src/public are copied verbatim into the client output root, and served
 	// from the same folder by the dev server
