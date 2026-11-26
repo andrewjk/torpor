@@ -95,10 +95,13 @@ export default async function loadData(
 			// navigation reuses its slot region; a prefetch must leave it alone
 			// (and not run its client load again). The context the layout
 			// passed to its slot is kept too, so refilling the slot after reuse
-			// still sees the layout's `$context` additions
+			// still sees the layout's `$context` additions -- as are the
+			// reactive props its component was created with, so the render can
+			// point them at the new page's data
 			if (reuse) {
 				stackLayout.slotRegion = previous.slotRegion;
 				stackLayout.context = previous.context;
+				stackLayout.props = previous.props;
 			}
 			Object.assign(stackLayout.data, previous.data);
 		} else {
@@ -170,6 +173,11 @@ export function errorLayoutStack(
 			reuse: rendered,
 			slotRegion: rendered && previous ? previous.slotRegion : null,
 			context: rendered && previous ? previous.context : undefined,
+			// The props object stays with its component, so a later navigation
+			// that reuses this layout can still update it. It is NOT pointed at
+			// the error page's data: the layout keeps showing the last good
+			// page's data while the error renders over it
+			props: rendered && previous ? previous.props : undefined,
 		});
 	});
 	return stack;

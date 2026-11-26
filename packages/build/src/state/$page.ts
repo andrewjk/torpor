@@ -16,6 +16,7 @@ const $page: PageState =
 			url: new URL("http://localhost"),
 			form: undefined,
 			flash: undefined,
+			meta: undefined,
 			error: {
 				message: "",
 			},

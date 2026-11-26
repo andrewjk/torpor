@@ -870,6 +870,11 @@ async function loadView(
 		return notFound();
 	}
 
+	// The page's static meta for layouts (`$page.meta`), replaced with each
+	// rendered page -- including error pages and form action re-renders, which
+	// go through here too
+	pageOf(ev).meta = clientEndPoint.meta;
+
 	// Consume the flash message when a page is rendered (but not for API
 	// requests), so that the following page -- and only that page -- can show
 	// it. For a form action that re-renders instead of redirecting, the

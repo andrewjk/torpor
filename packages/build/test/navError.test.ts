@@ -355,6 +355,126 @@ describe("layout slot reuse", () => {
 		expect(mountMock).not.toHaveBeenCalled();
 		expect(document.getElementById("app")!.innerHTML).not.toContain("Script syntax error");
 	});
+
+	test("a reused layout's props are pointed at the new page's data", async () => {
+		// The page's client load provides the merged data the layout should see
+		const pageLoad = async () => Response.json({ section: "bookings" });
+		client.router.addPages([
+			layoutRoute(),
+			{
+				path: "/dashboard",
+				type: PAGE_ROUTE,
+				endPoint: () => Promise.resolve({ default: { component: pageComponent, load: pageLoad } }),
+				subFolder: undefined,
+			},
+		]);
+
+		// The layout as it stands after the navigation that created it: its
+		// props object is the one its component holds (a `$watch` proxy in
+		// production; the mock above makes it the plain object here)
+		const props: Record<PropertyKey, any> = { data: { section: "home" }, form: undefined };
+		client.layoutStack = [
+			{
+				path: "/_layout",
+				data: {},
+				reuse: true,
+				slotRegion: liveRegion(),
+				props,
+			},
+		];
+
+		const navigated = await navigate(new URL("http://localhost/dashboard"));
+
+		expect(navigated.type).toBe("rendered");
+		// The same object the layout's component holds, now carrying the new
+		// page's merged data -- so the layout follows the page it wraps (the
+		// server, which re-renders the layout every request, already does)
+		expect(client.layoutStack[0].props).toBe(props);
+		expect(props.data).toEqual({ section: "bookings" });
+		expect(props.form).toBeUndefined();
+	});
+
+	test("every reused layout in the chain gets the new page's data", async () => {
+		const pageLoad = async () => Response.json({ pageLoad: true });
+		client.router.addPages([
+			layoutRoute(),
+			layoutRoute("/dashboard/_layout"),
+			{
+				path: "/dashboard",
+				type: PAGE_ROUTE,
+				endPoint: () => Promise.resolve({ default: { component: pageComponent, load: pageLoad } }),
+				subFolder: undefined,
+			},
+		]);
+
+		// Two layouts, each created in an earlier navigation with its own props
+		// object (the root in an earlier one than the section, say)
+		const rootProps: Record<PropertyKey, any> = { data: { older: true }, form: undefined };
+		const sectionProps: Record<PropertyKey, any> = { data: { old: true }, form: undefined };
+		client.layoutStack = [
+			{ path: "/_layout", data: {}, reuse: true, slotRegion: liveRegion(), props: rootProps },
+			{
+				path: "/dashboard/_layout",
+				data: {},
+				reuse: true,
+				slotRegion: liveRegion(),
+				props: sectionProps,
+			},
+		];
+
+		const navigated = await navigate(new URL("http://localhost/dashboard"));
+
+		expect(navigated.type).toBe("rendered");
+		expect(rootProps.data).toEqual({ pageLoad: true });
+		expect(sectionProps.data).toEqual({ pageLoad: true });
+	});
+
+	test("an error page over live layouts leaves their props alone", async () => {
+		// Both the page's and the error page's own loads fail (offline, or the
+		// server is down), so the error page renders over the reused layout
+		const errorLoad = async () => new Response(null, { status: 500 });
+		client.router.addPages([
+			layoutRoute(),
+			{
+				path: "/dashboard",
+				type: PAGE_ROUTE,
+				endPoint: () =>
+					Promise.resolve({ default: { component: pageComponent, load: failingLoad } }),
+				subFolder: undefined,
+			},
+			{
+				path: "/_error",
+				type: ERROR_ROUTE,
+				endPoint: () =>
+					Promise.resolve({ default: { component: errorComponent, load: errorLoad } }),
+				subFolder: undefined,
+			},
+		]);
+		const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+		const props: Record<PropertyKey, any> = { data: { section: "home" }, form: undefined };
+		client.layoutStack = [
+			{
+				path: "/_layout",
+				data: {},
+				reuse: true,
+				slotRegion: liveRegion(),
+				props,
+			},
+		];
+
+		try {
+			const navigated = await navigate(new URL("http://localhost/dashboard"));
+
+			expect(navigated.type).toBe("rendered");
+			expect(fillLayoutSlotMock).toHaveBeenCalled();
+			// The layout keeps the last good page's data: pointing it at the
+			// error page's (empty) data would blank a data-driven header while
+			// the error is up
+			expect(props.data).toEqual({ section: "home" });
+		} finally {
+			consoleError.mockRestore();
+		}
+	});
 });
 
 describe("navigate", () => {
@@ -757,6 +877,43 @@ describe("navigate", () => {
 			expect(fetchMock).toHaveBeenCalledTimes(2);
 		} finally {
 			vi.unstubAllGlobals();
+		}
+	});
+});
+
+describe("page meta", () => {
+	test("a navigation replaces $page.meta with the page endpoint's", async () => {
+		client.router.addPages([
+			{
+				path: "/booking",
+				type: PAGE_ROUTE,
+				endPoint: () =>
+					Promise.resolve({ default: { component: pageComponent, meta: { bare: true } } }),
+				subFolder: undefined,
+			},
+		]);
+		$page.meta = { bare: false };
+
+		const navigated = await navigate(new URL("http://localhost/booking"));
+
+		expect(navigated.type).toBe("rendered");
+		expect($page.meta).toEqual({ bare: true });
+	});
+
+	test("a failed navigation restores the previous $page.meta", async () => {
+		client.router.addPages(routesWith(failingLoad, false));
+		$page.meta = { bare: false };
+		const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+
+		try {
+			const navigated = await navigate(new URL("http://localhost/posts"));
+
+			// The navigation failed and the page is kept, so its meta is kept
+			// with it (the new page's meta was set while the loads ran)
+			expect(navigated.type).toBe("failed");
+			expect($page.meta).toEqual({ bare: false });
+		} finally {
+			consoleError.mockRestore();
 		}
 	});
 });

@@ -18,6 +18,7 @@ export default function pageOf(ev: ServerEvent): PageState {
 			url: ev.url,
 			form: undefined,
 			flash: undefined,
+			meta: undefined,
 			error: {
 				message: "",
 			},

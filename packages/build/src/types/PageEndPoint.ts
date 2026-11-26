@@ -36,6 +36,14 @@ export default interface PageEndPoint<
 	 */
 	serverData?: boolean;
 	/**
+	 * Static data for layouts: exposed to every component as `$page.meta` and
+	 * replaced on each navigation, e.g. `meta: { bare: true }` on pages that
+	 * want the root layout's header left out. Unlike load data, it's known
+	 * before anything renders (no load needed), so the server HTML is right
+	 * the first time.
+	 */
+	meta?: Record<string, any>;
+	/**
 	 * Loads data for the page.
 	 */
 	load?: (event: PageLoadEvent<Route>) => PageLoadReturn<Data> | Promise<PageLoadReturn<Data>>;

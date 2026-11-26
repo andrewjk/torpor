@@ -1,4 +1,4 @@
-import { clearLayoutSlot, fillLayoutSlot, hydrate } from "@torpor/view";
+import { $watch, clearLayoutSlot, fillLayoutSlot, hydrate } from "@torpor/view";
 import { type Component, type SlotRender } from "@torpor/view";
 import { mount, unmount } from "@torpor/view";
 import $page from "../state/$page";
@@ -83,6 +83,7 @@ async function navigateNow(
 	const previousUrl = $page.url;
 	const previousStatus = $page.status;
 	const previousError = $page.error;
+	const previousMeta = $page.meta;
 	let result: NavigationResult;
 	try {
 		result = await renderNavigation(rawUrl, withHydration, id, signal);
@@ -102,6 +103,7 @@ async function navigateNow(
 		$page.url = previousUrl;
 		$page.status = previousStatus;
 		$page.error = previousError;
+		$page.meta = previousMeta;
 	}
 	return result;
 }
@@ -178,6 +180,11 @@ async function renderNavigation(
 		return { type: "server-only" };
 	}
 
+	// The page's static meta for layouts (`$page.meta`), replaced on every
+	// navigation -- including the error-page render below, so a layout
+	// branching on `$page.meta` follows the page actually being shown
+	$page.meta = clientEndPoint.meta;
+
 	let newLayoutStack: LayoutPath[] = [];
 
 	// Pass the data into $props
@@ -200,6 +207,10 @@ async function renderNavigation(
 		return { type: "redirect" };
 	}
 	let data = result.data;
+	// Whether this navigation is an error page rendered over the layouts
+	// already on screen (their data can't load), in which case the reused
+	// layouts' props are left pointing at the last good page's data
+	let errorRender = false;
 	if (result.error) {
 		if (withHydration) {
 			// The server rendered this page fine moments ago -- keep its
@@ -224,6 +235,7 @@ async function renderNavigation(
 		if (!clientEndPoint?.component) {
 			return { type: "failed" };
 		}
+		$page.meta = clientEndPoint.meta;
 
 		$page.status = result.error.status;
 		$page.error = { message: result.error.message };
@@ -255,6 +267,10 @@ async function renderNavigation(
 			// with a document load that would fail too.
 			newLayoutStack = errorLayoutStack(handler, params);
 			data = {};
+			// The layouts staying on screen keep the last good page's data:
+			// pointing them at the error page's (empty) data would blank the
+			// header/navigation while the error is up
+			errorRender = true;
 		} else {
 			data = errorResult.data;
 		}
@@ -275,7 +291,12 @@ async function renderNavigation(
 		$page.form = form;
 		formElement.remove();
 	}
-	let $props: Record<string, any> = { data };
+	// The props for the page and every layout that renders fresh this time
+	// (the server passes all of them the same merged data; this is the client
+	// half). They're reactive, so a later navigation that reuses a layout can
+	// point its `data` at the new page's values and let the layout follow
+	// along -- see the reused-layout commit below
+	let $props: Record<string, any> = $watch({ data });
 
 	// We may have form data in $page.form, either from the hidden input
 	// (above), or added via onformsubmit (below)
@@ -360,6 +381,10 @@ async function renderNavigation(
 						// This slot belongs to layout i-1: keep the context it
 						// passed down so a later refill can replay it
 						layoutStack[i - 1].context = slotContext;
+						// Remember this layout's props, so a later navigation
+						// that reuses it can point its data at the new page's
+						// (see the reused branch of the render below)
+						layoutStack[i].props = $props;
 						layoutStack[i - 1].slotRegion = fillLayoutSlot(
 							layoutEndPoint.component!,
 							slotFunctions[i + 1],
@@ -391,6 +416,13 @@ async function renderNavigation(
 		// here (its superseded check failed above).
 		client.layoutStack = layoutStack;
 
+		if (!reused && layoutStack.length > 0) {
+			// The root layout is being created now: remember its props, so a
+			// later navigation that reuses it can update them (the deeper
+			// layouts record theirs in the slot functions above)
+			layoutStack[0].props = $props;
+		}
+
 		try {
 			if (reused) {
 				// The layout is being reused — clear the old slot content, then
@@ -414,6 +446,23 @@ async function renderNavigation(
 					);
 					window.location.reload();
 					return;
+				}
+				if (!errorRender) {
+					// Point the layouts that stay mounted at the new page's
+					// data, so a layout branching on page data (a header that
+					// comes and goes, say) follows navigation. The server
+					// re-renders its layouts with fresh data for every request;
+					// without this the client's reused layout would keep the
+					// first page's data forever. An error page rendering over
+					// the live shell leaves them on the last good page's data
+					// (see `errorRender` above)
+					for (let i = 0; i <= reusedIndex; i++) {
+						const layoutProps = layoutStack[i].props;
+						if (layoutProps) {
+							layoutProps.data = data;
+							layoutProps.form = $page.form;
+						}
+					}
 				}
 				app = slotRegion.startNode.parentNode as HTMLElement;
 				clearLayoutSlot(slotRegion);
