@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 1.11.1
+
+<sub>2026-11-26</sub>
+
+- _(patch)_ Fix: keep same-page `#hash` link jumps from snapping back to the top
+
 ## 1.11.0
 
 <sub>2026-11-26</sub>
