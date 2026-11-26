@@ -1,4 +1,5 @@
 import manifest from "@torpor/build/manifest";
+import { setUrlRewriter } from "@torpor/view";
 import loadData from "../nav/loadData.ts";
 import navigate from "../nav/navigate.ts";
 import type { NavigationResult } from "../nav/navigate.ts";
@@ -8,9 +9,17 @@ import client from "../state/client";
 import type LayoutPath from "../types/LayoutPath";
 import type PageEndPoint from "../types/PageEndPoint";
 import Router from "./Router.ts";
-import { setBasePath } from "./basePath.ts";
+import { addBaseToPath, getBasePath, setBasePath } from "./basePath.ts";
 
 setBasePath(manifest.base);
+
+// Markup is written base-free: the server adds the base to the links in its
+// HTML, and this adds it to the ones the client sets (dynamic attributes,
+// and pages and branches rendered on the client)
+const base = getBasePath();
+if (base) {
+	setUrlRewriter((url) => addBaseToPath(url, base));
+}
 
 // Build the router from the Site object created by the user
 const router = new Router();

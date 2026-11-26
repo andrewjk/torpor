@@ -1,3 +1,5 @@
+import { urlAttributeValue } from "./urlAttributes";
+
 export default function setAttribute(el: Element, name: string, value: any): void {
 	if (value === false || value === undefined || value === null) {
 		el.removeAttribute(name);
@@ -17,7 +19,7 @@ export default function setAttribute(el: Element, name: string, value: any): voi
 		if (setValueProperty(el, String(value))) return;
 	}
 
-	el.setAttribute(name, value);
+	el.setAttribute(name, urlAttributeValue(name, value));
 }
 
 /** Sets the `value` property on a form control; returns false for other elements. */

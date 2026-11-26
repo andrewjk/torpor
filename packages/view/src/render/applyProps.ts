@@ -1,5 +1,6 @@
 import $run from "../watch/$run";
 import { attachDelegatedEvent, isDelegatedEventType } from "./delegatedEvents";
+import { urlAttributeValue } from "./urlAttributes";
 
 export default function applyProps(
 	el: Element,
@@ -18,7 +19,7 @@ export default function applyProps(
 					}
 				} else {
 					$run(function setAttribute() {
-						el.setAttribute(name, value);
+						el.setAttribute(name, urlAttributeValue(name, value));
 					});
 				}
 			}

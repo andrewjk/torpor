@@ -1,3 +1,5 @@
+import { urlAttributeValue } from "./urlAttributes";
+
 export default function createElement(
 	tagName: string,
 	attributes: Record<string, string>,
@@ -8,7 +10,7 @@ export default function createElement(
 	// Reactive attributes will be set in $run effects
 	for (let [name, value] of Object.entries(attributes)) {
 		if (!isReactiveAttribute(name, value)) {
-			el.setAttribute(name, value);
+			el.setAttribute(name, urlAttributeValue(name, value));
 		}
 	}
 	for (let child of children) {

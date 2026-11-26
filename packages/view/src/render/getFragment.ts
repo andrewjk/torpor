@@ -1,3 +1,5 @@
+import { rewriteUrlsIn } from "./urlAttributes";
+
 export default function getFragment(
 	document: Document,
 	array: DocumentFragment[],
@@ -19,6 +21,8 @@ export default function getFragment(
 			template.innerHTML = html;
 			array[index] = template.content;
 		}
+		// Once per template, so clones share the rewritten URLs
+		rewriteUrlsIn(array[index]);
 	}
 
 	// Get the fragment from the array

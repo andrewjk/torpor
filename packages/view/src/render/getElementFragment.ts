@@ -22,6 +22,8 @@
  * @param ns When true, the template is created in the SVG namespace (its
  *   `firstElementChild` is then an SVG element).
  */
+import { rewriteUrlsIn } from "./urlAttributes";
+
 export default function getElementFragment(
 	document: Document,
 	array: Element[],
@@ -41,6 +43,8 @@ export default function getElementFragment(
 			template.innerHTML = html;
 			array[index] = template.content.firstElementChild!;
 		}
+		// Once per template, so clones share the rewritten URLs
+		rewriteUrlsIn(array[index]!);
 	}
 
 	// Import (rather than plain-clone) so the new element belongs to

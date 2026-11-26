@@ -134,13 +134,14 @@ prefetch. In rough order of value:
   pool); today it is sequential, which is slow for large sites. The page
   state is now kept per request (`site/requestPage.ts`), so it no longer forces this,
   but the module-global base path still would.
-- **Base path and client-set links** — with `site.basePath`, the server
-  adds the base to `href`/`src`/`action` attributes in its HTML
-  (`rewriteBaseInHtml`), but attributes the client sets don't get it: a
-  component that spreads `{$props.href}` (e.g. `@torpor/ui`'s `NavMenuLink`)
-  writes the base-free `/docs` back during hydration, so links lose the base
-  and navigate outside the site. Only hrefs built with `route()` are safe.
-  Either the client could add the base when setting link attributes, or the
-  docs should tell base path sites to build every link with `route()`.
 - **`adapter-github-pages`** — a thin adapter adding `.nojekyll` and
   `404.html` conventions on top of the prerendered output.
+
+## Client navigation drops the page title
+
+On the docs site, a client navigation from `/docs` to `/docs/markup` leaves
+`document.title` as plain "Torpor", while the server-rendered page's title
+is "Markup | Torpor". (Seen with and without `site.basePath`.) The client
+probably isn't applying the new page's head `title` after navigating, or a
+layout's title wins over the page's; check how `navigate.ts` merges head
+data compared with `mergeHead` on the server.

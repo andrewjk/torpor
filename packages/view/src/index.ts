@@ -35,6 +35,7 @@ import t_save_hydration from "./render/saveHydration";
 import t_head_element from "./render/headElement";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
+import { setUrlRewriter } from "./render/urlAttributes";
 import fromElement from "./stream/fromElement";
 import fromServer from "./stream/fromServer";
 import fromWebSocket from "./stream/fromWebSocket";
@@ -62,6 +63,9 @@ import $watch from "./watch/$watch";
 
 // Mount and hydrate
 export { mount, hydrate, unmount, fillLayoutSlot, clearLayoutSlot };
+
+// For host frameworks (e.g. @torpor/build's base path)
+export { setUrlRewriter };
 
 // Functions for the user that can be called from components
 export {
