@@ -2,10 +2,6 @@
  * Displays a colorized code preview.
  */
 export default function CodePreview($props: { code: string }) {
-	@head {
-		<title>Torpor</title>
-	}
-
 	let $state = $watch({
 		get code() {
 			return $props!.code;

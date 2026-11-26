@@ -1,4 +1,5 @@
 import devContext from "../dev/devContext";
+import { setDevSlotDepth } from "../dev/titleWarning";
 import type Component from "../types/Component";
 import type Region from "../types/Region";
 import type SlotRender from "../types/SlotRender";
@@ -67,9 +68,17 @@ export default function fillLayoutSlot(
 		refillDepths.delete(parent);
 	}
 
+	// In dev, note which layout slot is rendering, so that a page's title over
+	// its layouts' isn't reported as competing (see dev/titleWarning.ts)
+	const previousSlotDepth = devContext.enabled ? setDevSlotDepth(region.depth) : -1;
+
 	component(parent, anchor, $props, $context, {
 		_: slot,
 	});
+
+	if (devContext.enabled) {
+		setDevSlotDepth(previousSlotDepth);
+	}
 
 	popRegion(oldRegion);
 

@@ -130,12 +130,29 @@ function buildTitleNode(node: ElementNode, status: BuildStatus, b: Builder) {
 	}
 
 	status.imports.add("$run");
-	b.append("$run(() => {");
-	b.append(`
+	if (status.options.dev === true) {
+		// Warn about other mounted components' titles (see dev/titleWarning.ts)
+		status.imports.add("t_dev_title");
+		b.append(`{
+			const t_title_dev = t_dev_title();
+			$run(() => {
+				const t_old_title = document.title;
+				document.title = ${content};
+				t_title_dev.set(document.title);
+				return () => {
+					t_title_dev.unset();
+					document.title = t_old_title;
+				};
+			}, "runTitle");
+		}`);
+	} else {
+		b.append("$run(() => {");
+		b.append(`
 			const t_old_title = document.title;
 			document.title = ${content};
 			return () => document.title = t_old_title;
-		}${status.options.dev === true ? `, "runTitle"` : ""});`);
+		});`);
+	}
 }
 
 function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {

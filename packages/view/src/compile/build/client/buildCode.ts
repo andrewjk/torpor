@@ -75,6 +75,7 @@ const importsMap: Record<string, string> = {
 	devContext: 'import { devContext } from "${folder}/dev";',
 	t_push_dev_bound: 'import { t_push_dev_bound } from "${folder}/dev";',
 	t_pop_dev_bound: 'import { t_pop_dev_bound } from "${folder}/dev";',
+	t_dev_title: 'import { t_dev_title } from "${folder}/dev";',
 };
 
 export default function buildCode(

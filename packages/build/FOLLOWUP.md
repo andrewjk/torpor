@@ -136,12 +136,3 @@ prefetch. In rough order of value:
   but the module-global base path still would.
 - **`adapter-github-pages`** — a thin adapter adding `.nojekyll` and
   `404.html` conventions on top of the prerendered output.
-
-## Client navigation drops the page title
-
-On the docs site, a client navigation from `/docs` to `/docs/markup` leaves
-`document.title` as plain "Torpor", while the server-rendered page's title
-is "Markup | Torpor". (Seen with and without `site.basePath`.) The client
-probably isn't applying the new page's head `title` after navigating, or a
-layout's title wins over the page's; check how `navigate.ts` merges head
-data compared with `mergeHead` on the server.
